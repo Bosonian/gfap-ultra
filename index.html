@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iGFAP Check - Clinical Decision Support</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192x192.png" type="image/png">
+</head>
+<body>
+    <!-- Access Code Section -->
+    <section id="codeEntrySection">
+        <div class="logo-container">
+            <img src="hospital-logo.png" alt="Hospital Logo" id="appLogo">
+            <h1>iGFAP Check</h1>
+        </div>
+        <div class="card">
+            <h2>Access Required</h2>
+            <div class="input-group">
+                <label for="accessCodeInput">Enter Access Code:</label>
+                <input type="password" id="accessCodeInput" placeholder="XXXX-XXXX-XXXX">
+            </div>
+            <button id="submitAccessCode">Submit</button>
+            <p id="accessCodeError" class="error-message" hidden>Invalid access code</p>
+        </div>
+    </section>
+
+    <!-- Module Selection -->
+    <section id="moduleSelectionSection" hidden>
+        <header>
+            <h1>Select Diagnostic Module</h1>
+            <button id="logoutButton">Logout</button>
+        </header>
+        <div class="card-container">
+            <div class="card module-card" id="comaModuleButton">
+                <h2>Coma Module</h2>
+                <p>Evaluate GFAP levels in comatose patients</p>
+            </div>
+            <div class="card module-card" id="strokeModuleButton">
+                <h2>Stroke Module</h2>
+                <p>Predict intracerebral hemorrhage risk</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Coma Module -->
+    <section id="comaModuleSection" hidden>
+        <header>
+            <button id="backFromComa" class="back-button">← Back</button>
+            <h1>Coma Module</h1>
+        </header>
+        <div class="card">
+            <div class="input-group">
+                <label for="comaGfapInput">GFAP Value (pg/mL):</label>
+                <input type="number" id="comaGfapInput" min="0" step="0.1">
+            </div>
+            <button id="calculateComaRisk">Calculate Risk</button>
+            <div id="comaResult" class="outcome"></div>
+        </div>
+    </section>
+
+    <!-- Stroke Module: Screening Step -->
+    <section id="screeningSection" hidden>
+        <header>
+            <button id="backFromScreening" class="back-button">← Back</button>
+            <h1>Step 1: Initial Screening</h1>
+        </header>
+        <div class="card">
+            <div class="input-group">
+                <label for="screenAgeInput">Patient Age (years):</label>
+                <input type="number" id="screenAgeInput" min="18" max="120">
+            </div>
+            <div class="input-group">
+                <label for="screenGfapInput">GFAP Value (pg/mL):</label>
+                <input type="number" id="screenGfapInput" min="0" step="0.1">
+            </div>
+            <div class="input-group">
+                <label for="screenSbpInput">Systolic BP (mmHg):</label>
+                <input type="number" id="screenSbpInput" min="40" max="300">
+            </div>
+            <button id="calculateScreeningButton">Analyze Screening Data</button>
+            <div id="screeningResult" class="outcome"></div>
+        </div>
+    </section>
+
+    <!-- Stroke Module: Confirmation Step -->
+    <section id="confirmationSection" hidden>
+        <header>
+            <button id="backFromConfirmation" class="back-button">← Back</button>
+            <h1>Step 2: Detailed Assessment</h1>
+        </header>
+        <div class="card">
+            <h3>Pre-filled from Screening</h3>
+            <div class="input-group">
+                <label>Patient Age:</label>
+                <input type="number" id="confirmAgeInput" disabled>
+            </div>
+            <div class="input-group">
+                <label>GFAP Value:</label>
+                <input type="number" id="confirmGfapInput" disabled>
+            </div>
+            <div class="input-group">
+                <label>Systolic BP:</label>
+                <input type="number" id="confirmSbpInput" disabled>
+            </div>
+
+            <h3>Additional Parameters</h3>
+            <div class="input-group">
+                <label for="nihssInput">NIHSS Score:</label>
+                <input type="number" id="nihssInput" min="0" max="42">
+            </div>
+            <div class="input-group">
+                <label for="gcsInput">Glasgow Coma Scale:</label>
+                <input type="number" id="gcsInput" min="3" max="15">
+            </div>
+            
+            <!-- FAST-ED Calculator -->
+            <fieldset>
+                <legend>FAST-ED Score Calculator</legend>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" class="fast-ed" value="1"> Facial weakness</label>
+                    <label><input type="checkbox" class="fast-ed" value="1"> Arm weakness</label>
+                    <label><input type="checkbox" class="fast-ed" value="1"> Speech disturbance</label>
+                    <label><input type="checkbox" class="fast-ed" value="1"> Eye deviation</label>
+                    <label><input type="checkbox" class="fast-ed" value="1"> Denial/neglect</label>
+                </div>
+                <div class="input-group">
+                    <label>FAST-ED Total:</label>
+                    <input type="number" id="fastEdInput" min="0" max="5" readonly>
+                </div>
+            </fieldset>
+            
+            <button id="calculateConfirmationButton">Calculate Final Probability</button>
+            <div id="confirmationResult" class="outcome"></div>
+        </div>
+    </section>
+
+    <!-- Language and Theme Controls -->
+    <div class="controls">
+        <select id="languageSelector">
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+        </select>
+        <label class="theme-switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="translations.js"></script>
+    <script src="main.js"></script>
+    <script src="sw.js"></script>
+</body>
+</html>
