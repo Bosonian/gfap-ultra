@@ -1,688 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>iGFAP Check</title>
-    <style>
-        /* CSS Variables for Theming */
-        :root {
-            --primary: #007bff;
-            --primary-dark: #0069d9;
-            --secondary: #6c757d;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --background: #ffffff;
-            --text: #212529;
-            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            --transition: all 0.3s ease;
-            --input-bg: #ffffff;
-            --input-text: #212529;
-            --input-border: #ddd;
-            --result-green-bg: #e8f5e9;
-            --result-amber-bg: #fff8e1;
-            --result-red-bg: #ffebee;
-            --error-bg: #ffebee;
-            --error-text: #c62828;
-            --error-border: #f44336;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICH Prediction Tool</title>
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --primary-hover: #0056b3;
+      --background-color: #f8f9fa;
+      --container-bg: #ffffff;
+      --text-color: #333;
+      --result-high-bg: #f8d7da;
+      --result-high-text: #721c24;
+      --result-high-border: #f5c6cb;
+      --result-low-bg: #d4edda;
+      --result-low-text: #155724;
+      --result-low-border: #c3e6cb;
+    }
 
-        .dark-mode {
-            --primary: #409eff;
-            --primary-dark: #3a8ee6;
-            --secondary: #909399;
-            --success: #67c23a;
-            --danger: #f56c6c;
-            --warning: #e6a23c;
-            --background: #121212;
-            --text: #e0e0e0;
-            --light: #2d2d2d;
-            --card-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            --input-bg: #2d2d2d;
-            --input-text: #f8f9fa;
-            --input-border: #444;
-            --result-green-bg: #1c3b22;
-            --result-amber-bg: #4d3c1a;
-            --result-red-bg: #4d1f2a;
-            --error-bg: #4d1f2a;
-            --error-text: #f5c6cb;
-            --error-border: #f56c6c;
-        }
+    body.dark-mode {
+      --primary-color: #3399ff;
+      --primary-hover: #287ac7;
+      --background-color: #333;
+      --container-bg: #444;
+      --text-color: #f8f9fa;
+      --result-high-bg: #5c2a30;
+      --result-high-text: #f5c6cb;
+      --result-high-border: #721c24;
+      --result-low-bg: #2a5032;
+      --result-low-text: #c3e6cb;
+      --result-low-border: #155724;
+    }
 
-        /* General Styles */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background); color: var(--text);
-            line-height: 1.6; transition: var(--transition);
-            padding-bottom: 20px; min-height: 100vh;
-        }
-        .container {
-            max-width: 800px; margin: 20px auto; padding: 25px;
-            background-color: var(--light); border-radius: 12px;
-            box-shadow: var(--card-shadow); transition: var(--transition);
-            position: relative; overflow: hidden;
-        }
-        .hidden { display: none !important; }
-        h1, h2, h3 { margin-bottom: 20px; color: var(--primary); }
-
-        /* Header */
-        .app-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 20px; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .header-left h1 { margin: 0; font-size: 1.5rem; color: white; }
-        .header-right { display: flex; gap: 15px; align-items: center; }
-
-        /* Buttons & Actions */
-        button {
-            padding: 12px 20px; border: none; border-radius: 8px;
-            cursor: pointer; font-weight: 600; transition: var(--transition);
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            min-width: 120px; /* Ensure buttons have enough width for text */
-        }
-        button:disabled { opacity: 0.7; cursor: not-allowed; }
-        .primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .secondary { background-color: var(--secondary); color: white; }
-        .language-switcher button { padding: 5px; background: transparent; border-radius: 50%; width: 40px; height: 40px; overflow: hidden; min-width: 40px; }
-        .language-switcher img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
-        .home-button span { font-size: 1.2em; }
-        .action-buttons { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
-        .module-button-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .module-button-container button { width: 100%; max-width: 500px; }
-
-        /* Forms */
-        .input-group { margin-bottom: 25px; position: relative; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text); }
-        input, select {
-            width: 100%; padding: 12px 15px; border: 2px solid var(--input-border);
-            border-radius: 8px; font-size: 16px; transition: var(--transition);
-            background-color: var(--input-bg); color: var(--input-text);
-        }
-        input:focus, select:focus {
-            border-color: var(--primary); outline: none;
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
-        }
-        input[disabled] { background-color: color-mix(in srgb, var(--input-bg) 80%, var(--secondary) 20%); color: var(--secondary); }
-        .checkbox-group { margin-bottom: 12px; display: flex; align-items: center; }
-        .checkbox-group input { width: auto; margin-right: 10px; }
-        .score-calculator-group {
-            border: 1px solid var(--input-border); border-radius: 8px;
-            padding: 15px; margin-bottom: 20px; background-color: var(--input-bg);
-        }
-        .score-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .score-value-display { font-weight: bold; font-size: 1.2em; min-width: 30px; text-align: center; color: var(--text); }
-        .score-components { padding-top: 15px; border-top: 1px solid var(--input-border); }
-
-        /* Results & Info */
-        .result {
-            padding: 20px; border-radius: 10px; margin-top: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: var(--transition);
-            border-left: 5px solid; color: var(--text);
-        }
-        .outcome-green { background-color: var(--result-green-bg); border-left-color: var(--success); }
-        .outcome-amber { background-color: var(--result-amber-bg); border-left-color: var(--warning); }
-        .outcome-red { background-color: var(--result-red-bg); border-left-color: var(--danger); }
-        .error {
-            color: var(--error-text); background-color: var(--error-bg);
-            padding: 15px; border-radius: 8px; border: 1px solid var(--error-border);
-            margin-top: 15px; display: flex; align-items: center; gap: 10px;
-        }
-        .info-text-important {
-            background-color: var(--result-amber-bg); color: var(--text);
-            border-left: 5px solid var(--warning); padding: 15px;
-            margin-bottom: 25px; border-radius: 8px;
-            font-size: 1.1em; font-weight: 500;
-        }
-        .result-meta-info {
-            margin-top: 15px; padding-top: 10px;
-            border-top: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
-            font-size: 0.85em; opacity: 0.7;
-        }
-
-        /* Modal & Utilities */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
-            z-index: 1000; justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background-color: var(--light); color: var(--text); padding: 30px;
-            border-radius: 12px; max-width: 500px; width: 90%;
-            text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .disclaimer-text { margin-bottom: 25px; font-size: 18px; line-height: 1.5; }
-        .spinner {
-            display: inline-block; width: 20px; height: 20px;
-            border: 3px solid rgba(255,255,255,.3); border-radius: 50%;
-            border-top-color: white; animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        footer { text-align: center; margin-top: 30px; padding: 20px; color: var(--text); font-size: 0.9rem; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container { padding: 15px; margin: 15px; }
-            .app-header { flex-direction: column; gap: 15px; padding: 15px; }
-            .header-right { width: 100%; justify-content: space-between; }
-            .action-buttons { flex-direction: column; }
-            button { width: 100%; }
-        }
-    </style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; padding: 0; background-color: var(--background-color); color: var(--text-color); font-family: 'Arial', sans-serif; }
+    .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: var(--primary-color); color: white; position: fixed; top: 0; left: 0; right: 0; z-index: 999; }
+    .app-header h1 { margin: 0; font-size: 1.5em; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .language-switcher button,
+    #darkModeToggle { background: none; border: none; cursor: pointer; padding: 5px; color: white; font-size: 1.2em; }
+    .container { max-width: 500px; margin: 70px auto 20px; padding: 20px; background-color: var(--container-bg); border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    h2 { text-align: center; margin-bottom: 20px; }
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 15px; }
+    .input-group, .checkbox-group, .select-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input[type="number"], select { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ccc; border-radius: 5px; background-color: var(--background-color); color: var(--text-color); }
+    input:focus, select:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px var(--primary-hover); }
+    .checkbox-group { display: flex; align-items: center; }
+    .checkbox-group input[type="checkbox"] { margin-right: 8px; width: 18px; height: 18px; }
+    button.primary { background-color: var(--primary-color); color: white; border: none; border-radius: 5px; padding: 12px; font-size: 16px; font-weight: bold; width: 100%; cursor: pointer; transition: background-color 0.3s ease; }
+    button.primary:hover { background-color: var(--primary-hover); }
+    .result { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid; display: none; }
+    .result.high-risk { background-color: var(--result-high-bg); color: var(--result-high-text); border-color: var(--result-high-border); }
+    .result.low-risk { background-color: var(--result-low-bg); color: var(--result-low-text); border-color: var(--result-low-border); }
+    .result-prob { font-size: 2.5em; font-weight: bold; }
+    .result-label { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
+    .app-footer { text-align: center; padding: 20px 0; color: var(--secondary-color); }
+  </style>
 </head>
 <body>
-    <!-- App Header -->
-    <header class="app-header">
-        <div class="header-left"><h1 data-translate="appTitle">iGFAP Check</h1></div>
-        <div class="header-right">
-            <div class="language-switcher">
-                <button onclick="switchLanguage('en')" aria-label="Switch to English" title="Switch to English"><img src="https://flagcdn.com/gb.svg" alt="English" /></button>
-                <button onclick="switchLanguage('de')" aria-label="Switch to German" title="Switch to German"><img src="https://flagcdn.com/de.svg" alt="Deutsch" /></button>
-            </div>
-            <button id="darkModeToggle" aria-label="Toggle dark mode"><span>🌙</span></button>
-            <button class="home-button" id="homeButton" onclick="navigateToModuleSelection()">
-                <span data-translate="homeButtonText">🏠 Home</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Access Code Entry Section -->
-    <section id="codeEntrySection" class="container">
-        <p data-translate="codePrompt">🔑 Please enter your access code:</p>
-        <div class="input-group">
-            <input type="password" id="accessCodeInput" placeholder="Enter access code" />
-        </div>
-        <button class="primary" id="accessCodeButton"><span data-translate="accessCodeButtonText">Submit</span></button>
-        <p id="accessError" class="error hidden"></p>
-    </section>
-
-    <!-- Module Selection Section -->
-    <section id="moduleSelectionSection" class="container hidden">
-        <h2 data-translate="moduleSelectionTitle">Check probability for:</h2>
-        <div class="module-button-container">
-            <button class="primary" id="comaModuleButton"><span data-translate="comaModuleButtonText">Intracranial hemorrhage in comatose patients (GCS 3-8)</span></button>
-            <button class="primary" id="strokeModuleButton"><span data-translate="strokeModuleButtonText">Intracerebral hemorrhage in patients with stroke symptoms</span></button>
-        </div>
-    </section>
-
-    <!-- Coma Module Section -->
-    <section id="comaModuleSection" class="container hidden">
-        <h2 data-translate="comaModuleTitle">Intracranial hemorrhage in comatose patients (GCS 3-8)</h2>
-        <div class="input-group">
-            <label for="gfapComaInput" data-translate="gfapComaLabel">GFAP Value (pg/mL)</label>
-            <input type="number" id="gfapComaInput" min="29" max="10001" placeholder="Enter GFAP value" />
-        </div>
-        <div class="action-buttons">
-            <button class="primary" id="calculateComaButton"><span data-translate="calculateComaButtonText">Calculate Probability</span></button>
-            <button class="secondary" id="comaBackButton" onclick="navigateToModuleSelection()"><span data-translate="comaBackButtonText">⬅️ Back</span></button>
-        </div>
-        <p id="comaError" class="error hidden"></p>
-        <div class="result hidden" id="comaResult" aria-live="polite"></div>
-    </section>
-
-    <!-- Step 1: High-Sensitivity Screening Section -->
-    <section id="screeningSection" class="container hidden">
-        <h2 data-translate="screeningTitle"></h2>
-        <div class="input-group"><label for="screenAgeInput" data-translate="screenAgeLabel"></label><input type="number" id="screenAgeInput" min="18" max="120" /></div>
-        <div class="input-group"><label for="screenGfapInput" data-translate="screenGfapLabel"></label><input type="number" id="screenGfapInput" min="29" max="10001" /></div>
-        <div class="input-group"><label for="screenSbpInput" data-translate="screenSbpLabel"></label><input type="number" id="screenSbpInput" min="50" max="250" /></div>
-        <div class="action-buttons">
-            <button class="primary" id="calculateScreeningButton"><span data-translate="calculateScreeningButtonText"></span></button>
-            <button class="secondary" id="screeningBackButton" onclick="navigateToModuleSelection()"><span data-translate="screeningBackButtonText"></span></button>
-        </div>
-        <div class="result hidden" id="screeningResult" aria-live="polite"></div>
-        <p id="screeningError" class="error hidden"></p>
-    </section>
-
-    <!-- Step 2: High-Specificity Confirmation Section -->
-    <section id="confirmationSection" class="container hidden">
-        <h2 data-translate="confirmationTitle"></h2>
-        <p data-translate="confirmationInfoText" class="info-text-important"></p>
-        
-        <div class="input-group"><label for="confirmAgeInput" data-translate="confirmAgeLabel"></label><input type="number" id="confirmAgeInput" disabled /></div>
-        <div class="input-group"><label for="confirmGfapInput" data-translate="confirmGfapLabel"></label><input type="number" id="confirmGfapInput" disabled /></div>
-        <div class="input-group"><label for="confirmSbpInput" data-translate="confirmSbpLabel"></label><input type="number" id="confirmSbpInput" disabled /></div>
-        <div class="input-group"><label for="confirmDbpInput" data-translate="confirmDbpLabel"></label><input type="number" id="confirmDbpInput" min="30" max="200" /></div>
-        
-        <div class="input-group score-calculator-group">
-            <div class="score-header">
-                <label data-translate="advFastEdDisplayLabel"></label><span id="confirmFastEdScoreDisplay" class="score-value-display">0</span>
-                <button type="button" class="secondary" id="confirmToggleFastEdBtn"><span data-translate="toggleFastEdBtnText"></span></button>
-                <input type="hidden" id="confirmFastEdInput" value="0" />
-            </div>
-            <div id="fastEdComponentsContainerConfirm" class="score-components hidden">
-                <p data-translate="fastEdInfoText" style="font-size: 0.9em; margin-bottom: 10px;"></p>
-                <div class="checkbox-group"><input type="checkbox" id="confirmFastEdFacialPalsy" /><label for="confirmFastEdFacialPalsy" data-translate="fastEdFacialPalsyLabel"></label></div>
-                <div class="input-group"><label for="confirmFastEdArmWeakness" data-translate="fastEdArmWeaknessLabel"></label><select id="confirmFastEdArmWeakness" class="score-select"><option value="0" data-translate="fastEdArm0Label"></option><option value="1" data-translate="fastEdArm1Label"></option><option value="2" data-translate="fastEdArm2Label"></option></select></div>
-                <div class="input-group"><label for="confirmFastEdSpeechChanges" data-translate="fastEdSpeechChangesLabel"></label><select id="confirmFastEdSpeechChanges" class="score-select"><option value="0" data-translate="fastEdSpeech0Label"></option><option value="1" data-translate="fastEdSpeech1Label"></option><option value="2" data-translate="fastEdSpeech2Label"></option></select></div>
-                <div class="input-group"><label for="confirmFastEdEyeDeviation" data-translate="fastEdEyeDeviationLabel"></label><select id="confirmFastEdEyeDeviation" class="score-select"><option value="0" data-translate="fastEdEye0Label"></option><option value="1" data-translate="fastEdEye1Label"></option><option value="2" data-translate="fastEdEye2Label"></option></select></div>
-                <div class="input-group"><label for="confirmFastEdDenialNeglect" data-translate="fastEdDenialNeglectLabel"></label><select id="confirmFastEdDenialNeglect" class="score-select"><option value="0" data-translate="fastEdDenial0Label"></option><option value="1" data-translate="fastEdDenial1Label"></option><option value="2" data-translate="fastEdDenial2Label"></option></select></div>
-            </div>
-        </div>
-
-        <p data-translate="advAdditionalSymptomsLabel" style="font-weight: bold; margin-top: 20px; margin-bottom: 10px;"></p>
-        <div class="checkbox-group"><input type="checkbox" id="confirmEyeDeviationInput" /><label for="confirmEyeDeviationInput" data-translate="advEyeDeviationLabel"></label></div>
-        <div class="checkbox-group"><input type="checkbox" id="confirmArmParesisInput" /><label for="confirmArmParesisInput" data-translate="advArmParesisLabel"></label></div>
-        <div class="checkbox-group"><input type="checkbox" id="confirmLegParesisInput" /><label for="confirmLegParesisInput" data-translate="advLegParesisLabel"></label></div>
-        <div class="checkbox-group"><input type="checkbox" id="confirmAlteredSensoriumInput" /><label for="confirmAlteredSensoriumInput" data-translate="advAlteredSensoriumLabel"></label></div>
-        <div class="checkbox-group"><input type="checkbox" id="confirmHeadacheInput" /><label for="confirmHeadacheInput" data-translate="advHeadacheLabel"></label></div>
-        <div class="checkbox-group"><input type="checkbox" id="confirmAfibInput" /><label for="confirmAfibInput" data-translate="advAfibLabel"></label></div>
-        <div class="checkbox-group"><input type="checkbox" id="confirmAnticoagulantsInput" /><label for="confirmAnticoagulantsInput" data-translate="advAnticoagulantsLabel"></label></div>
-        <div class="checkbox-group"><input type="checkbox" id="confirmAntiplateletsInput" /><label for="confirmAntiplateletsInput" data-translate="advAntiplateletsLabel"></label></div>
-
-        <div class="action-buttons">
-            <button class="primary" id="calculateConfirmationButton"><span data-translate="calculateConfirmationButtonText"></span></button>
-            <button class="secondary" id="confirmationBackButton"><span data-translate="confirmationBackButtonText"></span></button>
-        </div>
-        <div class="result hidden" id="confirmationResult" aria-live="polite"></div>
-        <p id="confirmationError" class="error hidden"></p>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
-        <p><small data-translate="footerDisclaimer"></small></p>
-    </footer>
-
-    <!-- Disclaimer Modal -->
-    <div id="disclaimerModal" class="modal" role="dialog" aria-modal="true">
-        <div class="modal-content">
-            <p class="disclaimer-text" data-translate="disclaimerText"></p>
-            <button class="primary" id="disclaimerConfirmButton"><span data-translate="disclaimerConfirmButtonText"></span></button>
-        </div>
+  <header class="app-header">
+    <h1 id="appTitle">ICH Prediction</h1>
+    <div class="header-right">
+      <div class="language-switcher">
+        <button onclick="switchLanguage('en')" aria-label="Switch to English"><img src="https://flagcdn.com/gb.svg" alt="English"></button>
+        <button onclick="switchLanguage('de')" aria-label="Switch to German"><img src="https://flagcdn.com/de.svg" alt="Deutsch"></button>
+      </div>
+      <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
     </div>
+  </header>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // --- Global State & Config ---
-        let currentLang = "en";
-        let pendingResult = null;
-        let screeningDataCache = {}; 
-        const API_URLS = {
-            validate: "https://europe-west3-igfap-452720.cloudfunctions.net/validateAccessCode",
-            screen: "https://europe-west3-igfap-452720.cloudfunctions.net/screen",
-            confirm: "https://europe-west3-igfap-452720.cloudfunctions.net/confirm"
-        };
-        const MODEL_PERFORMANCE = {
-            screening: { sens: '90.9%', spec: '46.9%' },
-            confirmation: { sens: '72.7%', spec: '93.8%' }
-        };
+  <section class="container">
+    <h2 id="strokeModuleTitle">Intracerebral Hemorrhage Prediction</h2>
+    <form id="ich-form">
+      <div class="grid-container">
+        <div class="input-group">
+          <label for="age_years" id="ageLabel">Age (years)</label>
+          <input type="number" id="age_years" min="18" max="120" step="1" placeholder="e.g., 75" required>
+        </div>
+        <div class="input-group">
+          <label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label>
+          <input type="number" id="systolic_bp" min="80" max="300" step="1" placeholder="e.g., 160" required>
+        </div>
+        <div class="input-group">
+          <label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label>
+          <input type="number" id="gfap_value" min="29" max="10001" step="0.01" placeholder="e.g., 2875" required>
+        </div>
 
-        // --- Translations ---
-        const translations = {
-            en: {
-                appTitle: "iGFAP Check", homeButtonText: "🏠 Home",
-                codePrompt: "🔑 Please enter your access code:", accessCodeButtonText: "Submit",
-                moduleSelectionTitle: "Check probability for:",
-                comaModuleButtonText: "Intracranial hemorrhage in comatose patients (GCS 3-8)",
-                strokeModuleButtonText: "Intracerebral hemorrhage in patients with stroke symptoms",
-                comaModuleTitle: "Intracranial hemorrhage in comatose patients (GCS 3-8)",
-                calculateComaButtonText: "Calculate Probability", comaBackButtonText: "⬅️ Back",
-                screeningTitle: "Step 1: High-Sensitivity Screening",
-                confirmationTitle: "Step 2: High-Specificity Confirmation",
-                confirmationInfoText: "ICH Possible. Please provide additional data for a more accurate prediction.",
-                calculateScreeningButtonText: "Analyze Screening Data", screeningBackButtonText: "⬅️ Back",
-                calculateConfirmationButtonText: "Calculate Final Probability", confirmationBackButtonText: "⬅️ Back",
-                gfapComaLabel: "GFAP Value (pg/mL)", screenAgeLabel: "Patient Age (Years)",
-                screenSbpLabel: "Systolic BP (mmHg)", screenGfapLabel: "GFAP Value (pg/mL)",
-                confirmAgeLabel: "Patient Age (Years)", confirmSbpLabel: "Systolic BP (mmHg)",
-                confirmGfapLabel: "GFAP Value (pg/mL)", confirmDbpLabel: "Diastolic BP (mmHg)",
-                advFastEdDisplayLabel: "FAST ED Score:",
-                advAdditionalSymptomsLabel: "Additional Symptoms & History (check if present):",
-                advEyeDeviationLabel: "Eye Deviation", advArmParesisLabel: "Arm Paresis",
-                advLegParesisLabel: "Leg Paresis", advAlteredSensoriumLabel: "Altered Sensorium",
-                advHeadacheLabel: "Headache", advAfibLabel: "Atrial Fibrillation",
-                advAnticoagulantsLabel: "On Anticoagulants", advAntiplateletsLabel: "On Antiplatelets",
-                toggleFastEdBtnText: "Calculate/Edit", toggleFastEdBtnHideText: "Hide Components",
-                fastEdInfoText: "Select present findings for FAST ED:",
-                fastEdFacialPalsyLabel: "Facial Palsy", fastEdArmWeaknessLabel: "Arm Weakness",
-                fastEdArm0Label: "0 – No drift", fastEdArm1Label: "1 – Drifts", fastEdArm2Label: "2 – Falls",
-                fastEdSpeechChangesLabel: "Speech Changes", fastEdSpeech0Label: "0 – Normal",
-                fastEdSpeech1Label: "1 – Mild", fastEdSpeech2Label: "2 – Severe",
-                fastEdEyeDeviationLabel: "Eye Deviation", fastEdEye0Label: "0 – Absent",
-                fastEdEye1Label: "1 – Partial", fastEdEye2Label: "2 – Forced",
-                fastEdDenialNeglectLabel: "Denial/Neglect", fastEdDenial0Label: "0 – Absent",
-                fastEdDenial1Label: "1 – Mild", fastEdDenial2Label: "2 – Severe",
-                invalidInput: "Please enter valid values for all fields.",
-                serverError: "An error occurred with the server. Please try again.", accessError: "Invalid access code.",
-                disclaimerText: "The calculations are for research purposes only. Do not make clinical decisions based on this result.",
-                footerDisclaimer: "For research purposes only. Do not use for clinical decisions.",
-                disclaimerConfirmButtonText: "Confirm", resultTitle: "Calculation Result", newCalculation: "🔄 New Calculation",
-                outcomeA: "<strong>ICH Unlikely</strong><br>Probability of ICH: [PROB]%<br>The screening model indicates a low probability of ICH. This is not a definitive exclusion.",
-                outcomeB: "<strong>ICH Highly Likely</strong><br>Probability of ICH: [PROB]%<br>The confirmation model indicates a high probability of ICH. This patient is a candidate for immediate intervention.",
-                outcomeC: "<strong>ICH Unconfirmed (Grey Zone)</strong><br>Probability of ICH: [PROB]%<br>The confirmation model could not confirm a high probability of ICH. A CT scan remains essential for diagnosis."
-            },
-            de: {
-                appTitle: "iGFAP Check", homeButtonText: "🏠 Start",
-                codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:", accessCodeButtonText: "Absenden",
-                moduleSelectionTitle: "Wahrscheinlichkeit prüfen für:",
-                comaModuleButtonText: "Intrakranielle Blutung bei komatösen Patienten (GCS 3-8)",
-                strokeModuleButtonText: "Intrazerebrale Blutung bei Patienten mit Schlaganfallsymptomen",
-                comaModuleTitle: "Intrakranielle Blutung bei komatösen Patienten (GCS 3-8)",
-                calculateComaButtonText: "Wahrscheinlichkeit berechnen", comaBackButtonText: "⬅️ Zurück",
-                screeningTitle: "Schritt 1: Hochsensitives Screening",
-                confirmationTitle: "Schritt 2: Hochspezifische Bestätigung",
-                confirmationInfoText: "ICH möglich. Bitte geben Sie zusätzliche Daten für eine genauere Vorhersage an.",
-                calculateScreeningButtonText: "Screening-Daten analysieren", screeningBackButtonText: "⬅️ Zurück",
-                calculateConfirmationButtonText: "Endgültige Wahrscheinlichkeit berechnen", confirmationBackButtonText: "⬅️ Zurück",
-                gfapComaLabel: "GFAP-Wert (pg/mL)", screenAgeLabel: "Patientenalter (Jahre)",
-                screenSbpLabel: "Systolischer RR (mmHg)", screenGfapLabel: "GFAP-Wert (pg/mL)",
-                confirmAgeLabel: "Patientenalter (Jahre)", confirmSbpLabel: "Systolischer RR (mmHg)",
-                confirmGfapLabel: "GFAP-Wert (pg/mL)", confirmDbpLabel: "Diastolischer RR (mmHg)",
-                advFastEdDisplayLabel: "FAST-ED-Score:",
-                advAdditionalSymptomsLabel: "Zusätzliche Symptome & Anamnese (ankreuzen, falls vorhanden):",
-                advEyeDeviationLabel: "Blickdeviation", advArmParesisLabel: "Armparese",
-                advLegParesisLabel: "Beinparese", advAlteredSensoriumLabel: "Bewusstseinsveränderung",
-                advHeadacheLabel: "Kopfschmerzen", advAfibLabel: "Vorhofflimmern",
-                advAnticoagulantsLabel: "Unter Antikoagulanzien", advAntiplateletsLabel: "Unter Thrombozytenaggregationshemmern",
-                toggleFastEdBtnText: "Berechnen/Bearbeiten", toggleFastEdBtnHideText: "Komponenten ausblenden",
-                fastEdInfoText: "Wählen Sie vorhandene Befunde für FAST-ED:",
-                fastEdFacialPalsyLabel: "Fazialisparese", fastEdArmWeaknessLabel: "Armschwäche",
-                fastEdArm0Label: "0 – Kein Absinken", fastEdArm1Label: "1 – Sinkt ab", fastEdArm2Label: "2 – Fällt",
-                fastEdSpeechChangesLabel: "Sprachstörung", fastEdSpeech0Label: "0 – Normal",
-                fastEdSpeech1Label: "1 – Leicht", fastEdSpeech2Label: "2 – Schwer",
-                fastEdEyeDeviationLabel: "Blickdeviation", fastEdEye0Label: "0 – Abwesend",
-                fastEdEye1Label: "1 – Partiell", fastEdEye2Label: "2 – Forciert",
-                fastEdDenialNeglectLabel: "Neglect/Anosognosie", fastEdDenial0Label: "0 – Abwesend",
-                fastEdDenial1Label: "1 – Leicht", fastEdDenial2Label: "2 – Schwer",
-                invalidInput: "Bitte für alle Felder gültige Werte eingeben.",
-                serverError: "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es erneut.", accessError: "Ungültiger Zugangscode.",
-                disclaimerText: "Die Berechnungen dienen nur zu Forschungszwecken. Treffen Sie keine klinischen Entscheidungen basierend auf diesem Ergebnis.",
-                footerDisclaimer: "Nur für Forschungszwecke. Nicht für klinische Entscheidungen verwenden.",
-                disclaimerConfirmButtonText: "Bestätigen", resultTitle: "Ergebnis der Berechnung", newCalculation: "🔄 Neue Berechnung",
-                outcomeA: "<strong>ICH unwahrscheinlich</strong><br>ICH-Wahrscheinlichkeit: [PROB]%<br>Das Screening-Modell weist auf eine geringe Wahrscheinlichkeit hin. Dies ist jedoch kein definitiver Ausschluss.",
-                outcomeB: "<strong>ICH sehr wahrscheinlich</strong><br>ICH-Wahrscheinlichkeit: [PROB]%<br>Das Bestätigungsmodell weist auf eine hohe Wahrscheinlichkeit hin. Dieser Patient ist ein Kandidat für sofortige Intervention.",
-                outcomeC: "<strong>ICH nicht bestätigt (Graubereich)</strong><br>ICH-Wahrscheinlichkeit: [PROB]%<br>Das Bestätigungsmodell konnte eine hohe Wahrscheinlichkeit nicht bestätigen. Eine CT-Untersuchung bleibt unerlässlich."
-            }
-        };
+        <!-- Binary features now as checkboxes -->
+        <div class="checkbox-group">
+          <input type="checkbox" id="eye_deviation">
+          <label for="eye_deviation" id="eyeDeviationLabel">Eye Deviation</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="armparese">
+          <label for="armparese" id="armpareseLabel">Arm Paresis</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="beinparese">
+          <label for="beinparese" id="beinpareseLabel">Leg Paresis</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="atrial_fibrillation">
+          <label for="atrial_fibrillation" id="afibLabel">History of Atrial Fibrillation</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="antiplatelets">
+          <label for="antiplatelets" id="antiplateletsLabel">On Antiplatelets</label>
+        </div>
 
-        // --- DOM Elements ---
-        const sections = {
-            codeEntry: document.getElementById("codeEntrySection"), moduleSelection: document.getElementById("moduleSelectionSection"),
-            comaModule: document.getElementById("comaModuleSection"), screening: document.getElementById("screeningSection"),
-            confirmation: document.getElementById("confirmationSection"),
-        };
-        const allSectionIds = Object.keys(sections).map(k => sections[k].id);
+        <!-- Tri-state for headache remains a select -->
+        <div class="select-group" style="grid-column:1 / -1;">
+          <label for="headache" id="headacheLabel">Headache?</label>
+          <select id="headache">
+            <option value="" disabled selected>Choose…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+            <option value="-1">Unknown</option>
+          </select>
+        </div>
+      </div>
 
-        // --- UI & State Management ---
-        function showSection(sectionKey) {
-            allSectionIds.forEach(id => document.getElementById(id)?.classList.toggle("hidden", id !== sections[sectionKey].id));
-            setTimeout(() => sections[sectionKey].querySelector('input:not([disabled]), button')?.focus(), 50);
-        }
+      <button type="button" id="calculateButton" class="primary" id="calculateButton">Calculate Probability</button>
+    </form>
 
-        function switchLanguage(lang) {
-            currentLang = lang; document.documentElement.lang = lang; localStorage.setItem("language", lang);
-            const t = translations[lang] || translations.en;
-            document.querySelectorAll('[data-translate]').forEach(el => {
-                const key = el.dataset.translate;
-                if (t[key]) {
-                    el.innerHTML = t[key];
-                }
-            });
-        }
-        window.switchLanguage = switchLanguage;
+    <div class="result" id="result-container">
+      <div class="result-label" id="result-title"></div>
+      <div class="result-prob" id="result-probability"></div>
+    </div>
+  </section>
 
-        function navigateToModuleSelection() {
-            screeningDataCache = {}; 
-            if (sessionStorage.getItem("isAuthenticated") !== "true") { showSection("codeEntry"); return; }
-            showSection("moduleSelection");
-            document.querySelectorAll('.result, .error').forEach(el => el.classList.add('hidden'));
-        }
-        window.navigateToModuleSelection = navigateToModuleSelection;
-        
-        function resetStrokeModule() {
-            [...sections.screening.querySelectorAll('input'), ...sections.confirmation.querySelectorAll('input:not([disabled])')].forEach(i => i.value = '');
-            sections.confirmation.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-            sections.confirmation.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
-            recalculateFastEdScore();
-            navigateToModuleSelection();
-            showSection('screening');
-        }
+  <footer class="app-footer">
+    <p>© <span id="currentYear"></span> All rights reserved.</p>
+  </footer>
 
-        function showDisclaimer() { document.getElementById("disclaimerModal").style.display = "flex"; }
-        function closeDisclaimerAndShowResult() {
-            document.getElementById("disclaimerModal").style.display = "none";
-            if (!pendingResult || !pendingResult.element) return;
-            let finalHtml = pendingResult.html;
-            if (pendingResult.meta) {
-                finalHtml += `<div class="result-meta-info">Model Performance: Sensitivity ${pendingResult.meta.sens}, Specificity ${pendingResult.meta.spec}</div>`;
-            }
-            pendingResult.element.innerHTML = finalHtml;
-            pendingResult.element.className = `result ${pendingResult.riskClass}`;
-            const actionContainer = document.createElement('div');
-            actionContainer.className = 'action-buttons';
-            pendingResult.actions.forEach(action => {
-                const button = document.createElement('button');
-                button.className = action.primary ? 'primary' : 'secondary';
-                button.innerHTML = `<span data-translate="${action.translateKey}">${action.label}</span>`;
-                button.addEventListener('click', action.handler);
-                actionContainer.appendChild(button);
-            });
-            pendingResult.element.appendChild(actionContainer);
-            pendingResult.element.classList.remove("hidden");
-            switchLanguage(currentLang);
-            pendingResult = null;
-        }
+  <script>
+    // Model parameters
+    const INTERCEPT = -0.72549447;
+    const COEFFICIENTS = { age_years:-0.20927, eye_deviation:-0.26763, armparese:0.11730, beinparese:0.42467, atrial_fibrillation:-0.24687, systolic_bp:0.36337, antiplatelets:-0.52928, gfap_value:0.98846, headache:0.43796 };
+    const MEDIANS = { age_years:78.0, eye_deviation:0.0, armparese:1.0, beinparese:1.0, atrial_fibrillation:0.0, systolic_bp:160.0, antiplatelets:0.0, gfap_value:3.78419, headache:0.0 };
+    const IQRS    = { age_years:18.0, eye_deviation:1.0, armparese:1.0, beinparese:1.0, atrial_fibrillation:1.0, systolic_bp:41.5, antiplatelets:1.0, gfap_value:0.98704, headache:0.5 };
+    const IMPUTED_HEADACHE = 0.0;
+    const OPTIMAL_THRESHOLD = 0.61;
 
-        function setButtonLoading(button, isLoading) {
-            if (!button) return;
-            button.disabled = isLoading;
-            const span = button.querySelector("span");
-            if (!span) return;
-            const spinner = button.querySelector('.spinner');
-            if (isLoading && !spinner) {
-                const newSpinner = document.createElement('span');
-                newSpinner.className = 'spinner';
-                button.insertBefore(newSpinner, span);
-                span.style.display = 'none';
-            } else if (!isLoading && spinner) {
-                spinner.remove();
-                span.style.display = 'inline';
-            }
-        }
-        
-        // --- Core Logic ---
-        async function handleApiCall(url, payload, button, errorId, successCallback) {
-            document.getElementById(errorId).classList.add("hidden");
-            setButtonLoading(button, true);
-            try {
-                const response = await fetch(url, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.message || 'Server error');
-                successCallback(result);
-            } catch (error) {
-                console.error(`API call to ${url} failed:`, error);
-                const errorEl = document.getElementById(errorId);
-                errorEl.textContent = translations[currentLang].serverError;
-                errorEl.classList.remove("hidden");
-            } finally {
-                setButtonLoading(button, false);
-            }
-        }
-        
-        function validateAccessCode() {
-            const accessCode = document.getElementById("accessCodeInput").value.trim();
-            if (!accessCode) {
-                 document.getElementById("accessError").textContent = translations[currentLang].invalidInput;
-                 document.getElementById("accessError").classList.remove("hidden");
-                return;
-            };
-            sessionStorage.setItem("isAuthenticated", "true");
-            navigateToModuleSelection();
-        }
-        
-        // UPDATED: Using the client-side calculation function provided by the user
-        function calculateComaRisk() {
-            const gfapInput = document.getElementById("gfapComaInput");
-            const errorEl = document.getElementById("comaError");
-            const gfap = parseFloat(gfapInput.value);
+    // Translations
+    const translations = {
+      en:{appTitle:"ICH Prediction", strokeModuleTitle:"Intracerebral Hemorrhage Prediction", ageLabel:"Age (years)", agePlaceholder:"e.g., 75", sbpLabel:"Systolic BP (mmHg)", sbpPlaceholder:"e.g., 160", gfapLabel:"GFAP Value (pg/mL)", gfapPlaceholder:"e.g., 2875", eyeDeviationLabel:"Eye Deviation", armpareseLabel:"Arm Paresis", beinpareseLabel:"Leg Paresis", afibLabel:"History of Atrial Fibrillation", antiplateletsLabel:"On Antiplatelets", headacheLabel:"Headache?", calculateButton:"Calculate Probability", highRisk:"High Risk: ICH Suspected", lowRisk:"Low Risk: ICH Unlikely", darkModeToggleLabelOn:"Switch to Light Mode", darkModeToggleLabelOff:"Switch to Dark Mode"},
+      de:{appTitle:"ICB-Vorhersage", strokeModuleTitle:"Vorhersage einer intrazerebralen Blutung", ageLabel:"Alter (Jahre)", agePlaceholder:"z. B. 75", sbpLabel:"Systolischer RR (mmHg)", sbpPlaceholder:"z. B. 160", gfapLabel:"GFAP-Wert (pg/mL)", gfapPlaceholder:"z. B. 2875", eyeDeviationLabel:"Blickdeviation", armpareseLabel:"Armparese", beinpareseLabel:"Beinparese", afibLabel:"Vorhofflimmern-Anamnese", antiplateletsLabel:"Unter TAH", headacheLabel:"Kopfschmerzen?", calculateButton:"Wahrscheinlichkeit berechnen", highRisk:"Hohes Risiko: ICB vermutet", lowRisk:"Geringes Risiko: ICB unwahrscheinlich", darkModeToggleLabelOn:"Heller Modus", darkModeToggleLabelOff:"Dunkler Modus"}
+    };
 
-            errorEl.classList.add("hidden"); 
+    let currentLang = 'en';
 
-            if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
-                errorEl.textContent = "Please enter a valid GFAP value between 29 and 10001 pg/mL.";
-                errorEl.classList.remove("hidden");
-                return;
-            }
-
-            // Logistic regression formula from Mark 6
-            const log10GFAP = Math.log10(gfap);
-            const probability = 1 / (1 + Math.exp(-(2.5156 * log10GFAP - 6.2781)));
-
-            const percent = (probability * 100).toFixed(1);
-            const t = translations[currentLang];
-
-            pendingResult = {
-                element: document.getElementById("comaResult"),
-                html: `<h3>${t.resultTitle}</h3><p>Probability: <strong>${percent}%</strong></p>`,
-                riskClass: 'outcome-amber',
-                actions: [{ 
-                    label: t.newCalculation, 
-                    primary: true, 
-                    handler: () => {
-                        gfapInput.value = '';
-                        document.getElementById("comaResult").classList.add('hidden');
-                    },
-                    translateKey: 'newCalculation'
-                }]
-            };
-            showDisclaimer();
-        }
-
-
-        function handleScreening() {
-            const ageInput = document.getElementById("screenAgeInput"), gfapInput = document.getElementById("screenGfapInput"), sbpInput = document.getElementById("screenSbpInput");
-            if (!ageInput.value || !gfapInput.value || !sbpInput.value) {
-                document.getElementById("screeningError").textContent = translations[currentLang].invalidInput;
-                document.getElementById("screeningError").classList.remove("hidden");
-                return;
-            }
-            const payload = {
-                "Age (years)": parseInt(ageInput.value), "GFAP value": parseFloat(gfapInput.value), "Systolic BP": parseFloat(sbpInput.value)
-            };
-            screeningDataCache = payload;
-            handleApiCall(API_URLS.screen, payload, document.getElementById("calculateScreeningButton"), "screeningError", (result) => {
-                if (result.outcome === 'ICH_UNLIKELY') {
-                    const prob = (result.probability * 100).toFixed(1), t = translations[currentLang];
-                    pendingResult = {
-                        element: document.getElementById("screeningResult"), html: t.outcomeA.replace('[PROB]', prob),
-                        riskClass: 'outcome-green', meta: MODEL_PERFORMANCE.screening,
-                        actions: [{ label: t.newCalculation, primary: true, handler: resetStrokeModule, translateKey: 'newCalculation' }]
-                    };
-                    showDisclaimer();
-                } else if (result.outcome === 'PROCEED_TO_STEP_2') {
-                    document.getElementById('confirmAgeInput').value = screeningDataCache['Age (years)'];
-                    document.getElementById('confirmGfapInput').value = screeningDataCache['GFAP value'];
-                    document.getElementById('confirmSbpInput').value = screeningDataCache['Systolic BP'];
-                    showSection('confirmation');
-                }
-            });
-        }
-
-        function recalculateFastEdScore() {
-            let score = 0;
-            if (document.getElementById("confirmFastEdFacialPalsy").checked) score += 1;
-            const armWeaknessVal = parseInt(document.getElementById("confirmFastEdArmWeakness").value);
-            const eyeDeviationVal = parseInt(document.getElementById("confirmFastEdEyeDeviation").value);
-            score += armWeaknessVal;
-            score += parseInt(document.getElementById("confirmFastEdSpeechChanges").value);
-            score += eyeDeviationVal;
-            score += parseInt(document.getElementById("confirmFastEdDenialNeglect").value);
-            document.getElementById("confirmFastEdInput").value = score;
-            document.getElementById("confirmFastEdScoreDisplay").textContent = score;
-            document.getElementById("confirmArmParesisInput").checked = armWeaknessVal > 0;
-            document.getElementById("confirmEyeDeviationInput").checked = eyeDeviationVal > 0;
-        }
-
-        function handleConfirmation() {
-            const dbpInput = document.getElementById('confirmDbpInput');
-            if (!dbpInput.value) {
-                document.getElementById("confirmationError").textContent = translations[currentLang].invalidInput;
-                document.getElementById("confirmationError").classList.remove("hidden");
-                return;
-            }
-            const payload = { 
-                ...screeningDataCache,
-                "Diastolic BP": parseFloat(dbpInput.value),
-                "FAST ED Score": parseInt(document.getElementById('confirmFastEdInput').value),
-                "Eye Deviation": document.getElementById('confirmEyeDeviationInput').checked ? 1 : 0,
-                "Arm Paresis": document.getElementById('confirmArmParesisInput').checked ? 1 : 0,
-                "Leg Paresis": document.getElementById('confirmLegParesisInput').checked ? 1 : 0,
-                "Altered Sensorium": document.getElementById('confirmAlteredSensoriumInput').checked ? 1 : 0,
-                "Headache": document.getElementById('confirmHeadacheInput').checked ? 1 : 0,
-                "Atrial Fibrillation": document.getElementById('confirmAfibInput').checked ? 1 : 0,
-                "Anticoagulants": document.getElementById('confirmAnticoagulantsInput').checked ? 1 : 0,
-                "Antiplatelets": document.getElementById('confirmAntiplateletsInput').checked ? 1 : 0
-            };
-            handleApiCall(API_URLS.confirm, payload, document.getElementById("calculateConfirmationButton"), "confirmationError", (result) => {
-                const prob = (result.probability * 100).toFixed(1), t = translations[currentLang];
-                let outcomeText, riskClass;
-                if (result.outcome === 'ICH_HIGHLY_LIKELY') {
-                    outcomeText = t.outcomeB.replace('[PROB]', prob); riskClass = 'outcome-red';
-                } else {
-                    outcomeText = t.outcomeC.replace('[PROB]', prob); riskClass = 'outcome-amber';
-                }
-                pendingResult = {
-                    element: document.getElementById("confirmationResult"), html: outcomeText,
-                    riskClass: riskClass, meta: MODEL_PERFORMANCE.confirmation,
-                    actions: [{ label: t.newCalculation, primary: true, handler: resetStrokeModule, translateKey: 'newCalculation' }]
-                };
-                showDisclaimer();
-            });
-        }
-        
-        // --- App Initialization ---
-        function init() {
-            document.getElementById("currentYear").textContent = new Date().getFullYear();
-            const darkModeToggle = document.getElementById("darkModeToggle");
-            if (localStorage.getItem("darkMode") === "enabled") {
-                document.body.classList.add("dark-mode");
-                darkModeToggle.querySelector("span").textContent = "☀️";
-            }
-            darkModeToggle.addEventListener("click", () => {
-                document.body.classList.toggle("dark-mode");
-                const isDarkMode = document.body.classList.contains("dark-mode");
-                localStorage.setItem("darkMode", isDarkMode ? "enabled" : "disabled");
-                darkModeToggle.querySelector("span").textContent = isDarkMode ? "☀️" : "🌙";
-            });
-            
-            // Event Listeners
-            document.getElementById("accessCodeButton").addEventListener("click", validateAccessCode);
-            document.getElementById("accessCodeInput").addEventListener("keypress", e => e.key === 'Enter' && validateAccessCode());
-            document.getElementById("comaModuleButton").addEventListener("click", () => showSection('comaModule'));
-            document.getElementById("strokeModuleButton").addEventListener("click", () => showSection('screening'));
-            document.getElementById("calculateComaButton").addEventListener("click", calculateComaRisk);
-            document.getElementById("calculateScreeningButton").addEventListener("click", handleScreening);
-            document.getElementById("calculateConfirmationButton").addEventListener("click", handleConfirmation);
-            document.getElementById("confirmationBackButton").addEventListener("click", () => showSection('screening'));
-            document.getElementById("disclaimerConfirmButton").addEventListener("click", closeDisclaimerAndShowResult);
-            // FAST-ED Listeners
-            document.getElementById("confirmToggleFastEdBtn").addEventListener("click", () => {
-                const container = document.getElementById("fastEdComponentsContainerConfirm");
-                container.classList.toggle("hidden");
-                const btnSpan = container.previousElementSibling.querySelector('[data-translate="toggleFastEdBtnText"]');
-                const t = translations[currentLang];
-                btnSpan.textContent = container.classList.contains("hidden") ? t.toggleFastEdBtnText : t.toggleFastEdBtnHideText;
-            });
-            ["confirmFastEdFacialPalsy", "confirmFastEdArmWeakness", "confirmFastEdSpeechChanges", "confirmFastEdEyeDeviation", "confirmFastEdDenialNeglect"]
-                .forEach(id => document.getElementById(id).addEventListener("change", recalculateFastEdScore));
-
-            // Initial UI setup
-            switchLanguage(localStorage.getItem("language") || "en");
-            navigateToModuleSelection();
-        }
-        init();
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      if(localStorage.getItem('darkMode')==='enabled') { document.body.classList.add('dark-mode'); document.getElementById('darkModeToggle').textContent='☀️'; }
+      const lang = localStorage.getItem('language')||'en'; switchLanguage(lang);
+      document.getElementById('calculateButton').addEventListener('click', calculateProbability);
+      document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
     });
-    </script>
+
+    function switchLanguage(lang){
+      currentLang=lang; localStorage.setItem('language',lang);
+      const t=translations[lang];
+      ['appTitle','strokeModuleTitle','ageLabel','sbpLabel','gfapLabel','eyeDeviationLabel','armpareseLabel','beinpareseLabel','afibLabel','antiplateletsLabel','headacheLabel','calculateButton'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=t[id]; });
+      document.getElementById('age_years').placeholder = t.agePlaceholder;
+      document.getElementById('systolic_bp').placeholder = t.sbpPlaceholder;
+      document.getElementById('gfap_value').placeholder = t.gfapPlaceholder;
+      const toggle = document.getElementById('darkModeToggle'); toggle.setAttribute('aria-label', document.body.classList.contains('dark-mode') ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff);
+    }
+
+    function toggleDarkMode(){
+      document.body.classList.toggle('dark-mode'); const isDark=document.body.classList.contains('dark-mode');
+      const toggle=document.getElementById('darkModeToggle'), t=translations[currentLang]; toggle.textContent=isDark?'☀️':'🌙'; toggle.setAttribute('aria-label', isDark? t.darkModeToggleLabelOn: t.darkModeToggleLabelOff);
+      localStorage.setItem('darkMode', isDark?'enabled':'disabled');
+    }
+
+    function calculateProbability(){
+      const form=document.getElementById('ich-form'); if(!form.checkValidity()){ form.reportValidity(); return; }
+      let inputs={}; Object.keys(COEFFICIENTS).forEach(key=>{
+        if(key==='eye_deviation'||key==='armparese'||key==='beinparese'||key==='atrial_fibrillation'||key==='antiplatelets'){
+          inputs[key]= document.getElementById(key).checked ? 1 : 0;
+        } else {
+          inputs[key]= parseFloat(document.getElementById(key).value);
+        }
+      });
+      if(inputs.headache===-1) inputs.headache=IMPUTED_HEADACHE;
+      inputs.gfap_value = Math.log1p(inputs.gfap_value);
+      let z=INTERCEPT;
+      Object.keys(inputs).forEach(key=>{ const iqr=IQRS[key], val= iqr===0?0:(inputs[key]-MEDIANS[key])/iqr; z+= val*COEFFICIENTS[key]; });
+      const prob=1/(1+Math.exp(-z));
+      const decision = prob>=OPTIMAL_THRESHOLD?'high-risk':'low-risk';
+      displayResults(prob,decision);
+    }
+
+    function displayResults(prob,dec){
+      const c=document.getElementById('result-container');
+      document.getElementById('result-probability').textContent=`${(prob*100).toFixed(1)}%`;
+      document.getElementById('result-title').textContent = translations[currentLang][dec==='high-risk'?'highRisk':'lowRisk'];
+      c.className=`result ${dec}`; c.style.display='block';
+    }
+  </script>
 </body>
 </html>
