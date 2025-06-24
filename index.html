@@ -8,8 +8,6 @@
         :root {
             --primary-color: #007bff;
             --primary-hover: #0056b3;
-            --secondary-color: #6c757d;
-            --secondary-hover: #5a6268;
             --background-color: #f8f9fa;
             --container-bg: #ffffff;
             --text-color: #333;
@@ -19,30 +17,36 @@
             --result-low-bg: #d4edda;
             --result-low-text: #155724;
             --result-low-border: #c3e6cb;
+            --disclaimer-bg: #fff3cd;
+            --disclaimer-text: #856404;
+            --disclaimer-border: #ffeeba;
+            --driver-positive-bg: #e74c3c; /* Red for increasing risk */
+            --driver-negative-bg: #3498db; /* Blue for decreasing risk */
         }
 
         body.dark-mode {
             --primary-color: #3399ff;
             --primary-hover: #287ac7;
-            --secondary-color: #8f9aa3;
-            --secondary-hover: #7c858d;
-            --background-color: #333;
-            --container-bg: #444;
-            --text-color: #f8f9fa;
+            --background-color: #1e1e1e;
+            --container-bg: #2d2d2d;
+            --text-color: #f1f1f1;
             --result-high-bg: #5c2a30;
             --result-high-text: #f5c6cb;
             --result-high-border: #721c24;
             --result-low-bg: #2a5032;
             --result-low-text: #c3e6cb;
             --result-low-border: #155724;
+            --disclaimer-bg: #4d442a;
+            --disclaimer-text: #ffeeba;
+            --disclaimer-border: #856404;
+            --driver-positive-bg: #c0392b;
+            --driver-negative-bg: #2980b9;
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--background-color);
@@ -51,147 +55,75 @@
         }
 
         .container {
-            max-width: 500px;
-            margin: 70px auto 20px auto;
-            padding: 20px;
+            max-width: 650px;
+            margin: 80px auto 20px auto;
+            padding: 25px;
             background-color: var(--container-bg);
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: background-color 0.3s ease;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
         
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: white;
+            padding: 10px 25px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 999;
-        }
-
-        .app-header h1 {
-            font-size: 1.5em;
-            margin: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #ddd;
         }
         
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        body.dark-mode .app-header { border-bottom: 1px solid #444; }
+
+        .app-header h1 { font-size: 1.4em; margin: 0; color: var(--primary-color); }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .header-right button { width: auto; padding: 8px; margin-top: 0; background-color: transparent; font-size: 1.5rem; line-height: 1; }
+        .language-switcher img { width: 24px; height: 16px; border: 1px solid #ccc; border-radius: 3px; vertical-align: middle; opacity: 0.7; transition: opacity 0.2s; }
+        .language-switcher button { background: none; border: none; padding: 5px; cursor: pointer; }
+        .language-switcher button:hover img { opacity: 1; }
+        h2 { text-align: center; margin-bottom: 25px; }
         
-        .header-right button {
-            width: auto;
-            padding: 8px 12px;
-            margin-top: 0;
-        }
-        
-        .language-switcher img {
-            width: 24px;
-            height: 16px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            vertical-align: middle;
-        }
+        .disclaimer { padding: 15px; margin-bottom: 20px; border: 1px solid var(--disclaimer-border); background-color: var(--disclaimer-bg); color: var(--disclaimer-text); border-radius: 8px; text-align: center; font-size: 0.9em; }
+        .disclaimer strong { display: block; margin-bottom: 5px; }
 
-        .language-switcher button {
-            background: none;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-        }
+        .input-group, .select-group, .checkbox-group { margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: var(--background-color); display: flex; flex-direction: column; justify-content: center; }
+        body.dark-mode .input-group, body.dark-mode .select-group, body.dark-mode .checkbox-group { border-color: #444; }
+        .checkbox-group label { display: flex; align-items: flex-start; cursor: pointer; font-weight: bold; }
+        input[type="checkbox"] { width: 1.3em; height: 1.3em; margin-right: 12px; margin-top: 0.15em; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="number"], select { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; background-color: var(--container-bg); color: var(--text-color); transition: border-color 0.2s; }
+        body.dark-mode input[type="number"], body.dark-mode select { border-color: #555; }
+        input:focus, select:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent); }
 
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        button.primary { padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s ease; width: 100%; font-weight: bold; background-color: var(--primary-color); color: white; }
+        button.primary:hover { background-color: var(--primary-hover); }
 
-        .input-group, .select-group {
-            margin-bottom: 15px;
-        }
+        .result { margin-top: 25px; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid; display: none; }
+        .result.high-risk { background-color: var(--result-high-bg); color: var(--result-high-text); border-color: var(--result-high-border); }
+        .result.low-risk { background-color: var(--result-low-bg); color: var(--result-low-text); border-color: var(--result-low-border); }
+        .result-prob { font-size: 2.8em; font-weight: bold; }
+        .result-label { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        
-        input:focus, select:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        button {
-            padding: 12px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            font-weight: bold;
-        }
-
-        .primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid;
-            display: none;
-        }
-        
-        .result.high-risk {
-            background-color: var(--result-high-bg);
-            color: var(--result-high-text);
-            border-color: var(--result-high-border);
-        }
-
-        .result.low-risk {
-            background-color: var(--result-low-bg);
-            color: var(--result-low-text);
-            border-color: var(--result-low-border);
-        }
-        
-        .result-prob {
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-        
-        .result-label {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        /* --- SIDE-BY-SIDE DRIVER ANALYSIS STYLES --- */
+        #drivers-section { margin-top: 25px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; display: none; }
+        body.dark-mode #drivers-section { border-color: #444; }
+        #drivers-section h3 { margin-top: 0; text-align: center; }
+        #drivers-columns { display: flex; gap: 20px; }
+        .driver-column { flex: 1; min-width: 0; }
+        .driver-column h4 { margin-top: 0; text-align: center; font-size: 1em; }
+        .driver-item { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
+        .driver-label { width: 40%; text-align: right; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .driver-bar-container { flex-grow: 1; height: 18px; background-color: #eee; border-radius: 3px; }
+        body.dark-mode .driver-bar-container { background-color: #555; }
+        .driver-bar { height: 100%; transition: width 0.5s ease-out; }
+        .driver-bar.positive { background-color: var(--driver-positive-bg); }
+        .driver-bar.negative { background-color: var(--driver-negative-bg); }
     </style>
 </head>
 <body>
@@ -200,150 +132,99 @@
         <h1 id="appTitle">iGFAP Check</h1>
         <div class="header-right">
              <div class="language-switcher">
-                <button onclick="switchLanguage('en')" aria-label="Switch to English">
-                    <img src="https://flagcdn.com/gb.svg" alt="English">
-                </button>
-                <button onclick="switchLanguage('de')" aria-label="Switch to German">
-                    <img src="https://flagcdn.com/de.svg" alt="Deutsch">
-                </button>
+                <button onclick="switchLanguage('en')" aria-label="Switch to English"><img src="https://flagcdn.com/gb.svg" alt="English Flag"></button>
+                <button onclick="switchLanguage('de')" aria-label="Switch to German"><img src="https://flagcdn.com/de.svg" alt="German Flag"></button>
             </div>
             <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
         </div>
     </header>
 
-    <section id="mainSection" class="container">
+    <main id="mainSection" class="container">
         <h2 id="strokeModuleTitle">Intracerebral Hemorrhage Prediction</h2>
+
+        <div class="disclaimer">
+            <strong id="disclaimerTitle">For Informational Purposes Only</strong>
+            <p id="disclaimerText">This tool is not a substitute for professional medical advice, diagnosis, or treatment.</p>
+        </div>
+
         <form id="ich-form">
-            <!-- The form contains the 9 optimal features for our champion model -->
-            <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <div class="input-group">
-                    <label for="age_years" id="ageLabel">Age (years)</label>
-                    <input type="number" id="age_years" placeholder="e.g., 75" required>
-                </div>
-                <div class="input-group">
-                    <label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label>
-                    <input type="number" id="systolic_bp" placeholder="e.g., 160" required>
-                </div>
-                <div class="input-group">
-                    <label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label>
-                    <input type="number" id="gfap_value" placeholder="e.g., 2875" required>
-                </div>
-                <div class="select-group">
-                    <label for="eye_deviation" id="eyeDeviationLabel">Eye Deviation?</label>
-                    <select id="eye_deviation">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="armparese" id="armpareseLabel">Arm Paresis?</label>
-                    <select id="armparese">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="beinparese" id="beinpareseLabel">Leg Paresis?</label>
-                    <select id="beinparese">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="atrial_fibrillation" id="afibLabel">History of Atrial Fibrillation?</label>
-                    <select id="atrial_fibrillation">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="antiplatelets" id="antiplateletsLabel">On Antiplatelets?</label>
-                    <select id="antiplatelets">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
-                <div class="select-group" style="grid-column: 1 / -1;">
-                    <label for="headache" id="headacheLabel">Headache?</label>
-                    <select id="headache">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                        <option value="-1">Unknown</option>
-                    </select>
-                </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; align-items: stretch;">
+                <div class="input-group"><label for="age_years" id="ageLabel">Age (years)</label><input type="number" id="age_years" placeholder="e.g., 75" required min="0"></div>
+                <div class="input-group"><label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label><input type="number" id="systolic_bp" placeholder="e.g., 160" required min="0"></div>
+                <div class="input-group"><label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label><input type="number" id="gfap_value" placeholder="e.g., 2875" required min="0"></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="eye_deviation"><span id="eyeDeviationLabel">Eye Deviation?</span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="armparese" checked><span id="armpareseLabel">Arm Paresis?</span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="beinparese" checked><span id="beinpareseLabel">Leg Paresis?</span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="atrial_fibrillation"><span id="afibLabel">History of Atrial Fibrillation?</span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="antiplatelets"><span id="antiplateletsLabel">On Antiplatelets?</span></label></div>
+                <div class="select-group" style="grid-column: 1 / -1;"><label for="headache" id="headacheLabel">Headache?</label><select id="headache"><option value="0" id="headacheNo">No</option><option value="1" id="headacheYes">Yes</option><option value="-1" id="headacheUnknown">Unknown</option></select></div>
             </div>
             <button type="button" id="calculate-btn" class="primary">Calculate Probability</button>
         </form>
+        
         <div class="result" id="result-container">
             <div class="result-label" id="result-title"></div>
             <div class="result-prob" id="result-probability"></div>
         </div>
-    </section>
 
-    <footer style="text-align:center; padding-bottom: 20px;">
+        <section id="drivers-section">
+            <h3 id="driversTitle">Prediction Drivers</h3>
+            <div id="drivers-columns">
+                <div class="driver-column">
+                    <h4 id="increasingRiskTitle">Factors Increasing Risk</h4>
+                    <div id="positive-drivers"></div>
+                </div>
+                <div class="driver-column">
+                    <h4 id="decreasingRiskTitle">Factors Decreasing Risk</h4>
+                    <div id="negative-drivers"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align:center; padding: 20px; font-size: 0.9em; opacity: 0.7;">
         <p>© <span id="currentYear"></span> All rights reserved.</p>
     </footer>
 
     <script>
-        // --- Parameters for the FINAL 9-FEATURE CHAMPION MODEL --- //
+        // --- Model Parameters ---
         const INTERCEPT = -0.72549447;
-        const COEFFICIENTS = {
-            'age_years': -0.20927375, 'eye_deviation': -0.26763354, 'armparese': 0.11730522,
-            'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'systolic_bp': 0.36337294,
-            'antiplatelets': -0.52928134, 'gfap_value': 0.98845868, 'headache': 0.43796113,
-        };
-        const MEDIANS = {
-            'age_years': 78.0, 'eye_deviation': 0.0, 'armparese': 1.0, 'beinparese': 1.0,
-            'atrial_fibrillation': 0.0, 'systolic_bp': 160.0, 'antiplatelets': 0.0,
-            'gfap_value': 3.78418963, 'headache': 0.0,
-        };
-        const IQRS = {
-            'age_years': 18.0, 'eye_deviation': 1.0, 'armparese': 1.0, 'beinparese': 1.0,
-            'atrial_fibrillation': 1.0, 'systolic_bp': 41.5, 'antiplatelets': 1.0,
-            'gfap_value': 0.98704051, 'headache': 0.5,
-        };
+        const COEFFICIENTS = { 'age_years': -0.20927375, 'eye_deviation': -0.26763354, 'armparese': 0.11730522, 'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'systolic_bp': 0.36337294, 'antiplatelets': -0.52928134, 'gfap_value': 0.98845868, 'headache': 0.43796113 };
+        const MEDIANS = { 'age_years': 78.0, 'eye_deviation': 0.0, 'armparese': 1.0, 'beinparese': 1.0, 'atrial_fibrillation': 0.0, 'systolic_bp': 160.0, 'antiplatelets': 0.0, 'gfap_value': 3.78418963, 'headache': 0.0 };
+        const IQRS = { 'age_years': 18.0, 'eye_deviation': 1.0, 'armparese': 1.0, 'beinparese': 1.0, 'atrial_fibrillation': 1.0, 'systolic_bp': 41.5, 'antiplatelets': 1.0, 'gfap_value': 0.98704051, 'headache': 0.5 };
         const IMPUTED_HEADACHE = 0.0;
         const OPTIMAL_THRESHOLD = 0.61;
         
-        // --- Translation Data --- //
+        // --- Translation Data ---
         const translations = {
             en: {
-                appTitle: "iGFAP Check",
-                strokeModuleTitle: "Intracerebral Hemorrhage Prediction",
-                ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)",
-                eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?",
-                afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?",
-                calculateButton: "Calculate Probability",
-                highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely",
-                darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode",
+                driversTitle: "Prediction Drivers",
+                increasingRiskTitle: "Factors Increasing Risk",
+                decreasingRiskTitle: "Factors Decreasing Risk",
+                featureNames: { 'age_years': 'Age', 'eye_deviation': 'Eye Deviation', 'armparese': 'Arm Paresis', 'beinparese': 'Leg Paresis', 'atrial_fibrillation': 'Atrial Fibrillation', 'systolic_bp': 'Systolic BP', 'antiplatelets': 'Antiplatelets', 'gfap_value': 'GFAP', 'headache': 'Headache' }
             },
             de: {
-                appTitle: "iGFAP Check",
-                strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung",
-                ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)",
-                eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?",
-                afibLabel: "Vorhofflimmern-Anamnese?", antiplateletsLabel: "Unter Thrombozytenaggregationshemmern?", headacheLabel: "Kopfschmerzen?",
-                calculateButton: "Wahrscheinlichkeit berechnen",
-                highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich",
-                darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus",
+                driversTitle: "Treiber der Vorhersage",
+                increasingRiskTitle: "Risikoerhöhende Faktoren",
+                decreasingRiskTitle: "Risikomindernde Faktoren",
+                featureNames: { 'age_years': 'Alter', 'eye_deviation': 'Blickdeviation', 'armparese': 'Armparese', 'beinparese': 'Beinparese', 'atrial_fibrillation': 'Vorhofflimmern', 'systolic_bp': 'Systolischer RR', 'antiplatelets': 'Thrombozytenhemmer', 'gfap_value': 'GFAP', 'headache': 'Kopfschmerzen' }
             }
         };
-        
-        // --- App Logic --- //
-        document.addEventListener('DOMContentLoaded', () => {
-            const calculateBtn = document.getElementById('calculate-btn');
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
+        // Merging full translation objects to avoid repetition
+        Object.assign(translations.en, { appTitle: "iGFAP Check", strokeModuleTitle: "Intracerebral Hemorrhage Prediction", disclaimerTitle: "For Informational Purposes Only", disclaimerText: "This tool is not a substitute for professional medical advice, diagnosis, or treatment.", ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)", eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?", afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?", headacheNo: "No", headacheYes: "Yes", headacheUnknown: "Unknown", calculateButton: "Calculate Probability", highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely", darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode"});
+        Object.assign(translations.de, { appTitle: "iGFAP Check", strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung", disclaimerTitle: "Nur zu Informationszwecken", disclaimerText: "Dieses Tool ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung.", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)", eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?", afibLabel: "Vorhofflimmern-Anamnese?", antiplateletsLabel: "Unter Thrombozytenaggregationshemmern?", headacheLabel: "Kopfschmerzen?", headacheNo: "Nein", headacheYes: "Ja", headacheUnknown: "Unbekannt", calculateButton: "Wahrscheinlichkeit berechnen", highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich", darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus"});
 
+        // --- App Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
             if (localStorage.getItem('darkMode') === 'enabled') {
                 document.body.classList.add('dark-mode');
-                darkModeToggle.textContent = '☀️';
+                document.getElementById('darkModeToggle').textContent = '☀️';
             }
             const preferredLang = localStorage.getItem('language') || 'en';
             switchLanguage(preferredLang);
-
-            calculateBtn.addEventListener('click', calculateProbability);
-            darkModeToggle.addEventListener('click', toggleDarkMode);
+            document.getElementById('calculate-btn').addEventListener('click', calculateProbability);
+            document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
         });
 
         let currentLang = 'en';
@@ -351,89 +232,107 @@
             currentLang = lang;
             localStorage.setItem('language', lang);
             const t = translations[lang];
+            
             Object.keys(t).forEach(key => {
                 const element = document.getElementById(key);
-                if (element) element.textContent = t[key];
+                if (element && key !== 'featureNames') element.textContent = t[key];
             });
+            document.getElementById('calculate-btn').textContent = t.calculateButton;
+
             const darkModeToggle = document.getElementById('darkModeToggle');
-            if (document.body.classList.contains('dark-mode')) {
-                darkModeToggle.setAttribute('aria-label', t.darkModeToggleLabelOn);
-            } else {
-                darkModeToggle.setAttribute('aria-label', t.darkModeToggleLabelOff);
-            }
+            const ariaLabel = document.body.classList.contains('dark-mode') ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff;
+            darkModeToggle.setAttribute('aria-label', ariaLabel);
         }
 
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             const isDarkMode = document.body.classList.contains('dark-mode');
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const t = translations[currentLang];
-            darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
-            darkModeToggle.setAttribute('aria-label', isDarkMode ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff);
             localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+            const t = translations[currentLang];
+            darkModeToggle.setAttribute('aria-label', isDarkMode ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff);
         }
 
         function calculateProbability() {
             const form = document.getElementById('ich-form');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+            if (!form.checkValidity()) { form.reportValidity(); return; }
 
-            // 1. Get raw inputs
-            let inputs = {};
-            const featureKeys = Object.keys(COEFFICIENTS);
-            featureKeys.forEach(key => {
-                inputs[key] = parseFloat(document.getElementById(key).value);
-            });
-
-            // 2. Preprocess
-            if (inputs.headache === -1) {
-                inputs.headache = IMPUTED_HEADACHE;
-            }
+            // Get & Preprocess Inputs
+            const inputs = {};
+            const CHECKBOX_FEATURES = ['eye_deviation', 'armparese', 'beinparese', 'atrial_fibrillation', 'antiplatelets'];
+            ['age_years', 'systolic_bp', 'gfap_value'].forEach(id => { inputs[id] = parseFloat(document.getElementById(id).value); });
+            CHECKBOX_FEATURES.forEach(id => { inputs[id] = document.getElementById(id).checked ? 1 : 0; });
+            inputs['headache'] = parseFloat(document.getElementById('headache').value);
+            if (inputs.headache === -1) { inputs.headache = IMPUTED_HEADACHE; }
             inputs.gfap_value = Math.log1p(inputs.gfap_value);
             
-            // ** CRITICAL FIX: ** Replicate the Python pipeline's preprocessing correctly.
-            // In our final Python model, all features were scaled by the RobustScaler.
-            let scaledInputs = {};
-            for (const key in inputs) {
-                 if (IQRS[key] === 0) { // Avoid division by zero for features with no variance in training
-                    scaledInputs[key] = 0; 
-                } else {
-                    scaledInputs[key] = (inputs[key] - MEDIANS[key]) / IQRS[key];
-                }
+            // Scale Inputs & Calculate Contributions
+            const contributions = {};
+            for (const key in COEFFICIENTS) {
+                const scaledValue = (IQRS[key] !== 0) ? (inputs[key] - MEDIANS[key]) / IQRS[key] : 0;
+                contributions[key] = scaledValue * COEFFICIENTS[key];
             }
             
-            // 3. Calculate Log-Odds (Z) using the correctly scaled inputs
-            let logOdds = INTERCEPT;
-            for (const key in scaledInputs) {
-                logOdds += scaledInputs[key] * COEFFICIENTS[key];
-            }
-
-            // 4. Convert to Probability
+            // Calculate Final Probability
+            let logOdds = INTERCEPT + Object.values(contributions).reduce((a, b) => a + b, 0);
             const probability = 1 / (1 + Math.exp(-logOdds));
-
-            // 5. Make Decision
             const finalDecision = probability >= OPTIMAL_THRESHOLD ? 'high-risk' : 'low-risk';
 
-            // 6. Display Results
+            // Display All Results
             displayResults(probability, finalDecision);
+            displayDrivers(contributions);
         }
 
         function displayResults(probability, decision) {
             const resultContainer = document.getElementById('result-container');
-            const resultTitle = document.getElementById('result-title');
-            const resultProbability = document.getElementById('result-probability');
-
-            resultProbability.textContent = `${(probability * 100).toFixed(1)}%`;
-            resultContainer.className = `result ${decision}`;
-            
-            const t = translations[currentLang];
-            resultTitle.textContent = (decision === 'high-risk') ? t.highRisk : t.lowRisk;
-
             resultContainer.style.display = 'block';
+            resultContainer.className = `result ${decision}`;
+            const t = translations[currentLang];
+            document.getElementById('result-title').textContent = (decision === 'high-risk') ? t.highRisk : t.lowRisk;
+            document.getElementById('result-probability').textContent = `${(probability * 100).toFixed(1)}%`;
         }
 
+        function displayDrivers(contributions) {
+            const driversSection = document.getElementById('drivers-section');
+            const posContainer = document.getElementById('positive-drivers');
+            const negContainer = document.getElementById('negative-drivers');
+            posContainer.innerHTML = '';
+            negContainer.innerHTML = '';
+
+            const positiveDrivers = Object.entries(contributions).filter(([, val]) => val > 0).sort((a, b) => b[1] - a[1]);
+            const negativeDrivers = Object.entries(contributions).filter(([, val]) => val < 0).sort((a, b) => a[1] - b[1]);
+            
+            const maxAbsContribution = Math.max(...Object.values(contributions).map(Math.abs));
+            const t = translations[currentLang];
+
+            const createDriverItem = (key, value) => {
+                const item = document.createElement('div');
+                item.className = 'driver-item';
+                const label = document.createElement('span');
+                label.className = 'driver-label';
+                label.textContent = t.featureNames[key] || key;
+                label.title = t.featureNames[key] || key;
+                const barContainer = document.createElement('div');
+                barContainer.className = 'driver-bar-container';
+                const bar = document.createElement('div');
+                bar.className = 'driver-bar ' + (value > 0 ? 'positive' : 'negative');
+                
+                setTimeout(() => { bar.style.width = `${(Math.abs(value) / maxAbsContribution) * 100}%`; }, 10);
+                
+                barContainer.appendChild(bar);
+                item.appendChild(label);
+                item.appendChild(barContainer);
+                return item;
+            };
+
+            positiveDrivers.forEach(([key, value]) => posContainer.appendChild(createDriverItem(key, value)));
+            negativeDrivers.forEach(([key, value]) => negContainer.appendChild(createDriverItem(key, value)));
+
+            driversSection.style.display = 'block';
+            driversSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     </script>
 </body>
 </html>
+
