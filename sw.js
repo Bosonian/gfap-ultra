@@ -1,5 +1,5 @@
 // A simple version number for your cache
-const CACHE_VERSION = 'v2.2.1'; 
+const CACHE_VERSION = 'v2.2.2'; 
 const CACHE_NAME = `igfap-cache-${CACHE_VERSION}`;
 
 // List of essential files for the app shell to work offline
