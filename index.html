@@ -22,6 +22,11 @@
             --disclaimer-border: #ffeeba;
             --driver-positive-bg: #e74c3c; /* Red for increasing risk */
             --driver-negative-bg: #3498db; /* Blue for decreasing risk */
+
+            /* Meter Colors */
+            --meter-green: #28a745;
+            --meter-yellow: #ffc107;
+            --meter-red: #dc3545;
         }
 
         body.dark-mode {
@@ -41,6 +46,11 @@
             --disclaimer-border: #856404;
             --driver-positive-bg: #c0392b;
             --driver-negative-bg: #2980b9;
+
+            /* Meter Colors for dark mode */
+            --meter-green: #2ecc71;
+            --meter-yellow: #f1c40f;
+            --meter-red: #e74c3c;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -83,7 +93,7 @@
 
         .app-header h1 { font-size: 1.4em; margin: 0; color: var(--primary-color); }
         .header-right { display: flex; align-items: center; gap: 10px; }
-        .header-right button { width: auto; padding: 8px; margin-top: 0; background-color: transparent; font-size: 1.5rem; line-height: 1; }
+        .header-right button { width: auto; padding: 8px; margin-top: 0; background-color: transparent; font-size: 1.5rem; line-height: 1; border: none; cursor: pointer;}
         .language-switcher img { width: 24px; height: 16px; border: 1px solid #ccc; border-radius: 3px; vertical-align: middle; opacity: 0.7; transition: opacity 0.2s; }
         .language-switcher button { background: none; border: none; padding: 5px; cursor: pointer; }
         .language-switcher button:hover img { opacity: 1; }
@@ -94,8 +104,21 @@
 
         .input-group, .select-group, .checkbox-group { margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: var(--background-color); display: flex; flex-direction: column; justify-content: center; }
         body.dark-mode .input-group, body.dark-mode .select-group, body.dark-mode .checkbox-group { border-color: #444; }
-        .checkbox-group label { display: flex; align-items: flex-start; cursor: pointer; font-weight: bold; }
-        input[type="checkbox"] { width: 1.3em; height: 1.3em; margin-right: 12px; margin-top: 0.15em; }
+        
+        /* Adjusted label styling for checkboxes to allow wrapping */
+        .checkbox-group label { 
+            display: flex; 
+            align-items: flex-start; /* Keep alignment for checkbox and text */
+            cursor: pointer; 
+            font-weight: bold; 
+            flex-grow: 1; /* Allow label to take available space */
+            flex-wrap: wrap; /* Allow text to wrap */
+        }
+        .checkbox-group label span {
+            flex-grow: 1; /* Allow the span itself to wrap */
+        }
+
+        input[type="checkbox"] { width: 1.3em; height: 1.3em; margin-right: 12px; margin-top: 0.15em; flex-shrink: 0; /* Prevent checkbox from shrinking */ }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
         input[type="number"], select { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; background-color: var(--container-bg); color: var(--text-color); transition: border-color 0.2s; }
         body.dark-mode input[type="number"], body.dark-mode select { border-color: #555; }
@@ -109,6 +132,61 @@
         .result.low-risk { background-color: var(--result-low-bg); color: var(--result-low-text); border-color: var(--result-low-border); }
         .result-prob { font-size: 2.8em; font-weight: bold; }
         .result-label { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; }
+
+        /* --- Meter Styles --- */
+        .probability-meter-container {
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to right, var(--meter-green) 0%, var(--meter-yellow) calc(var(--op-thresh-percent) - 1%), var(--meter-red) var(--op-thresh-percent));
+            border-radius: 15px;
+            position: relative;
+            margin: 20px 0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .probability-meter-marker {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%); /* Only vertical translation */
+            width: 8px;
+            height: 20px;
+            background-color: var(--text-color);
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            transition: left 0.5s ease-out;
+            z-index: 2;
+        }
+
+        .probability-meter-label {
+            position: absolute;
+            bottom: calc(100% + 5px); /* Position above the meter bar */
+            /* left will be set by JS */
+            transform: translateX(-50%); /* Centered relative to its own left point */
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--text-color);
+            white-space: nowrap;
+            background-color: var(--container-bg);
+            padding: 2px 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 3;
+        }
+        body.dark-mode .probability-meter-label { border-color: #555; }
+
+        .probability-meter-threshold-label {
+            position: absolute;
+            top: calc(100% + 5px); /* Position below the meter */
+            transform: translateX(-50%); /* Center horizontally relative to its left */
+            font-size: 0.8em;
+            color: var(--text-color);
+            white-space: nowrap;
+            opacity: 0.8;
+            z-index: 1; /* Ensure it's behind the marker label if they overlap */
+        }
+
 
         /* --- SIDE-BY-SIDE DRIVER ANALYSIS STYLES --- */
         #drivers-section { margin-top: 25px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; display: none; }
@@ -124,6 +202,7 @@
         .driver-bar { height: 100%; transition: width 0.5s ease-out; }
         .driver-bar.positive { background-color: var(--driver-positive-bg); }
         .driver-bar.negative { background-color: var(--driver-negative-bg); }
+
     </style>
 </head>
 <body>
@@ -148,23 +227,33 @@
         </div>
 
         <form id="ich-form">
+            <!-- Tiled layout for input groups -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; align-items: stretch;">
                 <div class="input-group"><label for="age_years" id="ageLabel">Age (years)</label><input type="number" id="age_years" placeholder="e.g., 75" required min="0"></div>
                 <div class="input-group"><label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label><input type="number" id="systolic_bp" placeholder="e.g., 160" required min="0"></div>
                 <div class="input-group"><label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label><input type="number" id="gfap_value" placeholder="e.g., 2875" required min="0"></div>
+                
+                <!-- Checkboxes now leverage the grid for a tiled appearance -->
                 <div class="checkbox-group"><label><input type="checkbox" id="eye_deviation"><span id="eyeDeviationLabel">Eye Deviation?</span></label></div>
                 <div class="checkbox-group"><label><input type="checkbox" id="armparese" checked><span id="armpareseLabel">Arm Paresis?</span></label></div>
                 <div class="checkbox-group"><label><input type="checkbox" id="beinparese" checked><span id="beinpareseLabel">Leg Paresis?</span></label></div>
                 <div class="checkbox-group"><label><input type="checkbox" id="atrial_fibrillation"><span id="afibLabel">History of Atrial Fibrillation?</span></label></div>
                 <div class="checkbox-group"><label><input type="checkbox" id="antiplatelets"><span id="antiplateletsLabel">On Antiplatelets?</span></label></div>
-                <div class="select-group" style="grid-column: 1 / -1;"><label for="headache" id="headacheLabel">Headache?</label><select id="headache"><option value="0" id="headacheNo">No</option><option value="1" id="headacheYes">Yes</option><option value="-1" id="headacheUnknown">Unknown</option></select></div>
+                
+                <!-- Headache as a checkbox, placed within the grid -->
+                <div class="checkbox-group"><label><input type="checkbox" id="headache"><span id="headacheLabel">Headache?</span></label></div>
             </div>
             <button type="button" id="calculate-btn" class="primary">Calculate Probability</button>
         </form>
         
         <div class="result" id="result-container">
             <div class="result-label" id="result-title"></div>
-            <div class="result-prob" id="result-probability"></div>
+            <!-- Probability Meter Section -->
+            <div class="probability-meter-container" style="--op-thresh-percent: 32%;">
+                <div class="probability-meter-marker" id="prob-meter-marker"></div> 
+                <span class="probability-meter-label" id="prob-meter-label"></span>
+                <span class="probability-meter-threshold-label" id="threshold-label">iGFAP Cut-off: 0.32</span>
+            </div>
         </div>
 
         <section id="drivers-section">
@@ -193,7 +282,37 @@
         const MEDIANS = { 'age_years': 78.0, 'eye_deviation': 0.0, 'armparese': 1.0, 'beinparese': 1.0, 'atrial_fibrillation': 0.0, 'systolic_bp': 160.0, 'antiplatelets': 0.0, 'gfap_value': 3.78418963, 'headache': 0.0 };
         const IQRS = { 'age_years': 18.0, 'eye_deviation': 1.0, 'armparese': 1.0, 'beinparese': 1.0, 'atrial_fibrillation': 1.0, 'systolic_bp': 41.5, 'antiplatelets': 1.0, 'gfap_value': 0.98704051, 'headache': 0.5 };
         const IMPUTED_HEADACHE = 0.0;
-        const OPTIMAL_THRESHOLD = 0.61;
+        const OP_THRESH = 0.32; // Updated threshold
+
+        // --- Calibration mapping from your reliability diagram ---
+        const X_MAP = [0.00, 0.054, 0.142, 0.225, 0.321, 0.488, 0.626, 0.770, 0.826, 0.976, 1.00];
+        const Y_MAP = [0.00, 0.036, 0.042, 0.286, 0.500, 1.000, 1.000, 1.000, 1.000, 1.000, 1.00];
+
+        /**
+         * Given a raw probability p ∈ [0,1], returns the piecewise-linear
+         * calibrated probability based on your X_MAP → Y_MAP.
+         */
+        function calibratePiecewise(p) {
+            // below lowest bin
+            if (p <= X_MAP[0]) {
+                return Y_MAP[0];
+            }
+            // above highest bin
+            if (p >= X_MAP[X_MAP.length - 1]) {
+                return Y_MAP[Y_MAP.length - 1];
+            }
+            // find the interval [X_MAP[i], X_MAP[i+1]] containing p
+            for (let i = 0; i < X_MAP.length - 1; i++) {
+                const x0 = X_MAP[i],    x1 = X_MAP[i + 1];
+                const y0 = Y_MAP[i],    y1 = Y_MAP[i + 1];
+                if (p >= x0 && p <= x1) {
+                    const t = (p - x0) / (x1 - x0);
+                    return y0 + t * (y1 - y0);
+                }
+            }
+            // fallback (shouldn't happen)
+            return p;
+        }
         
         // --- Translation Data ---
         const translations = {
@@ -201,18 +320,23 @@
                 driversTitle: "Prediction Drivers",
                 increasingRiskTitle: "Factors Increasing Risk",
                 decreasingRiskTitle: "Factors Decreasing Risk",
-                featureNames: { 'age_years': 'Age', 'eye_deviation': 'Eye Deviation', 'armparese': 'Arm Paresis', 'beinparese': 'Leg Paresis', 'atrial_fibrillation': 'Atrial Fibrillation', 'systolic_bp': 'Systolic BP', 'antiplatelets': 'Antiplatelets', 'gfap_value': 'GFAP', 'headache': 'Headache' }
+                featureNames: { 'age_years': 'Age', 'eye_deviation': 'Eye Deviation', 'armparese': 'Arm Paresis', 'beinparese': 'Leg Paresis', 'atrial_fibrillation': 'Atrial Fibrillation', 'systolic_bp': 'Systolic BP', 'antiplatelets': 'Antiplatelets', 'gfap_value': 'GFAP', 'headache': 'Headache' },
+                thresholdLabel: "iGFAP Cut-off:", 
+                probLabel: "Probability:"
             },
             de: {
                 driversTitle: "Treiber der Vorhersage",
                 increasingRiskTitle: "Risikoerhöhende Faktoren",
                 decreasingRiskTitle: "Risikomindernde Faktoren",
-                featureNames: { 'age_years': 'Alter', 'eye_deviation': 'Blickdeviation', 'armparese': 'Armparese', 'beinparese': 'Beinparese', 'atrial_fibrillation': 'Vorhofflimmern', 'systolic_bp': 'Systolischer RR', 'antiplatelets': 'Thrombozytenhemmer', 'gfap_value': 'GFAP', 'headache': 'Kopfschmerzen' }
+                featureNames: { 'age_years': 'Alter', 'eye_deviation': 'Blickdeviation', 'armparese': 'Armparese', 'beinparese': 'Beinparese', 'atrial_fibrillation': 'Vorhofflimmern', 'systolic_bp': 'Systolischer RR', 'antiplatelets': 'Thrombozytenhemmer', 'gfap_value': 'GFAP', 'headache': 'Kopfschmerzen' },
+                thresholdLabel: "iGFAP Cut-off:", 
+                probLabel: "Wahrscheinlichkeit:"
             }
         };
         // Merging full translation objects to avoid repetition
         Object.assign(translations.en, { appTitle: "iGFAP Check", strokeModuleTitle: "Intracerebral Hemorrhage Prediction", disclaimerTitle: "For Informational Purposes Only", disclaimerText: "This tool is not a substitute for professional medical advice, diagnosis, or treatment.", ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)", eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?", afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?", headacheNo: "No", headacheYes: "Yes", headacheUnknown: "Unknown", calculateButton: "Calculate Probability", highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely", darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode"});
-        Object.assign(translations.de, { appTitle: "iGFAP Check", strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung", disclaimerTitle: "Nur zu Informationszwecken", disclaimerText: "Dieses Tool ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung.", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)", eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?", afibLabel: "Vorhofflimmern-Anamnese?", antiplateletsLabel: "Unter Thrombozytenaggregationshemmern?", headacheLabel: "Kopfschmerzen?", headacheNo: "Nein", headacheYes: "Ja", headacheUnknown: "Unbekannt", calculateButton: "Wahrscheinlichkeit berechnen", highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich", darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus"});
+        Object.assign(translations.de, { appTitle: "iGFAP Check", strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung", disclaimerTitle: "Nur zu Informationszwecken", disclaimerText: "Dieses Tool ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung.", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)", eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?", afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Kopfschmerzen?", headacheNo: "Nein", headacheYes: "Ja", headacheUnknown: "Unbekannt", calculateButton: "Wahrscheinlichkeit berechnen", highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich", darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus"});
+
 
         // --- App Logic ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -225,6 +349,9 @@
             switchLanguage(preferredLang);
             document.getElementById('calculate-btn').addEventListener('click', calculateProbability);
             document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+            // Call positionThresholdLabel initially and on window resize
+            positionThresholdLabel(); // Ensure it's called on load
+            window.addEventListener('resize', positionThresholdLabel);
         });
 
         let currentLang = 'en';
@@ -235,13 +362,21 @@
             
             Object.keys(t).forEach(key => {
                 const element = document.getElementById(key);
-                if (element && key !== 'featureNames') element.textContent = t[key];
+                // Exclude the headache select options as they are now gone
+                if (element && key !== 'featureNames' && !key.startsWith('headache')) { 
+                     element.textContent = t[key];
+                }
             });
             document.getElementById('calculate-btn').textContent = t.calculateButton;
 
             const darkModeToggle = document.getElementById('darkModeToggle');
             const ariaLabel = document.body.classList.contains('dark-mode') ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff;
             darkModeToggle.setAttribute('aria-label', ariaLabel);
+
+            // Update threshold label to use iGFAP Cut-off and OP_THRESH
+            document.getElementById('threshold-label').textContent = `${t.thresholdLabel} ${OP_THRESH.toFixed(2)}`;
+            // Re-position the threshold label after text content might change its width
+            positionThresholdLabel();
         }
 
         function toggleDarkMode() {
@@ -260,37 +395,70 @@
 
             // Get & Preprocess Inputs
             const inputs = {};
-            const CHECKBOX_FEATURES = ['eye_deviation', 'armparese', 'beinparese', 'atrial_fibrillation', 'antiplatelets'];
+            // Updated CHECKBOX_FEATURES to include 'headache'
+            const CHECKBOX_FEATURES = ['eye_deviation', 'armparese', 'beinparese', 'atrial_fibrillation', 'antiplatelets', 'headache']; 
             ['age_years', 'systolic_bp', 'gfap_value'].forEach(id => { inputs[id] = parseFloat(document.getElementById(id).value); });
             CHECKBOX_FEATURES.forEach(id => { inputs[id] = document.getElementById(id).checked ? 1 : 0; });
-            inputs['headache'] = parseFloat(document.getElementById('headache').value);
-            if (inputs.headache === -1) { inputs.headache = IMPUTED_HEADACHE; }
-            inputs.gfap_value = Math.log1p(inputs.gfap_value);
+            
+            // Removed specific headache parsing and imputation, as it's now a direct checkbox
+            // inputs['headache'] = parseFloat(document.getElementById('headache').value);
+            // if (inputs.headache === -1) { inputs.headache = IMPUTED_HEADACHE; }
+
+            inputs.gfap_value = Math.log1p(Math.max(inputs.gfap_value, 0)); // Log‐transform GFAP
             
             // Scale Inputs & Calculate Contributions
+            let logOdds = INTERCEPT;
             const contributions = {};
             for (const key in COEFFICIENTS) {
-                const scaledValue = (IQRS[key] !== 0) ? (inputs[key] - MEDIANS[key]) / IQRS[key] : 0;
-                contributions[key] = scaledValue * COEFFICIENTS[key];
+                const raw = inputs[key];
+                const median = MEDIANS[key];
+                const iqr = IQRS[key] || 1; // avoid divide by zero
+                const scaled = (raw - median) / iqr;
+                const contrib = scaled * COEFFICIENTS[key];
+                contributions[key] = contrib;
+                logOdds += contrib;
             }
             
-            // Calculate Final Probability
-            let logOdds = INTERCEPT + Object.values(contributions).reduce((a, b) => a + b, 0);
-            const probability = 1 / (1 + Math.exp(-logOdds));
-            const finalDecision = probability >= OPTIMAL_THRESHOLD ? 'high-risk' : 'low-risk';
+            // Convert to probability & calibrate
+            const rawProb = 1 / (1 + Math.exp(-logOdds));
+            const calibratedProb = calibratePiecewise(rawProb);
+
+            // Decide risk group
+            const finalDecision = (calibratedProb >= OP_THRESH) ? 'high-risk' : 'low-risk';
 
             // Display All Results
-            displayResults(probability, finalDecision);
+            displayResults(calibratedProb, finalDecision);
             displayDrivers(contributions);
         }
 
         function displayResults(probability, decision) {
             const resultContainer = document.getElementById('result-container');
+            const meterMarker = document.getElementById('prob-meter-marker');
+            const meterLabel = document.getElementById('prob-meter-label');
+            const meterContainer = document.querySelector('.probability-meter-container'); // Get the container
+
             resultContainer.style.display = 'block';
             resultContainer.className = `result ${decision}`;
             const t = translations[currentLang];
             document.getElementById('result-title').textContent = (decision === 'high-risk') ? t.highRisk : t.lowRisk;
-            document.getElementById('result-probability').textContent = `${(probability * 100).toFixed(1)}%`;
+
+            // Update meter's custom property for CSS gradient
+            meterContainer.style.setProperty('--op-thresh-percent', `${(OP_THRESH * 100).toFixed(0)}%`);
+
+            // Position the marker
+            const markerPosition = Math.min(Math.max(probability, 0), 1) * 100; // Ensure 0-100%
+            meterMarker.style.left = `${markerPosition}%`;
+
+            // Position the label directly relative to the container based on marker position
+            meterLabel.textContent = `${(probability * 100).toFixed(1)}%`;
+            meterLabel.style.left = `${markerPosition}%`;
+            // The transform: translateX(-50%) in CSS handles centering.
+            
+            // Position the threshold label (call directly here to ensure it's updated on result display too)
+            positionThresholdLabel();
+
+            // Scroll to the result section
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function displayDrivers(contributions) {
@@ -303,7 +471,10 @@
             const positiveDrivers = Object.entries(contributions).filter(([, val]) => val > 0).sort((a, b) => b[1] - a[1]);
             const negativeDrivers = Object.entries(contributions).filter(([, val]) => val < 0).sort((a, b) => a[1] - b[1]);
             
-            const maxAbsContribution = Math.max(...Object.values(contributions).map(Math.abs));
+            // Ensure maxAbsContribution is not zero to prevent division by zero
+            const contributionValues = Object.values(contributions).map(Math.abs);
+            const maxAbsContribution = contributionValues.length > 0 ? Math.max(...contributionValues) : 0;
+
             const t = translations[currentLang];
 
             const createDriverItem = (key, value) => {
@@ -318,7 +489,10 @@
                 const bar = document.createElement('div');
                 bar.className = 'driver-bar ' + (value > 0 ? 'positive' : 'negative');
                 
-                setTimeout(() => { bar.style.width = `${(Math.abs(value) / maxAbsContribution) * 100}%`; }, 10);
+                // Calculate bar width safely
+                const barWidth = (maxAbsContribution > 0) ? (Math.abs(value) / maxAbsContribution) * 100 : 0;
+
+                setTimeout(() => { bar.style.width = `${barWidth}%`; }, 10);
                 
                 barContainer.appendChild(bar);
                 item.appendChild(label);
@@ -332,6 +506,25 @@
             driversSection.style.display = 'block';
             driversSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+
+        /**
+         * Positions the threshold label dynamically at the threshold point on the meter.
+         */
+        function positionThresholdLabel() {
+            const thresholdLabel = document.getElementById('threshold-label');
+            const meterContainer = document.querySelector('.probability-meter-container');
+            if (!meterContainer || !thresholdLabel) return; // Exit if elements not found
+
+            // Calculate the left position based on the OP_THRESH
+            const thresholdPosition = OP_THRESH * 100; // in percentage
+            
+            // Set the left position for the label
+            thresholdLabel.style.left = `${thresholdPosition}%`;
+            // The CSS transform: translateX(-50%) will center it horizontally at this point
+        }
+
+        // Ensure positionThresholdLabel is called on load and resize
+        // (Already done in DOMContentLoaded and window resize listener)
     </script>
 </body>
 </html>
