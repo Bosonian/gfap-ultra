@@ -34,11 +34,6 @@
             --step-indicator-text: #777;
             --step-indicator-active-text: #fff;
             --step-indicator-completed-bg: #28a745; /* Green for completed steps */
-
-            /* LLM Explanation Modal */
-            --modal-bg: rgba(0, 0, 0, 0.6);
-            --modal-content-bg: #ffffff;
-            --modal-text-color: #333;
         }
 
         body.dark-mode {
@@ -70,11 +65,6 @@
             --step-indicator-text: #ccc;
             --step-indicator-active-text: #fff;
             --step-indicator-completed-bg: #2ecc71;
-
-            /* LLM Explanation Modal Dark Mode */
-            --modal-bg: rgba(0, 0, 0, 0.8);
-            --modal-content-bg: #3d3d3d;
-            --modal-text-color: #f1f1f1;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -394,156 +384,6 @@
         .summary-value {
             color: var(--primary-color); /* Highlight values */
         }
-
-        /* LLM share modal styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1001; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: var(--modal-bg);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: var(--modal-content-bg);
-            margin: auto;
-            padding: 25px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            position: relative;
-            color: var(--modal-text-color);
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-close-button {
-            color: var(--text-color);
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .modal-close-button:hover,
-        .modal-close-button:focus {
-            color: #999;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .modal-header {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        body.dark-mode .modal-header { border-bottom-color: #555; }
-
-
-        .modal-body p {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-
-        .modal-body ul {
-            list-style-type: disc;
-            margin-left: 20px;
-            margin-bottom: 10px;
-        }
-
-        .modal-body strong {
-            color: var(--primary-color);
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 10px;
-            display: none; /* Hidden by default */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .llm-disclaimer {
-            font-size: 0.8em;
-            color: #888;
-            margin-top: 20px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
-        body.dark-mode .llm-disclaimer { border-top-color: #555; }
-
-        /* Share button styling */
-        .share-button-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .share-button {
-            background-color: #28a745; /* Green for share */
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        .share-button:hover {
-            background-color: #218838;
-        }
-
-        /* Styling for the copy text area in modal */
-        #shareableSummaryText {
-            width: 100%;
-            height: 150px;
-            padding: 10px;
-            margin-top: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: var(--background-color); /* Matches app background */
-            color: var(--text-color); /* Matches app text */
-            font-family: monospace; /* Monospace for code/data-like text */
-            resize: vertical; /* Allow vertical resizing */
-        }
-        body.dark-mode #shareableSummaryText { border-color: #555; }
-
-        .copy-button {
-            background-color: #007bff;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
-        }
-        .copy-button:hover {
-            background-color: #0056b3;
-        }
-
     </style>
 </head>
 <body>
@@ -642,11 +482,6 @@
                 <span class="probability-meter-label" id="prob-meter-label"></span>
                 <span class="probability-meter-threshold-label" id="threshold-label">iGFAP Cut-off: 0.32</span>
             </div>
-
-            <!-- New Share Button -->
-            <div class="share-button-container">
-                <button id="share-summary-btn" class="share-button" style="display: none;">✨ Share Summary</button>
-            </div>
         </div>
 
         <section id="drivers-section">
@@ -667,22 +502,6 @@
     <footer style="text-align:center; padding: 20px; font-size: 0.9em; opacity: 0.7;">
         <p>© <span id="currentYear"></span> All rights reserved.</p>
     </footer>
-
-    <!-- LLM Share Modal -->
-    <div id="shareModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close-button share-modal-close">&times;</span>
-            <div class="modal-header" id="shareModalHeader">AI-Generated Summary</div>
-            <div class="modal-body">
-                <div class="loading-spinner" id="shareModalSpinner"></div>
-                <textarea id="shareableSummaryText" readonly></textarea>
-                <button class="copy-button" id="copySummaryBtn">Copy to Clipboard</button>
-                <div class="llm-disclaimer">
-                    Disclaimer: This summary is generated by an AI model and is for informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for any health concerns.
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         // --- Model Parameters ---
@@ -741,14 +560,7 @@
                 step3Label: "Clinical",
                 step4Label: "History",
                 step5Label: "Review",
-                summaryTitle: "Review Your Inputs",
-                shareSummaryButton: "Share Summary",
-                summaryModalTitle: "AI-Generated Summary",
-                loadingSummary: "Generating summary...",
-                summaryError: "Failed to generate summary. Please try again.",
-                copyButton: "Copy to Clipboard",
-                copiedText: "Copied!",
-                medicalDisclaimer: "Disclaimer: This summary is generated by an AI model and is for informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for any health concerns."
+                summaryTitle: "Review Your Inputs"
             },
             de: {
                 driversTitle: "Treiber der Vorhersage",
@@ -766,14 +578,7 @@
                 step3Label: "Klinik",
                 step4Label: "Anamnese",
                 step5Label: "Überprüfung",
-                summaryTitle: "Ihre Eingaben überprüfen",
-                shareSummaryButton: "Zusammenfassung teilen",
-                summaryModalTitle: "KI-generierte Zusammenfassung",
-                loadingSummary: "Zusammenfassung wird generiert...",
-                summaryError: "Fehler beim Generieren der Zusammenfassung. Bitte versuchen Sie es erneut.",
-                copyButton: "In Zwischenablage kopieren",
-                copiedText: "Kopiert!",
-                medicalDisclaimer: "Haftungsausschluss: Diese Zusammenfassung wird von einem KI-Modell generiert und dient nur zu Informationszwecken. Sie ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung. Konsultieren Sie immer einen qualifizierten Gesundheitsdienstleister bei gesundheitlichen Bedenken."
+                summaryTitle: "Ihre Eingaben überprüfen"
             }
         };
         // Merging full translation objects to avoid repetition
@@ -786,12 +591,6 @@
         const totalSteps = 5; // Now 5 steps including the review/calculate step
         let formSteps = [];
         let stepperItems = []; // Array to hold stepper circle/label elements
-
-        // Store last calculated data for share summary
-        let lastPatientInputs = {};
-        let lastCalibratedProb = 0;
-        let lastFinalDecision = '';
-        let lastContributions = {}; // Store contributions for drivers in summary
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
@@ -815,16 +614,6 @@
             document.getElementById('next-btn').addEventListener('click', showNextStep);
             document.getElementById('prev-btn').addEventListener('click', showPrevStep);
 
-            // Share summary button and modal
-            document.getElementById('share-summary-btn').addEventListener('click', generateAndShowShareSummary);
-            document.querySelector('.share-modal-close').addEventListener('click', closeShareModal);
-            document.getElementById('shareModal').addEventListener('click', (event) => {
-                if (event.target.id === 'shareModal') {
-                    closeShareModal();
-                }
-            });
-            document.getElementById('copySummaryBtn').addEventListener('click', copySummaryToClipboard);
-
             // Initialize form display
             showStep(currentStep);
             positionThresholdLabel(); // Ensure it's called on load
@@ -841,7 +630,7 @@
                 const element = document.getElementById(key);
                 // Exclude old headache select options and featureNames from general textContent update
                 if (element && key !== 'featureNames' && !key.startsWith('headacheNo') && !key.startsWith('headacheYes') && !key.startsWith('headacheUnknown')
-                    && !key.startsWith('step') && key !== 'summaryTitle' && key !== 'shareSummaryButton' && key !== 'summaryModalTitle' && key !== 'loadingSummary' && key !== 'summaryError' && key !== 'copyButton' && key !== 'copiedText' && key !== 'medicalDisclaimer'
+                    && !key.startsWith('step') && key !== 'summaryTitle' 
                 ) { 
                      element.textContent = t[key];
                 }
@@ -868,10 +657,6 @@
             document.querySelector('.stepper-item[data-step="5"]').title = currentLang === 'en' ? 'Review & Calculate' : 'Überprüfung & Berechnung';
 
             document.getElementById('summaryTitle').textContent = t.summaryTitle;
-            document.getElementById('share-summary-btn').textContent = `✨ ${t.shareSummaryButton}`;
-            document.getElementById('shareModalHeader').textContent = t.summaryModalTitle;
-            document.getElementById('copySummaryBtn').textContent = t.copyButton;
-            document.querySelector('.llm-disclaimer').textContent = t.medicalDisclaimer;
 
 
             const darkModeToggle = document.getElementById('darkModeToggle');
@@ -974,7 +759,7 @@
             summaryContentDiv.innerHTML = ''; // Clear previous summary
 
             const t = translations[currentLang];
-            lastPatientInputs = {}; // Reset for new summary
+            // lastPatientInputs = {}; // No longer needed as we're not passing to LLM
 
             const inputElements = [
                 { id: 'age_years', type: 'number', label: t.featureNames.age_years, unit: currentLang === 'en' ? 'years' : 'Jahre' },
@@ -1001,7 +786,7 @@
                         rawValue = element.checked;
                         displayValue = element.checked ? (currentLang === 'en' ? 'Yes' : 'Ja') : (currentLang === 'en' ? 'No' : 'Nein');
                     }
-                    lastPatientInputs[item.id] = rawValue; // Store raw value for LLM
+                    // lastPatientInputs[item.id] = rawValue; // No longer needed
                     
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'summary-item';
@@ -1047,23 +832,20 @@
                 contributions[key] = contrib;
                 logOdds += contrib;
             }
-            lastContributions = contributions; // Store for share summary
+            // lastContributions = contributions; // No longer needed
             
             // Convert to probability & calibrate
             const rawProb = 1 / (1 + Math.exp(-logOdds));
             const calibratedProb = calibratePiecewise(rawProb);
-            lastCalibratedProb = calibratedProb; // Store for share summary
+            // lastCalibratedProb = calibratedProb; // No longer needed
 
             // Decide risk group
             const finalDecision = (calibratedProb >= OP_THRESH) ? 'high-risk' : 'low-risk';
-            lastFinalDecision = finalDecision; // Store for share summary
+            // lastFinalDecision = finalDecision; // No longer needed
 
             // Display All Results
             displayResults(calibratedProb, finalDecision);
             displayDrivers(contributions);
-
-            // Show the share summary button after calculation
-            document.getElementById('share-summary-btn').style.display = 'inline-block';
         }
 
         function displayResults(probability, decision) {
@@ -1157,117 +939,6 @@
             thresholdLabel.style.left = `${thresholdPosition}%`;
             // The CSS transform: translateX(-50%) will center it horizontally at this point
         }
-
-        // --- LLM Share Summary Functions ---
-        async function generateAndShowShareSummary() {
-            const shareModal = document.getElementById('shareModal');
-            const shareModalSpinner = document.getElementById('shareModalSpinner');
-            const shareableSummaryText = document.getElementById('shareableSummaryText');
-            const t = translations[currentLang];
-
-            shareableSummaryText.value = t.loadingSummary; // Set loading message
-            shareModalSpinner.style.display = 'block'; // Show spinner
-            shareModal.style.display = 'flex'; // Show the modal
-
-            const patientData = [];
-            const featureMap = translations[currentLang].featureNames;
-
-            // Collect all inputs from lastPatientInputs for the prompt
-            for (const key in lastPatientInputs) {
-                const label = featureMap[key] || key;
-                let value = lastPatientInputs[key];
-
-                // Re-format boolean values for human readability
-                if (typeof value === 'boolean') {
-                    value = value ? (currentLang === 'en' ? 'Yes' : 'Ja') : (currentLang === 'en' ? 'No' : 'Nein');
-                }
-                // Add units for numerical values as they were originally entered
-                if (key === 'age_years') value = `${document.getElementById('age_years').value} ${currentLang === 'en' ? 'years' : 'Jahre'}`;
-                if (key === 'systolic_bp') value = `${document.getElementById('systolic_bp').value} mmHg`;
-                if (key === 'gfap_value') value = `${document.getElementById('gfap_value').value} pg/mL`;
-
-                patientData.push(`${label}: ${value}`);
-            }
-
-            const positiveDrivers = Object.entries(lastContributions)
-                                    .filter(([, val]) => val > 0)
-                                    .sort((a, b) => b[1] - a[1])
-                                    .map(([key,]) => translations[currentLang].featureNames[key] || key);
-
-            const negativeDrivers = Object.entries(lastContributions)
-                                    .filter(([, val]) => val < 0)
-                                    .sort((a, b) => a[1] - b[1])
-                                    .map(([key,]) => translations[currentLang].featureNames[key] || key);
-
-            const prompt = `Generate a concise, human-readable patient summary report based on the following data for potential Intracerebral Hemorrhage (ICH) prediction. The target audience is healthcare professionals.
-            
-            Patient Data:
-            ${patientData.join('\n- ')}
-
-            Prediction Result:
-            - Calculated probability: ${(lastCalibratedProb * 100).toFixed(1)}%
-            - Risk classification: ${lastFinalDecision === 'high-risk' ? translations[currentLang].highRisk : translations[currentLang].lowRisk}
-            - ICH Cut-off for high risk: ${(OP_THRESH * 100).toFixed(0)}%
-
-            Prediction Drivers (factors influencing the prediction):
-            - Factors increasing risk: ${positiveDrivers.length > 0 ? positiveDrivers.join(', ') : 'None'}
-            - Factors decreasing risk: ${negativeDrivers.length > 0 ? negativeDrivers.join(', ') : 'None'}
-
-            Please provide the summary in a narrative, clinical note-like format, like this example: "68 year old patient with a weakness of upper and lower extremities showing a Eye deviation had a bp of 140 mm Hg systolic. The iGFAP value was 2875 pg/mL. The patient showed high probability of ICH. The sbp and gfap spoke for icb and older age group and possible ischemia in patient taking antiplatelet drugs spoke against icb".
-            Do not include any greeting or conversational text, just the summary.
-            Crucially, end the summary with this exact disclaimer: "${t.medicalDisclaimer}"`;
-
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    shareableSummaryText.value = text;
-                } else {
-                    shareableSummaryText.value = t.summaryError;
-                    console.error("Gemini API returned an unexpected structure:", result);
-                }
-            } catch (error) {
-                shareableSummaryText.value = t.summaryError;
-                console.error("Error calling Gemini API:", error);
-            } finally {
-                shareModalSpinner.style.display = 'none'; // Hide spinner
-            }
-        }
-
-        function closeShareModal() {
-            document.getElementById('shareModal').style.display = 'none';
-            document.getElementById('shareableSummaryText').value = ''; // Clear content when closing
-        }
-
-        function copySummaryToClipboard() {
-            const summaryTextarea = document.getElementById('shareableSummaryText');
-            summaryTextarea.select(); // Selects the text within the textarea
-            summaryTextarea.setSelectionRange(0, 99999); // For mobile devices
-
-            document.execCommand('copy'); // Copies the selected text
-
-            const copyButton = document.getElementById('copySummaryBtn');
-            const originalText = copyButton.textContent;
-            copyButton.textContent = translations[currentLang].copiedText; // Change text to "Copied!"
-            setTimeout(() => {
-                copyButton.textContent = originalText; // Revert text after a short delay
-            }, 1500);
-        }
-
     </script>
 </body>
 </html>
