@@ -3,393 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICH Prediction Tool</title>
+    <title>iGFAP Check</title>
     <style>
         :root {
-            --primary-color: #007bff;
-            --primary-hover: #0056b3;
-            --background-color: #f8f9fa;
-            --container-bg: #ffffff;
-            --text-color: #333;
-            --result-high-bg: #f8d7da;
-            --result-high-text: #721c24;
-            --result-high-border: #f5c6cb;
-            --result-low-bg: #d4edda;
-            --result-low-text: #155724;
-            --result-low-border: #c3e6cb;
-            --disclaimer-bg: #fff3cd;
-            --disclaimer-text: #856404;
-            --disclaimer-border: #ffeeba;
-            --driver-positive-bg: #e74c3c; /* Red for increasing risk */
-            --driver-negative-bg: #3498db; /* Blue for decreasing risk */
-
-            /* Meter Colors */
-            --meter-green: #28a745;
-            --meter-yellow: #ffc107;
-            --meter-red: #dc3545;
-
-            /* Multi-step form styles */
-            --step-indicator-bg: #e0e0e0;
-            --step-indicator-active-bg: var(--primary-color);
-            --step-indicator-text: #777;
-            --step-indicator-active-text: #fff;
-            --step-indicator-completed-bg: #28a745; /* Green for completed steps */
+            --primary-color: #007bff; --primary-hover: #0056b3; --background-color: #f4f7f9;
+            --container-bg: #ffffff; --text-color: #333; --border-color: #dee2e6;
+            --result-green-bg: #d4edda; --result-green-text: #155724; --result-green-border: #28a745;
+            --result-amber-bg: #fff3cd; --result-amber-text: #856404; --result-amber-border: #ffc107;
+            --result-red-bg: #f8d7da; --result-red-text: #721c24; --result-red-border: #dc3545;
+            --driver-positive-bg: #e74c3c; --driver-negative-bg: #3498db;
+            --meter-green: #28a745; --meter-yellow: #ffc107; --meter-red: #dc3545;
         }
-
         body.dark-mode {
-            --primary-color: #3399ff;
-            --primary-hover: #287ac7;
-            --background-color: #1e1e1e;
-            --container-bg: #2d2d2d;
-            --text-color: #f1f1f1;
-            --result-high-bg: #5c2a30;
-            --result-high-text: #f5c6cb;
-            --result-high-border: #721c24;
-            --result-low-bg: #2a5032;
-            --result-low-text: #c3e6cb;
-            --result-low-border: #155724;
-            --disclaimer-bg: #4d442a;
-            --disclaimer-text: #ffeeba;
-            --disclaimer-border: #856404;
-            --driver-positive-bg: #c0392b;
-            --driver-negative-bg: #2980b9;
-
-            /* Meter Colors for dark mode */
-            --meter-green: #2ecc71;
-            --meter-yellow: #f1c40f;
-            --meter-red: #e74c3c;
-
-            /* Multi-step form dark mode styles */
-            --step-indicator-bg: #555;
-            --step-indicator-active-bg: var(--primary-color);
-            --step-indicator-text: #ccc;
-            --step-indicator-active-text: #fff;
-            --step-indicator-completed-bg: #2ecc71;
+            --primary-color: #409eff; --primary-hover: #3a8ee6; --background-color: #121212;
+            --container-bg: #1e1e1e; --text-color: #f1f1f1; --border-color: #444;
+            --result-green-bg: #2a5032; --result-green-text: #c3e6cb; --result-green-border: #2ecc71;
+            --result-amber-bg: #4d442a; --result-amber-text: #ffeeba; --result-amber-border: #f1c40f;
+            --result-red-bg: #5c2a30; --result-red-text: #f5c6cb; --result-red-border: #f56c6c;
+            --driver-positive-bg: #c0392b; --driver-negative-bg: #2980b9;
         }
-
         *, *::before, *::after { box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .container {
-            max-width: 650px;
-            margin: 80px auto 20px auto;
-            padding: 25px;
-            background-color: var(--container-bg);
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 25px;
-            background-color: var(--container-bg);
-            color: var(--text-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        body.dark-mode .app-header { border-bottom: 1px solid #444; }
-
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 80px 15px 20px 15px; background-color: var(--background-color); color: var(--text-color); transition: background-color 0.3s ease, color 0.3s ease; }
+        .container { max-width: 650px; margin: 0 auto; padding: 25px; background-color: var(--container-bg); border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
+        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background-color: var(--container-bg); color: var(--text-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); }
         .app-header h1 { font-size: 1.4em; margin: 0; color: var(--primary-color); }
-        .header-right { display: flex; align-items: center; gap: 10px; }
-        .header-right button { width: auto; padding: 8px; margin-top: 0; background-color: transparent; font-size: 1.5rem; line-height: 1; border: none; cursor: pointer;}
-        .language-switcher img { width: 24px; height: 16px; border: 1px solid #ccc; border-radius: 3px; vertical-align: middle; opacity: 0.7; transition: opacity 0.2s; }
-        .language-switcher button { background: none; border: none; padding: 5px; cursor: pointer; }
-        .language-switcher button:hover img { opacity: 1; }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .language-switcher button { background: none; border: none; padding: 5px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+        .language-switcher button:hover { opacity: 1; }
+        .language-switcher img { width: 24px; height: 16px; border-radius: 3px; }
+        #darkModeToggle { background: none; border: none; color: var(--text-color); font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 8px; }
         h2 { text-align: center; margin-bottom: 25px; }
-        
-        .disclaimer { padding: 15px; margin-bottom: 20px; border: 1px solid var(--disclaimer-border); background-color: var(--disclaimer-bg); color: var(--disclaimer-text); border-radius: 8px; text-align: center; font-size: 0.9em; }
-        .disclaimer strong { display: block; margin-bottom: 5px; }
-
-        /* General input/checkbox group styling */
-        .input-group, .checkbox-group { 
-            margin-bottom: 15px; 
-            padding: 15px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            background-color: var(--background-color); 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-        }
-        body.dark-mode .input-group, body.dark-mode .checkbox-group { border-color: #444; }
-        
-        /* Adjusted label styling for checkboxes to allow wrapping */
-        .checkbox-group label { 
-            display: flex; 
-            align-items: flex-start; /* Keep alignment for checkbox and text */
-            cursor: pointer; 
-            font-weight: bold; 
-            flex-grow: 1; /* Allow label to take available space */
-            flex-wrap: wrap; /* Allow text to wrap */
-        }
-        .checkbox-group label span {
-            flex-grow: 1; /* Allow the span itself to wrap */
-        }
-
-        input[type="checkbox"] { width: 1.3em; height: 1.3em; margin-right: 12px; margin-top: 0.15em; flex-shrink: 0; /* Prevent checkbox from shrinking */ }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input[type="number"], select { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; background-color: var(--container-bg); color: var(--text-color); transition: border-color 0.2s; }
-        body.dark-mode input[type="number"], body.dark-mode select { border-color: #555; }
-        input:focus, select:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent); }
-
-        button.primary { padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s ease; width: 100%; font-weight: bold; background-color: var(--primary-color); color: white; }
+        .disclaimer { padding: 15px; margin-bottom: 20px; border: 1px solid var(--result-low-border); background-color: var(--result-low-bg); color: var(--result-low-text); border-radius: 8px; text-align: center; font-size: 0.9em; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .input-group, .checkbox-group { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--background-color); }
+        .checkbox-group label { display: flex; align-items: center; cursor: pointer; font-weight: bold; height: 100%;}
+        input[type="checkbox"] { width: 1.3em; height: 1.3em; margin-right: 12px; accent-color: var(--primary-color); }
+        label { display: block; margin-bottom: 6px; font-weight: bold; }
+        input[type="number"] { width: 100%; padding: 10px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--container-bg); color: var(--text-color); transition: border-color 0.2s; }
+        input:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent); }
+        button.primary { padding: 12px; margin-top: 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background-color 0.3s ease; width: 100%; font-weight: bold; background-color: var(--primary-color); color: white; }
         button.primary:hover { background-color: var(--primary-hover); }
-
-        .result { margin-top: 25px; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid; display: none; }
-        .result.high-risk { background-color: var(--result-high-bg); color: var(--result-high-text); border-color: var(--result-high-border); }
-        .result.low-risk { background-color: var(--result-low-bg); color: var(--result-low-text); border-color: var(--result-low-border); }
-        .result-prob { font-size: 2.8em; font-weight: bold; }
-        .result-label { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; }
-
-        /* --- Meter Styles --- */
-        .probability-meter-container {
-            width: 100%;
-            height: 30px;
-            background: linear-gradient(to right, var(--meter-green) 0%, var(--meter-yellow) calc(var(--op-thresh-percent) - 1%), var(--meter-red) var(--op-thresh-percent));
-            border-radius: 15px;
-            position: relative;
-            margin: 20px 0;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .probability-meter-marker {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%); /* Only vertical translation */
-            width: 8px;
-            height: 20px;
-            background-color: var(--text-color);
-            border-radius: 4px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
-            transition: left 0.5s ease-out;
-            z-index: 2;
-        }
-
-        .probability-meter-label {
-            position: absolute;
-            bottom: calc(100% + 5px); /* Position above the meter bar */
-            /* left will be set by JS */
-            transform: translateX(-50%); /* Centered relative to its own left point */
-            font-size: 0.9em;
-            font-weight: bold;
-            color: var(--text-color);
-            white-space: nowrap;
-            background-color: var(--container-bg);
-            padding: 2px 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 3;
-        }
-        body.dark-mode .probability-meter-label { border-color: #555; }
-
-        .probability-meter-threshold-label {
-            position: absolute;
-            top: calc(100% + 5px); /* Position below the meter */
-            transform: translateX(-50%); /* Center horizontally relative to its left */
-            font-size: 0.8em;
-            color: var(--text-color);
-            white-space: nowrap;
-            opacity: 0.8;
-            z-index: 1; /* Ensure it's behind the marker label if they overlap */
-        }
-
-
-        /* --- SIDE-BY-SIDE DRIVER ANALYSIS STYLES --- */
-        #drivers-section { margin-top: 25px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; display: none; }
-        body.dark-mode #drivers-section { border-color: #444; }
-        #drivers-section h3 { margin-top: 0; text-align: center; }
+        .result { margin-top: 25px; padding: 20px; border-radius: 8px; text-align: center; border-left: 5px solid; display: none; }
+        .result.high-risk { background-color: var(--result-red-bg); color: var(--result-red-text); border-left-color: var(--result-red-border); }
+        .result.medium-risk { background-color: var(--result-amber-bg); color: var(--result-amber-text); border-left-color: var(--result-amber-border); }
+        .result.low-risk { background-color: var(--result-green-bg); color: var(--result-green-text); border-left-color: var(--result-green-border); }
+        .probability-meter-container { width: 100%; height: 25px; /* THE FIX IS HERE: New 3-color gradient */ background: linear-gradient(to right, var(--meter-green) 25%, var(--meter-yellow) 50%, var(--meter-red) 100%); border-radius: 15px; position: relative; margin: 20px 0 30px 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+        .probability-meter-marker { position: absolute; top: -5px; bottom: -5px; width: 6px; background-color: var(--text-color); border-radius: 3px; box-shadow: 0 0 5px rgba(0,0,0,0.5); transition: left 0.5s ease-out; }
+        .probability-meter-label { position: absolute; bottom: 100%; transform: translateX(-50%); font-size: 1.1em; font-weight: bold; padding-bottom: 5px; }
+        #drivers-section { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-color); display: none; }
+        #drivers-section h3 { text-align: center; margin-bottom: 15px; }
         #drivers-columns { display: flex; gap: 20px; }
         .driver-column { flex: 1; min-width: 0; }
         .driver-column h4 { margin-top: 0; text-align: center; font-size: 1em; }
         .driver-item { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
-        .driver-label { width: 40%; text-align: right; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .driver-label { flex-shrink: 0; width: 40%; text-align: right; font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; }
         .driver-bar-container { flex-grow: 1; height: 18px; background-color: #eee; border-radius: 3px; }
         body.dark-mode .driver-bar-container { background-color: #555; }
-        .driver-bar { height: 100%; transition: width 0.5s ease-out; }
+        .driver-bar { height: 100%; border-radius: 3px; transition: width 0.5s ease-out; }
         .driver-bar.positive { background-color: var(--driver-positive-bg); }
         .driver-bar.negative { background-color: var(--driver-negative-bg); }
-
-        /* Multi-step form specific styles */
-        .form-step {
-            display: none; /* Hide all steps by default */
-            /* Inherits grid styles from active class for consistency */
-        }
-        .form-step.active {
-            display: grid; /* Show active step as a grid */
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            align-items: stretch;
-        }
-        /* Specific override for summary step to ensure it's a block, not a grid */
-        #step-5.form-step.active {
-            display: block; /* Summary step content should be a block, not a grid */
-        }
-
-        .form-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .form-navigation button {
-            width: 48%; /* Adjust width for side-by-side buttons */
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            font-weight: bold;
-        }
-        .form-navigation button.prev {
-            background-color: #6c757d; /* Grey for previous */
-            color: white;
-        }
-        .form-navigation button.prev:hover {
-            background-color: #5a6268;
-        }
-        .form-navigation button.next {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        .form-navigation button.next:hover {
-            background-color: var(--primary-hover);
-        }
-        /* Calculate button on the last step */
-        #calculate-btn {
-            display: none; /* Hidden by default, shown only on the last step */
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            font-weight: bold;
-        }
-        #calculate-btn:hover {
-             background-color: var(--primary-hover);
-        }
-
-
-        .stepper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            position: relative;
-            padding: 0 5px; /* Reduced padding to give more space to labels */
-        }
-        .stepper::before {
-            content: '';
-            position: absolute;
-            width: calc(100% - 10px); /* Adjust width based on new padding */
-            height: 2px;
-            background-color: var(--step-indicator-bg);
-            top: 50%;
-            left: 5px; /* Align with new padding */
-            transform: translateY(-50%);
-            z-index: 0;
-        }
-        .stepper-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            text-align: center;
-            position: relative;
-            z-index: 1; /* Keep dots and labels above the line */
-        }
-        .stepper-circle {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: var(--step-indicator-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            color: var(--step-indicator-text);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            margin-bottom: 5px;
-            border: 2px solid var(--step-indicator-bg); /* Default border */
-        }
-        .stepper-label {
-            font-size: 0.7em; /* Slightly smaller font size for mobile */
-            color: var(--step-indicator-text);
-            transition: color 0.3s ease;
-            white-space: nowrap; /* Prevent step labels from wrapping */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%; /* Ensure ellipsis works */
-        }
-
-        .stepper-item.active .stepper-circle {
-            background-color: var(--step-indicator-active-bg);
-            color: var(--step-indicator-active-text);
-            border-color: var(--primary-color);
-        }
-        .stepper-item.active .stepper-label {
-            color: var(--primary-color);
-        }
-        .stepper-item.completed .stepper-circle {
-            background-color: var(--step-indicator-completed-bg);
-            color: var(--step-indicator-active-text); /* White tick for completed */
-            border-color: var(--step-indicator-completed-bg);
-        }
-        .stepper-item.completed .stepper-circle::after {
-            content: '✓'; /* Checkmark for completed steps */
-            font-size: 1.2em;
-        }
-        .stepper-item.completed .stepper-label {
-            color: var(--text-color);
-        }
-
-        /* Summary styles */
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #eee;
-            font-size: 0.95em;
-        }
-        body.dark-mode .summary-item { border-bottom-color: #444; }
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-        .summary-label {
-            font-weight: bold;
-            color: var(--text-color);
-        }
-        .summary-value {
-            color: var(--primary-color); /* Highlight values */
-        }
     </style>
 </head>
 <body>
 
     <header class="app-header">
-        <h1 id="appTitle">iGFAP Check</h1>
+        <h1 data-translate="appTitle"></h1>
         <div class="header-right">
              <div class="language-switcher">
                 <button onclick="switchLanguage('en')" aria-label="Switch to English"><img src="https://flagcdn.com/gb.svg" alt="English Flag"></button>
@@ -400,103 +78,37 @@
     </header>
 
     <main id="mainSection" class="container">
-        <h2 id="strokeModuleTitle">Intracerebral Hemorrhage Prediction</h2>
-
-        <div class="disclaimer">
-            <strong id="disclaimerTitle">For Informational Purposes Only</strong>
-            <p id="disclaimerText">This tool is not a substitute for professional medical advice, diagnosis, or treatment.</p>
-        </div>
-
+        <h2 data-translate="strokeModuleTitle"></h2>
+        <div class="disclaimer"><strong data-translate="disclaimerTitle"></strong><p data-translate="disclaimerText"></p></div>
         <form id="ich-form">
-            <!-- Stepper Progress Indicators -->
-            <div class="stepper" id="form-stepper">
-                <div class="stepper-item" data-step="1" title="Patient Demographics">
-                    <div class="stepper-circle">1</div>
-                    <span class="stepper-label" id="step1Label">Demographics</span>
-                </div>
-                <div class="stepper-item" data-step="2" title="Vital Signs & Biomarkers">
-                    <div class="stepper-circle">2</div>
-                    <span class="stepper-label" id="step2Label">Vitals</span>
-                </div>
-                <div class="stepper-item" data-step="3" title="Neurological & Clinical Signs">
-                    <div class="stepper-circle">3</div>
-                    <span class="stepper-label" id="step3Label">Clinical</span>
-                </div>
-                <div class="stepper-item" data-step="4" title="Past Medical History">
-                    <div class="stepper-circle">4</div>
-                    <span class="stepper-label" id="step4Label">History</span>
-                </div>
-                <div class="stepper-item" data-step="5" title="Review & Calculate">
-                    <div class="stepper-circle">5</div>
-                    <span class="stepper-label" id="step5Label">Review</span>
-                </div>
+            <div class="input-grid">
+                <div class="input-group"><label for="gfap_value" data-translate="gfapLabel"></label><input type="number" id="gfap_value" placeholder="e.g., 2875" required min="29" max="10001"></div>
+                <div class="input-group"><label for="age_years" data-translate="ageLabel"></label><input type="number" id="age_years" placeholder="e.g., 75" required></div>
+                <div class="input-group"><label for="systolic_bp" data-translate="sbpLabel"></label><input type="number" id="systolic_bp" placeholder="e.g., 160" required></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="headache"><span data-translate="headacheLabel"></span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="eye_deviation"><span data-translate="eyeDeviationLabel"></span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="armparese"><span data-translate="armpareseLabel"></span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="beinparese"><span data-translate="beinpareseLabel"></span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="atrial_fibrillation"><span data-translate="afibLabel"></span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="antiplatelets"><span data-translate="antiplateletsLabel"></span></label></div>
             </div>
-
-            <!-- Form Steps -->
-            <!-- Step 1: Patient Demographics -->
-            <div class="form-step" id="step-1">
-                <div class="input-group"><label for="age_years" id="ageLabel">Age (years)</label><input type="number" id="age_years" placeholder="e.g., 75" required min="0"></div>
-            </div>
-
-            <!-- Step 2: Vital Signs & Biomarkers -->
-            <div class="form-step" id="step-2">
-                <div class="input-group"><label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label><input type="number" id="systolic_bp" placeholder="e.g., 160" required min="0"></div>
-                <div class="input-group"><label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label><input type="number" id="gfap_value" placeholder="e.g., 2875" required min="0"></div>
-            </div>
-
-            <!-- Step 3: Neurological & Clinical Signs -->
-            <div class="form-step" id="step-3">
-                <div class="checkbox-group"><label><input type="checkbox" id="eye_deviation"><span id="eyeDeviationLabel">Eye Deviation?</span></label></div>
-                <div class="checkbox-group"><label><input type="checkbox" id="armparese" checked><span id="armpareseLabel">Arm Paresis?</span></label></div>
-                <div class="checkbox-group"><label><input type="checkbox" id="beinparese" checked><span id="beinpareseLabel">Leg Paresis?</span></label></div>
-                <div class="checkbox-group"><label><input type="checkbox" id="headache"><span id="headacheLabel">Headache?</span></label></div>
-            </div>
-
-            <!-- Step 4: Past Medical History -->
-            <div class="form-step" id="step-4">
-                <div class="checkbox-group"><label><input type="checkbox" id="atrial_fibrillation"><span id="afibLabel">History of Atrial Fibrillation?</span></label></div>
-                <div class="checkbox-group"><label><input type="checkbox" id="antiplatelets"><span id="antiplateletsLabel">On Antiplatelets?</span></label></div>
-            </div>
-            
-            <!-- Step 5: Review and Calculate -->
-            <div class="form-step" id="step-5">
-                <h3 id="summaryTitle" style="text-align: center; margin-bottom: 20px;">Review Your Inputs</h3>
-                <div id="summary-content">
-                    <!-- Summary items will be dynamically populated here -->
-                </div>
-                 <button type="button" id="calculate-btn" class="primary">Calculate Probability</button>
-            </div>
-
-            <!-- Navigation Buttons -->
-            <div class="form-navigation">
-                <button type="button" id="prev-btn" class="prev" style="display: none;">Previous</button>
-                <button type="button" id="next-btn" class="next">Next</button>
-            </div>
+            <button type="button" id="calculate-btn" class="primary" data-translate="calculateButton"></button>
         </form>
-        
+        <p id="error-message" class="error-message hidden"></p>
         <div class="result" id="result-container">
             <div class="result-label" id="result-title"></div>
-            <!-- Probability Meter Section -->
-            <div class="probability-meter-container" style="--op-thresh-percent: 32%;">
+            <div class="probability-meter-container">
                 <div class="probability-meter-marker" id="prob-meter-marker"></div> 
                 <span class="probability-meter-label" id="prob-meter-label"></span>
-                <span class="probability-meter-threshold-label" id="threshold-label">iGFAP Cut-off: 0.32</span>
             </div>
+            <section id="drivers-section">
+                <h3 data-translate="driversTitle"></h3>
+                <div id="drivers-columns">
+                    <div class="driver-column"><h4 data-translate="increasingRiskTitle"></h4><div id="positive-drivers"></div></div>
+                    <div class="driver-column"><h4 data-translate="decreasingRiskTitle"></h4><div id="negative-drivers"></div></div>
+                </div>
+            </section>
         </div>
-
-        <section id="drivers-section">
-            <h3 id="driversTitle">Prediction Drivers</h3>
-            <div id="drivers-columns">
-                <div class="driver-column">
-                    <h4 id="increasingRiskTitle">Factors Increasing Risk</h4>
-                    <div id="positive-drivers"></div>
-                </div>
-                <div class="driver-column">
-                    <h4 id="decreasingRiskTitle">Factors Decreasing Risk</h4>
-                    <div id="negative-drivers"></div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer style="text-align:center; padding: 20px; font-size: 0.9em; opacity: 0.7;">
@@ -504,442 +116,162 @@
     </footer>
 
     <script>
-        // --- Model Parameters ---
-        const INTERCEPT = -0.72549447;
-        const COEFFICIENTS = { 'age_years': -0.20927375, 'eye_deviation': -0.26763354, 'armparese': 0.11730522, 'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'systolic_bp': 0.36337294, 'antiplatelets': -0.52928134, 'gfap_value': 0.98845868, 'headache': 0.43796113 };
-        const MEDIANS = { 'age_years': 78.0, 'eye_deviation': 0.0, 'armparese': 1.0, 'beinparese': 1.0, 'atrial_fibrillation': 0.0, 'systolic_bp': 160.0, 'antiplatelets': 0.0, 'gfap_value': 3.78418963, 'headache': 0.0 };
-        const IQRS = { 'age_years': 18.0, 'eye_deviation': 1.0, 'armparese': 1.0, 'beinparese': 1.0, 'atrial_fibrillation': 1.0, 'systolic_bp': 41.5, 'antiplatelets': 1.0, 'gfap_value': 0.98704051, 'headache': 0.5 };
-        const IMPUTED_HEADACHE = 0.0;
-        const OP_THRESH = 0.32; // Updated threshold
+        const MODEL_PARAMS = {
+            INTERCEPT: -0.72549447,
+            COEFFICIENTS: {'age_years': -0.20927375, 'eye_deviation': -0.26763354, 'armparese': 0.11730522, 'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'systolic_bp': 0.36337294, 'antiplatelets': -0.52928134, 'gfap_value': 0.98845868, 'headache': 0.43796113 },
+            SCALER_PARAMS: {'gfap_value': { center: 3.78418963, scale: 0.98704051 }, 'age_years': { center: 78.0, scale: 18.0 }, 'systolic_bp': { center: 160.0, scale: 41.5 } },
+            CALIBRATION_A: 1.15, CALIBRATION_B: -0.20 
+        };
+        const FEATURES = Object.keys(MODEL_PARAMS.COEFFICIENTS);
+        const CONTINUOUS_FEATURES = Object.keys(MODEL_PARAMS.SCALER_PARAMS);
 
-        // --- Calibration mapping from your reliability diagram ---
-        const X_MAP = [0.00, 0.054, 0.142, 0.225, 0.321, 0.488, 0.626, 0.770, 0.826, 0.976, 1.00];
-        const Y_MAP = [0.00, 0.036, 0.042, 0.286, 0.500, 1.000, 1.000, 1.000, 1.000, 1.000, 1.00];
-
-        /**
-         * Given a raw probability p ∈ [0,1], returns the piecewise-linear
-         * calibrated probability based on your X_MAP → Y_MAP.
-         */
-        function calibratePiecewise(p) {
-            // below lowest bin
-            if (p <= X_MAP[0]) {
-                return Y_MAP[0];
-            }
-            // above highest bin
-            if (p >= X_MAP[X_MAP.length - 1]) {
-                return Y_MAP[Y_MAP.length - 1];
-            }
-            // find the interval [X_MAP[i], X_MAP[i+1]] containing p
-            for (let i = 0; i < X_MAP.length - 1; i++) {
-                const x0 = X_MAP[i],    x1 = X_MAP[i + 1];
-                const y0 = Y_MAP[i],    y1 = Y_MAP[i + 1];
-                if (p >= x0 && p <= x1) {
-                    const t = (p - x0) / (x1 - x0);
-                    return y0 + t * (y1 - y0);
-                }
-            }
-            // fallback (shouldn't happen)
-            return p;
-        }
-        
-        // --- Translation Data ---
         const translations = {
             en: {
-                driversTitle: "Prediction Drivers",
-                increasingRiskTitle: "Factors Increasing Risk",
-                decreasingRiskTitle: "Factors Decreasing Risk",
-                featureNames: { 'age_years': 'Age', 'eye_deviation': 'Eye Deviation', 'armparese': 'Arm Paresis', 'beinparese': 'Leg Paresis', 'atrial_fibrillation': 'Atrial Fibrillation', 'systolic_bp': 'Systolic BP', 'antiplatelets': 'Antiplatelets', 'gfap_value': 'GFAP', 'headache': 'Headache' },
-                thresholdLabel: "iGFAP Cut-off:", 
-                probLabel: "Probability:",
-                nextButton: "Next",
-                previousButton: "Previous",
-                calculateButton: "Calculate Probability",
-                // Shorter step labels for stepper
-                step1Label: "Demographics",
-                step2Label: "Vitals",
-                step3Label: "Clinical",
-                step4Label: "History",
-                step5Label: "Review",
-                summaryTitle: "Review Your Inputs"
+                appTitle: "iGFAP Check", strokeModuleTitle: "ICH Probability Assessment", disclaimerTitle: "For Research Purposes Only", disclaimerText: "This tool is not a substitute for professional medical advice.",
+                gfapLabel: "GFAP Value (pg/mL)", ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)",
+                headacheLabel: "Headache", eyeDeviationLabel: "Eye Deviation", armpareseLabel: "Arm Paresis", beinpareseLabel: "Leg Paresis",
+                afibLabel: "History of AFib", antiplateletsLabel: "On Antiplatelets",
+                calculateButton: "Calculate ICH Probability",
+                highRisk: "High Probability of ICH (>50%)", mediumRisk: "Medium Probability of ICH (25-50%)", lowRisk: "Low Probability of ICH (<25%)",
+                invalidInput: "Please fill all fields.", driversTitle: "Prediction Drivers", increasingRiskTitle: "Factors Increasing Risk", decreasingRiskTitle: "Factors Decreasing Risk",
+                featureNames: { 'age_years': 'Age', 'eye_deviation': 'Eye Deviation', 'armparese': 'Arm Paresis', 'beinparese': 'Leg Paresis', 'atrial_fibrillation': 'Atrial Fibrillation', 'systolic_bp': 'Systolic BP', 'antiplatelets': 'On Antiplatelets', 'gfap_value': 'GFAP', 'headache': 'Headache' },
             },
             de: {
-                driversTitle: "Treiber der Vorhersage",
-                increasingRiskTitle: "Risikoerhöhende Faktoren",
-                decreasingRiskTitle: "Risikomindernde Faktoren",
-                featureNames: { 'age_years': 'Alter', 'eye_deviation': 'Blickdeviation', 'armparese': 'Armparese', 'beinparese': 'Beinparese', 'atrial_fibrillation': 'Vorhofflimmern', 'systolic_bp': 'Systolischer RR', 'antiplatelets': 'Thrombozytenhemmer', 'gfap_value': 'GFAP', 'headache': 'Kopfschmerzen' },
-                thresholdLabel: "iGFAP Cut-off:", 
-                probLabel: "Wahrscheinlichkeit:",
-                nextButton: "Weiter",
-                previousButton: "Zurück",
-                calculateButton: "Wahrscheinlichkeit berechnen",
-                // Shorter step labels for stepper
-                step1Label: "Demografie",
-                step2Label: "Vitalwerte",
-                step3Label: "Klinik",
-                step4Label: "Anamnese",
-                step5Label: "Überprüfung",
-                summaryTitle: "Ihre Eingaben überprüfen"
+                appTitle: "iGFAP Check", strokeModuleTitle: "ICB-Wahrscheinlichkeitsbewertung", disclaimerTitle: "Nur zu Forschungszwecken", disclaimerText: "Dieses Tool ist kein Ersatz für professionelle medizinische Beratung.",
+                gfapLabel: "GFAP-Wert (pg/mL)", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)",
+                headacheLabel: "Kopfschmerzen", eyeDeviationLabel: "Blickdeviation", armpareseLabel: "Armparese", beinpareseLabel: "Beinparese",
+                afibLabel: "Vorhofflimmern-Anamnese", antiplateletsLabel: "Unter TAH",
+                calculateButton: "ICB-Wahrscheinlichkeit berechnen",
+                highRisk: "Hohe Wahrscheinlichkeit für ICB (>50%)", mediumRisk: "Mittlere Wahrscheinlichkeit für ICB (25-50%)", lowRisk: "Geringe Wahrscheinlichkeit für ICB (<25%)",
+                invalidInput: "Bitte füllen Sie alle Felder aus.", driversTitle: "Treiber der Vorhersage", increasingRiskTitle: "Risikoerhöhende Faktoren", decreasingRiskTitle: "Risikomindernde Faktoren",
+                featureNames: { 'age_years': 'Alter', 'eye_deviation': 'Blickdeviation', 'armparese': 'Armparese', 'beinparese': 'Beinparese', 'atrial_fibrillation': 'Vorhofflimmern', 'systolic_bp': 'Systolischer RR', 'antiplatelets': 'Unter TAH', 'gfap_value': 'GFAP', 'headache': 'Kopfschmerzen' },
             }
         };
-        // Merging full translation objects to avoid repetition
-        Object.assign(translations.en, { appTitle: "iGFAP Check", strokeModuleTitle: "Intracerebral Hemorrhage Prediction", disclaimerTitle: "For Informational Purposes Only", disclaimerText: "This tool is not a substitute for professional medical advice, diagnosis, or treatment.", ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)", eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?", afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?", calculateButton: "Calculate Probability", highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely", darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode"});
-        Object.assign(translations.de, { appTitle: "iGFAP Check", strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung", disclaimerTitle: "Nur zu Informationszwecken", disclaimerText: "Dieses Tool ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung.", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)", eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?", afibLabel: "Vorhofflimmern-Anamnese?", antiplateletsLabel: "Unter Thrombozytenaggregationshemmern?", headacheLabel: "Kopfschmerzen?", calculateButton: "Wahrscheinlichkeit berechnen", highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich", darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus"});
-
-
-        // --- App Logic ---
-        let currentStep = 1;
-        const totalSteps = 5; // Now 5 steps including the review/calculate step
-        let formSteps = [];
-        let stepperItems = []; // Array to hold stepper circle/label elements
-
+        
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkModeToggle').textContent = '☀️';
-            }
-            const preferredLang = localStorage.getItem('language') || 'en';
-            switchLanguage(preferredLang);
-
-            // Populate formSteps array
-            for (let i = 1; i <= totalSteps; i++) {
-                formSteps.push(document.getElementById(`step-${i}`));
-            }
-
-            // Populate stepperItems array
-            stepperItems = Array.from(document.querySelectorAll('.stepper-item'));
-
+            if (localStorage.getItem('darkMode') === 'enabled') { document.body.classList.add('dark-mode'); document.getElementById('darkModeToggle').textContent = '☀️'; }
+            switchLanguage(localStorage.getItem('language') || 'en');
             document.getElementById('calculate-btn').addEventListener('click', calculateProbability);
-            document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-            document.getElementById('next-btn').addEventListener('click', showNextStep);
-            document.getElementById('prev-btn').addEventListener('click', showPrevStep);
-
-            // Initialize form display
-            showStep(currentStep);
-            positionThresholdLabel(); // Ensure it's called on load
-            window.addEventListener('resize', positionThresholdLabel);
+            document.getElementById('darkModeToggle').addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                document.getElementById('darkModeToggle').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+            });
         });
 
-        let currentLang = 'en';
         function switchLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('language', lang);
+            window.currentLang = lang;
             const t = translations[lang];
-            
-            Object.keys(t).forEach(key => {
-                const element = document.getElementById(key);
-                // Exclude old headache select options and featureNames from general textContent update
-                if (element && key !== 'featureNames' && !key.startsWith('headacheNo') && !key.startsWith('headacheYes') && !key.startsWith('headacheUnknown')
-                    && !key.startsWith('step') && key !== 'summaryTitle' 
-                ) { 
-                     element.textContent = t[key];
-                }
-            });
-            // Update specific button and step labels
-            document.getElementById('calculate-btn').textContent = t.calculateButton;
-            document.getElementById('next-btn').textContent = t.nextButton;
-            document.getElementById('prev-btn').textContent = t.previousButton;
-            
-            // Update stepper labels and titles
-            document.querySelector('.stepper-item[data-step="1"] .stepper-label').textContent = t.step1Label;
-            document.querySelector('.stepper-item[data-step="1"]').title = currentLang === 'en' ? 'Patient Demographics' : 'Patientendemografie';
-            
-            document.querySelector('.stepper-item[data-step="2"] .stepper-label').textContent = t.step2Label;
-            document.querySelector('.stepper-item[data-step="2"]').title = currentLang === 'en' ? 'Vital Signs & Biomarkers' : 'Vitalwerte & Biomarker';
-
-            document.querySelector('.stepper-item[data-step="3"] .stepper-label').textContent = t.step3Label;
-            document.querySelector('.stepper-item[data-step="3"]').title = currentLang === 'en' ? 'Neurological & Clinical Signs' : 'Neurologische & Klinische Zeichen';
-
-            document.querySelector('.stepper-item[data-step="4"] .stepper-label').textContent = t.step4Label;
-            document.querySelector('.stepper-item[data-step="4"]').title = currentLang === 'en' ? 'Past Medical History' : 'Anamnese';
-
-            document.querySelector('.stepper-item[data-step="5"] .stepper-label').textContent = t.step5Label;
-            document.querySelector('.stepper-item[data-step="5"]').title = currentLang === 'en' ? 'Review & Calculate' : 'Überprüfung & Berechnung';
-
-            document.getElementById('summaryTitle').textContent = t.summaryTitle;
-
-
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const ariaLabel = document.body.classList.contains('dark-mode') ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff;
-            darkModeToggle.setAttribute('aria-label', ariaLabel);
-
-            // Update threshold label to use iGFAP Cut-off and OP_THRESH
-            document.getElementById('threshold-label').textContent = `${t.thresholdLabel} ${OP_THRESH.toFixed(2)}`;
-            // Re-position the threshold label after text content might change its width
-            positionThresholdLabel();
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
-            const t = translations[currentLang];
-            darkModeToggle.setAttribute('aria-label', isDarkMode ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff);
-        }
-
-        // --- Multi-step form functions ---
-        function showStep(stepNum) {
-            formSteps.forEach((stepDiv, index) => {
-                if (index + 1 === stepNum) {
-                    stepDiv.classList.add('active');
-                } else {
-                    stepDiv.classList.remove('active');
-                }
-            });
-
-            // Update stepper visual indicators
-            stepperItems.forEach((item, index) => {
-                if (index + 1 < stepNum) {
-                    item.classList.add('completed');
-                    item.classList.remove('active');
-                } else if (index + 1 === stepNum) {
-                    item.classList.add('active');
-                    item.classList.remove('completed');
-                } else {
-                    item.classList.remove('active', 'completed');
-                }
-            });
-
-            // Show/hide navigation buttons and calculate button
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const calculateBtn = document.getElementById('calculate-btn');
-
-            prevBtn.style.display = (stepNum === 1) ? 'none' : 'block';
-            
-            if (stepNum === totalSteps) { // If it's the last step (Review)
-                nextBtn.style.display = 'none';
-                calculateBtn.style.display = 'block'; // Show calculate button
-                populateSummary(); // Populate the summary before showing
-            } else {
-                nextBtn.style.display = 'block';
-                calculateBtn.style.display = 'none'; // Hide calculate button
-            }
-            
-            // Scroll to the top of the form section to ensure the new step is visible
-            document.getElementById('mainSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function checkCurrentStepValidity() {
-            const currentFormStepDiv = formSteps[currentStep - 1];
-            // Only validate required inputs in the current active step (unless it's the summary step)
-            if (currentStep === totalSteps) return true; // Summary step doesn't have inputs to validate
-
-            const inputsInCurrentStep = currentFormStepDiv.querySelectorAll('input[required], select[required]');
-            let allValid = true;
-            inputsInCurrentStep.forEach(input => {
-                if (!input.checkValidity()) {
-                    input.reportValidity();
-                    allValid = false;
-                }
-            });
-            return allValid;
-        }
-
-        function showNextStep() {
-            if (checkCurrentStepValidity()) {
-                if (currentStep < totalSteps) {
-                    currentStep++;
-                    showStep(currentStep);
-                }
-            }
-        }
-
-        function showPrevStep() {
-            if (currentStep > 1) {
-                currentStep--;
-                showStep(currentStep);
-            }
-        }
-
-        function populateSummary() {
-            const summaryContentDiv = document.getElementById('summary-content');
-            summaryContentDiv.innerHTML = ''; // Clear previous summary
-
-            const t = translations[currentLang];
-            // lastPatientInputs = {}; // No longer needed as we're not passing to LLM
-
-            const inputElements = [
-                { id: 'age_years', type: 'number', label: t.featureNames.age_years, unit: currentLang === 'en' ? 'years' : 'Jahre' },
-                { id: 'systolic_bp', type: 'number', label: t.featureNames.systolic_bp, unit: 'mmHg' },
-                { id: 'gfap_value', type: 'number', label: t.featureNames.gfap_value, unit: 'pg/mL' },
-                { id: 'eye_deviation', type: 'checkbox', label: t.featureNames.eye_deviation },
-                { id: 'armparese', type: 'checkbox', label: t.featureNames.armparese },
-                { id: 'beinparese', type: 'checkbox', label: t.featureNames.beinparese },
-                { id: 'atrial_fibrillation', type: 'checkbox', label: t.featureNames.atrial_fibrillation },
-                { id: 'antiplatelets', type: 'checkbox', label: t.featureNames.antiplatelets },
-                { id: 'headache', type: 'checkbox', label: t.featureNames.headache }
-            ];
-
-            inputElements.forEach(item => {
-                const element = document.getElementById(item.id);
-                if (element) {
-                    let displayValue = '';
-                    let rawValue;
-
-                    if (item.type === 'number') {
-                        rawValue = element.value;
-                        displayValue = `${element.value} ${item.unit || ''}`;
-                    } else if (item.type === 'checkbox') {
-                        rawValue = element.checked;
-                        displayValue = element.checked ? (currentLang === 'en' ? 'Yes' : 'Ja') : (currentLang === 'en' ? 'No' : 'Nein');
-                    }
-                    // lastPatientInputs[item.id] = rawValue; // No longer needed
-                    
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'summary-item';
-                    const labelSpan = document.createElement('span');
-                    labelSpan.className = 'summary-label';
-                    labelSpan.textContent = `${item.label}:`;
-                    const valueSpan = document.createElement('span');
-                    valueSpan.className = 'summary-value';
-                    valueSpan.textContent = displayValue;
-
-                    itemDiv.appendChild(labelSpan);
-                    itemDiv.appendChild(valueSpan);
-                    summaryContentDiv.appendChild(itemDiv);
-                }
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.dataset.translate;
+                if (t[key]) el.textContent = t[key];
             });
         }
-
+        window.switchLanguage = switchLanguage;
 
         function calculateProbability() {
-            // No need for form.checkValidity() here if step-by-step validation is strict enough
-            // But keep it as a final fallback for safety
-            const form = document.getElementById('ich-form');
-            if (!form.checkValidity()) { form.reportValidity(); return; }
-
-
-            // Get & Preprocess Inputs
+            const errorMsg = document.getElementById('error-message');
+            errorMsg.style.display = 'none';
             const inputs = {};
-            const CHECKBOX_FEATURES = ['eye_deviation', 'armparese', 'beinparese', 'atrial_fibrillation', 'antiplatelets', 'headache']; 
-            ['age_years', 'systolic_bp', 'gfap_value'].forEach(id => { inputs[id] = parseFloat(document.getElementById(id).value); });
-            CHECKBOX_FEATURES.forEach(id => { inputs[id] = document.getElementById(id).checked ? 1 : 0; });
-            
-            inputs.gfap_value = Math.log1p(Math.max(inputs.gfap_value, 0)); // Log‐transform GFAP
-            
-            // Scale Inputs & Calculate Contributions
-            let logOdds = INTERCEPT;
-            const contributions = {};
-            for (const key in COEFFICIENTS) {
-                const raw = inputs[key];
-                const median = MEDIANS[key];
-                const iqr = IQRS[key] || 1; // avoid divide by zero
-                const scaled = (raw - median) / iqr;
-                const contrib = scaled * COEFFICIENTS[key];
-                contributions[key] = contrib;
-                logOdds += contrib;
+            for (const key of FEATURES) {
+                const el = document.getElementById(key);
+                if (!el) continue;
+                if (el.type === 'checkbox') {
+                    inputs[key] = el.checked ? 1 : 0;
+                } else if (el.value === '' || el.value === null) {
+                    errorMsg.textContent = translations[window.currentLang].invalidInput;
+                    errorMsg.style.display = 'block';
+                    return;
+                } else {
+                    inputs[key] = parseFloat(el.value);
+                }
             }
-            // lastContributions = contributions; // No longer needed
+            if (inputs.headache === -1) inputs.headache = 0.0;
+            inputs.gfap_value = Math.log1p(inputs.gfap_value);
+
+            const contributions = {};
+            let logOdds = MODEL_PARAMS.INTERCEPT;
+            for (const key in MODEL_PARAMS.COEFFICIENTS) {
+                let featureValue = inputs[key];
+                if (CONTINUOUS_FEATURES.includes(key)) {
+                    featureValue = (featureValue - MODEL_PARAMS.SCALER_PARAMS[key].center) / MODEL_PARAMS.SCALER_PARAMS[key].scale;
+                }
+                const contribution = featureValue * MODEL_PARAMS.COEFFICIENTS[key];
+                contributions[key] = contribution;
+                logOdds += contribution;
+            }
             
-            // Convert to probability & calibrate
             const rawProb = 1 / (1 + Math.exp(-logOdds));
-            const calibratedProb = calibratePiecewise(rawProb);
-            // lastCalibratedProb = calibratedProb; // No longer needed
+            const calibratedLogOdds = MODEL_PARAMS.CALIBRATION_A * logOdds + MODEL_PARAMS.CALIBRATION_B;
+            const calibratedProb = 1 / (1 + Math.exp(-calibratedLogOdds));
 
-            // Decide risk group
-            const finalDecision = (calibratedProb >= OP_THRESH) ? 'high-risk' : 'low-risk';
-            // lastFinalDecision = finalDecision; // No longer needed
-
-            // Display All Results
-            displayResults(calibratedProb, finalDecision);
-            displayDrivers(contributions);
+            displayResults(calibratedProb, contributions);
         }
 
-        function displayResults(probability, decision) {
+        function displayResults(probability, contributions) {
             const resultContainer = document.getElementById('result-container');
+            const resultTitle = document.getElementById('result-title');
             const meterMarker = document.getElementById('prob-meter-marker');
             const meterLabel = document.getElementById('prob-meter-label');
-            const meterContainer = document.querySelector('.probability-meter-container'); // Get the container
-
-            resultContainer.style.display = 'block';
-            resultContainer.className = `result ${decision}`;
-            const t = translations[currentLang];
-            document.getElementById('result-title').textContent = (decision === 'high-risk') ? t.highRisk : t.lowRisk;
-
-            // Update meter's custom property for CSS gradient
-            meterContainer.style.setProperty('--op-thresh-percent', `${(OP_THRESH * 100).toFixed(0)}%`);
-
-            // Position the marker
-            const markerPosition = Math.min(Math.max(probability, 0), 1) * 100; // Ensure 0-100%
-            meterMarker.style.left = `${markerPosition}%`;
-
-            // Position the label directly relative to the container based on marker position
-            meterLabel.textContent = `${(probability * 100).toFixed(1)}%`;
-            meterLabel.style.left = `${markerPosition}%`;
-            // The transform: translateX(-50%) in CSS handles centering.
             
-            // Position the threshold label (call directly here to ensure it's updated on result display too)
-            positionThresholdLabel();
+            resultContainer.style.display = 'block';
+            const t = translations[window.currentLang];
+            let decisionClass, decisionLabelKey;
+            
+            if (probability < 0.25) {
+                decisionClass = 'low-risk';
+                decisionLabelKey = 'lowRisk';
+            } else if (probability < 0.50) {
+                decisionClass = 'medium-risk';
+                decisionLabelKey = 'mediumRisk';
+            } else {
+                decisionClass = 'high-risk';
+                decisionLabelKey = 'highRisk';
+            }
 
-            // Scroll to the result section
-            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            resultContainer.className = `result ${decisionClass}`;
+            resultTitle.textContent = t[decisionLabelKey];
+            
+            const markerPosition = Math.min(Math.max(probability, 0), 1) * 100;
+            meterMarker.style.left = `calc(${markerPosition}% - 3px)`;
+            meterLabel.style.left = `${markerPosition}%`;
+            meterLabel.textContent = `${(probability * 100).toFixed(0)}%`;
+            
+            displayDrivers(contributions);
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-
-        function displayDrivers(contributions) {
+        
+        function displayDrivers(contributions){
             const driversSection = document.getElementById('drivers-section');
             const posContainer = document.getElementById('positive-drivers');
             const negContainer = document.getElementById('negative-drivers');
-            posContainer.innerHTML = '';
-            negContainer.innerHTML = '';
+            posContainer.innerHTML = ''; negContainer.innerHTML = '';
 
-            const positiveDrivers = Object.entries(contributions).filter(([, val]) => val > 0).sort((a, b) => b[1] - a[1]);
-            const negativeDrivers = Object.entries(contributions).filter(([, val]) => val < 0).sort((a, b) => a[1] - b[1]);
-            
-            // Ensure maxAbsContribution is not zero to prevent division by zero
-            const contributionValues = Object.values(contributions).map(Math.abs);
-            const maxAbsContribution = contributionValues.length > 0 ? Math.max(...contributionValues) : 0;
+            const sortedDrivers = Object.entries(contributions).filter(([, val]) => Math.abs(val) > 0.01).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+            const maxAbsContribution = sortedDrivers.length > 0 ? Math.abs(sortedDrivers[0][1]) : 0;
+            const t = translations[window.currentLang];
 
-            const t = translations[currentLang];
-
-            const createDriverItem = (key, value) => {
+            sortedDrivers.forEach(([key, value]) => {
+                const container = value > 0 ? posContainer : negContainer;
                 const item = document.createElement('div');
                 item.className = 'driver-item';
                 const label = document.createElement('span');
                 label.className = 'driver-label';
                 label.textContent = t.featureNames[key] || key;
-                label.title = t.featureNames[key] || key;
                 const barContainer = document.createElement('div');
                 barContainer.className = 'driver-bar-container';
                 const bar = document.createElement('div');
                 bar.className = 'driver-bar ' + (value > 0 ? 'positive' : 'negative');
-                
-                // Calculate bar width safely
                 const barWidth = (maxAbsContribution > 0) ? (Math.abs(value) / maxAbsContribution) * 100 : 0;
-
                 setTimeout(() => { bar.style.width = `${barWidth}%`; }, 10);
-                
                 barContainer.appendChild(bar);
                 item.appendChild(label);
                 item.appendChild(barContainer);
-                return item;
-            };
-
-            positiveDrivers.forEach(([key, value]) => posContainer.appendChild(createDriverItem(key, value)));
-            negativeDrivers.forEach(([key, value]) => negContainer.appendChild(createDriverItem(key, value)));
-
+                container.appendChild(item);
+            });
             driversSection.style.display = 'block';
-            driversSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        /**
-         * Positions the threshold label dynamically at the threshold point on the meter.
-         */
-        function positionThresholdLabel() {
-            const thresholdLabel = document.getElementById('threshold-label');
-            const meterContainer = document.querySelector('.probability-meter-container');
-            if (!meterContainer || !thresholdLabel) return; // Exit if elements not found
-
-            // Calculate the left position based on the OP_THRESH
-            const thresholdPosition = OP_THRESH * 100; // in percentage
-            
-            // Set the left position for the label
-            thresholdLabel.style.left = `${thresholdPosition}%`;
-            // The CSS transform: translateX(-50%) will center it horizontally at this point
         }
     </script>
 </body>
 </html>
-
