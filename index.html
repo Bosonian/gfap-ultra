@@ -27,6 +27,18 @@
             --meter-green: #28a745;
             --meter-yellow: #ffc107;
             --meter-red: #dc3545;
+
+            /* Multi-step form styles */
+            --step-indicator-bg: #e0e0e0;
+            --step-indicator-active-bg: var(--primary-color);
+            --step-indicator-text: #777;
+            --step-indicator-active-text: #fff;
+            --step-indicator-completed-bg: #28a745; /* Green for completed steps */
+
+            /* LLM Explanation Modal */
+            --modal-bg: rgba(0, 0, 0, 0.6);
+            --modal-content-bg: #ffffff;
+            --modal-text-color: #333;
         }
 
         body.dark-mode {
@@ -51,6 +63,18 @@
             --meter-green: #2ecc71;
             --meter-yellow: #f1c40f;
             --meter-red: #e74c3c;
+
+            /* Multi-step form dark mode styles */
+            --step-indicator-bg: #555;
+            --step-indicator-active-bg: var(--primary-color);
+            --step-indicator-text: #ccc;
+            --step-indicator-active-text: #fff;
+            --step-indicator-completed-bg: #2ecc71;
+
+            /* LLM Explanation Modal Dark Mode */
+            --modal-bg: rgba(0, 0, 0, 0.8);
+            --modal-content-bg: #3d3d3d;
+            --modal-text-color: #f1f1f1;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -102,8 +126,18 @@
         .disclaimer { padding: 15px; margin-bottom: 20px; border: 1px solid var(--disclaimer-border); background-color: var(--disclaimer-bg); color: var(--disclaimer-text); border-radius: 8px; text-align: center; font-size: 0.9em; }
         .disclaimer strong { display: block; margin-bottom: 5px; }
 
-        .input-group, .select-group, .checkbox-group { margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: var(--background-color); display: flex; flex-direction: column; justify-content: center; }
-        body.dark-mode .input-group, body.dark-mode .select-group, body.dark-mode .checkbox-group { border-color: #444; }
+        /* General input/checkbox group styling */
+        .input-group, .checkbox-group { 
+            margin-bottom: 15px; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background-color: var(--background-color); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        body.dark-mode .input-group, body.dark-mode .checkbox-group { border-color: #444; }
         
         /* Adjusted label styling for checkboxes to allow wrapping */
         .checkbox-group label { 
@@ -203,6 +237,313 @@
         .driver-bar.positive { background-color: var(--driver-positive-bg); }
         .driver-bar.negative { background-color: var(--driver-negative-bg); }
 
+        /* Multi-step form specific styles */
+        .form-step {
+            display: none; /* Hide all steps by default */
+            /* Inherits grid styles from active class for consistency */
+        }
+        .form-step.active {
+            display: grid; /* Show active step as a grid */
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            align-items: stretch;
+        }
+        /* Specific override for summary step to ensure it's a block, not a grid */
+        #step-5.form-step.active {
+            display: block; /* Summary step content should be a block, not a grid */
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .form-navigation button {
+            width: 48%; /* Adjust width for side-by-side buttons */
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        .form-navigation button.prev {
+            background-color: #6c757d; /* Grey for previous */
+            color: white;
+        }
+        .form-navigation button.prev:hover {
+            background-color: #5a6268;
+        }
+        .form-navigation button.next {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .form-navigation button.next:hover {
+            background-color: var(--primary-hover);
+        }
+        /* Calculate button on the last step */
+        #calculate-btn {
+            display: none; /* Hidden by default, shown only on the last step */
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            font-weight: bold;
+        }
+        #calculate-btn:hover {
+             background-color: var(--primary-hover);
+        }
+
+
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+            padding: 0 5px; /* Reduced padding to give more space to labels */
+        }
+        .stepper::before {
+            content: '';
+            position: absolute;
+            width: calc(100% - 10px); /* Adjust width based on new padding */
+            height: 2px;
+            background-color: var(--step-indicator-bg);
+            top: 50%;
+            left: 5px; /* Align with new padding */
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        .stepper-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1; /* Keep dots and labels above the line */
+        }
+        .stepper-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--step-indicator-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--step-indicator-text);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin-bottom: 5px;
+            border: 2px solid var(--step-indicator-bg); /* Default border */
+        }
+        .stepper-label {
+            font-size: 0.7em; /* Slightly smaller font size for mobile */
+            color: var(--step-indicator-text);
+            transition: color 0.3s ease;
+            white-space: nowrap; /* Prevent step labels from wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%; /* Ensure ellipsis works */
+        }
+
+        .stepper-item.active .stepper-circle {
+            background-color: var(--step-indicator-active-bg);
+            color: var(--step-indicator-active-text);
+            border-color: var(--primary-color);
+        }
+        .stepper-item.active .stepper-label {
+            color: var(--primary-color);
+        }
+        .stepper-item.completed .stepper-circle {
+            background-color: var(--step-indicator-completed-bg);
+            color: var(--step-indicator-active-text); /* White tick for completed */
+            border-color: var(--step-indicator-completed-bg);
+        }
+        .stepper-item.completed .stepper-circle::after {
+            content: '✓'; /* Checkmark for completed steps */
+            font-size: 1.2em;
+        }
+        .stepper-item.completed .stepper-label {
+            color: var(--text-color);
+        }
+
+        /* Summary styles */
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.95em;
+        }
+        body.dark-mode .summary-item { border-bottom-color: #444; }
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        .summary-label {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        .summary-value {
+            color: var(--primary-color); /* Highlight values */
+        }
+
+        /* LLM share modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: var(--modal-bg);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--modal-content-bg);
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+            color: var(--modal-text-color);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-close-button {
+            color: var(--text-color);
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close-button:hover,
+        .modal-close-button:focus {
+            color: #999;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        body.dark-mode .modal-header { border-bottom-color: #555; }
+
+
+        .modal-body p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .modal-body ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .modal-body strong {
+            color: var(--primary-color);
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .llm-disclaimer {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        body.dark-mode .llm-disclaimer { border-top-color: #555; }
+
+        /* Share button styling */
+        .share-button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .share-button {
+            background-color: #28a745; /* Green for share */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .share-button:hover {
+            background-color: #218838;
+        }
+
+        /* Styling for the copy text area in modal */
+        #shareableSummaryText {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            margin-top: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: var(--background-color); /* Matches app background */
+            color: var(--text-color); /* Matches app text */
+            font-family: monospace; /* Monospace for code/data-like text */
+            resize: vertical; /* Allow vertical resizing */
+        }
+        body.dark-mode #shareableSummaryText { border-color: #555; }
+
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+
     </style>
 </head>
 <body>
@@ -227,23 +568,70 @@
         </div>
 
         <form id="ich-form">
-            <!-- Tiled layout for input groups -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; align-items: stretch;">
+            <!-- Stepper Progress Indicators -->
+            <div class="stepper" id="form-stepper">
+                <div class="stepper-item" data-step="1" title="Patient Demographics">
+                    <div class="stepper-circle">1</div>
+                    <span class="stepper-label" id="step1Label">Demographics</span>
+                </div>
+                <div class="stepper-item" data-step="2" title="Vital Signs & Biomarkers">
+                    <div class="stepper-circle">2</div>
+                    <span class="stepper-label" id="step2Label">Vitals</span>
+                </div>
+                <div class="stepper-item" data-step="3" title="Neurological & Clinical Signs">
+                    <div class="stepper-circle">3</div>
+                    <span class="stepper-label" id="step3Label">Clinical</span>
+                </div>
+                <div class="stepper-item" data-step="4" title="Past Medical History">
+                    <div class="stepper-circle">4</div>
+                    <span class="stepper-label" id="step4Label">History</span>
+                </div>
+                <div class="stepper-item" data-step="5" title="Review & Calculate">
+                    <div class="stepper-circle">5</div>
+                    <span class="stepper-label" id="step5Label">Review</span>
+                </div>
+            </div>
+
+            <!-- Form Steps -->
+            <!-- Step 1: Patient Demographics -->
+            <div class="form-step" id="step-1">
                 <div class="input-group"><label for="age_years" id="ageLabel">Age (years)</label><input type="number" id="age_years" placeholder="e.g., 75" required min="0"></div>
+            </div>
+
+            <!-- Step 2: Vital Signs & Biomarkers -->
+            <div class="form-step" id="step-2">
                 <div class="input-group"><label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label><input type="number" id="systolic_bp" placeholder="e.g., 160" required min="0"></div>
                 <div class="input-group"><label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label><input type="number" id="gfap_value" placeholder="e.g., 2875" required min="0"></div>
-                
-                <!-- Checkboxes now leverage the grid for a tiled appearance -->
+            </div>
+
+            <!-- Step 3: Neurological & Clinical Signs -->
+            <div class="form-step" id="step-3">
                 <div class="checkbox-group"><label><input type="checkbox" id="eye_deviation"><span id="eyeDeviationLabel">Eye Deviation?</span></label></div>
                 <div class="checkbox-group"><label><input type="checkbox" id="armparese" checked><span id="armpareseLabel">Arm Paresis?</span></label></div>
                 <div class="checkbox-group"><label><input type="checkbox" id="beinparese" checked><span id="beinpareseLabel">Leg Paresis?</span></label></div>
-                <div class="checkbox-group"><label><input type="checkbox" id="atrial_fibrillation"><span id="afibLabel">History of Atrial Fibrillation?</span></label></div>
-                <div class="checkbox-group"><label><input type="checkbox" id="antiplatelets"><span id="antiplateletsLabel">On Antiplatelets?</span></label></div>
-                
-                <!-- Headache as a checkbox, placed within the grid -->
                 <div class="checkbox-group"><label><input type="checkbox" id="headache"><span id="headacheLabel">Headache?</span></label></div>
             </div>
-            <button type="button" id="calculate-btn" class="primary">Calculate Probability</button>
+
+            <!-- Step 4: Past Medical History -->
+            <div class="form-step" id="step-4">
+                <div class="checkbox-group"><label><input type="checkbox" id="atrial_fibrillation"><span id="afibLabel">History of Atrial Fibrillation?</span></label></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="antiplatelets"><span id="antiplateletsLabel">On Antiplatelets?</span></label></div>
+            </div>
+            
+            <!-- Step 5: Review and Calculate -->
+            <div class="form-step" id="step-5">
+                <h3 id="summaryTitle" style="text-align: center; margin-bottom: 20px;">Review Your Inputs</h3>
+                <div id="summary-content">
+                    <!-- Summary items will be dynamically populated here -->
+                </div>
+                 <button type="button" id="calculate-btn" class="primary">Calculate Probability</button>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="form-navigation">
+                <button type="button" id="prev-btn" class="prev" style="display: none;">Previous</button>
+                <button type="button" id="next-btn" class="next">Next</button>
+            </div>
         </form>
         
         <div class="result" id="result-container">
@@ -253,6 +641,11 @@
                 <div class="probability-meter-marker" id="prob-meter-marker"></div> 
                 <span class="probability-meter-label" id="prob-meter-label"></span>
                 <span class="probability-meter-threshold-label" id="threshold-label">iGFAP Cut-off: 0.32</span>
+            </div>
+
+            <!-- New Share Button -->
+            <div class="share-button-container">
+                <button id="share-summary-btn" class="share-button" style="display: none;">✨ Share Summary</button>
             </div>
         </div>
 
@@ -274,6 +667,22 @@
     <footer style="text-align:center; padding: 20px; font-size: 0.9em; opacity: 0.7;">
         <p>© <span id="currentYear"></span> All rights reserved.</p>
     </footer>
+
+    <!-- LLM Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button share-modal-close">&times;</span>
+            <div class="modal-header" id="shareModalHeader">AI-Generated Summary</div>
+            <div class="modal-body">
+                <div class="loading-spinner" id="shareModalSpinner"></div>
+                <textarea id="shareableSummaryText" readonly></textarea>
+                <button class="copy-button" id="copySummaryBtn">Copy to Clipboard</button>
+                <div class="llm-disclaimer">
+                    Disclaimer: This summary is generated by an AI model and is for informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for any health concerns.
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // --- Model Parameters ---
@@ -322,7 +731,24 @@
                 decreasingRiskTitle: "Factors Decreasing Risk",
                 featureNames: { 'age_years': 'Age', 'eye_deviation': 'Eye Deviation', 'armparese': 'Arm Paresis', 'beinparese': 'Leg Paresis', 'atrial_fibrillation': 'Atrial Fibrillation', 'systolic_bp': 'Systolic BP', 'antiplatelets': 'Antiplatelets', 'gfap_value': 'GFAP', 'headache': 'Headache' },
                 thresholdLabel: "iGFAP Cut-off:", 
-                probLabel: "Probability:"
+                probLabel: "Probability:",
+                nextButton: "Next",
+                previousButton: "Previous",
+                calculateButton: "Calculate Probability",
+                // Shorter step labels for stepper
+                step1Label: "Demographics",
+                step2Label: "Vitals",
+                step3Label: "Clinical",
+                step4Label: "History",
+                step5Label: "Review",
+                summaryTitle: "Review Your Inputs",
+                shareSummaryButton: "Share Summary",
+                summaryModalTitle: "AI-Generated Summary",
+                loadingSummary: "Generating summary...",
+                summaryError: "Failed to generate summary. Please try again.",
+                copyButton: "Copy to Clipboard",
+                copiedText: "Copied!",
+                medicalDisclaimer: "Disclaimer: This summary is generated by an AI model and is for informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for any health concerns."
             },
             de: {
                 driversTitle: "Treiber der Vorhersage",
@@ -330,15 +756,43 @@
                 decreasingRiskTitle: "Risikomindernde Faktoren",
                 featureNames: { 'age_years': 'Alter', 'eye_deviation': 'Blickdeviation', 'armparese': 'Armparese', 'beinparese': 'Beinparese', 'atrial_fibrillation': 'Vorhofflimmern', 'systolic_bp': 'Systolischer RR', 'antiplatelets': 'Thrombozytenhemmer', 'gfap_value': 'GFAP', 'headache': 'Kopfschmerzen' },
                 thresholdLabel: "iGFAP Cut-off:", 
-                probLabel: "Wahrscheinlichkeit:"
+                probLabel: "Wahrscheinlichkeit:",
+                nextButton: "Weiter",
+                previousButton: "Zurück",
+                calculateButton: "Wahrscheinlichkeit berechnen",
+                // Shorter step labels for stepper
+                step1Label: "Demografie",
+                step2Label: "Vitalwerte",
+                step3Label: "Klinik",
+                step4Label: "Anamnese",
+                step5Label: "Überprüfung",
+                summaryTitle: "Ihre Eingaben überprüfen",
+                shareSummaryButton: "Zusammenfassung teilen",
+                summaryModalTitle: "KI-generierte Zusammenfassung",
+                loadingSummary: "Zusammenfassung wird generiert...",
+                summaryError: "Fehler beim Generieren der Zusammenfassung. Bitte versuchen Sie es erneut.",
+                copyButton: "In Zwischenablage kopieren",
+                copiedText: "Kopiert!",
+                medicalDisclaimer: "Haftungsausschluss: Diese Zusammenfassung wird von einem KI-Modell generiert und dient nur zu Informationszwecken. Sie ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung. Konsultieren Sie immer einen qualifizierten Gesundheitsdienstleister bei gesundheitlichen Bedenken."
             }
         };
         // Merging full translation objects to avoid repetition
-        Object.assign(translations.en, { appTitle: "iGFAP Check", strokeModuleTitle: "Intracerebral Hemorrhage Prediction", disclaimerTitle: "For Informational Purposes Only", disclaimerText: "This tool is not a substitute for professional medical advice, diagnosis, or treatment.", ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)", eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?", afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?", headacheNo: "No", headacheYes: "Yes", headacheUnknown: "Unknown", calculateButton: "Calculate Probability", highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely", darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode"});
-        Object.assign(translations.de, { appTitle: "iGFAP Check", strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung", disclaimerTitle: "Nur zu Informationszwecken", disclaimerText: "Dieses Tool ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung.", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)", eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?", afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Kopfschmerzen?", headacheNo: "Nein", headacheYes: "Ja", headacheUnknown: "Unbekannt", calculateButton: "Wahrscheinlichkeit berechnen", highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich", darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus"});
+        Object.assign(translations.en, { appTitle: "iGFAP Check", strokeModuleTitle: "Intracerebral Hemorrhage Prediction", disclaimerTitle: "For Informational Purposes Only", disclaimerText: "This tool is not a substitute for professional medical advice, diagnosis, or treatment.", ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)", eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?", afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?", calculateButton: "Calculate Probability", highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely", darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode"});
+        Object.assign(translations.de, { appTitle: "iGFAP Check", strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung", disclaimerTitle: "Nur zu Informationszwecken", disclaimerText: "Dieses Tool ist kein Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung.", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)", eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?", afibLabel: "Vorhofflimmern-Anamnese?", antiplateletsLabel: "Unter Thrombozytenaggregationshemmern?", headacheLabel: "Kopfschmerzen?", calculateButton: "Wahrscheinlichkeit berechnen", highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich", darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus"});
 
 
         // --- App Logic ---
+        let currentStep = 1;
+        const totalSteps = 5; // Now 5 steps including the review/calculate step
+        let formSteps = [];
+        let stepperItems = []; // Array to hold stepper circle/label elements
+
+        // Store last calculated data for share summary
+        let lastPatientInputs = {};
+        let lastCalibratedProb = 0;
+        let lastFinalDecision = '';
+        let lastContributions = {}; // Store contributions for drivers in summary
+
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
             if (localStorage.getItem('darkMode') === 'enabled') {
@@ -347,9 +801,32 @@
             }
             const preferredLang = localStorage.getItem('language') || 'en';
             switchLanguage(preferredLang);
+
+            // Populate formSteps array
+            for (let i = 1; i <= totalSteps; i++) {
+                formSteps.push(document.getElementById(`step-${i}`));
+            }
+
+            // Populate stepperItems array
+            stepperItems = Array.from(document.querySelectorAll('.stepper-item'));
+
             document.getElementById('calculate-btn').addEventListener('click', calculateProbability);
             document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-            // Call positionThresholdLabel initially and on window resize
+            document.getElementById('next-btn').addEventListener('click', showNextStep);
+            document.getElementById('prev-btn').addEventListener('click', showPrevStep);
+
+            // Share summary button and modal
+            document.getElementById('share-summary-btn').addEventListener('click', generateAndShowShareSummary);
+            document.querySelector('.share-modal-close').addEventListener('click', closeShareModal);
+            document.getElementById('shareModal').addEventListener('click', (event) => {
+                if (event.target.id === 'shareModal') {
+                    closeShareModal();
+                }
+            });
+            document.getElementById('copySummaryBtn').addEventListener('click', copySummaryToClipboard);
+
+            // Initialize form display
+            showStep(currentStep);
             positionThresholdLabel(); // Ensure it's called on load
             window.addEventListener('resize', positionThresholdLabel);
         });
@@ -362,12 +839,40 @@
             
             Object.keys(t).forEach(key => {
                 const element = document.getElementById(key);
-                // Exclude the headache select options as they are now gone
-                if (element && key !== 'featureNames' && !key.startsWith('headache')) { 
+                // Exclude old headache select options and featureNames from general textContent update
+                if (element && key !== 'featureNames' && !key.startsWith('headacheNo') && !key.startsWith('headacheYes') && !key.startsWith('headacheUnknown')
+                    && !key.startsWith('step') && key !== 'summaryTitle' && key !== 'shareSummaryButton' && key !== 'summaryModalTitle' && key !== 'loadingSummary' && key !== 'summaryError' && key !== 'copyButton' && key !== 'copiedText' && key !== 'medicalDisclaimer'
+                ) { 
                      element.textContent = t[key];
                 }
             });
+            // Update specific button and step labels
             document.getElementById('calculate-btn').textContent = t.calculateButton;
+            document.getElementById('next-btn').textContent = t.nextButton;
+            document.getElementById('prev-btn').textContent = t.previousButton;
+            
+            // Update stepper labels and titles
+            document.querySelector('.stepper-item[data-step="1"] .stepper-label').textContent = t.step1Label;
+            document.querySelector('.stepper-item[data-step="1"]').title = currentLang === 'en' ? 'Patient Demographics' : 'Patientendemografie';
+            
+            document.querySelector('.stepper-item[data-step="2"] .stepper-label').textContent = t.step2Label;
+            document.querySelector('.stepper-item[data-step="2"]').title = currentLang === 'en' ? 'Vital Signs & Biomarkers' : 'Vitalwerte & Biomarker';
+
+            document.querySelector('.stepper-item[data-step="3"] .stepper-label').textContent = t.step3Label;
+            document.querySelector('.stepper-item[data-step="3"]').title = currentLang === 'en' ? 'Neurological & Clinical Signs' : 'Neurologische & Klinische Zeichen';
+
+            document.querySelector('.stepper-item[data-step="4"] .stepper-label').textContent = t.step4Label;
+            document.querySelector('.stepper-item[data-step="4"]').title = currentLang === 'en' ? 'Past Medical History' : 'Anamnese';
+
+            document.querySelector('.stepper-item[data-step="5"] .stepper-label').textContent = t.step5Label;
+            document.querySelector('.stepper-item[data-step="5"]').title = currentLang === 'en' ? 'Review & Calculate' : 'Überprüfung & Berechnung';
+
+            document.getElementById('summaryTitle').textContent = t.summaryTitle;
+            document.getElementById('share-summary-btn').textContent = `✨ ${t.shareSummaryButton}`;
+            document.getElementById('shareModalHeader').textContent = t.summaryModalTitle;
+            document.getElementById('copySummaryBtn').textContent = t.copyButton;
+            document.querySelector('.llm-disclaimer').textContent = t.medicalDisclaimer;
+
 
             const darkModeToggle = document.getElementById('darkModeToggle');
             const ariaLabel = document.body.classList.contains('dark-mode') ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff;
@@ -389,21 +894,145 @@
             darkModeToggle.setAttribute('aria-label', isDarkMode ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff);
         }
 
+        // --- Multi-step form functions ---
+        function showStep(stepNum) {
+            formSteps.forEach((stepDiv, index) => {
+                if (index + 1 === stepNum) {
+                    stepDiv.classList.add('active');
+                } else {
+                    stepDiv.classList.remove('active');
+                }
+            });
+
+            // Update stepper visual indicators
+            stepperItems.forEach((item, index) => {
+                if (index + 1 < stepNum) {
+                    item.classList.add('completed');
+                    item.classList.remove('active');
+                } else if (index + 1 === stepNum) {
+                    item.classList.add('active');
+                    item.classList.remove('completed');
+                } else {
+                    item.classList.remove('active', 'completed');
+                }
+            });
+
+            // Show/hide navigation buttons and calculate button
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const calculateBtn = document.getElementById('calculate-btn');
+
+            prevBtn.style.display = (stepNum === 1) ? 'none' : 'block';
+            
+            if (stepNum === totalSteps) { // If it's the last step (Review)
+                nextBtn.style.display = 'none';
+                calculateBtn.style.display = 'block'; // Show calculate button
+                populateSummary(); // Populate the summary before showing
+            } else {
+                nextBtn.style.display = 'block';
+                calculateBtn.style.display = 'none'; // Hide calculate button
+            }
+            
+            // Scroll to the top of the form section to ensure the new step is visible
+            document.getElementById('mainSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function checkCurrentStepValidity() {
+            const currentFormStepDiv = formSteps[currentStep - 1];
+            // Only validate required inputs in the current active step (unless it's the summary step)
+            if (currentStep === totalSteps) return true; // Summary step doesn't have inputs to validate
+
+            const inputsInCurrentStep = currentFormStepDiv.querySelectorAll('input[required], select[required]');
+            let allValid = true;
+            inputsInCurrentStep.forEach(input => {
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    allValid = false;
+                }
+            });
+            return allValid;
+        }
+
+        function showNextStep() {
+            if (checkCurrentStepValidity()) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            }
+        }
+
+        function showPrevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function populateSummary() {
+            const summaryContentDiv = document.getElementById('summary-content');
+            summaryContentDiv.innerHTML = ''; // Clear previous summary
+
+            const t = translations[currentLang];
+            lastPatientInputs = {}; // Reset for new summary
+
+            const inputElements = [
+                { id: 'age_years', type: 'number', label: t.featureNames.age_years, unit: currentLang === 'en' ? 'years' : 'Jahre' },
+                { id: 'systolic_bp', type: 'number', label: t.featureNames.systolic_bp, unit: 'mmHg' },
+                { id: 'gfap_value', type: 'number', label: t.featureNames.gfap_value, unit: 'pg/mL' },
+                { id: 'eye_deviation', type: 'checkbox', label: t.featureNames.eye_deviation },
+                { id: 'armparese', type: 'checkbox', label: t.featureNames.armparese },
+                { id: 'beinparese', type: 'checkbox', label: t.featureNames.beinparese },
+                { id: 'atrial_fibrillation', type: 'checkbox', label: t.featureNames.atrial_fibrillation },
+                { id: 'antiplatelets', type: 'checkbox', label: t.featureNames.antiplatelets },
+                { id: 'headache', type: 'checkbox', label: t.featureNames.headache }
+            ];
+
+            inputElements.forEach(item => {
+                const element = document.getElementById(item.id);
+                if (element) {
+                    let displayValue = '';
+                    let rawValue;
+
+                    if (item.type === 'number') {
+                        rawValue = element.value;
+                        displayValue = `${element.value} ${item.unit || ''}`;
+                    } else if (item.type === 'checkbox') {
+                        rawValue = element.checked;
+                        displayValue = element.checked ? (currentLang === 'en' ? 'Yes' : 'Ja') : (currentLang === 'en' ? 'No' : 'Nein');
+                    }
+                    lastPatientInputs[item.id] = rawValue; // Store raw value for LLM
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'summary-item';
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'summary-label';
+                    labelSpan.textContent = `${item.label}:`;
+                    const valueSpan = document.createElement('span');
+                    valueSpan.className = 'summary-value';
+                    valueSpan.textContent = displayValue;
+
+                    itemDiv.appendChild(labelSpan);
+                    itemDiv.appendChild(valueSpan);
+                    summaryContentDiv.appendChild(itemDiv);
+                }
+            });
+        }
+
+
         function calculateProbability() {
+            // No need for form.checkValidity() here if step-by-step validation is strict enough
+            // But keep it as a final fallback for safety
             const form = document.getElementById('ich-form');
             if (!form.checkValidity()) { form.reportValidity(); return; }
 
+
             // Get & Preprocess Inputs
             const inputs = {};
-            // Updated CHECKBOX_FEATURES to include 'headache'
             const CHECKBOX_FEATURES = ['eye_deviation', 'armparese', 'beinparese', 'atrial_fibrillation', 'antiplatelets', 'headache']; 
             ['age_years', 'systolic_bp', 'gfap_value'].forEach(id => { inputs[id] = parseFloat(document.getElementById(id).value); });
             CHECKBOX_FEATURES.forEach(id => { inputs[id] = document.getElementById(id).checked ? 1 : 0; });
             
-            // Removed specific headache parsing and imputation, as it's now a direct checkbox
-            // inputs['headache'] = parseFloat(document.getElementById('headache').value);
-            // if (inputs.headache === -1) { inputs.headache = IMPUTED_HEADACHE; }
-
             inputs.gfap_value = Math.log1p(Math.max(inputs.gfap_value, 0)); // Log‐transform GFAP
             
             // Scale Inputs & Calculate Contributions
@@ -418,17 +1047,23 @@
                 contributions[key] = contrib;
                 logOdds += contrib;
             }
+            lastContributions = contributions; // Store for share summary
             
             // Convert to probability & calibrate
             const rawProb = 1 / (1 + Math.exp(-logOdds));
             const calibratedProb = calibratePiecewise(rawProb);
+            lastCalibratedProb = calibratedProb; // Store for share summary
 
             // Decide risk group
             const finalDecision = (calibratedProb >= OP_THRESH) ? 'high-risk' : 'low-risk';
+            lastFinalDecision = finalDecision; // Store for share summary
 
             // Display All Results
             displayResults(calibratedProb, finalDecision);
             displayDrivers(contributions);
+
+            // Show the share summary button after calculation
+            document.getElementById('share-summary-btn').style.display = 'inline-block';
         }
 
         function displayResults(probability, decision) {
@@ -523,8 +1158,117 @@
             // The CSS transform: translateX(-50%) will center it horizontally at this point
         }
 
-        // Ensure positionThresholdLabel is called on load and resize
-        // (Already done in DOMContentLoaded and window resize listener)
+        // --- LLM Share Summary Functions ---
+        async function generateAndShowShareSummary() {
+            const shareModal = document.getElementById('shareModal');
+            const shareModalSpinner = document.getElementById('shareModalSpinner');
+            const shareableSummaryText = document.getElementById('shareableSummaryText');
+            const t = translations[currentLang];
+
+            shareableSummaryText.value = t.loadingSummary; // Set loading message
+            shareModalSpinner.style.display = 'block'; // Show spinner
+            shareModal.style.display = 'flex'; // Show the modal
+
+            const patientData = [];
+            const featureMap = translations[currentLang].featureNames;
+
+            // Collect all inputs from lastPatientInputs for the prompt
+            for (const key in lastPatientInputs) {
+                const label = featureMap[key] || key;
+                let value = lastPatientInputs[key];
+
+                // Re-format boolean values for human readability
+                if (typeof value === 'boolean') {
+                    value = value ? (currentLang === 'en' ? 'Yes' : 'Ja') : (currentLang === 'en' ? 'No' : 'Nein');
+                }
+                // Add units for numerical values as they were originally entered
+                if (key === 'age_years') value = `${document.getElementById('age_years').value} ${currentLang === 'en' ? 'years' : 'Jahre'}`;
+                if (key === 'systolic_bp') value = `${document.getElementById('systolic_bp').value} mmHg`;
+                if (key === 'gfap_value') value = `${document.getElementById('gfap_value').value} pg/mL`;
+
+                patientData.push(`${label}: ${value}`);
+            }
+
+            const positiveDrivers = Object.entries(lastContributions)
+                                    .filter(([, val]) => val > 0)
+                                    .sort((a, b) => b[1] - a[1])
+                                    .map(([key,]) => translations[currentLang].featureNames[key] || key);
+
+            const negativeDrivers = Object.entries(lastContributions)
+                                    .filter(([, val]) => val < 0)
+                                    .sort((a, b) => a[1] - b[1])
+                                    .map(([key,]) => translations[currentLang].featureNames[key] || key);
+
+            const prompt = `Generate a concise, human-readable patient summary report based on the following data for potential Intracerebral Hemorrhage (ICH) prediction. The target audience is healthcare professionals.
+            
+            Patient Data:
+            ${patientData.join('\n- ')}
+
+            Prediction Result:
+            - Calculated probability: ${(lastCalibratedProb * 100).toFixed(1)}%
+            - Risk classification: ${lastFinalDecision === 'high-risk' ? translations[currentLang].highRisk : translations[currentLang].lowRisk}
+            - ICH Cut-off for high risk: ${(OP_THRESH * 100).toFixed(0)}%
+
+            Prediction Drivers (factors influencing the prediction):
+            - Factors increasing risk: ${positiveDrivers.length > 0 ? positiveDrivers.join(', ') : 'None'}
+            - Factors decreasing risk: ${negativeDrivers.length > 0 ? negativeDrivers.join(', ') : 'None'}
+
+            Please provide the summary in a narrative, clinical note-like format, like this example: "68 year old patient with a weakness of upper and lower extremities showing a Eye deviation had a bp of 140 mm Hg systolic. The iGFAP value was 2875 pg/mL. The patient showed high probability of ICH. The sbp and gfap spoke for icb and older age group and possible ischemia in patient taking antiplatelet drugs spoke against icb".
+            Do not include any greeting or conversational text, just the summary.
+            Crucially, end the summary with this exact disclaimer: "${t.medicalDisclaimer}"`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    shareableSummaryText.value = text;
+                } else {
+                    shareableSummaryText.value = t.summaryError;
+                    console.error("Gemini API returned an unexpected structure:", result);
+                }
+            } catch (error) {
+                shareableSummaryText.value = t.summaryError;
+                console.error("Error calling Gemini API:", error);
+            } finally {
+                shareModalSpinner.style.display = 'none'; // Hide spinner
+            }
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+            document.getElementById('shareableSummaryText').value = ''; // Clear content when closing
+        }
+
+        function copySummaryToClipboard() {
+            const summaryTextarea = document.getElementById('shareableSummaryText');
+            summaryTextarea.select(); // Selects the text within the textarea
+            summaryTextarea.setSelectionRange(0, 99999); // For mobile devices
+
+            document.execCommand('copy'); // Copies the selected text
+
+            const copyButton = document.getElementById('copySummaryBtn');
+            const originalText = copyButton.textContent;
+            copyButton.textContent = translations[currentLang].copiedText; // Change text to "Copied!"
+            setTimeout(() => {
+                copyButton.textContent = originalText; // Revert text after a short delay
+            }, 1500);
+        }
+
     </script>
 </body>
 </html>
+
