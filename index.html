@@ -301,8 +301,8 @@
                 driversTitle: "Prediction Drivers", increasingRisk: "Increasing Risk", decreasingRisk: "Decreasing Risk",
                 ichTitle: "ICH Details", lvoTitle: "LVO Details", calculateBtn: "Calc", applyScore: "Apply Score",
                 triage: {
-                    lvo_title: "LVO STRONGLY INDICATED", lvo_rec: "Proceed directly to the nearest LVO-capable Comprehensive Stroke Center.",
-                    ich_title: "ICH STRONGLY INDICATED", ich_rec: "Proceed to the nearest appropriate Stroke Center. Thrombectomy not indicated.",
+                    lvo_title: "LVO LIKELY", lvo_rec: "Proceed directly to the nearest LVO-capable Comprehensive Stroke Center.",
+                    ich_title: "STRONG SUSPICION OF ICH", ich_rec: "Proceed to the nearest center with neurosurgical capabilities. Thrombectomy not indicated.",
                     unclear_title: "UNCLEAR STROKE TYPE", unclear_rec: "LVO cannot be ruled out. Default to LVO protocol: proceed to LVO-capable center if feasible.",
                     mimic_title: "ICH & LVO UNLIKELY", mimic_rec: "Re-evaluate for Stroke Mimics (e.g., seizure, migraine, hypoglycemia). Proceed to nearest appropriate facility.",
                     error_title: "LVO DATA UNAVAILABLE", error_rec: "Could not retrieve LVO data. ICH analysis is shown below. Proceed based on clinical judgment.",
@@ -324,9 +324,9 @@
                 driversTitle: "Treiber der Vorhersage", increasingRisk: "Risikoerhöhend", decreasingRisk: "Risikomindernd",
                 ichTitle: "ICB-Details", lvoTitle: "LVO-Details", calculateBtn: "Ber.", applyScore: "Anwenden",
                 triage: {
-                    lvo_title: "LVO Wahrscheinlich", lvo_rec: "Fahren Sie direkt zum nächsten LVO-fähigen überregionalen Schlaganfallzentrum.",
-                    ich_title: "Starker Verdacht auf ICB", ich_rec: "Fahren Sie zum nächstgelegenen geeigneten Schlaganfallzentrum. Thrombektomie nicht indiziert.",
-                    unclear_title: "UNKLARER SCHLAGANFALLTYP", unclear_rec: "LVO kann nicht ausgeschlossen werden. Standardmäßig LVO-Protokoll: Fahren Sie, wenn möglich, zu einem LVO-fähigen Zentrum.",
+                    lvo_title: "LVO Wahrscheinlich", lvo_rec: "Fahren Sie direkt zum nächsten Thrombektomie-fähigen Zentrum.",
+                    ich_title: "Starker Verdacht auf ICB", ich_rec: "Fahren Sie zum nächstgelegenen Zentrum mit neurochirurgischer Abteilung. Thrombektomie nicht indiziert.",
+                    unclear_title: "UNKLARER SCHLAGANFALLTYP", unclear_rec: "LVO kann nicht ausgeschlossen werden. Standardmäßig LVO-Protokoll: Fahren Sie, wenn möglich, zu einem Thrombektomie-fähigen Zentrum.",
                     mimic_title: "ICB & LVO UNWAHRSCHEINLICH", mimic_rec: "Erwägen Sie Schlaganfall-Mimics (z.B. Anfall, Migräne, Hypoglykämie). Fahren Sie zur nächstgelegenen geeigneten Einrichtung.",
                     error_title: "LVO-DATEN NICHT VERFÜGBAR", error_rec: "LVO-Daten konnten nicht abgerufen werden. ICB-Analyse unten angezeigt. Handeln Sie nach klinischem Ermessen.",
                 },
@@ -342,10 +342,14 @@
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            const savedLang = localStorage.getItem('language') || 'en';
-            switchLanguage(savedLang);
+            // Set initial language based on browser setting, then local storage
+            const savedLang = localStorage.getItem('language');
+            const browserLang = navigator.language.startsWith('de') ? 'de' : 'en';
+            switchLanguage(savedLang || browserLang);
 
-            if (localStorage.getItem('darkMode') === 'enabled') {
+            // Set initial theme based on system preference, then local storage
+            const savedTheme = localStorage.getItem('darkMode');
+            if (savedTheme === 'enabled' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.body.classList.add('dark-mode');
                 document.getElementById('darkModeToggle').textContent = '☀️';
             }
@@ -565,10 +569,11 @@
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             const isDarkMode = document.body.classList.contains('dark-mode');
-            document.getElementById('darkModeToggle').textContent = isDarkMode ? '☀️' : '🌙';
             localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            document.getElementById('darkModeToggle').textContent = isDarkMode ? '☀️' : '🌙';
         }
 
     </script>
 </body>
 </html>
+
