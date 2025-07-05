@@ -1,0 +1,40 @@
+PK                  
+   META-INF/MANIFEST.MF
+   
+Manifest-Version: 1.0
+Created-By: Stroke Triage Assistant Builder
+Name: AndroidManifest.xml
+Package: com.medical.stroketriage
+Version: 1.0.0
+Version-Code: 1
+Min-SDK: 21
+Target-SDK: 34
+
+Application-Label: Stroke Triage Assistant
+Application-Icon: res/icon.png
+Application-Description: Medical stroke triage and probability analysis
+
+Permissions:
+- android.permission.INTERNET
+- android.permission.ACCESS_NETWORK_STATE
+- android.permission.WRITE_EXTERNAL_STORAGE
+
+Features:
+- Offline stroke probability calculation
+- FAST-ED score calculator
+- Multi-language support (English/German)
+- Dark mode support
+- Medical parameter validation
+- Secure data handling
+
+This is a placeholder APK file for the Stroke Triage Assistant.
+In a production environment, this would be a properly compiled Android APK
+containing the full application with native Android optimizations.
+
+Build Date: 2024-01-01
+Build Tool: Capacitor/Cordova
+Web Version: Embedded
+File Size: ~2MB
+
+Note: This is a demonstration file. For actual deployment, 
+use proper Android development tools and sign the APK appropriately.

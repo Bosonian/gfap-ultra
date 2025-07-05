@@ -5,7 +5,11 @@ const CACHE_NAME = `igfap-cache-${CACHE_VERSION}`;
 // List of essential files for the app shell to work offline
 const APP_SHELL_URLS = [
   './',
-  './index.html'
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './StrokeTriageAssistant-v1.0.0.apk'
 ];
 
 // Install event: cache the app shell
@@ -39,10 +43,11 @@ self.addEventListener('message', event => {
 
 // Fetch event: serve from cache, falling back to network
 self.addEventListener('fetch', event => {
-    // For local model files and app shell, use a cache-first strategy.
+    // For local model files, app shell, and APK files, use a cache-first strategy.
     if (APP_SHELL_URLS.some(url => event.request.url.endsWith(url)) || 
         event.request.url.includes('.onnx') || 
-        event.request.url.includes('.json')) {
+        event.request.url.includes('.json') ||
+        event.request.url.includes('.apk')) {
         
         event.respondWith(
             caches.match(event.request).then(cachedResponse => {

@@ -1,0 +1,57 @@
+{
+  "name": "Stroke Triage Assistant",
+  "short_name": "StrokeTriage",
+  "description": "Medical stroke triage and probability analysis application",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7f9",
+  "theme_color": "#007bff",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["medical", "healthcare", "utilities"],
+  "screenshots": [
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "label": "Stroke Triage Assistant main interface"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick Analysis",
+      "short_name": "Analyze",
+      "description": "Quickly analyze stroke probability",
+      "url": "./?quick=true",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.medical.stroketriage",
+      "id": "com.medical.stroketriage"
+    }
+  ],
+  "prefer_related_applications": false
+}
