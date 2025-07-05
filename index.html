@@ -468,18 +468,35 @@
         }
 
         function renderAnalysisDetails(ichData, lvoData) {
+             // Clean up any existing animations before rendering new ones
+             cleanupAnimations();
+             
              document.getElementById('ich-prob-panel').innerHTML = renderProbPanel('ich', ichData);
              document.getElementById('lvo-prob-panel').innerHTML = renderProbPanel('lvo', lvoData);
              document.getElementById('ich-drivers-panel').innerHTML = renderDriversPanel('ich', ichData);
              document.getElementById('lvo-drivers-panel').innerHTML = renderDriversPanel('lvo', lvoData);
         }
 
+        function cleanupAnimations() {
+            // Clear any existing probability meter animations to prevent memory leaks
+            const existingMarkers = document.querySelectorAll('.probability-meter-marker');
+            existingMarkers.forEach(marker => {
+                marker.style.transition = 'none';
+                // Force reflow to ensure transition is removed
+                marker.offsetHeight;
+            });
+        }
+
         function renderProbPanel(type, data) {
             const t = translations[window.currentLang];
             if (!data) return `<h4>${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><p>Data unavailable.</p>`;
             const prob = data.probability;
-            const markerPos = Math.min(Math.max(prob, 0), 1) * 100;
-            return `<h4 data-translate="${type}Title">${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><div class="probability-meter-container"><div class="probability-meter-marker" style="left: calc(${markerPos}% - 3px);"></div><span class="probability-meter-label" style="left: ${markerPos}%;">${(prob * 100).toFixed(0)}%</span></div>`;
+            // Ensure probability is within valid range [0, 1]
+            const clampedProb = Math.min(Math.max(prob, 0), 1);
+            const markerPos = clampedProb * 100;
+            
+            // Add data attributes for proper cleanup and animation handling
+            return `<h4 data-translate="${type}Title">${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><div class="probability-meter-container"><div class="probability-meter-marker" data-type="${type}" style="left: calc(${markerPos}% - 3px); transition: left 0.5s ease-out;"></div><span class="probability-meter-label" style="left: ${markerPos}%;">${(clampedProb * 100).toFixed(0)}%</span></div>`;
         }
         
         function renderDriversPanel(type, data) {
@@ -523,6 +540,16 @@
         function collectInputs() {
             const data = {};
             const allIds = Object.keys(translations.en.featureNames);
+            
+            // Define reasonable medical value ranges
+            const validationRules = {
+                'gfap_value': { min: 0, max: 10000, name: 'GFAP Value' },
+                'age_years': { min: 0, max: 120, name: 'Age' },
+                'systolic_bp': { min: 50, max: 300, name: 'Systolic BP' },
+                'diastolic_bp': { min: 30, max: 200, name: 'Diastolic BP' },
+                'fast_ed_score': { min: 0, max: 9, name: 'FAST-ED Score' }
+            };
+            
             for (const id of allIds) {
                 const el = document.getElementById(id);
                 if (!el) continue;
@@ -535,6 +562,15 @@
                         CONFIG.dom.errorMsg.style.display = 'block';
                         return null;
                     }
+                    
+                    // Validate ranges for medical values
+                    const rule = validationRules[id];
+                    if (rule && (val < rule.min || val > rule.max)) {
+                        CONFIG.dom.errorMsg.textContent = `${rule.name} must be between ${rule.min} and ${rule.max}`;
+                        CONFIG.dom.errorMsg.style.display = 'block';
+                        return null;
+                    }
+                    
                     data[id] = val;
                 }
             }

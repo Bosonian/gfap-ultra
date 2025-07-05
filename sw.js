@@ -56,11 +56,12 @@ self.addEventListener('fetch', event => {
                         cache.put(event.request, responseToCache);
                     });
                     return networkResponse;
+                }).catch(error => {
+                    console.error('Fetch failed:', error);
+                    throw error;
                 });
             })
         );
-    } else {
-        // For all other requests (like external fonts, etc.), let the browser handle it.
-        return;
     }
+    // For all other requests, let the browser handle them normally (don't return early)
 });
