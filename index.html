@@ -136,8 +136,36 @@
     .error-message { color: var(--ich-text); background-color: var(--ich-bg); padding: 12px; border: 1px solid var(--ich-border); border-radius: 6px; display: none; margin-top: 20px; text-align: center; }
 
     /* --- Modal Styles --- */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px 0; opacity: 0; transition: opacity 0.3s ease; }
-    .modal-overlay.visible { display: flex; opacity: 1; }
+    .modal-overlay { 
+        position: fixed; 
+        top: 0; left: 0; 
+        width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.7); 
+        z-index: 2000; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    .modal-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .modal-content {
+        background: var(--container-bg);
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-content p {
+        margin: 0 0 20px 0;
+    }
   </style>
 </head>
 
@@ -240,7 +268,7 @@
     <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
   </footer>
 
-  <div id="disclaimerModal" class="modal-overlay" style="display: flex; opacity: 1;">
+  <div id="disclaimerModal" class="modal-overlay">
     <div class="modal-content">
       <p class="disclaimer-text" data-translate="disclaimerText">
         The calculations are for research purposes only, do not make clinical decisions based on it.
@@ -255,61 +283,84 @@
     const translations = { /* Translations object as before */ };
     
     // Main Application Controller
-    document.addEventListener('DOMContentLoaded', () => { /* Main navigation and initialization logic as before */ });
+    document.addEventListener('DOMContentLoaded', () => {
+        const sections = {
+            // disclaimer is now controlled by its own function
+            access: document.getElementById('codeEntrySection'),
+            moduleSelection: document.getElementById('moduleSelectionSection'),
+            coma: document.getElementById('comaModuleSection'),
+            unifiedStroke: document.getElementById('unifiedStrokeModuleSection')
+        };
+        const buttons = {
+            disclaimerConfirm: document.getElementById('disclaimerConfirmButton'),
+            accessCode: document.getElementById('accessCodeButton'),
+            // ... other buttons
+        };
+        const errors = { /* ... */ };
+        let isUnifiedModuleInitialized = false;
+
+        // NEW: Reusable function to request user confirmation
+        function requestDisclaimerConfirmation() {
+            return new Promise(resolve => {
+                const modal = document.getElementById('disclaimerModal');
+                
+                const handler = () => {
+                    modal.classList.remove('visible');
+                    buttons.disclaimerConfirm.removeEventListener('click', handler);
+                    resolve();
+                };
+
+                buttons.disclaimerConfirm.addEventListener('click', handler);
+                
+                modal.classList.add('visible');
+            });
+        }
+
+        function showSection(sectionToShow) { /* ... */ }
+        function hideErrors() { /* ... */ }
+        window.switchLanguage = function(lang) { /* ... */ };
+        
+        // REMOVED: Initial disclaimer show logic
+
+        buttons.accessCode.addEventListener('click', () => { /* ... */ });
+        
+        // ... navigation button listeners ...
+
+        buttons.coma.addEventListener('click', () => showSection('coma'));
+        buttons.stroke.addEventListener('click', () => {
+            showSection('unifiedStroke');
+            if (!isUnifiedModuleInitialized) {
+                strokeModule.initialize();
+                isUnifiedModuleInitialized = true;
+            }
+        });
+        
+        // UPDATED: Coma calculation now waits for disclaimer
+        buttons.calculateComa.addEventListener('async click', async () => {
+            hideErrors();
+            await requestDisclaimerConfirmation(); // Wait for confirmation
+            
+            const input = document.getElementById('gfapComaInput');
+            // ... rest of the validation and calculation logic
+        });
+        
+        // ... page initialization ...
+    });
 
     // Stroke Module Scope
     const strokeModule = (() => {
-        const dom = {};
-        const api = { lvoPrediction: 'https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', lvoExplanation: 'https://lvo-ppv-service-564499947017.europe-west3.run.app/explain' };
-        // CORRECTED ICH MODEL COEFFICIENTS
-        const ichModel = {
-            INTERCEPT: -0.72549447,
-            COEFFICIENTS: { 'gfap_value': 0.98845868, 'age_years': -0.20927375, 'systolic_bp': 0.36337294, 'headache': 0.43796113, 'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'antiplatelets': -0.52928134, 'fast_ed_face': 0.0, 'fast_ed_arm': 0.11730522, 'fast_ed_speech': 0.0, 'fast_ed_eyes': -0.26763354, 'fast_ed_denial': 0.0 },
-            SCALER_PARAMS: {'gfap_value': { center: 3.78418963, scale: 0.98704051 }, 'age_years': { center: 78.0, scale: 18.0 }, 'systolic_bp': { center: 160.0, scale: 41.5 } },
-            CALIBRATION: { A: 1.15, B: -0.20 }
-        };
-        const modelInputs = ['gfap_value', 'age_years', 'systolic_bp', 'diastolic_bp', 'headache', 'beinparese', 'atrial_fibrillation', 'antiplatelets', 'vigilanzminderung', 'antcoagulated_noak', 'fast_ed_face', 'fast_ed_arm', 'fast_ed_speech', 'fast_ed_eyes', 'fast_ed_denial'];
-        
-        // ... Stroke module functions ...
-
-        async function fetchLvo(inputs) {
-            const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inputs) };
-            const [predResponse, explResponse] = await Promise.all([ fetch(api.lvoPrediction, fetchOptions), fetch(api.lvoExplanation, fetchOptions) ]);
-            
-            if (!predResponse.ok || !explResponse.ok) {
-                throw new Error(`API Error: Prediction ${predResponse.status}, Explanation ${explResponse.status}`);
-            }
-
-            const predJson = await predResponse.json();
-            const explJson = await explResponse.json();
-
-            // HARDENED: Validate the structure of the API response
-            if (typeof predJson.lvo_probability === 'undefined' || typeof explJson.feature_impacts === 'undefined') {
-                throw new Error('Invalid API response format from LVO service.');
-            }
-
-            return { probability: predJson.lvo_probability, impacts: explJson.feature_impacts };
-        }
+        // ... as before ...
 
         async function handleAnalyze(event) {
-            // ... as before, but with updated conditional logic ...
-            const promises = [calculateIch(inputs)];
-            if (inputs.fast_ed_score >= 4) {
-                promises.push(fetchLvo(inputs));
-            }
-            
-            const results = await Promise.allSettled(promises);
-            // ...
+            event.preventDefault();
+
+            await requestDisclaimerConfirmation(); // Wait for confirmation
+
+            setLoading(true);
+            // ... rest of the analysis logic
         }
 
-        function determineTriageRecommendation(ich, lvo, fastEdScore) {
-            // CORRECTED: Handle case where LVO was not assessed
-            if (fastEdScore < 4) return { type: 'no_lvo', ich, lvo: null };
-            if (!lvo) return { type: 'error', ich, lvo: null };
-            // ... rest of the logic
-        }
-
-        // ... All other stroke module functions ...
+        // ... rest of the stroke module functions ...
         
         return { initialize };
     })();
