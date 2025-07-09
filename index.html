@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,15 +132,15 @@
     <section id="moduleSelectionSection" class="container hidden">
       <h2 data-translate="moduleSelectionTitle">Check probability for:</h2>
       <button class="primary" id="comaModuleButton" style="margin-bottom: 15px;">
-        <span data-translate="comaModuleButtonText">Intracranial hemorrhage in comatose patients (GCS 3-8)</span>
+        <span data-translate="comaModuleButtonText">ICH risk in comatose patients (GCS 3-8)</span>
       </button>
       <button class="primary" id="strokeModuleButton">
-        <span data-translate="strokeModuleButtonText">Intracerebral hemorrhage in patients with stroke symptoms (Unified Model)</span>
+        <span data-translate="strokeModuleButtonText">ICH risk in patients with stroke symptoms (Unified Model)</span>
       </button>
     </section>
 
     <section id="comaModuleSection" class="container hidden">
-      <h2 data-translate="comaModuleTitle">Intracranial hemorrhage in comatose patients (GCS 3-8)</h2>
+      <h2 data-translate="comaModuleTitle">ICH risk in comatose patients (GCS 3-8)</h2>
       <div class="input-group">
         <label for="gfapComaInput" data-translate="gfapComaLabel">GFAP Value (pg/mL)</label>
         <input type="number" id="gfapComaInput" min="29" max="10001" />
@@ -187,7 +186,19 @@
           </form>
           
           <div id="resultsArea" class="hidden">
+              <div id="triageRecommendation"></div>
+              <div id="analysisDetails">
+                  <div class="probabilities">
+                      <div class="prob-panel" id="ichProbPanel"></div>
+                      <div class="prob-panel" id="lvoProbPanel"></div>
+                  </div>
+                  <h3 class="drivers-title" data-translate="driversTitle">Prediction Drivers</h3>
+                  <div class="drivers-container">
+                      <div class="drivers-panel" id="ichDriversPanel"></div>
+                      <div class="drivers-panel" id="lvoDriversPanel"></div>
+                  </div>
               </div>
+          </div>
       </div>
     </section>
   </main>
@@ -229,6 +240,9 @@
             fastEdDenial: "Denial / Neglect", fastEdDenial0: "Absent", fastEdDenial1: "Present",
             invalidStrokeInput: "Please fill all required fields with valid numbers.",
             toggleDarkMode: "Toggle dark mode", toggleLightMode: "Toggle light mode",
+            triage: { lvo_title: "LVO LIKELY", lvo_rec: "Proceed directly to the nearest LVO-capable Comprehensive Stroke Center.", ich_title: "STRONG SUSPICION OF ICH", ich_rec: "Proceed to the nearest center with neurosurgical capabilities. Thrombectomy not indicated.", unclear_title: "UNCLEAR STROKE TYPE", unclear_rec: "LVO cannot be ruled out. Default to LVO protocol: proceed to LVO-capable center if feasible.", mimic_title: "ICH & LVO UNLIKELY", mimic_rec: "Re-evaluate for Stroke Mimics (e.g., seizure, migraine, hypoglycemia). Proceed to nearest appropriate facility.", error_title: "LVO DATA UNAVAILABLE", error_rec: "Could not retrieve LVO data. ICH analysis is shown below. Proceed based on clinical judgment.", no_lvo_title: "LVO UNLIKELY (FAST-ED < 4)", no_lvo_rec: "LVO assessment not indicated based on low FAST-ED score. Proceed based on ICH analysis and clinical judgment." },
+            featureNames: { ageYears: 'Age', legParesis: 'Leg Paresis', atrialFibrillation: 'AFib History', systolicBp: 'Systolic BP', diastolicBp: 'Diastolic BP', onAntiplatelets: 'On Antiplatelets', gfapValue: 'GFAP', headache: 'Headache', vigilanceReduction: 'Vigilance', onNoak: 'NOAK', fastEdFace: 'Facial Palsy', fastEdArm: 'Arm Weakness', fastEdSpeech: 'Speech', fastEdEyes: 'Eye Deviation', fastEdDenial: 'Denial/Neglect' },
+            driversTitle: "Prediction Drivers", increasingRisk: "Increasing Risk", decreasingRisk: "Decreasing Risk", ichTitle: "ICH Details", lvoTitle: "LVO Details",
         },
         de: {
             appTitle: "iGFAP-Prüfung", homeButton: "🏠 Startseite", accessPrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:", submitButton: "Senden",
@@ -249,6 +263,9 @@
             fastEdDenial: "Neglect / Anosognosie", fastEdDenial0: "Fehlend", fastEdDenial1: "Vorhanden",
             invalidStrokeInput: "Bitte füllen Sie alle Pflichtfelder mit gültigen Zahlen aus.",
             toggleDarkMode: "Dunkelmodus umschalten", toggleLightMode: "Heller Modus umschalten",
+            triage: { lvo_title: "LVO Wahrscheinlich", lvo_rec: "Fahren Sie direkt zum nächsten Thrombektomie-fähigen Zentrum.", ich_title: "Starker Verdacht auf ICB", ich_rec: "Fahren Sie zum nächstgelegenen Zentrum mit neurochirurgischer Abteilung. Thrombektomie nicht indiziert.", unclear_title: "UNKLARER SCHLAGANFALLTYP", unclear_rec: "LVO kann nicht ausgeschlossen werden. Standardmäßig LVO-Protokoll: Fahren Sie, wenn möglich, zu einem Thrombektomie-fähigen Zentrum.", mimic_title: "ICB & LVO UNWAHRSCHEINLICH", mimic_rec: "Erwägen Sie Schlaganfall-Mimics (z.B. Anfall, Migräne, Hypoglykämie). Fahren Sie zur nächstgelegenen geeigneten Einrichtung.", error_title: "LVO-DATEN NICHT VERFÜGBAR", error_rec: "LVO-Daten konnten nicht abgerufen werden. ICB-Analyse unten angezeigt. Handeln Sie nach klinischem Ermessen.", no_lvo_title: "LVO UNWAHRSCHEINLICH (FAST-ED < 4)", no_lvo_rec: "LVO-Bewertung aufgrund des niedrigen FAST-ED-Scores nicht angezeigt. Verfahren Sie basierend auf der ICB-Analyse und dem klinischen Ermessen." },
+            featureNames: { ageYears: 'Alter', legParesis: 'Beinparese', atrialFibrillation: 'Vorhofflimmern', systolicBp: 'Systol. RR', diastolicBp: 'Diastol. RR', onAntiplatelets: 'Thrombozytenhemmer', gfapValue: 'GFAP', headache: 'Kopfschmerzen', vigilanceReduction: 'Vigilanz', onNoak: 'NOAK', fastEdFace: 'Fazialisparese', fastEdArm: 'Armschwäche', fastEdSpeech: 'Sprache', fastEdEyes: 'Blickdeviation', fastEdDenial: 'Neglect/Anosognosie' },
+            driversTitle: "Treiber der Vorhersage", increasingRisk: "Risikoerhöhend", decreasingRisk: "Risikomindernd", ichTitle: "ICB-Details", lvoTitle: "LVO-Details",
         }
     };
     
@@ -270,7 +287,6 @@
                 comaBack: document.getElementById('comaBackButton'),
                 strokeBack: document.getElementById('strokeBackButton'),
                 calculateComa: document.getElementById('calculateComaButton'),
-                calculateStroke: document.getElementById('calculateStrokeButton'),
                 darkModeToggle: document.getElementById('darkModeToggle'),
             },
             errors: {
@@ -306,7 +322,6 @@
                     target.textContent = t[key];
                 }
             });
-            // Update dynamic ARIA labels
             const isDarkMode = document.body.classList.contains('dark-mode');
             dom.buttons.darkModeToggle.setAttribute('aria-label', isDarkMode ? t.toggleLightMode : t.toggleDarkMode);
         };
@@ -324,7 +339,6 @@
             }
         };
 
-        // --- Accessibility: Modal Focus Trap ---
         const handleFocusTrap = (e) => {
             const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
             const modal = dom.disclaimerModal;
@@ -334,12 +348,12 @@
 
             if (e.key !== 'Tab') return;
 
-            if (e.shiftKey) { // if shift key pressed for shift + tab combination
+            if (e.shiftKey) { 
                 if (document.activeElement === firstFocusableElement) {
                     lastFocusableElement.focus();
                     e.preventDefault();
                 }
-            } else { // if tab key is pressed
+            } else {
                 if (document.activeElement === lastFocusableElement) {
                     firstFocusableElement.focus();
                     e.preventDefault();
@@ -350,23 +364,20 @@
         const requestDisclaimerConfirmation = () => {
             return new Promise(resolve => {
                 const modal = dom.disclaimerModal;
-                activeElementBeforeModal = document.activeElement; // Save focus
+                activeElementBeforeModal = document.activeElement;
                 
                 const handler = () => {
                     modal.classList.remove('visible');
                     modal.removeEventListener('keydown', handleFocusTrap);
                     dom.buttons.disclaimerConfirm.removeEventListener('click', handler);
-                    if(activeElementBeforeModal) activeElementBeforeModal.focus(); // Restore focus
+                    if(activeElementBeforeModal) activeElementBeforeModal.focus();
                     resolve();
                 };
 
                 dom.buttons.disclaimerConfirm.addEventListener('click', handler);
                 modal.addEventListener('keydown', handleFocusTrap);
-                modal.classList.remove('hidden'); // Use class to control display for transitions
-                setTimeout(() => { // Delay to allow transition
-                    modal.classList.add('visible');
-                    dom.buttons.disclaimerConfirm.focus(); // Set focus
-                }, 10);
+                modal.classList.add('visible');
+                setTimeout(() => dom.buttons.disclaimerConfirm.focus(), 10);
             });
         };
 
@@ -390,15 +401,26 @@
 
             setLoadingState(dom.buttons.accessCode, true);
             try {
-                // This logic would be replaced with your API call
-                const isCorrect = inputCode === "iGFAP_2025"; // Placeholder for API
-                if (isCorrect) {
-                    showSection('moduleSelection');
+                const response = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/validateAccessCode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: inputCode })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.valid) {
+                        showSection('moduleSelection');
+                    } else {
+                        dom.errors.access.textContent = translations[currentLanguage].invalidCode;
+                        dom.errors.access.classList.remove('hidden');
+                    }
                 } else {
-                    dom.errors.access.textContent = translations[currentLanguage].invalidCode;
+                    dom.errors.access.textContent = translations[currentLanguage].serverError;
                     dom.errors.access.classList.remove('hidden');
                 }
             } catch (error) {
+                console.error("Access Code Fetch Error:", error);
                 dom.errors.access.textContent = translations[currentLanguage].serverError;
                 dom.errors.access.classList.remove('hidden');
             } finally {
@@ -434,17 +456,25 @@
             await requestDisclaimerConfirmation();
             setLoadingState(dom.buttons.calculateComa, true);
             try {
-                // This is where you would call your API
-                // Simulating a successful API call
-                const data = { probability: Math.random() }; // Placeholder
-                
-                resultDiv.textContent = 'Probability of ICH: ';
-                const strongEl = document.createElement('strong');
-                strongEl.textContent = `${(data.probability * 100).toFixed(1)}%`;
-                resultDiv.appendChild(strongEl);
-                resultDiv.classList.remove('hidden');
+                const response = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/calculateComaRisk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gfap: value })
+                });
 
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.textContent = 'Probability of ICH: ';
+                    const strongEl = document.createElement('strong');
+                    strongEl.textContent = `${(data.probability * 100).toFixed(1)}%`;
+                    resultDiv.appendChild(strongEl);
+                    resultDiv.classList.remove('hidden');
+                } else {
+                    dom.errors.coma.textContent = translations[currentLanguage].serverError;
+                    dom.errors.coma.classList.remove('hidden');
+                }
             } catch (error) {
+                console.error("Coma Risk Fetch Error:", error);
                 dom.errors.coma.textContent = translations[currentLanguage].serverError;
                 dom.errors.coma.classList.remove('hidden');
             } finally {
@@ -454,22 +484,34 @@
 
         // --- Stroke Module (IIFE) ---
         const strokeModule = (() => {
-            const dom = {}; // Local DOM cache for this module
-            
+            const dom = {};
+            const api = { lvoPrediction: 'https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', lvoExplanation: 'https://lvo-ppv-service-564499947017.europe-west3.run.app/explain' };
+            const ichModel = {
+                INTERCEPT: -0.72549447,
+                COEFFICIENTS: { 'gfapValue': 0.98845868, 'ageYears': -0.20927375, 'systolicBp': 0.36337294, 'headache': 0.43796113, 'legParesis': 0.42467409, 'atrialFibrillation': -0.24686695, 'onAntiplatelets': -0.52928134, 'fastEdArm': 0.11730522, 'fastEdEyes': -0.26763354 },
+                SCALER_PARAMS: {'gfapValue': { center: 3.78418963, scale: 0.98704051 }, 'ageYears': { center: 78.0, scale: 18.0 }, 'systolicBp': { center: 160.0, scale: 41.5 } },
+                CALIBRATION: { A: 1.15, B: -0.20 }
+            };
+            const modelInputs = ['gfapValue', 'ageYears', 'systolicBp', 'diastolicBp', 'headache', 'legParesis', 'atrialFibrillation', 'onAntiplatelets', 'vigilanceReduction', 'onNoak', 'fastEdFace', 'fastEdArm', 'fastEdSpeech', 'fastEdEyes', 'fastEdDenial'];
+
             const initialize = () => {
-                // Cache elements once
                 Object.assign(dom, {
                     form: document.getElementById('triageForm'),
                     calculateBtn: document.getElementById('calculateStrokeButton'),
                     errorMsg: document.getElementById('strokeError'),
                     resultsArea: document.getElementById('resultsArea'),
+                    triageRec: document.getElementById('triageRecommendation'),
+                    ichProbPanel: document.getElementById('ichProbPanel'),
+                    lvoProbPanel: document.getElementById('lvoProbPanel'),
+                    ichDriversPanel: document.getElementById('ichDriversPanel'),
+                    lvoDriversPanel: document.getElementById('lvoDriversPanel'),
                     fastEdSelects: Array.from(document.querySelectorAll('.fast-ed-component select')),
                     fastEdDisplay: document.getElementById('fastEdScoreDisplay')
                 });
                 
                 dom.form.addEventListener('submit', handleAnalyze);
                 dom.fastEdSelects.forEach(sel => sel.addEventListener('change', updateFastEdScore));
-                updateFastEdScore(); // Initial calculation
+                updateFastEdScore();
             };
             
             const updateFastEdScore = () => {
@@ -486,16 +528,31 @@
 
                 await requestDisclaimerConfirmation();
                 setLoadingState(dom.calculateBtn, true);
+                dom.resultsArea.classList.add('hidden');
 
                 try {
-                    // Simulating API calls and logic
-                    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-                    const ichData = { probability: Math.random() };
-                    const lvoData = inputs.fastEdScore >= 4 ? { probability: Math.random() } : null;
+                    const promises = [calculateIch(inputs)];
+                    if (inputs.fastEdScore >= 4) {
+                        promises.push(fetchLvo(inputs));
+                    }
+                    
+                    const results = await Promise.allSettled(promises);
+                    const ichResult = results[0];
+                    const lvoResult = results.length > 1 ? results[1] : null;
+
+                    const ichData = ichResult.status === 'fulfilled' ? ichResult.value : null;
+                    const lvoData = lvoResult && lvoResult.status === 'fulfilled' ? lvoResult.value : null;
+                    
+                    const triageOutcome = determineTriageRecommendation(ichData, lvoData, inputs.fastEdScore);
+                    
+                    renderTriageCard(triageOutcome);
+                    renderAnalysisDetails(ichData, lvoData);
                     
                     dom.resultsArea.classList.remove('hidden');
-                    // In a real app, you would inject the results here
+                    dom.resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
                 } catch (error) {
+                    console.error("Stroke Analysis Error:", error);
                     dom.errorMsg.textContent = translations[currentLanguage].serverError;
                     dom.errorMsg.classList.remove('hidden');
                 } finally {
@@ -506,13 +563,20 @@
             const collectInputs = () => {
                 const data = {};
                 let isValid = true;
-                const requiredNumeric = ['gfapValue', 'ageYears', 'systolicBp', 'diastolicBp'];
                 
-                requiredNumeric.forEach(id => {
+                modelInputs.forEach(id => {
                     const el = document.getElementById(id);
-                    const val = parseFloat(el.value);
-                    if(isNaN(val)) isValid = false;
-                    data[id] = val;
+                    if (!el) return;
+
+                    if (el.type === 'checkbox') {
+                        data[id] = el.checked ? 1 : 0;
+                    } else if (el.tagName === 'SELECT') {
+                        data[id] = parseInt(el.value, 10);
+                    } else {
+                        const val = parseFloat(el.value);
+                        if (el.required && isNaN(val)) isValid = false;
+                        data[id] = val;
+                    }
                 });
 
                 if(!isValid) {
@@ -521,10 +585,93 @@
                     return null;
                 }
 
-                // Collect other inputs...
                 data.fastEdScore = dom.fastEdSelects.reduce((sum, el) => sum + parseInt(el.value, 10), 0);
-
                 return data;
+            };
+
+            const calculateIch = (inputs) => {
+                return new Promise(resolve => {
+                    const model = ichModel;
+                    const ichInputs = { ...inputs, gfapValue: Math.log1p(inputs.gfapValue) };
+                    let logOdds = model.INTERCEPT;
+                    const impacts = {};
+                    for (const [feature, coef] of Object.entries(model.COEFFICIENTS)) {
+                        let value = ichInputs[feature];
+                        if (model.SCALER_PARAMS[feature]) {
+                            const s = model.SCALER_PARAMS[feature];
+                            value = (value - s.center) / s.scale;
+                        }
+                        const impact = value * coef;
+                        impacts[feature] = impact;
+                        logOdds += impact;
+                    }
+                    const calibratedLogOdds = model.CALIBRATION.A * logOdds + model.CALIBRATION.B;
+                    const probability = 1 / (1 + Math.exp(-calibratedLogOdds));
+                    resolve({ probability, impacts });
+                });
+            };
+
+            const fetchLvo = async (inputs) => {
+                const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inputs) };
+                const [predResponse, explResponse] = await Promise.all([ fetch(api.lvoPrediction, fetchOptions), fetch(api.lvoExplanation, fetchOptions) ]);
+                
+                if (!predResponse.ok || !explResponse.ok) throw new Error(`API Error: Prediction ${predResponse.status}, Explanation ${explResponse.status}`);
+
+                const predJson = await predResponse.json();
+                const explJson = await explResponse.json();
+
+                if (typeof predJson.lvo_probability === 'undefined' || typeof explJson.feature_impacts === 'undefined') throw new Error('Invalid API response format from LVO service.');
+
+                return { probability: predJson.lvo_probability, impacts: explJson.feature_impacts };
+            };
+
+            const determineTriageRecommendation = (ich, lvo, fastEdScore) => {
+                if (fastEdScore < 4) return { type: 'no_lvo', ich, lvo: null };
+                if (!lvo) return { type: 'error', ich, lvo: null };
+                const ichProb = ich.probability;
+                const lvoProb = lvo.probability;
+                if (lvoProb > 0.6 && lvoProb > ichProb * 2) return { type: 'lvo', ich, lvo };
+                if (ichProb > 0.5 && ichProb > lvoProb * 2) return { type: 'ich', ich, lvo };
+                if (ichProb < 0.2 && lvoProb < 0.2) return { type: 'mimic', ich, lvo };
+                return { type: 'unclear', ich, lvo };
+            };
+
+            const renderTriageCard = (outcome) => {
+                const t = translations[currentLanguage].triage;
+                const icons = { lvo: '🧠<span style="color:var(--lvo-border)">⚡️</span>', ich: '🧠<span style="color:var(--ich-border)">🩸</span>', unclear: '🧠❓', mimic: '👩‍⚕️🩺', error: '📡⚠️', no_lvo: '👩‍⚕️🩺' };
+                const titleKey = `${outcome.type}_title`;
+                const recKey = `${outcome.type}_rec`;
+                dom.triageRec.innerHTML = `<div class="triage-card ${outcome.type}"><div class="icon">${icons[outcome.type]}</div><h3>${t[titleKey]}</h3><p>${t[recKey]}</p></div>`;
+            };
+
+            const renderAnalysisDetails = (ichData, lvoData) => {
+                 dom.ichProbPanel.innerHTML = renderProbPanel('ich', ichData);
+                 dom.lvoProbPanel.innerHTML = renderProbPanel('lvo', lvoData);
+                 dom.ichDriversPanel.innerHTML = renderDriversPanel('ich', ichData);
+                 dom.lvoDriversPanel.innerHTML = renderDriversPanel('lvo', lvoData);
+            };
+
+            const renderProbPanel = (type, data) => {
+                const t = translations[currentLanguage];
+                if (!data) return `<h4>${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><p>Data unavailable.</p>`;
+                const prob = data.probability;
+                const markerPos = Math.min(Math.max(prob, 0), 1) * 100;
+                return `<h4 data-translate="${type}Title">${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><div class="probability-meter-container"><div class="probability-meter-marker" style="left: calc(${markerPos}% - 3px);"></div><span class="probability-meter-label" style="left: ${markerPos}%;">${(prob * 100).toFixed(0)}%</span></div>`;
+            };
+        
+            const renderDriversPanel = (type, data) => {
+                const t = translations[currentLanguage];
+                if (!data || !data.impacts) return `<h4>${type === 'ich' ? t.ichTitle : t.lvoTitle} Drivers</h4><p>Data unavailable.</p>`;
+                const sortedDrivers = Object.entries(data.impacts).filter(([, val]) => Math.abs(val) > 0.01).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+                const maxAbsImpact = sortedDrivers.length > 0 ? Math.abs(sortedDrivers[0][1]) : 0;
+                let posHTML = '', negHTML = '';
+                sortedDrivers.forEach(([key, value]) => {
+                    const barWidth = (maxAbsImpact > 0) ? (Math.abs(value) / maxAbsImpact) * 100 : 0;
+                    const label = t.featureNames[key] || key;
+                    const itemHTML = `<div class="driver-item"><span class="driver-label">${label}</span><div class="driver-bar-container"><div class="driver-bar ${value >= 0 ? 'positive' : 'negative'}" style="width: ${barWidth}%;"></div></div></div>`;
+                    if (value >= 0) posHTML += itemHTML; else negHTML += itemHTML;
+                });
+                return `<h4>${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><div class="drivers-columns"><div class="driver-column"><h5 data-translate="increasingRisk">${t.increasingRisk}</h5><div>${posHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div><div class="driver-column"><h5 data-translate="decreasingRisk">${t.decreasingRisk}</h5><div>${negHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div></div>`;
             };
 
             return { initialize };
