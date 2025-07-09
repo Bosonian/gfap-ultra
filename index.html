@@ -2,701 +2,563 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iGFAP Check</title>
-
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="icon" href="icon-512.png" sizes="512x512" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>iGFAP Triage App</title>
   <meta name="theme-color" content="#007bff" />
-
   <style>
-    /* 1. Minimal CSS Reset */
-    html { line-height: 1.15; -webkit-text-size-adjust: 100%; }
-    body { margin: 0; }
-
     :root {
-        --primary-color: #007bff; --primary-hover: #0056b3; --background-color: #f4f7f9;
-        --container-bg: #ffffff; --text-color: #333; --border-color: #dee2e6; --input-bg: #f8f9fa;
-        
-        /* Triage Card Colors */
-        --lvo-bg: #e1f5fe; --lvo-text: #01579b; --lvo-border: #0288d1;
-        --ich-bg: #fbe9e7; --ich-text: #b71c1c; --ich-border: #d84315;
-        --unclear-bg: #fffde7; --unclear-text: #f57f17; --unclear-border: #fbc02d;
-        --mimic-bg: #e8f5e9; --mimic-text: #1b5e20; --mimic-border: #388e3c;
-        
-        --driver-positive-bg: #e74c3c; --driver-negative-bg: #3498db;
-        --meter-green: #28a745; --meter-yellow: #ffc107; --meter-red: #dc3545;
+      --primary-color: #007bff; --primary-hover: #0056b3; --background-color: #f4f7f9;
+      --container-bg: #ffffff; --text-color: #333; --border-color: #dee2e6; --input-bg: #f8f9fa;
+      --lvo-bg: #e1f5fe; --lvo-text: #01579b; --lvo-border: #0288d1;
+      --ich-bg: #fbe9e7; --ich-text: #b71c1c; --ich-border: #d84315;
+      --unclear-bg: #fffde7; --unclear-text: #f57f17; --unclear-border: #fbc02d;
+      --mimic-bg: #e8f5e9; --mimic-text: #1b5e20; --mimic-border: #388e3c;
+      --driver-positive-bg: #e74c3c; --driver-negative-bg: #3498db;
+      --meter-green: #28a745; --meter-yellow: #ffc107; --meter-red: #dc3545;
     }
-
     body.dark-mode {
-        --primary-color: #409eff; --primary-hover: #3a8ee6; --background-color: #121212;
-        --container-bg: #1e1e1e; --text-color: #f1f1f1; --border-color: #444; --input-bg: #2a2a2a;
-
-        --lvo-bg: #1a3a5b; --lvo-text: #b3e5fc; --lvo-border: #4fc3f7;
-        --ich-bg: #5c2a30; --ich-text: #ffcdd2; --ich-border: #ff8a65;
-        --unclear-bg: #4d442a; --unclear-text: #fff59d; --unclear-border: #ffee58;
-        --mimic-bg: #2a5032; --mimic-text: #c8e6c9; --mimic-border: #81c784;
+      --primary-color: #409eff; --primary-hover: #3a8ee6; --background-color: #121212;
+      --container-bg: #1e1e1e; --text-color: #f1f1f1; --border-color: #444; --input-bg: #2a2a2a;
+      --lvo-bg: #1a3a5b; --lvo-text: #b3e5fc; --lvo-border: #4fc3f7;
+      --ich-bg: #5c2a30; --ich-text: #ffcdd2; --ich-border: #ff8a65;
+      --unclear-bg: #4d442a; --unclear-text: #fff59d; --unclear-border: #ffee58;
+      --mimic-bg: #2a5032; --mimic-text: #c8e6c9; --mimic-border: #81c784;
     }
-
     *, *::before, *::after { box-sizing: border-box; }
-
-    body { 
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
-        padding: 80px 15px 40px; 
-        background-color: var(--background-color); 
-        color: var(--text-color); 
-        transition: background-color 0.3s ease, color 0.3s ease; 
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 80px 10px 40px;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
     }
-
-    .container { 
-        max-width: 750px; 
-        margin: 20px auto; 
-        padding: 25px; 
-        background-color: var(--container-bg); 
-        border-radius: 12px; 
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
-        border: 1px solid var(--border-color); 
-        transition: background-color 0.3s, border-color 0.3s;
+    .container {
+      max-width: 750px; margin: 20px auto; padding: 25px;
+      background-color: var(--container-bg);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-color);
     }
-    
-    .hidden { display: none !important; }
-
-    /* --- Header & Global Elements --- */
-    .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background-color: var(--container-bg); box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
-    .app-header h1 { font-size: 1.4em; margin: 0; color: var(--primary-color); }
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 25px; background-color: var(--container-bg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    }
+    .app-header h1 { font-size: 1.4em; margin: 0; color: var(--primary-color);}
     .header-right { display: flex; align-items: center; gap: 15px; }
-    .language-switcher button { background: none; border: none; padding: 5px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
-    .language-switcher button:hover { opacity: 1; }
-    .language-switcher img { width: 24px; height: 16px; border-radius: 3px; vertical-align: middle; }
-    #darkModeToggle { background: none; border: none; color: var(--text-color); font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 8px; }
-    .home-button { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    
-    /* --- Form Elements --- */
-    h2 { text-align: center; margin-bottom: 25px; }
-    .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .input-group, .checkbox-group { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); }
-    label { display: block; margin-bottom: 6px; font-weight: bold; }
-    input[type="number"], input[type="password"], select { width: 100%; padding: 10px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--container-bg); color: var(--text-color); transition: border-color 0.2s, background-color 0.3s, color 0.3s; }
-    input:focus, select:focus { 
-        border-color: var(--primary-color); 
-        outline: none; 
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Fallback */
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent); 
-    }
-    button.primary, button.secondary { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; transition: background-color 0.3s ease; font-weight: bold; position: relative; }
-    button.primary { background-color: var(--primary-color); color: white; width: 100%; margin-top: 25px; font-size: 1.1em;}
-    button.secondary { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); }
-    button.primary:hover:not(:disabled) { background-color: var(--primary-hover); }
-    button:disabled { background-color: #a0a0a0; cursor: wait; }
-    .loading-spinner { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
-
-    /* Other Styles... */
-    .score-display { display: flex; align-items: center; justify-content: space-between; background-color: #f0f3f5; background-color: color-mix(in srgb, var(--input-bg) 50%, var(--background-color)); grid-column: 1 / -1; }
-    .score-value { font-size: 1.8em; font-weight: bold; color: var(--primary-color); }
-    .error-message { color: var(--ich-text); background-color: var(--ich-bg); padding: 12px; border: 1px solid var(--ich-border); border-radius: 6px; display: none; margin-top: 20px; text-align: center; }
-
-    /* Modal Styles */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
-    .modal-overlay.visible { opacity: 1; pointer-events: auto; }
-    .modal-content { background: var(--container-bg); padding: 25px; border-radius: 12px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-    .modal-content p { margin: 0 0 20px 0; }
+    .language-switcher button { background: none; border: none; padding: 5px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;}
+    .language-switcher button:hover { opacity: 1;}
+    .language-switcher img { width: 24px; height: 16px; border-radius: 3px; vertical-align: middle;}
+    #darkModeToggle { background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; padding: 8px; }
+    h2 { text-align: center; margin-bottom: 25px;}
+    .input-group, .checkbox-group { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg);}
+    label { display: block; margin-bottom: 6px; font-weight: bold;}
+    input[type="number"], input[type="password"], select { width: 100%; padding: 10px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--container-bg); color: var(--text-color); transition: border-color 0.2s, background-color 0.3s, color 0.3s;}
+    input:focus, select:focus { border-color: var(--primary-color);}
+    button.primary, button.secondary { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold;}
+    button.primary { background-color: var(--primary-color); color: white; width: 100%; margin-top: 15px;}
+    button.secondary { background: none; border: 1px solid var(--primary-color); color: var(--primary-color);}
+    button.primary:hover:not(:disabled) { background-color: var(--primary-hover);}
+    button:disabled { background-color: #a0a0a0; cursor: wait;}
+    .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;}
+    .error-message { color: var(--ich-text); background-color: var(--ich-bg); padding: 12px; border: 1px solid var(--ich-border); border-radius: 6px; display: none; margin-top: 20px;}
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.visible { display: flex;}
+    .modal { background: var(--container-bg); padding: 25px; border-radius: 12px; max-width: 400px; width: 95%; box-shadow: 0 5px 15px rgba(0,0,0,0.25);}
+    .prob-panel { min-width: 220px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px;}
+    .probability-meter-container { width: 100%; height: 20px; background: linear-gradient(to right, var(--meter-green) 25%, var(--meter-yellow) 50%, var(--meter-red) 100%); border-radius: 10px; position: relative;}
+    .probability-meter-marker { position: absolute; top: -3px; bottom: -3px; width: 6px; background-color: var(--text-color); border: 2px solid var(--container-bg); border-radius: 3px;}
+    .probability-meter-label { position: absolute; top: 100%; transform: translateX(-50%); font-size: 1em; font-weight: bold; padding-top: 5px;}
+    .triage-card { padding: 20px; border-radius: 12px; border-left: 8px solid; text-align: center;}
+    .triage-card.lvo { background-color: var(--lvo-bg); color: var(--lvo-text); border-left-color: var(--lvo-border);}
+    .triage-card.ich { background-color: var(--ich-bg); color: var(--ich-text); border-left-color: var(--ich-border);}
+    .triage-card.unclear { background-color: var(--unclear-bg); color: var(--unclear-text); border-left-color: var(--unclear-border);}
+    .triage-card.mimic { background-color: var(--mimic-bg); color: var(--mimic-text); border-left-color: var(--mimic-border);}
+    .triage-card .icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .drivers-title { text-align: center; margin: 30px 0 15px; font-size: 1.3em;}
+    .drivers-container { display: flex; gap: 25px; flex-wrap: wrap;}
+    .drivers-panel { flex: 1; min-width: 220px;}
+    .drivers-columns { display: flex; gap: 15px;}
+    .driver-column { flex: 1;}
+    .driver-column h5 { margin: 0 0 10px 0; text-align: center; font-size: 0.9em; opacity: 0.8;}
+    .driver-item { display: flex; align-items: center; margin-bottom: 8px; gap: 8px;}
+    .driver-label { flex-shrink: 0; width: 45%; text-align: right; font-size: 0.9em;}
+    .driver-bar-container { flex-grow: 1; height: 16px; background-color: color-mix(in srgb, var(--border-color) 50%, transparent); border-radius: 5px;}
+    .driver-bar { height: 100%; border-radius: 5px; transition: width 0.5s ease-out;}
+    .driver-bar.positive { background-color: var(--driver-positive-bg);}
+    .driver-bar.negative { background-color: var(--driver-negative-bg);}
   </style>
 </head>
-
 <body>
+  <!-- Header -->
   <header class="app-header">
-    <h1 id="appTitle" data-translate="appTitle">iGFAP Check</h1>
+    <h1 id="appTitle">iGFAP Triage App</h1>
     <div class="header-right">
-       <div class="language-switcher">
-           <button onclick="switchLanguage('en')" aria-label="Switch to English"><img src="https://flagcdn.com/gb.svg" alt="English Flag"></button>
-           <button onclick="switchLanguage('de')" aria-label="Switch to German"><img src="https://flagcdn.com/de.svg" alt="German Flag"></button>
-       </div>
+      <div class="language-switcher">
+        <button onclick="switchLanguage('en')" aria-label="Switch to English"><img src="https://flagcdn.com/gb.svg" alt="English"></button>
+        <button onclick="switchLanguage('de')" aria-label="Switch to German"><img src="https://flagcdn.com/de.svg" alt="Deutsch"></button>
+      </div>
       <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
-      <button class="home-button" id="homeButton"><span data-translate="homeButton">🏠 Home</span></button>
     </div>
   </header>
 
   <main>
-    <section id="codeEntrySection" class="container">
-      <p data-translate="accessPrompt">🔑 Please enter your access code:</p>
+    <!-- 1. Access Code Entry -->
+    <section id="accessCodeSection" class="container">
+      <p>🔑 Please enter your access code:</p>
       <div class="input-group">
-        <input type="password" id="accessCodeInput"/>
+        <input type="password" id="accessCodeInput" required autocomplete="off" />
       </div>
-      <button class="primary" id="accessCodeButton"><span data-translate="submitButton">Submit</span></button>
-      <p id="accessError" class="error-message hidden" style="margin-top:15px;"></p>
+      <button class="primary" id="accessCodeButton">Submit</button>
+      <p id="accessError" class="error-message"></p>
     </section>
 
-    <section id="moduleSelectionSection" class="container hidden">
-      <h2 data-translate="moduleSelectionTitle">Check probability for:</h2>
-      <button class="primary" id="comaModuleButton" style="margin-bottom: 15px;">
-        <span data-translate="comaModuleButtonText">ICH risk in comatose patients (GCS 3-8)</span>
-      </button>
-      <button class="primary" id="strokeModuleButton">
-        <span data-translate="strokeModuleButtonText">ICH risk in patients with stroke symptoms (Unified Model)</span>
-      </button>
+    <!-- 2. Module Selection -->
+    <section id="moduleSelectionSection" class="container" style="display:none;">
+      <h2>Select Module</h2>
+      <button class="primary" id="comaModuleBtn">Coma ICH Probability</button>
+      <button class="primary" id="strokeModuleBtn">Stroke Triage Assistant</button>
     </section>
 
-    <section id="comaModuleSection" class="container hidden">
-      <h2 data-translate="comaModuleTitle">ICH risk in comatose patients (GCS 3-8)</h2>
-      <div class="input-group">
-        <label for="gfapComaInput" data-translate="gfapComaLabel">GFAP Value (pg/mL)</label>
-        <input type="number" id="gfapComaInput" min="29" max="10001" />
-      </div>
-      <p id="comaError" class="error-message hidden"></p>
-      <button class="primary" id="calculateComaButton"><span data-translate="calculateComaButton">Calculate Probability</span></button>
-      <button class="secondary" id="comaBackButton" style="width: 100%; margin-top: 15px;"><span data-translate="backButton">⬅️ Back</span></button>
-      <div class="result hidden" id="comaResult" aria-live="polite"></div>
+    <!-- 3. Coma Module -->
+    <section id="comaModuleSection" class="container" style="display:none;">
+      <h2>Coma ICH Probability</h2>
+      <form id="comaForm">
+        <div class="input-group">
+          <label for="gfapComaInput">GFAP Value (pg/mL)</label>
+          <input type="number" id="gfapComaInput" min="29" max="10001" required />
+        </div>
+        <button class="primary" id="calculateComaButton" type="submit">Calculate</button>
+        <button class="secondary" id="comaBackButton" type="button">⬅️ Back</button>
+      </form>
+      <div id="comaResult" style="margin-top: 16px; display:none;"></div>
+      <p id="comaError" class="error-message"></p>
     </section>
 
-    <section id="unifiedStrokeModuleSection" class="hidden">
-      <div class="container">
-          <h2 data-translate="formTitle">Patient Data Entry</h2>
-          <form id="triageForm">
-              <div class="input-grid">
-                  <div class="input-group"><label for="gfapValue" data-translate="gfapLabel">GFAP Value (pg/mL)</label><input type="number" id="gfapValue" required></div>
-                  <div class="input-group"><label for="ageYears" data-translate="ageLabel">Age (years)</label><input type="number" id="ageYears" required></div>
-                  <div class="input-group"><label for="systolicBp" data-translate="sbpLabel">Systolic BP</label><input type="number" id="systolicBp" required></div>
-                  <div class="input-group"><label for="diastolicBp" data-translate="dbpLabel">Diastolic BP</label><input type="number" id="diastolicBp" required></div>
-                  
-                  <div class="checkbox-group"><label><input type="checkbox" id="headache"><span data-translate="headacheLabel">Headache</span></label></div>
-                  <div class="checkbox-group"><label><input type="checkbox" id="legParesis"><span data-translate="beinpareseLabel">Leg Paresis</span></label></div>
-                  <div class="checkbox-group"><label><input type="checkbox" id="atrialFibrillation"><span data-translate="afibLabel">Atrial Fibrillation</span></label></div>
-                  <div class="checkbox-group"><label><input type="checkbox" id="onAntiplatelets"><span data-translate="antiplateletsLabel">On Antiplatelets</span></label></div>
-                  <div class="checkbox-group"><label><input type="checkbox" id="vigilanceReduction"><span data-translate="vigilanceLabel">Vigilance Reduction</span></label></div>
-                  <div class="checkbox-group"><label><input type="checkbox" id="onNoak"><span data-translate="noakLabel">On NOAK</span></label></div>
-
-                  <div class="input-group fast-ed-component"><label for="fastEdFace" data-translate="fastEdFace">Facial Palsy</label><select id="fastEdFace" required><option value="0" data-translate="fastEdFace0">Normal symmetry</option><option value="1" data-translate="fastEdFace1">Minor paralysis</option></select></div>
-                  <div class="input-group fast-ed-component"><label for="fastEdArm" data-translate="fastEdArm">Arm Weakness</label><select id="fastEdArm" required><option value="0" data-translate="fastEdArm0">No drift</option><option value="1" data-translate="fastEdArm1">Drifts down</option><option value="2" data-translate="fastEdArm2">Falls rapidly</option></select></div>
-                  <div class="input-group fast-ed-component"><label for="fastEdSpeech" data-translate="fastEdSpeech">Speech Changes</label><select id="fastEdSpeech" required><option value="0" data-translate="fastEdSpeech0">Normal</option><option value="1" data-translate="fastEdSpeech1">Mild-moderate</option><option value="2" data-translate="fastEdSpeech2">Severe / Mute</option></select></div>
-                  <div class="input-group fast-ed-component"><label for="fastEdEyes" data-translate="fastEdEyes">Eye Deviation</label><select id="fastEdEyes" required><option value="0" data-translate="fastEdEyes0">Absent</option><option value="1" data-translate="fastEdEyes1">Present</option></select></div>
-                  <div class="input-group fast-ed-component"><label for="fastEdDenial" data-translate="fastEdDenial">Denial / Neglect</label><select id="fastEdDenial" required><option value="0" data-translate="fastEdDenial0">Absent</option><option value="1" data-translate="fastEdDenial1">Present</option></select></div>
-
-                  <div class="input-group score-display">
-                      <label data-translate="calculatedFastEdLabel">Calculated FAST-ED Score:</label>
-                      <span id="fastEdScoreDisplay" class="score-value">0</span>
-                  </div>
-              </div>
-
-              <p id="strokeError" class="error-message"></p>
-              <button type="submit" id="calculateStrokeButton" class="primary"><span data-translate="analyzeButton">Analyze Stroke Probability</span></button>
-              <button type="button" class="secondary" id="strokeBackButton" style="width: 100%; margin-top: 15px;"><span data-translate="backButton">⬅️ Back</span></button>
-          </form>
-          
-          <div id="resultsArea" class="hidden">
-              <div id="triageRecommendation"></div>
-              <div id="analysisDetails">
-                  <div class="probabilities">
-                      <div class="prob-panel" id="ichProbPanel"></div>
-                      <div class="prob-panel" id="lvoProbPanel"></div>
-                  </div>
-                  <h3 class="drivers-title" data-translate="driversTitle">Prediction Drivers</h3>
-                  <div class="drivers-container">
-                      <div class="drivers-panel" id="ichDriversPanel"></div>
-                      <div class="drivers-panel" id="lvoDriversPanel"></div>
-                  </div>
-              </div>
+    <!-- 4. Stroke Triage Assistant -->
+    <section id="strokeModuleSection" class="container" style="display:none;">
+      <h2>Stroke Triage Assistant</h2>
+      <form id="triage-form">
+        <div class="input-grid">
+          <div class="input-group"><label for="gfap_value">GFAP Value (pg/mL)</label><input type="number" id="gfap_value" required></div>
+          <div class="input-group"><label for="age_years">Age (years)</label><input type="number" id="age_years" required></div>
+          <div class="input-group"><label for="systolic_bp">Systolic BP</label><input type="number" id="systolic_bp" required></div>
+          <div class="input-group"><label for="diastolic_bp">Diastolic BP</label><input type="number" id="diastolic_bp" required></div>
+          <div class="input-group">
+            <label for="fast_ed_score">FAST-ED Score</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="number" id="fast_ed_score" min="0" max="9" required>
+              <button type="button" class="secondary" id="open-fast-ed-modal-btn">Calc</button>
+            </div>
           </div>
+          <div class="checkbox-group"><label><input type="checkbox" id="headache"> Headache</label></div>
+          <div class="checkbox-group"><label><input type="checkbox" id="eye_deviation"> Eye Deviation</label></div>
+          <div class="checkbox-group"><label><input type="checkbox" id="armparese"> Arm Paresis</label></div>
+          <div class="checkbox-group"><label><input type="checkbox" id="beinparese"> Leg Paresis</label></div>
+          <div class="checkbox-group"><label><input type="checkbox" id="atrial_fibrillation"> Atrial Fibrillation</label></div>
+          <div class="checkbox-group"><label><input type="checkbox" id="antiplatelets"> On Antiplatelets</label></div>
+          <div class="checkbox-group"><label><input type="checkbox" id="vigilanzminderung"> Vigilance Reduction</label></div>
+          <div class="checkbox-group"><label><input type="checkbox" id="antcoagulated_noak"> On NOAK</label></div>
+        </div>
+        <button type="submit" id="calculate-btn" class="primary">Analyze Stroke Probability</button>
+      </form>
+      <p id="strokeError" class="error-message"></p>
+      <div id="results-area" style="display:none;">
+        <div id="triage-recommendation"></div>
+        <div style="text-align:center;">
+          <button id="analysis-toggle">View Detailed Analysis</button>
+        </div>
+        <div id="analysis-details">
+          <div class="probabilities">
+            <div class="prob-panel" id="ich-prob-panel"></div>
+            <div class="prob-panel" id="lvo-prob-panel"></div>
+          </div>
+          <h3 class="drivers-title">Prediction Drivers</h3>
+          <div class="drivers-container">
+            <div class="drivers-panel" id="ich-drivers-panel"></div>
+            <div class="drivers-panel" id="lvo-drivers-panel"></div>
+          </div>
+        </div>
       </div>
     </section>
+
+    <!-- FAST-ED Calculator Modal -->
+    <div class="modal-overlay" id="fast-ed-modal-overlay">
+      <div class="modal" id="fast-ed-modal">
+        <h3>FAST-ED Calculator</h3>
+        <div class="input-group"><label for="fast-ed-face">Facial Palsy</label>
+          <select id="fast-ed-face"><option value="0">Normal symmetry</option><option value="1">Minor paralysis</option><option value="2">Complete paralysis</option></select>
+        </div>
+        <div class="input-group"><label for="fast-ed-arm">Arm Weakness</label>
+          <select id="fast-ed-arm"><option value="0">No drift</option><option value="1">Drifts down</option><option value="2">Falls rapidly</option></select>
+        </div>
+        <div class="input-group"><label for="fast-ed-speech">Speech Changes</label>
+          <select id="fast-ed-speech"><option value="0">Normal</option><option value="1">Mild-moderate dysarthria/aphasia</option><option value="2">Severe aphasia / mute</option></select>
+        </div>
+        <div class="input-group"><label for="fast-ed-eyes">Eye Deviation</label>
+          <select id="fast-ed-eyes"><option value="0">Absent</<select id="fast-ed-eyes">
+            <option value="0">Absent</option>
+            <option value="1">Present</option>
+          </select>
+        </div>
+        <div class="input-group"><label for="fast-ed-denial">Denial / Neglect (Anosognosia)</label>
+          <select id="fast-ed-denial">
+            <option value="0">Absent</option>
+            <option value="1">Present</option>
+          </select>
+        </div>
+        <button type="button" class="primary" id="apply-fast-ed-score-btn" style="margin-top: 18px;">Apply Score</button>
+        <button type="button" class="secondary" id="close-fast-ed-modal-btn" style="margin-top: 10px;">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Disclaimer Modal -->
+    <div class="modal-overlay" id="disclaimer-modal">
+      <div class="modal">
+        <h3>Disclaimer</h3>
+        <p>The calculations are for research purposes only; do not make clinical decisions based on them.</p>
+        <button class="primary" id="confirm-disclaimer-btn">Confirm</button>
+      </div>
+    </div>
   </main>
-  
+
   <footer style="text-align:center; margin-top:20px; padding-bottom: 20px;">
     <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
   </footer>
 
-  <div id="disclaimerModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="disclaimerTitle">
-    <div class="modal-content">
-      <h3 id="disclaimerTitle" class="hidden" data-translate="disclaimerTitle">Disclaimer</h3>
-      <p class="disclaimer-text" data-translate="disclaimerText">
-        The calculations are for research purposes only; do not make clinical decisions based on them.
-      </p>
-      <button class="primary" id="disclaimerConfirmButton">
-        <span data-translate="confirmButton">Confirm</span>
-      </button>
-    </div>
-  </div>
-
   <script>
-    const translations = {
-        en: {
-            appTitle: "iGFAP Check", homeButton: "🏠 Home", accessPrompt: "🔑 Please enter your access code:", submitButton: "Submit",
-            accessCodeRequired: "Please enter a code.",
-            moduleSelectionTitle: "Check probability for:", comaModuleButtonText: "ICH risk in comatose patients (GCS 3-8)",
-            strokeModuleButtonText: "ICH risk in patients with stroke symptoms (Unified Model)",
-            comaModuleTitle: "ICH risk in comatose patients (GCS 3-8)", gfapComaLabel: "GFAP Value (pg/mL)",
-            calculateComaButton: "Calculate Probability", backButton: "⬅️ Back", invalidInput: "Please enter a valid number.", invalidCode: "Invalid access code.", serverError: "A server error occurred. Please try again later.",
-            disclaimerTitle: "Disclaimer", disclaimerText: "The calculations are for research purposes only; do not make clinical decisions based on them.", confirmButton: "Confirm",
-            formTitle: "Patient Data Entry", gfapLabel: "GFAP Value (pg/mL)", ageLabel: "Age (years)", sbpLabel: "Systolic BP", dbpLabel: "Diastolic BP",
-            headacheLabel: "Headache", beinpareseLabel: "Leg Paresis",
-            afibLabel: "Atrial Fibrillation", antiplateletsLabel: "On Antiplatelets", vigilanceLabel: "Vigilance Reduction", noakLabel: "On NOAK",
-            analyzeButton: "Analyze Stroke Probability", calculatedFastEdLabel: "Calculated FAST-ED Score:",
-            fastEdFace: "Facial Palsy", fastEdFace0: "Normal", fastEdFace1: "Minor paralysis",
-            fastEdArm: "Arm Weakness", fastEdArm0: "No drift", fastEdArm1: "Drifts down", fastEdArm2: "Falls rapidly",
-            fastEdSpeech: "Speech Changes", fastEdSpeech0: "Normal", fastEdSpeech1: "Mild-moderate", fastEdSpeech2: "Severe / Mute",
-            fastEdEyes: "Eye Deviation", fastEdEyes0: "Absent", fastEdEyes1: "Present",
-            fastEdDenial: "Denial / Neglect", fastEdDenial0: "Absent", fastEdDenial1: "Present",
-            invalidStrokeInput: "Please fill all required fields with valid numbers.",
-            toggleDarkMode: "Toggle dark mode", toggleLightMode: "Toggle light mode",
-            triage: { lvo_title: "LVO LIKELY", lvo_rec: "Proceed directly to the nearest LVO-capable Comprehensive Stroke Center.", ich_title: "STRONG SUSPICION OF ICH", ich_rec: "Proceed to the nearest center with neurosurgical capabilities. Thrombectomy not indicated.", unclear_title: "UNCLEAR STROKE TYPE", unclear_rec: "LVO cannot be ruled out. Default to LVO protocol: proceed to LVO-capable center if feasible.", mimic_title: "ICH & LVO UNLIKELY", mimic_rec: "Re-evaluate for Stroke Mimics (e.g., seizure, migraine, hypoglycemia). Proceed to nearest appropriate facility.", error_title: "LVO DATA UNAVAILABLE", error_rec: "Could not retrieve LVO data. ICH analysis is shown below. Proceed based on clinical judgment.", no_lvo_title: "LVO UNLIKELY (FAST-ED < 4)", no_lvo_rec: "LVO assessment not indicated based on low FAST-ED score. Proceed based on ICH analysis and clinical judgment." },
-            featureNames: { ageYears: 'Age', legParesis: 'Leg Paresis', atrialFibrillation: 'AFib History', systolicBp: 'Systolic BP', diastolicBp: 'Diastolic BP', onAntiplatelets: 'On Antiplatelets', gfapValue: 'GFAP', headache: 'Headache', vigilanceReduction: 'Vigilance', onNoak: 'NOAK', fastEdFace: 'Facial Palsy', fastEdArm: 'Arm Weakness', fastEdSpeech: 'Speech', fastEdEyes: 'Eye Deviation', fastEdDenial: 'Denial/Neglect' },
-            driversTitle: "Prediction Drivers", increasingRisk: "Increasing Risk", decreasingRisk: "Decreasing Risk", ichTitle: "ICH Details", lvoTitle: "LVO Details",
-        },
-        de: {
-            appTitle: "iGFAP-Prüfung", homeButton: "🏠 Startseite", accessPrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:", submitButton: "Senden",
-            accessCodeRequired: "Bitte geben Sie einen Code ein.",
-            moduleSelectionTitle: "Wahrscheinlichkeit prüfen für:", comaModuleButtonText: "ICB-Risiko bei komatösen Patienten (GCS 3-8)",
-            strokeModuleButtonText: "ICB-Risiko bei Patienten mit Schlaganfallsymptomen (Einheitliches Modell)",
-            comaModuleTitle: "ICB-Risiko bei komatösen Patienten (GCS 3-8)", gfapComaLabel: "GFAP-Wert (pg/mL)",
-            calculateComaButton: "Wahrscheinlichkeit berechnen", backButton: "⬅️ Zurück", invalidInput: "Bitte geben Sie eine gültige Zahl ein.", invalidCode: "Ungültiger Zugangscode.", serverError: "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
-            disclaimerTitle: "Haftungsausschluss", disclaimerText: "Die Berechnungen dienen nur zu Forschungszwecken; treffen Sie keine klinischen Entscheidungen auf dieser Grundlage.", confirmButton: "Bestätigen",
-            formTitle: "Patientendateneingabe", gfapLabel: "GFAP-Wert (pg/mL)", ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR", dbpLabel: "Diastolischer RR",
-            headacheLabel: "Kopfschmerzen", beinpareseLabel: "Beinparese",
-            afibLabel: "Vorhofflimmern", antiplateletsLabel: "Thrombozytenaggregationshemmer", vigilanceLabel: "Vigilanzminderung", noakLabel: "Unter NOAK",
-            analyzeButton: "Schlaganfall-Wahrscheinlichkeit analysieren", calculatedFastEdLabel: "Berechneter FAST-ED Score:",
-            fastEdFace: "Fazialisparese", fastEdFace0: "Normal", fastEdFace1: "Leichte Lähmung",
-            fastEdArm: "Armschwäche", fastEdArm0: "Kein Absinken", fastEdArm1: "Sinkt ab", fastEdArm2: "Fällt schnell",
-            fastEdSpeech: "Sprachstörung", fastEdSpeech0: "Normal", fastEdSpeech1: "Leicht bis mäßig", fastEdSpeech2: "Schwer / Stumm",
-            fastEdEyes: "Blickdeviation", fastEdEyes0: "Fehlend", fastEdEyes1: "Vorhanden",
-            fastEdDenial: "Neglect / Anosognosie", fastEdDenial0: "Fehlend", fastEdDenial1: "Vorhanden",
-            invalidStrokeInput: "Bitte füllen Sie alle Pflichtfelder mit gültigen Zahlen aus.",
-            toggleDarkMode: "Dunkelmodus umschalten", toggleLightMode: "Heller Modus umschalten",
-            triage: { lvo_title: "LVO Wahrscheinlich", lvo_rec: "Fahren Sie direkt zum nächsten Thrombektomie-fähigen Zentrum.", ich_title: "Starker Verdacht auf ICB", ich_rec: "Fahren Sie zum nächstgelegenen Zentrum mit neurochirurgischer Abteilung. Thrombektomie nicht indiziert.", unclear_title: "UNKLARER SCHLAGANFALLTYP", unclear_rec: "LVO kann nicht ausgeschlossen werden. Standardmäßig LVO-Protokoll: Fahren Sie, wenn möglich, zu einem Thrombektomie-fähigen Zentrum.", mimic_title: "ICB & LVO UNWAHRSCHEINLICH", mimic_rec: "Erwägen Sie Schlaganfall-Mimics (z.B. Anfall, Migräne, Hypoglykämie). Fahren Sie zur nächstgelegenen geeigneten Einrichtung.", error_title: "LVO-DATEN NICHT VERFÜGBAR", error_rec: "LVO-Daten konnten nicht abgerufen werden. ICB-Analyse unten angezeigt. Handeln Sie nach klinischem Ermessen.", no_lvo_title: "LVO UNWAHRSCHEINLICH (FAST-ED < 4)", no_lvo_rec: "LVO-Bewertung aufgrund des niedrigen FAST-ED-Scores nicht angezeigt. Verfahren Sie basierend auf der ICB-Analyse und dem klinischen Ermessen." },
-            featureNames: { ageYears: 'Alter', legParesis: 'Beinparese', atrialFibrillation: 'Vorhofflimmern', systolicBp: 'Systol. RR', diastolicBp: 'Diastol. RR', onAntiplatelets: 'Thrombozytenhemmer', gfapValue: 'GFAP', headache: 'Kopfschmerzen', vigilanceReduction: 'Vigilanz', onNoak: 'NOAK', fastEdFace: 'Fazialisparese', fastEdArm: 'Armschwäche', fastEdSpeech: 'Sprache', fastEdEyes: 'Blickdeviation', fastEdDenial: 'Neglect/Anosognosie' },
-            driversTitle: "Treiber der Vorhersage", increasingRisk: "Risikoerhöhend", decreasingRisk: "Risikomindernd", ichTitle: "ICB-Details", lvoTitle: "LVO-Details",
-        }
+    // ---- PAGE ELEMENTS ----
+    const dom = {
+      sections: {
+        access: document.getElementById('accessCodeSection'),
+        modules: document.getElementById('moduleSelectionSection'),
+        coma: document.getElementById('comaModuleSection'),
+        stroke: document.getElementById('strokeModuleSection')
+      },
+      accessCode: document.getElementById('accessCodeInput'),
+      accessCodeBtn: document.getElementById('accessCodeButton'),
+      accessError: document.getElementById('accessError'),
+      moduleComaBtn: document.getElementById('comaModuleBtn'),
+      moduleStrokeBtn: document.getElementById('strokeModuleBtn'),
+      comaForm: document.getElementById('comaForm'),
+      comaInput: document.getElementById('gfapComaInput'),
+      comaCalcBtn: document.getElementById('calculateComaButton'),
+      comaBackBtn: document.getElementById('comaBackButton'),
+      comaResult: document.getElementById('comaResult'),
+      comaError: document.getElementById('comaError'),
+      strokeForm: document.getElementById('triage-form'),
+      strokeError: document.getElementById('strokeError'),
+      resultsArea: document.getElementById('results-area'),
+      triageRec: document.getElementById('triage-recommendation'),
+      analysisToggle: document.getElementById('analysis-toggle'),
+      analysisDetails: document.getElementById('analysis-details'),
+      ichProbPanel: document.getElementById('ich-prob-panel'),
+      lvoProbPanel: document.getElementById('lvo-prob-panel'),
+      ichDriversPanel: document.getElementById('ich-drivers-panel'),
+      lvoDriversPanel: document.getElementById('lvo-drivers-panel'),
+      fastEdModalOverlay: document.getElementById('fast-ed-modal-overlay'),
+      fastEdModal: document.getElementById('fast-ed-modal'),
+      openFastEdBtn: document.getElementById('open-fast-ed-modal-btn'),
+      applyFastEdBtn: document.getElementById('apply-fast-ed-score-btn'),
+      closeFastEdModalBtn: document.getElementById('close-fast-ed-modal-btn'),
+      darkModeToggle: document.getElementById('darkModeToggle'),
+      disclaimerModal: document.getElementById('disclaimer-modal'),
+      confirmDisclaimerBtn: document.getElementById('confirm-disclaimer-btn'),
     };
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        // Element cache
-        const dom = {
-            sections: {
-                access: document.getElementById('codeEntrySection'),
-                moduleSelection: document.getElementById('moduleSelectionSection'),
-                coma: document.getElementById('comaModuleSection'),
-                unifiedStroke: document.getElementById('unifiedStrokeModuleSection'),
-            },
-            buttons: {
-                disclaimerConfirm: document.getElementById('disclaimerConfirmButton'),
-                accessCode: document.getElementById('accessCodeButton'),
-                home: document.getElementById('homeButton'),
-                coma: document.getElementById('comaModuleButton'),
-                stroke: document.getElementById('strokeModuleButton'),
-                comaBack: document.getElementById('comaBackButton'),
-                strokeBack: document.getElementById('strokeBackButton'),
-                calculateComa: document.getElementById('calculateComaButton'),
-                darkModeToggle: document.getElementById('darkModeToggle'),
-            },
-            errors: {
-                access: document.getElementById('accessError'),
-                coma: document.getElementById('comaError'),
-                stroke: document.getElementById('strokeError'),
-            },
-            disclaimerModal: document.getElementById('disclaimerModal'),
-        };
 
-        let currentLanguage = 'en';
-        let isUnifiedModuleInitialized = false;
-        let activeElementBeforeModal;
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        // --- Core Functions ---
-        const showSection = (sectionName) => {
-            Object.values(dom.sections).forEach(s => s.classList.add('hidden'));
-            if(dom.sections[sectionName]) dom.sections[sectionName].classList.remove('hidden');
-            window.scrollTo(0,0);
-        };
+    // ---- PAGE NAVIGATION ----
+    function showSection(which) {
+      for (let key in dom.sections) dom.sections[key].style.display = 'none';
+      dom.sections[which].style.display = '';
+      window.scrollTo(0,0);
+    }
 
-        const hideErrors = () => Object.values(dom.errors).forEach(e => e.classList.add('hidden'));
+    // ---- DARK MODE ----
+    dom.darkModeToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('dark-mode');
+      dom.darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    });
+    // Restore user’s previous theme:
+    (function(){
+      const savedTheme = localStorage.getItem('darkMode');
+      if (savedTheme === 'enabled' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('dark-mode');
+        dom.darkModeToggle.textContent = '☀️';
+      }
+    })();
 
-        window.switchLanguage = (lang) => {
-            hideErrors();
-            currentLanguage = lang;
-            localStorage.setItem('language', lang);
-            const t = translations[lang] || translations.en;
-            document.querySelectorAll('[data-translate]').forEach(el => {
-                const key = el.dataset.translate;
-                if (t[key]) {
-                    const target = el.querySelector('span') || el;
-                    target.textContent = t[key];
-                }
-            });
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            dom.buttons.darkModeToggle.setAttribute('aria-label', isDarkMode ? t.toggleLightMode : t.toggleDarkMode);
-        };
-
-        const setLoadingState = (button, isLoading) => {
-            if (isLoading) {
-                button.disabled = true;
-                const spinner = document.createElement('div');
-                spinner.className = 'loading-spinner';
-                button.prepend(spinner);
-            } else {
-                button.disabled = false;
-                const spinner = button.querySelector('.loading-spinner');
-                if (spinner) spinner.remove();
-            }
-        };
-
-        const handleFocusTrap = (e) => {
-            const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-            const modal = dom.disclaimerModal;
-            const firstFocusableElement = modal.querySelectorAll(focusableElements)[0]; 
-            const focusableContent = modal.querySelectorAll(focusableElements);
-            const lastFocusableElement = focusableContent[focusableContent.length - 1];
-
-            if (e.key !== 'Tab') return;
-
-            if (e.shiftKey) { 
-                if (document.activeElement === firstFocusableElement) {
-                    lastFocusableElement.focus();
-                    e.preventDefault();
-                }
-            } else {
-                if (document.activeElement === lastFocusableElement) {
-                    firstFocusableElement.focus();
-                    e.preventDefault();
-                }
-            }
-        };
-
-        const requestDisclaimerConfirmation = () => {
-            return new Promise(resolve => {
-                const modal = dom.disclaimerModal;
-                activeElementBeforeModal = document.activeElement;
-                
-                const handler = () => {
-                    modal.classList.remove('visible');
-                    modal.removeEventListener('keydown', handleFocusTrap);
-                    dom.buttons.disclaimerConfirm.removeEventListener('click', handler);
-                    if(activeElementBeforeModal) activeElementBeforeModal.focus();
-                    resolve();
-                };
-
-                dom.buttons.disclaimerConfirm.addEventListener('click', handler);
-                modal.addEventListener('keydown', handleFocusTrap);
-                modal.classList.add('visible');
-                setTimeout(() => dom.buttons.disclaimerConfirm.focus(), 10);
-            });
-        };
-
-        // --- Event Listeners ---
-        dom.buttons.darkModeToggle.addEventListener('click', () => {
-            const isDarkMode = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-            dom.buttons.darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
-            const t = translations[currentLanguage];
-            dom.buttons.darkModeToggle.setAttribute('aria-label', isDarkMode ? t.toggleLightMode : t.toggleDarkMode);
+    // ---- ACCESS CODE LOGIC ----
+    dom.accessCodeBtn.addEventListener('click', async () => {
+      dom.accessError.style.display = 'none';
+      const code = dom.accessCode.value.trim();
+      if (!code) {
+        dom.accessError.textContent = 'Please enter a code.'; dom.accessError.style.display = '';
+        return;
+      }
+      dom.accessCodeBtn.disabled = true;
+      try {
+        // ---- BACKEND VALIDATION ----
+        const resp = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/validateAccessCode', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
         });
-
-        dom.buttons.accessCode.addEventListener('click', async () => {
-            hideErrors();
-            const inputCode = document.getElementById('accessCodeInput').value;
-            if (!inputCode) {
-                dom.errors.access.textContent = translations[currentLanguage].accessCodeRequired;
-                dom.errors.access.classList.remove('hidden');
-                return;
-            }
-
-            setLoadingState(dom.buttons.accessCode, true);
-            try {
-                const response = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/validateAccessCode', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: inputCode })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.valid) {
-                        showSection('moduleSelection');
-                    } else {
-                        dom.errors.access.textContent = translations[currentLanguage].invalidCode;
-                        dom.errors.access.classList.remove('hidden');
-                    }
-                } else {
-                    dom.errors.access.textContent = translations[currentLanguage].serverError;
-                    dom.errors.access.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Access Code Fetch Error:", error);
-                dom.errors.access.textContent = translations[currentLanguage].serverError;
-                dom.errors.access.classList.remove('hidden');
-            } finally {
-                setLoadingState(dom.buttons.accessCode, false);
-            }
-        });
-        
-        const goToModuleSelection = () => showSection('moduleSelection');
-        ['home', 'comaBack', 'strokeBack'].forEach(key => dom.buttons[key].addEventListener('click', goToModuleSelection));
-
-        dom.buttons.coma.addEventListener('click', () => showSection('coma'));
-        dom.buttons.stroke.addEventListener('click', () => {
-            showSection('unifiedStroke');
-            if (!isUnifiedModuleInitialized) {
-                strokeModule.initialize();
-                isUnifiedModuleInitialized = true;
-            }
-        });
-        
-        dom.buttons.calculateComa.addEventListener('click', async () => {
-            hideErrors();
-            const input = document.getElementById('gfapComaInput');
-            const resultDiv = document.getElementById('comaResult');
-            const value = parseFloat(input.value);
-
-            if (isNaN(value) || value < input.min || value > input.max) {
-                dom.errors.coma.textContent = translations[currentLanguage].invalidInput;
-                dom.errors.coma.classList.remove('hidden');
-                resultDiv.classList.add('hidden');
-                return;
-            }
-            
-            await requestDisclaimerConfirmation();
-            setLoadingState(dom.buttons.calculateComa, true);
-            try {
-                const response = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/calculateComaRisk', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ gfap: value })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    resultDiv.textContent = 'Probability of ICH: ';
-                    const strongEl = document.createElement('strong');
-                    strongEl.textContent = `${(data.probability * 100).toFixed(1)}%`;
-                    resultDiv.appendChild(strongEl);
-                    resultDiv.classList.remove('hidden');
-                } else {
-                    dom.errors.coma.textContent = translations[currentLanguage].serverError;
-                    dom.errors.coma.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Coma Risk Fetch Error:", error);
-                dom.errors.coma.textContent = translations[currentLanguage].serverError;
-                dom.errors.coma.classList.remove('hidden');
-            } finally {
-                setLoadingState(dom.buttons.calculateComa, false);
-            }
-        });
-
-        // --- Stroke Module (IIFE) ---
-        const strokeModule = (() => {
-            const dom = {};
-            const api = { lvoPrediction: 'https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', lvoExplanation: 'https://lvo-ppv-service-564499947017.europe-west3.run.app/explain' };
-            const ichModel = {
-                INTERCEPT: -0.72549447,
-                COEFFICIENTS: { 'gfapValue': 0.98845868, 'ageYears': -0.20927375, 'systolicBp': 0.36337294, 'headache': 0.43796113, 'legParesis': 0.42467409, 'atrialFibrillation': -0.24686695, 'onAntiplatelets': -0.52928134, 'fastEdArm': 0.11730522, 'fastEdEyes': -0.26763354 },
-                SCALER_PARAMS: {'gfapValue': { center: 3.78418963, scale: 0.98704051 }, 'ageYears': { center: 78.0, scale: 18.0 }, 'systolicBp': { center: 160.0, scale: 41.5 } },
-                CALIBRATION: { A: 1.15, B: -0.20 }
-            };
-            const modelInputs = ['gfapValue', 'ageYears', 'systolicBp', 'diastolicBp', 'headache', 'legParesis', 'atrialFibrillation', 'onAntiplatelets', 'vigilanceReduction', 'onNoak', 'fastEdFace', 'fastEdArm', 'fastEdSpeech', 'fastEdEyes', 'fastEdDenial'];
-
-            const initialize = () => {
-                Object.assign(dom, {
-                    form: document.getElementById('triageForm'),
-                    calculateBtn: document.getElementById('calculateStrokeButton'),
-                    errorMsg: document.getElementById('strokeError'),
-                    resultsArea: document.getElementById('resultsArea'),
-                    triageRec: document.getElementById('triageRecommendation'),
-                    ichProbPanel: document.getElementById('ichProbPanel'),
-                    lvoProbPanel: document.getElementById('lvoProbPanel'),
-                    ichDriversPanel: document.getElementById('ichDriversPanel'),
-                    lvoDriversPanel: document.getElementById('lvoDriversPanel'),
-                    fastEdSelects: Array.from(document.querySelectorAll('.fast-ed-component select')),
-                    fastEdDisplay: document.getElementById('fastEdScoreDisplay')
-                });
-                
-                dom.form.addEventListener('submit', handleAnalyze);
-                dom.fastEdSelects.forEach(sel => sel.addEventListener('change', updateFastEdScore));
-                updateFastEdScore();
-            };
-            
-            const updateFastEdScore = () => {
-                const total = dom.fastEdSelects.reduce((sum, el) => sum + parseInt(el.value, 10), 0);
-                dom.fastEdDisplay.textContent = total;
-            };
-
-            const handleAnalyze = async (event) => {
-                event.preventDefault();
-                hideErrors();
-                
-                const inputs = collectInputs();
-                if (!inputs) return;
-
-                await requestDisclaimerConfirmation();
-                setLoadingState(dom.calculateBtn, true);
-                dom.resultsArea.classList.add('hidden');
-
-                try {
-                    const promises = [calculateIch(inputs)];
-                    if (inputs.fastEdScore >= 4) {
-                        promises.push(fetchLvo(inputs));
-                    }
-                    
-                    const results = await Promise.allSettled(promises);
-                    const ichResult = results[0];
-                    const lvoResult = results.length > 1 ? results[1] : null;
-
-                    const ichData = ichResult.status === 'fulfilled' ? ichResult.value : null;
-                    const lvoData = lvoResult && lvoResult.status === 'fulfilled' ? lvoResult.value : null;
-                    
-                    const triageOutcome = determineTriageRecommendation(ichData, lvoData, inputs.fastEdScore);
-                    
-                    renderTriageCard(triageOutcome);
-                    renderAnalysisDetails(ichData, lvoData);
-                    
-                    dom.resultsArea.classList.remove('hidden');
-                    dom.resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                } catch (error) {
-                    console.error("Stroke Analysis Error:", error);
-                    dom.errorMsg.textContent = translations[currentLanguage].serverError;
-                    dom.errorMsg.classList.remove('hidden');
-                } finally {
-                    setLoadingState(dom.calculateBtn, false);
-                }
-            };
-
-            const collectInputs = () => {
-                const data = {};
-                let isValid = true;
-                
-                modelInputs.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (!el) return;
-
-                    if (el.type === 'checkbox') {
-                        data[id] = el.checked ? 1 : 0;
-                    } else if (el.tagName === 'SELECT') {
-                        data[id] = parseInt(el.value, 10);
-                    } else {
-                        const val = parseFloat(el.value);
-                        if (el.required && isNaN(val)) isValid = false;
-                        data[id] = val;
-                    }
-                });
-
-                if(!isValid) {
-                    dom.errorMsg.textContent = translations[currentLanguage].invalidStrokeInput;
-                    dom.errorMsg.classList.remove('hidden');
-                    return null;
-                }
-
-                data.fastEdScore = dom.fastEdSelects.reduce((sum, el) => sum + parseInt(el.value, 10), 0);
-                return data;
-            };
-
-            const calculateIch = (inputs) => {
-                return new Promise(resolve => {
-                    const model = ichModel;
-                    const ichInputs = { ...inputs, gfapValue: Math.log1p(inputs.gfapValue) };
-                    let logOdds = model.INTERCEPT;
-                    const impacts = {};
-                    for (const [feature, coef] of Object.entries(model.COEFFICIENTS)) {
-                        let value = ichInputs[feature];
-                        if (model.SCALER_PARAMS[feature]) {
-                            const s = model.SCALER_PARAMS[feature];
-                            value = (value - s.center) / s.scale;
-                        }
-                        const impact = value * coef;
-                        impacts[feature] = impact;
-                        logOdds += impact;
-                    }
-                    const calibratedLogOdds = model.CALIBRATION.A * logOdds + model.CALIBRATION.B;
-                    const probability = 1 / (1 + Math.exp(-calibratedLogOdds));
-                    resolve({ probability, impacts });
-                });
-            };
-
-            const fetchLvo = async (inputs) => {
-                const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inputs) };
-                const [predResponse, explResponse] = await Promise.all([ fetch(api.lvoPrediction, fetchOptions), fetch(api.lvoExplanation, fetchOptions) ]);
-                
-                if (!predResponse.ok || !explResponse.ok) throw new Error(`API Error: Prediction ${predResponse.status}, Explanation ${explResponse.status}`);
-
-                const predJson = await predResponse.json();
-                const explJson = await explResponse.json();
-
-                if (typeof predJson.lvo_probability === 'undefined' || typeof explJson.feature_impacts === 'undefined') throw new Error('Invalid API response format from LVO service.');
-
-                return { probability: predJson.lvo_probability, impacts: explJson.feature_impacts };
-            };
-
-            const determineTriageRecommendation = (ich, lvo, fastEdScore) => {
-                if (fastEdScore < 4) return { type: 'no_lvo', ich, lvo: null };
-                if (!lvo) return { type: 'error', ich, lvo: null };
-                const ichProb = ich.probability;
-                const lvoProb = lvo.probability;
-                if (lvoProb > 0.6 && lvoProb > ichProb * 2) return { type: 'lvo', ich, lvo };
-                if (ichProb > 0.5 && ichProb > lvoProb * 2) return { type: 'ich', ich, lvo };
-                if (ichProb < 0.2 && lvoProb < 0.2) return { type: 'mimic', ich, lvo };
-                return { type: 'unclear', ich, lvo };
-            };
-
-            const renderTriageCard = (outcome) => {
-                const t = translations[currentLanguage].triage;
-                const icons = { lvo: '🧠<span style="color:var(--lvo-border)">⚡️</span>', ich: '🧠<span style="color:var(--ich-border)">🩸</span>', unclear: '🧠❓', mimic: '👩‍⚕️🩺', error: '📡⚠️', no_lvo: '👩‍⚕️🩺' };
-                const titleKey = `${outcome.type}_title`;
-                const recKey = `${outcome.type}_rec`;
-                dom.triageRec.innerHTML = `<div class="triage-card ${outcome.type}"><div class="icon">${icons[outcome.type]}</div><h3>${t[titleKey]}</h3><p>${t[recKey]}</p></div>`;
-            };
-
-            const renderAnalysisDetails = (ichData, lvoData) => {
-                 dom.ichProbPanel.innerHTML = renderProbPanel('ich', ichData);
-                 dom.lvoProbPanel.innerHTML = renderProbPanel('lvo', lvoData);
-                 dom.ichDriversPanel.innerHTML = renderDriversPanel('ich', ichData);
-                 dom.lvoDriversPanel.innerHTML = renderDriversPanel('lvo', lvoData);
-            };
-
-            const renderProbPanel = (type, data) => {
-                const t = translations[currentLanguage];
-                if (!data) return `<h4>${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><p>Data unavailable.</p>`;
-                const prob = data.probability;
-                const markerPos = Math.min(Math.max(prob, 0), 1) * 100;
-                return `<h4 data-translate="${type}Title">${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><div class="probability-meter-container"><div class="probability-meter-marker" style="left: calc(${markerPos}% - 3px);"></div><span class="probability-meter-label" style="left: ${markerPos}%;">${(prob * 100).toFixed(0)}%</span></div>`;
-            };
-        
-            const renderDriversPanel = (type, data) => {
-                const t = translations[currentLanguage];
-                if (!data || !data.impacts) return `<h4>${type === 'ich' ? t.ichTitle : t.lvoTitle} Drivers</h4><p>Data unavailable.</p>`;
-                const sortedDrivers = Object.entries(data.impacts).filter(([, val]) => Math.abs(val) > 0.01).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
-                const maxAbsImpact = sortedDrivers.length > 0 ? Math.abs(sortedDrivers[0][1]) : 0;
-                let posHTML = '', negHTML = '';
-                sortedDrivers.forEach(([key, value]) => {
-                    const barWidth = (maxAbsImpact > 0) ? (Math.abs(value) / maxAbsImpact) * 100 : 0;
-                    const label = t.featureNames[key] || key;
-                    const itemHTML = `<div class="driver-item"><span class="driver-label">${label}</span><div class="driver-bar-container"><div class="driver-bar ${value >= 0 ? 'positive' : 'negative'}" style="width: ${barWidth}%;"></div></div></div>`;
-                    if (value >= 0) posHTML += itemHTML; else negHTML += itemHTML;
-                });
-                return `<h4>${type === 'ich' ? t.ichTitle : t.lvoTitle}</h4><div class="drivers-columns"><div class="driver-column"><h5 data-translate="increasingRisk">${t.increasingRisk}</h5><div>${posHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div><div class="driver-column"><h5 data-translate="decreasingRisk">${t.decreasingRisk}</h5><div>${negHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div></div>`;
-            };
-
-            return { initialize };
-        })();
-
-        // --- Initial Page Setup ---
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        const savedLang = localStorage.getItem('language') || (navigator.language.startsWith('de') ? 'de' : 'en');
-        switchLanguage(savedLang);
-        const savedTheme = localStorage.getItem('darkMode');
-        if (savedTheme === 'enabled' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.body.classList.add('dark-mode');
-            dom.buttons.darkModeToggle.textContent = '☀️';
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.valid) { showSection('modules'); }
+          else { dom.accessError.textContent = 'Invalid access code.'; dom.accessError.style.display = ''; }
+        } else {
+          dom.accessError.textContent = 'A server error occurred.'; dom.accessError.style.display = '';
         }
-        showSection('access'); // Start at access code screen
+      } catch (err) {
+        dom.accessError.textContent = 'Network error.'; dom.accessError.style.display = '';
+      } finally {
+        dom.accessCodeBtn.disabled = false;
+      }
     });
 
-    // --- Service Worker Registration ---
-    if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-            navigator.serviceWorker
-                .register("./sw.js")
-                .catch((err) => console.error("Service Worker registration failed:", err));
-        });
+    // ---- MODULE NAVIGATION ----
+    dom.moduleComaBtn.addEventListener('click', ()=> showSection('coma'));
+    dom.moduleStrokeBtn.addEventListener('click', ()=> showSection('stroke'));
+    dom.comaBackBtn.addEventListener('click', ()=> showSection('modules'));
+
+    // ---- DISCLAIMER MODAL ----
+    function requestDisclaimer() {
+      return new Promise(resolve => {
+        dom.disclaimerModal.classList.add('visible');
+        dom.confirmDisclaimerBtn.onclick = function() {
+          dom.disclaimerModal.classList.remove('visible');
+          resolve();
+        };
+      });
     }
+
+    // ---- COMA MODULE LOGIC ----
+    dom.comaForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      dom.comaError.style.display = 'none'; dom.comaResult.style.display = 'none';
+      const value = parseFloat(dom.comaInput.value);
+      if (isNaN(value) || value < parseInt(dom.comaInput.min) || value > parseInt(dom.comaInput.max)) {
+        dom.comaError.textContent = 'Please enter a valid GFAP value (29–10001).'; dom.comaError.style.display = '';
+        return;
+      }
+      await requestDisclaimer();
+      dom.comaCalcBtn.disabled = true;
+      try {
+        // ---- BACKEND CALL ----
+        const resp = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/calculateComaRisk', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gfap: value })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          dom.comaResult.innerHTML = `<strong>Probability of ICH: ${(data.probability*100).toFixed(1)}%</strong>`;
+          dom.comaResult.style.display = '';
+        } else {
+          dom.comaError.textContent = 'A server error occurred.'; dom.comaError.style.display = '';
+        }
+      } catch (err) {
+        dom.comaError.textContent = 'Network error.'; dom.comaError.style.display = '';
+      } finally {
+        dom.comaCalcBtn.disabled = false;
+      }
+    });
+
+    // ---- FAST-ED CALCULATOR MODAL LOGIC ----
+    dom.openFastEdBtn.addEventListener('click', ()=> dom.fastEdModalOverlay.classList.add('visible'));
+    dom.closeFastEdModalBtn.addEventListener('click', ()=> dom.fastEdModalOverlay.classList.remove('visible'));
+    dom.applyFastEdBtn.addEventListener('click', () => {
+      // Calculate FAST-ED total
+      const face = parseInt(document.getElementById('fast-ed-face').value)||0;
+      const arm = parseInt(document.getElementById('fast-ed-arm').value)||0;
+      const speech = parseInt(document.getElementById('fast-ed-speech').value)||0;
+      const eyes = parseInt(document.getElementById('fast-ed-eyes').value)||0;
+      const denial = parseInt(document.getElementById('fast-ed-denial').value)||0;
+      const total = face + arm + speech + eyes + denial;
+      document.getElementById('fast_ed_score').value = total;
+      // Sync arm/eye to checkboxes:
+      document.getElementById('armparese').checked = (arm > 0);
+      document.getElementById('eye_deviation').checked = (eyes > 0);
+      dom.fastEdModalOverlay.classList.remove('visible');
+    });
+
+    // ---- STROKE TRIAGE LOGIC ----
+    dom.strokeForm.addEventListener('submit', async function(e){
+      e.preventDefault();
+      dom.strokeError.style.display = 'none'; dom.resultsArea.style.display = 'none';
+      // Gather input
+      const ids = ['gfap_value','age_years','systolic_bp','diastolic_bp','fast_ed_score','headache','eye_deviation','armparese','beinparese','atrial_fibrillation','antiplatelets','vigilanzminderung','antcoagulated_noak'];
+      const data = {};
+      let valid = true;
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.type === 'checkbox') data[id] = el.checked ? 1 : 0;
+        else {
+          const v = parseFloat(el.value);
+          if (el.required && isNaN(v)) valid = false;
+          data[id] = v;
+        }
+      });
+      if (!valid) {
+        dom.strokeError.textContent = 'Please fill all required fields with valid numbers.'; dom.strokeError.style.display = '';
+        return;
+      }
+      await requestDisclaimer();
+      dom.strokeForm.querySelector('button[type="submit"]').disabled = true;
+      try {
+        // ICH calculation (local, same as before)
+        const model = {
+          INTERCEPT: -0.72549447,
+          COEFFICIENTS: {'gfap_value': 0.98845868, 'age_years': -0.20927375, 'systolic_bp': 0.36337294, 'headache': 0.43796113, 'eye_deviation': -0.26763354, 'armparese': 0.11730522, 'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'antiplatelets': -0.52928134 },
+          SCALER_PARAMS: {'gfap_value': { center: 3.78418963, scale: 0.98704051 }, 'age_years': { center: 78.0, scale: 18.0 }, 'systolic_bp': { center: 160.0, scale: 41.5 } },
+          CALIBRATION: { A: 1.15, B: -0.20 }
+        };
+        // Logistic regression calculation
+        const ichInputs = {...data, gfap_value: Math.log1p(data.gfap_value)};
+        let logOdds = model.INTERCEPT;
+        const impacts = {};
+        for (const [feature, coef] of Object.entries(model.COEFFICIENTS)) {
+          let value = ichInputs[feature];
+          if (model.SCALER_PARAMS[feature]) {
+            const s = model.SCALER_PARAMS[feature];
+            value = (value - s.center) / s.scale;
+          }
+          impacts[feature] = value * coef;
+          logOdds += value * coef;
+        }
+        const calibrated = model.CALIBRATION.A * logOdds + model.CALIBRATION.B;
+        const ichProb = 1 / (1 + Math.exp(-calibrated));
+        // LVO prediction (backend)
+        let lvoProb = null, lvoImpacts = null;
+        try {
+          const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) };
+          const [predRes, explRes] = await Promise.all([
+            fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', fetchOptions),
+            fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/explain', fetchOptions)
+          ]);
+          if (predRes.ok && explRes.ok) {
+            const pred = await predRes.json();
+            const expl = await explRes.json();
+            lvoProb = pred.lvo_probability;
+            lvoImpacts = expl.feature_impacts;
+          }
+        } catch(e){}
+        // TRIAGE
+        let type = "unclear";
+        if (lvoProb === null) type = "error";
+        else {
+          if (lvoProb > 0.6 && lvoProb > ichProb * 2) type = "lvo";
+          else if (ichProb > 0.5 && ichProb > lvoProb * 2) type = "ich";
+          else if (ichProb < 0.2 && lvoProb < 0.2) type = "mimic";
+        }
+        // RENDER
+        const triageText = {
+          lvo: { title: "LVO LIKELY", rec: "Proceed directly to the nearest LVO-capable Comprehensive Stroke Center." },
+          ich: { title: "STRONG SUSPICION OF ICH", rec: "Proceed to the nearest center with neurosurgical capabilities. Thrombectomy not indicated." },
+          mimic: { title: "ICH & LVO UNLIKELY", rec: "Re-evaluate for Stroke Mimics (e.g., seizure, migraine, hypoglycemia). Proceed to nearest appropriate facility." },
+          unclear: { title: "UNCLEAR STROKE TYPE", rec: "LVO cannot be ruled out. Default to LVO protocol: proceed to LVO-capable center if feasible." },
+          error: { title: "LVO DATA UNAVAILABLE", rec: "Could not retrieve LVO data. ICH analysis is shown below. Proceed based on clinical judgment." }
+        };
+        const icons = {
+          lvo: '🧠<span style="color:var(--lvo-border)">⚡️</span>',
+          ich: '🧠<span style="color:var(--ich-border)">🩸</span>',
+          unclear: '🧠❓', mimic: '👩‍⚕️🩺', error: '📡⚠️'
+        };
+        dom.triageRec.innerHTML =
+          `<div class="triage-card ${type}">
+            <div class="icon">${icons[type]}</div>
+            <h3>${triageText[type].title}</h3>
+            <p>${triageText[type].rec}</p>
+          </div>`;
+        // Probability panels
+        dom.ichProbPanel.innerHTML = `<h4>ICH Details</h4>
+          <div class="probability-meter-container">
+            <div class="probability-meter-marker" style="left:calc(${(ichProb*100).toFixed(0)}% - 3px);"></div>
+            <span class="probability-meter-label" style="left:${(ichProb*100).toFixed(0)}%;">${(ichProb*100).toFixed(1)}%</span>
+          </div>`;
+        dom.lvoProbPanel.innerHTML = (lvoProb===null) ? `<h4>LVO Details</h4><p>Data unavailable.</p>` :
+          `<h4>LVO Details</h4>
+            <div class="probability-meter-container">
+              <div class="probability-meter-marker" style="left:calc(${(lvoProb*100).toFixed(0)}% - 3px);"></div>
+              <span class="probability-meter-label" style="left:${(lvoProb*100).toFixed(0)}%;">${(lvoProb*100).toFixed(1)}%</span>
+            </div>`;
+        // Drivers panels
+        dom.ichDriversPanel.innerHTML = renderDriversPanel(impacts, 'ICH');
+        dom.lvoDriversPanel.innerHTML = renderDriversPanel(lvoImpacts, 'LVO');
+        // Show results
+        dom.resultsArea.style.display = '';
+        dom.resultsArea.scrollIntoView({behavior:"smooth",block:"start"});
+        dom.analysisDetails.classList.remove('expanded');
+        dom.analysisToggle.textContent = 'View Detailed Analysis';
+      } catch(err) {
+        dom.strokeError.textContent = 'A server or network error occurred.'; dom.strokeError.style.display = '';
+      } finally {
+        dom.strokeForm.querySelector('button[type="submit"]').disabled = false;
+      }
+    });
+
+    // --- ANALYSIS DETAILS TOGGLE ---
+    dom.analysisToggle.addEventListener('click', function() {
+      const d = dom.analysisDetails;
+      d.classList.toggle('expanded');
+      dom.analysisToggle.textContent = d.classList.contains('expanded') ? 'Hide Detailed Analysis' : 'View Detailed Analysis';
+    });
+
+    // --- DRIVER PANEL RENDER ---
+    function renderDriversPanel(impacts, label) {
+      if (!impacts) return `<h4>${label} Drivers</h4><p>Data unavailable.</p>`;
+      const sorted = Object.entries(impacts).filter(([k,v])=>Math.abs(v)>0.01).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
+      const maxAbs = sorted.length>0 ? Math.abs(sorted[0][1]) : 0;
+      let posHTML = '', negHTML = '';
+      sorted.forEach(([key,val])=>{
+        const barWidth= (maxAbs > 0) ? (Math.abs(val) / maxAbs) * 100 : 0;
+        const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const itemHTML = `<div class="driver-item">
+            <span class="driver-label">${fieldName}</span>
+            <div class="driver-bar-container">
+                <div class="driver-bar ${val >= 0 ? 'positive' : 'negative'}" style="width: ${barWidth}%;"></div>
+            </div>
+          </div>`;
+        if (val >= 0) posHTML += itemHTML;
+        else negHTML += itemHTML;
+      });
+      return `<h4>${label} Drivers</h4>
+        <div class="drivers-columns">
+          <div class="driver-column"><h5>Increasing Risk</h5><div>${posHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div>
+          <div class="driver-column"><h5>Decreasing Risk</h5><div>${negHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div>
+        </div>`;
+    }
+
+    // ---- LANGUAGE SWITCH (stub, simple) ----
+    function switchLanguage(lang) {
+      // For full localization, expand here.
+      document.documentElement.lang = lang;
+      // Example: update UI labels if multi-language is required.
+    }
+
+    // ---- CLOSE MODALS WHEN CLICKING OUTSIDE ----
+    [dom.fastEdModalOverlay, dom.disclaimerModal].forEach(modal => {
+      modal.addEventListener('click', function(e){
+        if (e.target === modal) modal.classList.remove('visible');
+      });
+    });
+
+    // ---- ENTER KEY ACCESS CODE SUBMIT ----
+    dom.accessCode.addEventListener('keydown', e=>{
+      if (e.key==='Enter') dom.accessCodeBtn.click();
+    });
+
+    // ---- STARTUP: show access code section only ----
+    showSection('access');
+
   </script>
 </body>
 </html>
