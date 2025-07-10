@@ -95,7 +95,6 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="app-header">
     <h1 id="appTitle">iGFAP Triage App</h1>
     <div class="header-right">
@@ -108,7 +107,6 @@
   </header>
 
   <main>
-    <!-- 1. Access Code Entry -->
     <section id="accessCodeSection" class="container">
       <p>🔑 Please enter your access code:</p>
       <div class="input-group">
@@ -118,14 +116,12 @@
       <p id="accessError" class="error-message"></p>
     </section>
 
-    <!-- 2. Module Selection -->
     <section id="moduleSelectionSection" class="container" style="display:none;">
       <h2>Select Module</h2>
       <button class="primary" id="comaModuleBtn">Coma ICH Probability</button>
       <button class="primary" id="strokeModuleBtn">Stroke Triage Assistant</button>
     </section>
 
-    <!-- 3. Coma Module -->
     <section id="comaModuleSection" class="container" style="display:none;">
       <h2>Coma ICH Probability</h2>
       <form id="comaForm">
@@ -140,7 +136,6 @@
       <p id="comaError" class="error-message"></p>
     </section>
 
-    <!-- 4. Stroke Triage Assistant -->
     <section id="strokeModuleSection" class="container" style="display:none;">
       <h2>Stroke Triage Assistant</h2>
       <form id="triage-form">
@@ -187,7 +182,6 @@
       </div>
     </section>
 
-    <!-- FAST-ED Calculator Modal -->
     <div class="modal-overlay" id="fast-ed-modal-overlay">
       <div class="modal" id="fast-ed-modal">
         <h3>FAST-ED Calculator</h3>
@@ -201,23 +195,16 @@
           <select id="fast-ed-speech"><option value="0">Normal</option><option value="1">Mild-moderate dysarthria/aphasia</option><option value="2">Severe aphasia / mute</option></select>
         </div>
         <div class="input-group"><label for="fast-ed-eyes">Eye Deviation</label>
-          <select id="fast-ed-eyes"><option value="0">Absent</<select id="fast-ed-eyes">
-            <option value="0">Absent</option>
-            <option value="1">Present</option>
-          </select>
+          <select id="fast-ed-eyes"><option value="0">Absent</option><option value="1">Present</option></select>
         </div>
         <div class="input-group"><label for="fast-ed-denial">Denial / Neglect (Anosognosia)</label>
-          <select id="fast-ed-denial">
-            <option value="0">Absent</option>
-            <option value="1">Present</option>
-          </select>
+          <select id="fast-ed-denial"><option value="0">Absent</option><option value="1">Present</option></select>
         </div>
         <button type="button" class="primary" id="apply-fast-ed-score-btn" style="margin-top: 18px;">Apply Score</button>
         <button type="button" class="secondary" id="close-fast-ed-modal-btn" style="margin-top: 10px;">Cancel</button>
       </div>
     </div>
 
-    <!-- Disclaimer Modal -->
     <div class="modal-overlay" id="disclaimer-modal">
       <div class="modal">
         <h3>Disclaimer</h3>
@@ -228,7 +215,7 @@
   </main>
 
   <footer style="text-align:center; margin-top:20px; padding-bottom: 20px;">
-    <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
+    <p>© <span id="currentYear"></span> iGFAP Triage App</p>
   </footer>
 
   <script>
@@ -305,7 +292,6 @@
       }
       dom.accessCodeBtn.disabled = true;
       try {
-        // ---- BACKEND VALIDATION ----
         const resp = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/validateAccessCode', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code })
@@ -352,7 +338,6 @@
       await requestDisclaimer();
       dom.comaCalcBtn.disabled = true;
       try {
-        // ---- BACKEND CALL ----
         const resp = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/calculateComaRisk', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ gfap: value })
@@ -393,7 +378,6 @@
     dom.strokeForm.addEventListener('submit', async function(e){
       e.preventDefault();
       dom.strokeError.style.display = 'none'; dom.resultsArea.style.display = 'none';
-      // Gather input
       const ids = ['gfap_value','age_years','systolic_bp','diastolic_bp','fast_ed_score','headache','eye_deviation','armparese','beinparese','atrial_fibrillation','antiplatelets','vigilanzminderung','antcoagulated_noak'];
       const data = {};
       let valid = true;
@@ -414,14 +398,13 @@
       await requestDisclaimer();
       dom.strokeForm.querySelector('button[type="submit"]').disabled = true;
       try {
-        // ICH calculation (local, same as before)
+        // ICH calculation (local)
         const model = {
           INTERCEPT: -0.72549447,
           COEFFICIENTS: {'gfap_value': 0.98845868, 'age_years': -0.20927375, 'systolic_bp': 0.36337294, 'headache': 0.43796113, 'eye_deviation': -0.26763354, 'armparese': 0.11730522, 'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'antiplatelets': -0.52928134 },
           SCALER_PARAMS: {'gfap_value': { center: 3.78418963, scale: 0.98704051 }, 'age_years': { center: 78.0, scale: 18.0 }, 'systolic_bp': { center: 160.0, scale: 41.5 } },
           CALIBRATION: { A: 1.15, B: -0.20 }
         };
-        // Logistic regression calculation
         const ichInputs = {...data, gfap_value: Math.log1p(data.gfap_value)};
         let logOdds = model.INTERCEPT;
         const impacts = {};
@@ -436,21 +419,25 @@
         }
         const calibrated = model.CALIBRATION.A * logOdds + model.CALIBRATION.B;
         const ichProb = 1 / (1 + Math.exp(-calibrated));
+        
         // LVO prediction (backend)
         let lvoProb = null, lvoImpacts = null;
-        try {
-          const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) };
-          const [predRes, explRes] = await Promise.all([
-            fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', fetchOptions),
-            fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/explain', fetchOptions)
-          ]);
-          if (predRes.ok && explRes.ok) {
-            const pred = await predRes.json();
-            const expl = await explRes.json();
-            lvoProb = pred.lvo_probability;
-            lvoImpacts = expl.feature_impacts;
-          }
-        } catch(e){}
+        // CORRECTED: The silent catch block is removed. Errors will now be caught by the outer block.
+        const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) };
+        const [predRes, explRes] = await Promise.all([
+          fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', fetchOptions),
+          fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/explain', fetchOptions)
+        ]);
+        if (predRes.ok && explRes.ok) {
+          const pred = await predRes.json();
+          const expl = await explRes.json();
+          lvoProb = pred.lvo_probability;
+          lvoImpacts = expl.feature_impacts;
+        } else {
+            // If one of the LVO calls fails, we can still proceed without LVO data
+            console.warn("LVO data fetch failed, server responded with non-OK status.");
+        }
+
         // TRIAGE
         let type = "unclear";
         if (lvoProb === null) type = "error";
@@ -467,38 +454,18 @@
           unclear: { title: "UNCLEAR STROKE TYPE", rec: "LVO cannot be ruled out. Default to LVO protocol: proceed to LVO-capable center if feasible." },
           error: { title: "LVO DATA UNAVAILABLE", rec: "Could not retrieve LVO data. ICH analysis is shown below. Proceed based on clinical judgment." }
         };
-        const icons = {
-          lvo: '🧠<span style="color:var(--lvo-border)">⚡️</span>',
-          ich: '🧠<span style="color:var(--ich-border)">🩸</span>',
-          unclear: '🧠❓', mimic: '👩‍⚕️🩺', error: '📡⚠️'
-        };
-        dom.triageRec.innerHTML =
-          `<div class="triage-card ${type}">
-            <div class="icon">${icons[type]}</div>
-            <h3>${triageText[type].title}</h3>
-            <p>${triageText[type].rec}</p>
-          </div>`;
-        // Probability panels
-        dom.ichProbPanel.innerHTML = `<h4>ICH Details</h4>
-          <div class="probability-meter-container">
-            <div class="probability-meter-marker" style="left:calc(${(ichProb*100).toFixed(0)}% - 3px);"></div>
-            <span class="probability-meter-label" style="left:${(ichProb*100).toFixed(0)}%;">${(ichProb*100).toFixed(1)}%</span>
-          </div>`;
-        dom.lvoProbPanel.innerHTML = (lvoProb===null) ? `<h4>LVO Details</h4><p>Data unavailable.</p>` :
-          `<h4>LVO Details</h4>
-            <div class="probability-meter-container">
-              <div class="probability-meter-marker" style="left:calc(${(lvoProb*100).toFixed(0)}% - 3px);"></div>
-              <span class="probability-meter-label" style="left:${(lvoProb*100).toFixed(0)}%;">${(lvoProb*100).toFixed(1)}%</span>
-            </div>`;
-        // Drivers panels
+        const icons = { lvo: '🧠<span style="color:var(--lvo-border)">⚡️</span>', ich: '🧠<span style="color:var(--ich-border)">🩸</span>', unclear: '🧠❓', mimic: '👩‍⚕️🩺', error: '📡⚠️' };
+        dom.triageRec.innerHTML = `<div class="triage-card ${type}"><div class="icon">${icons[type]}</div><h3>${triageText[type].title}</h3><p>${triageText[type].rec}</p></div>`;
+        dom.ichProbPanel.innerHTML = `<h4>ICH Details</h4><div class="probability-meter-container"><div class="probability-meter-marker" style="left:calc(${(ichProb*100).toFixed(0)}% - 3px);"></div><span class="probability-meter-label" style="left:${(ichProb*100).toFixed(0)}%;">${(ichProb*100).toFixed(1)}%</span></div>`;
+        dom.lvoProbPanel.innerHTML = (lvoProb===null) ? `<h4>LVO Details</h4><p>Data unavailable.</p>` : `<h4>LVO Details</h4><div class="probability-meter-container"><div class="probability-meter-marker" style="left:calc(${(lvoProb*100).toFixed(0)}% - 3px);"></div><span class="probability-meter-label" style="left:${(lvoProb*100).toFixed(0)}%;">${(lvoProb*100).toFixed(1)}%</span></div>`;
         dom.ichDriversPanel.innerHTML = renderDriversPanel(impacts, 'ICH');
         dom.lvoDriversPanel.innerHTML = renderDriversPanel(lvoImpacts, 'LVO');
-        // Show results
         dom.resultsArea.style.display = '';
         dom.resultsArea.scrollIntoView({behavior:"smooth",block:"start"});
         dom.analysisDetails.classList.remove('expanded');
         dom.analysisToggle.textContent = 'View Detailed Analysis';
       } catch(err) {
+        console.error("Stroke Analysis Error:", err);
         dom.strokeError.textContent = 'A server or network error occurred.'; dom.strokeError.style.display = '';
       } finally {
         dom.strokeForm.querySelector('button[type="submit"]').disabled = false;
@@ -521,27 +488,16 @@
       sorted.forEach(([key,val])=>{
         const barWidth= (maxAbs > 0) ? (Math.abs(val) / maxAbs) * 100 : 0;
         const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const itemHTML = `<div class="driver-item">
-            <span class="driver-label">${fieldName}</span>
-            <div class="driver-bar-container">
-                <div class="driver-bar ${val >= 0 ? 'positive' : 'negative'}" style="width: ${barWidth}%;"></div>
-            </div>
-          </div>`;
+        const itemHTML = `<div class="driver-item"><span class="driver-label">${fieldName}</span><div class="driver-bar-container"><div class="driver-bar ${val >= 0 ? 'positive' : 'negative'}" style="width: ${barWidth}%;"></div></div></div>`;
         if (val >= 0) posHTML += itemHTML;
         else negHTML += itemHTML;
       });
-      return `<h4>${label} Drivers</h4>
-        <div class="drivers-columns">
-          <div class="driver-column"><h5>Increasing Risk</h5><div>${posHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div>
-          <div class="driver-column"><h5>Decreasing Risk</h5><div>${negHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div>
-        </div>`;
+      return `<h4>${label} Drivers</h4><div class="drivers-columns"><div class="driver-column"><h5>Increasing Risk</h5><div>${posHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div><div class="driver-column"><h5>Decreasing Risk</h5><div>${negHTML || '<p style-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div></div>`;
     }
 
     // ---- LANGUAGE SWITCH (stub, simple) ----
     function switchLanguage(lang) {
-      // For full localization, expand here.
       document.documentElement.lang = lang;
-      // Example: update UI labels if multi-language is required.
     }
 
     // ---- CLOSE MODALS WHEN CLICKING OUTSIDE ----
@@ -556,7 +512,7 @@
       if (e.key==='Enter') dom.accessCodeBtn.click();
     });
 
-    // ---- STARTUP: show access code section only ----
+    // ---- STARTUP ----
     showSection('access');
 
   </script>
