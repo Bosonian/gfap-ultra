@@ -331,7 +331,7 @@
       e.preventDefault();
       dom.comaError.style.display = 'none'; dom.comaResult.style.display = 'none';
       const value = parseFloat(dom.comaInput.value);
-      if (isNaN(value) || value < parseInt(dom.comaInput.min) || value > parseInt(dom.comaInput.max)) {
+      if (isNaN(value) || value < parseFloat(dom.comaInput.min) || value > parseFloat(dom.comaInput.max)) {
         dom.comaError.textContent = 'Please enter a valid GFAP value (29–10001).'; dom.comaError.style.display = '';
         return;
       }
@@ -344,8 +344,12 @@
         });
         if (resp.ok) {
           const data = await resp.json();
-          dom.comaResult.innerHTML = `<strong>Probability of ICH: ${(data.probability*100).toFixed(1)}%</strong>`;
-          dom.comaResult.style.display = '';
+          if (data && typeof data.probability !== 'undefined') {
+            dom.comaResult.innerHTML = `<strong>Probability of ICH: ${(data.probability*100).toFixed(1)}%</strong>`;
+            dom.comaResult.style.display = '';
+          } else {
+            dom.comaError.textContent = 'Invalid response from server.'; dom.comaError.style.display = '';
+          }
         } else {
           dom.comaError.textContent = 'A server error occurred.'; dom.comaError.style.display = '';
         }
@@ -422,20 +426,26 @@
         
         // LVO prediction (backend)
         let lvoProb = null, lvoImpacts = null;
-        // CORRECTED: The silent catch block is removed. Errors will now be caught by the outer block.
-        const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) };
-        const [predRes, explRes] = await Promise.all([
-          fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', fetchOptions),
-          fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/explain', fetchOptions)
-        ]);
-        if (predRes.ok && explRes.ok) {
-          const pred = await predRes.json();
-          const expl = await explRes.json();
-          lvoProb = pred.lvo_probability;
-          lvoImpacts = expl.feature_impacts;
-        } else {
-            // If one of the LVO calls fails, we can still proceed without LVO data
-            console.warn("LVO data fetch failed, server responded with non-OK status.");
+        try {
+          const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) };
+          const [predRes, explRes] = await Promise.all([
+            fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/predict', fetchOptions),
+            fetch('https://lvo-ppv-service-564499947017.europe-west3.run.app/explain', fetchOptions)
+          ]);
+          if (predRes.ok && explRes.ok) {
+            const pred = await predRes.json();
+            const expl = await explRes.json();
+            if (typeof pred.lvo_probability !== 'undefined' && typeof expl.feature_impacts !== 'undefined') {
+              lvoProb = pred.lvo_probability;
+              lvoImpacts = expl.feature_impacts;
+            } else {
+              console.warn("LVO API returned invalid data format.");
+            }
+          } else {
+            console.warn("LVO data fetch failed, server responded with non-OK status:", predRes.status, explRes.status);
+          }
+        } catch (lvoError) {
+          console.warn("LVO data fetch failed due to network or other error:", lvoError.message);
         }
 
         // TRIAGE
@@ -492,7 +502,7 @@
         if (val >= 0) posHTML += itemHTML;
         else negHTML += itemHTML;
       });
-      return `<h4>${label} Drivers</h4><div class="drivers-columns"><div class="driver-column"><h5>Increasing Risk</h5><div>${posHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div><div class="driver-column"><h5>Decreasing Risk</h5><div>${negHTML || '<p style-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div></div>`;
+      return `<h4>${label} Drivers</h4><div class="drivers-columns"><div class="driver-column"><h5>Increasing Risk</h5><div>${posHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div><div class="driver-column"><h5>Decreasing Risk</h5><div>${negHTML || '<p style="text-align:center;font-size:0.9em;opacity:0.7;">None</p>'}</div></div></div>`;
     }
 
     // ---- LANGUAGE SWITCH (stub, simple) ----
