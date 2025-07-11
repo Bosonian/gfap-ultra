@@ -92,6 +92,13 @@
     .score-header { display: flex; justify-content: space-between; align-items: center; background-color: var(--input-bg); padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; }
     .score-header h3 { margin: 0; text-align: left; flex-grow: 1; }
     .dynamic-score-display { font-size: 1.6em; font-weight: bold; color: var(--primary-color); padding: 2px 12px; background-color: var(--container-bg); border-radius: 6px; border: 1px solid var(--border-color); }
+    
+    /* FIX: Media query for mobile responsiveness of results */
+    @media (max-width: 768px) {
+      #analysisDetails {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+      }
+    }
   </style>
 </head>
 <body>
@@ -217,7 +224,7 @@
         const init = () => {
             dom.buttons.darkModeToggle.addEventListener('click', () => { const isDarkMode = document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled'); dom.buttons.darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙'; const t = translations[currentLanguage]; dom.buttons.darkModeToggle.setAttribute('aria-label', isDarkMode ? t.toggleLightMode : t.toggleDarkMode); });
             dom.buttons.langEn.addEventListener('click', () => switchLanguage('en')); dom.buttons.langDe.addEventListener('click', () => switchLanguage('de'));
-            const sharedCallbacks = { showSection, setLoadingState, requestDisclaimer, getLang: () => currentLanguage };
+            const sharedCallbacks = { showSection, setLoadingState, requestDisclaimer, getLang: () => currentLanguage, switchLanguage };
             comaModule.init(sharedCallbacks); strokeModule.init(sharedCallbacks);
             document.getElementById('currentYear').textContent = new Date().getFullYear(); const savedLang = localStorage.getItem('language') || (navigator.language.startsWith('de') ? 'de' : 'en'); switchLanguage(savedLang);
             const savedTheme = localStorage.getItem('darkMode'); if (savedTheme === 'enabled' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.body.classList.add('dark-mode'); dom.buttons.darkModeToggle.textContent = '☀️'; }
@@ -230,7 +237,18 @@
     const comaModule = (() => {
         let dom = {}; let callbacks = {};
         const init = (parentCallbacks) => { dom = { form: document.getElementById('comaForm'), input: document.getElementById('gfapComaInput'), button: document.getElementById('calculateComaButton'), backButton: document.getElementById('comaBackButton'), result: document.getElementById('comaResult'), error: document.getElementById('comaError'), moduleBtn: document.getElementById('comaModuleBtn') }; callbacks = parentCallbacks; dom.form.addEventListener('submit', handleComaSubmit); dom.moduleBtn.addEventListener('click', () => callbacks.showSection('coma')); dom.backButton.addEventListener('click', () => callbacks.showSection('moduleSelection')); };
-        const handleComaSubmit = async (e) => { e.preventDefault(); dom.error.classList.add('hidden'); dom.result.classList.add('hidden'); const value = parseFloat(dom.input.value); if (isNaN(value) || value < parseFloat(dom.input.min) || value > parseFloat(dom.input.max)) { dom.error.textContent = translations[callbacks.getLang()].invalidInput; dom.error.classList.remove('hidden'); return; } await callbacks.requestDisclaimer(); callbacks.setLoadingState(dom.button, true); try { const response = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/calculateComaRisk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gfap: value }) }); if (response.ok) { const data = await response.json(); if (data.result && typeof data.result.probability !== 'undefined') { dom.result.textContent = 'Probability of ICH: '; const strongEl = document.createElement('strong'); strongEl.textContent = `${(data.result.probability * 100).toFixed(1)}%`; dom.result.appendChild(strongEl); dom.result.classList.remove('hidden'); } else { throw new Error('Invalid response format from server.'); } } else { throw new Error(`Server responded with status ${response.status}`); } } catch (error) { console.error("Coma Risk Fetch Error:", error); dom.error.textContent = translations[callbacks.getLang()].serverError; dom.error.classList.remove('hidden'); } finally { callbacks.setLoadingState(dom.button, false); } };
+        const handleComaSubmit = async (e) => {
+            e.preventDefault(); dom.error.classList.add('hidden'); dom.result.classList.add('hidden');
+            const value = parseFloat(dom.input.value);
+            if (isNaN(value) || value < parseFloat(dom.input.min) || value > parseFloat(dom.input.max)) { dom.error.textContent = translations[callbacks.getLang()].invalidInput; dom.error.classList.remove('hidden'); return; }
+            await callbacks.requestDisclaimer(); callbacks.setLoadingState(dom.button, true);
+            try {
+                // FIX: This endpoint requires a nested { "data": {...} } object.
+                const response = await fetch('https://europe-west3-igfap-452720.cloudfunctions.net/calculateComaRisk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: { gfap: value } }) });
+                if (response.ok) { const data = await response.json(); if (data.result && typeof data.result.probability !== 'undefined') { dom.result.textContent = 'Probability of ICH: '; const strongEl = document.createElement('strong'); strongEl.textContent = `${(data.result.probability * 100).toFixed(1)}%`; dom.result.appendChild(strongEl); dom.result.classList.remove('hidden'); } else { throw new Error('Invalid response format from server.'); } } else { throw new Error(`Server responded with status ${response.status}`); }
+            } catch (error) { console.error("Coma Risk Fetch Error:", error); dom.error.textContent = translations[callbacks.getLang()].serverError; dom.error.classList.remove('hidden'); }
+            finally { callbacks.setLoadingState(dom.button, false); }
+        };
         return { init };
     })();
     
@@ -241,9 +259,7 @@
         const ichModel = { INTERCEPT: -0.72549447, COEFFICIENTS: {'gfapValue': 0.98845868, 'ageYears': -0.20927375, 'systolicBp': 0.36337294, 'headache': 0.43796113, 'eyeDeviation': -0.26763354, 'armParesis': 0.11730522, 'legParesis': 0.42467409, 'atrialFibrillation': -0.24686695, 'onAntiplatelets': -0.52928134 }, SCALER_PARAMS: {'gfapValue': { center: 3.78418963, scale: 0.98704051 }, 'ageYears': { center: 78.0, scale: 18.0 }, 'systolicBp': { center: 160.0, scale: 41.5 } }, CALIBRATION: { A: 1.15, B: -0.20 } };
         const modelInputs = ['gfapValue', 'ageYears', 'systolicBp', 'diastolicBp', 'headache', 'eyeDeviation', 'armParesis', 'legParesis', 'atrialFibrillation', 'onAntiplatelets', 'vigilanceReduction', 'onNoak'];
 
-        const init = (parentCallbacks) => {
-            callbacks = parentCallbacks; document.getElementById('strokeModuleBtn').addEventListener('click', () => { callbacks.showSection('stroke'); if (!dom.form) createForm(); });
-        };
+        const init = (parentCallbacks) => { callbacks = parentCallbacks; document.getElementById('strokeModuleBtn').addEventListener('click', () => { callbacks.showSection('stroke'); if (!dom.form) createForm(); }); };
         
         const createForm = () => {
             const section = document.getElementById('strokeModuleSection');
@@ -288,8 +304,7 @@
             dom.backButton.addEventListener('click', () => callbacks.showSection('moduleSelection'));
             dom.analysisToggle.addEventListener('click', toggleAnalysis);
             dom.fastEdInputs.forEach(el => el.addEventListener('change', updateFastEdScoreDisplay));
-            callbacks.getLang() !== 'en' && callbacks.switchLanguage(callbacks.getLang()); // Re-translate dynamic content
-            updateFastEdScoreDisplay();
+            callbacks.switchLanguage(callbacks.getLang()); updateFastEdScoreDisplay();
         };
 
         const updateDerivedCheckboxes = () => { const armValue = parseInt(document.getElementById('strokeFastEdArm').value) || 0; const eyeValue = parseInt(document.getElementById('strokeFastEdEyes').value) || 0; document.getElementById('armParesis').checked = (armValue > 0); document.getElementById('eyeDeviation').checked = (eyeValue > 0); };
@@ -305,11 +320,10 @@
             try {
                 let lvoData = null;
                 if (data.fastEdScore >= 4) lvoData = await fetchLvo(data);
-                const triageOutcome = determineTriage(ichData, lvoData, data.fastEdScore);
-                renderResults(triageOutcome);
+                renderResults(determineTriage(ichData, lvoData, data.fastEdScore));
             } catch (error) {
                 console.error("LVO Fetch Error:", error);
-                renderResults({ type: 'error', ichData, lvoData: null }); // Reliability Fix: Explicitly render error state
+                renderResults({ type: 'error', ichData, lvoData: null });
             } finally {
                 callbacks.setLoadingState(dom.button, false);
                 dom.resultsArea.classList.remove('hidden');
@@ -321,31 +335,14 @@
         const remapKeysForBackend = (data) => { const remappedData = {}; const keyMap = { gfapValue: 'gfap_value', ageYears: 'age_years', systolicBp: 'systolic_bp', diastolicBp: 'diastolic_bp', fastEdScore: 'fast_ed_score', headache: 'headache', eyeDeviation: 'eye_deviation', armParesis: 'armparese', legParesis: 'beinparese', atrialFibrillation: 'atrial_fibrillation', onAntiplatelets: 'antiplatelets', vigilanceReduction: 'vigilanzminderung', onNoak: 'antcoagulated_noak' }; for(const key in data) { if(keyMap[key]) remappedData[keyMap[key]] = data[key]; } return remappedData; };
         const calculateIch = (data) => { const ichInputs = {...data, gfapValue: Math.log1p(data.gfapValue)}; let logOdds = ichModel.INTERCEPT; const impacts = {}; for (const [feature, coef] of Object.entries(ichModel.COEFFICIENTS)) { let value = ichInputs[feature]; if (ichModel.SCALER_PARAMS[feature]) { const s = ichModel.SCALER_PARAMS[feature]; value = (value - s.center) / s.scale; } impacts[feature] = value * coef; logOdds += value * coef; } const calibrated = ichModel.CALIBRATION.A * logOdds + ichModel.CALIBRATION.B; const probability = 1 / (1 + Math.exp(-calibrated)); return { probability, impacts }; };
         const fetchLvo = async (data) => { const remappedData = remapKeysForBackend(data); const fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(remappedData) }; const [predRes, explRes] = await Promise.all([ fetch(api.lvoPrediction, fetchOptions), fetch(api.lvoExplanation, fetchOptions) ]); if (!predRes.ok || !explRes.ok) throw new Error(`API Error: Prediction ${predRes.status}, Explanation ${explRes.status}`); const pred = await predRes.json(); const expl = await explRes.json(); if (typeof pred.lvo_probability === 'undefined' || typeof expl.feature_impacts === 'undefined') throw new Error('Invalid API response format'); return { probability: pred.lvo_probability, impacts: expl.feature_impacts }; };
-
-        const determineTriage = (ichData, lvoData, fastEdScore) => { if (fastEdScore < 4) { const type = ichData.probability > 0.5 ? "ich_only" : "mimic_only"; return { type, ichData, lvoData: null }; } if (!lvoData) return { type: "error", ichData, lvoData }; const ichProb = ichData.probability; const lvoProb = lvoData.probability; if (ichProb < 0.2 && lvoProb < 0.2) return { type: "mimic", ichData, lvoData }; if (ichProb > 0.5 && ichProb > lvoProb) return { type: "ich", ichData, lvoData }; if (lvoProb > 0.6 && lvoProb > ichProb) return { type: "lvo", ichData, lvoData }; return { type: "unclear", ichData, lvoData }; };
+        const determineTriage = (ichData, lvoData, fastEdScore) => { if (fastEdScore < 4) { const type = ichData.probability > 0.5 ? "ich_only" : "mimic_only"; return { type, ichData, lvoData: null }; } if (!lvoData) return { type: "error", ichData, lvoData: null }; const ichProb = ichData.probability; const lvoProb = lvoData.probability; if (ichProb < 0.2 && lvoProb < 0.2) return { type: "mimic", ichData, lvoData }; if (ichProb > 0.5 && ichProb > lvoProb) return { type: "ich", ichData, lvoData }; if (lvoProb > 0.6 && lvoProb > ichProb) return { type: "lvo", ichData, lvoData }; return { type: "unclear", ichData, lvoData }; };
         
-        // --- SECURE RENDERING FUNCTIONS ---
         const renderResults = (outcome) => {
             const t = translations[callbacks.getLang()]; const triageText = t.triage;
             const icons = { lvo: '🧠⚡️', ich: '🧠🩸', unclear: '🧠❓', mimic: '‍⚕️🩺', error: '📡⚠️', ich_only: '🧠🩸', mimic_only: '‍⚕️🩺' };
-            
-            // Security Fix: Create elements safely, no .innerHTML
-            dom.triageRec.innerHTML = ''; // Clear previous results
-            const card = document.createElement('div');
-            card.className = `triage-card ${outcome.type}`;
-            const iconEl = document.createElement('div');
-            iconEl.className = 'icon';
-            iconEl.textContent = icons[outcome.type]; // Safe
-            const titleEl = document.createElement('h3');
-            titleEl.textContent = triageText[`${outcome.type}_title`]; // Safe
-            const recEl = document.createElement('p');
-            recEl.textContent = triageText[`${outcome.type}_rec`]; // Safe
-            card.append(iconEl, titleEl, recEl);
-            dom.triageRec.appendChild(card);
-            
-            dom.analysisDetails.style.gridTemplateColumns = outcome.lvoData ? '1fr 1fr' : '1fr';
-            dom.lvoProbPanel.style.display = outcome.lvoData ? 'block' : 'none';
-            dom.lvoDriversPanel.style.display = outcome.lvoData ? 'block' : 'none';
+            dom.triageRec.innerHTML = ''; const card = document.createElement('div'); card.className = `triage-card ${outcome.type}`; const iconEl = document.createElement('div'); iconEl.className = 'icon'; iconEl.textContent = icons[outcome.type]; const titleEl = document.createElement('h3'); titleEl.textContent = triageText[`${outcome.type}_title`]; const recEl = document.createElement('p'); recEl.textContent = triageText[`${outcome.type}_rec`]; card.append(iconEl, titleEl, recEl); dom.triageRec.appendChild(card);
+            dom.analysisDetails.style.gridTemplateColumns = outcome.lvoData ? '' : '1fr';
+            dom.lvoProbPanel.style.display = outcome.lvoData ? '' : 'none'; dom.lvoDriversPanel.style.display = outcome.lvoData ? '' : 'none';
             dom.ichProbPanel.innerHTML = ''; dom.ichProbPanel.appendChild(renderProbPanel('ich', outcome.ichData));
             dom.ichDriversPanel.innerHTML = ''; dom.ichDriversPanel.appendChild(renderDriversPanel(outcome.ichData.impacts, 'ich'));
             if (outcome.lvoData) {
@@ -353,35 +350,8 @@
                 dom.lvoDriversPanel.innerHTML = ''; dom.lvoDriversPanel.appendChild(renderDriversPanel(outcome.lvoData.impacts, 'lvo'));
             }
         };
-
         const renderProbPanel = (type, data) => { const t = translations[callbacks.getLang()]; const wrapper = document.createDocumentFragment(); const title = document.createElement('h4'); title.textContent = t[`${type}Title`]; wrapper.appendChild(title); if (!data) { const p = document.createElement('p'); p.textContent = 'Data unavailable.'; wrapper.appendChild(p); return wrapper; } const prob = data.probability; const meter = document.createElement('div'); meter.className = 'probability-meter-container'; const marker = document.createElement('div'); marker.className = 'probability-meter-marker'; marker.style.left = `calc(${(prob*100).toFixed(0)}% - 3px)`; const label = document.createElement('span'); label.className = 'probability-meter-label'; label.style.left = `${(prob*100).toFixed(0)}%`; label.textContent = `${(prob*100).toFixed(1)}%`; meter.append(marker, label); wrapper.appendChild(meter); return wrapper; };
-        
-        const renderDriversPanel = (impacts, type) => {
-            const t = translations[callbacks.getLang()]; const wrapper = document.createDocumentFragment();
-            const driversTitle = document.querySelector('.drivers-title');
-            if(driversTitle) driversTitle.textContent = t.driversTitle;
-
-            if (!impacts) { const p = document.createElement('p'); p.textContent = 'Data unavailable.'; wrapper.appendChild(p); return wrapper; }
-            const sorted = Object.entries(impacts).filter(([, val])=>Math.abs(val)>0.01).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
-            if (sorted.length === 0) return wrapper;
-            const maxAbs = Math.abs(sorted[0][1]); const columns = document.createElement('div'); columns.className = 'drivers-columns';
-            const posCol = document.createElement('div'); posCol.className = 'driver-column'; const negCol = document.createElement('div'); negCol.className = 'driver-column';
-            const posTitle = document.createElement('h5'); posTitle.textContent = t.increasingRisk; posCol.appendChild(posTitle);
-            const negTitle = document.createElement('h5'); negTitle.textContent = t.decreasingRisk; negCol.appendChild(negTitle);
-            
-            sorted.forEach(([key, val]) => {
-                const barWidth = (maxAbs > 0) ? (Math.abs(val) / maxAbs) * 100 : 0;
-                // Security Fix: Create elements safely, no .innerHTML
-                const item = document.createElement('div'); item.className = 'driver-item';
-                const label = document.createElement('span'); label.className = 'driver-label'; label.textContent = t.featureNames[key] || key;
-                const barContainer = document.createElement('div'); barContainer.className = 'driver-bar-container';
-                const bar = document.createElement('div'); bar.className = `driver-bar ${val >= 0 ? 'positive' : 'negative'}`; bar.style.width = `${barWidth}%`;
-                barContainer.appendChild(bar); item.append(label, barContainer);
-                if (val >= 0) posCol.appendChild(item); else negCol.appendChild(item);
-            });
-            if(posCol.children.length > 1) columns.appendChild(posCol); if(negCol.children.length > 1) columns.appendChild(negCol);
-            wrapper.appendChild(columns); return wrapper;
-        };
+        const renderDriversPanel = (impacts, type) => { const t = translations[callbacks.getLang()]; const wrapper = document.createDocumentFragment(); const driversTitle = document.querySelector('.drivers-title'); if(driversTitle) driversTitle.textContent = t.driversTitle; if (!impacts) { const p = document.createElement('p'); p.textContent = 'Data unavailable.'; wrapper.appendChild(p); return wrapper; } const sorted = Object.entries(impacts).filter(([, val])=>Math.abs(val)>0.01).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])); if (sorted.length === 0) return wrapper; const maxAbs = Math.abs(sorted[0][1]); const columns = document.createElement('div'); columns.className = 'drivers-columns'; const posCol = document.createElement('div'); posCol.className = 'driver-column'; const negCol = document.createElement('div'); negCol.className = 'driver-column'; const posTitle = document.createElement('h5'); posTitle.textContent = t.increasingRisk; posCol.appendChild(posTitle); const negTitle = document.createElement('h5'); negTitle.textContent = t.decreasingRisk; negCol.appendChild(negTitle); sorted.forEach(([key, val]) => { const barWidth = (maxAbs > 0) ? (Math.abs(val) / maxAbs) * 100 : 0; const item = document.createElement('div'); item.className = 'driver-item'; const label = document.createElement('span'); label.className = 'driver-label'; label.textContent = t.featureNames[key] || key; const barContainer = document.createElement('div'); barContainer.className = 'driver-bar-container'; const bar = document.createElement('div'); bar.className = `driver-bar ${val >= 0 ? 'positive' : 'negative'}`; bar.style.width = `${barWidth}%`; barContainer.appendChild(bar); item.append(label, barContainer); if (val >= 0) posCol.appendChild(item); else negCol.appendChild(item); }); if(posCol.children.length > 1) columns.appendChild(posCol); if(negCol.children.length > 1) columns.appendChild(negCol); wrapper.appendChild(columns); return wrapper; };
         return { init };
     })();
     
