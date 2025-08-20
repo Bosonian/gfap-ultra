@@ -1,0 +1,26 @@
+{
+  "name": "stroke-triage-assistant",
+  "private": true,
+  "version": "2.0.1",
+  "type": "module",
+  "description": "Professional stroke triage assistant for emergency medical services",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "stroke",
+    "triage",
+    "medical",
+    "emergency",
+    "gfap",
+    "ich",
+    "lvo"
+  ],
+  "author": "iGFAP Project",
+  "license": "Proprietary"
+}
