@@ -85,6 +85,7 @@ class App {
         const helpModal = document.getElementById('helpModal');
         if (helpModal && helpModal.classList.contains('show')) {
           helpModal.classList.remove('show');
+          helpModal.style.display = 'none';
           helpModal.setAttribute('aria-hidden', 'true');
         }
       }
@@ -105,20 +106,28 @@ class App {
     const modalClose = helpModal?.querySelector('.modal-close');
 
     if (helpButton && helpModal) {
+      // Ensure modal starts hidden
+      helpModal.classList.remove('show');
+      helpModal.style.display = 'none';
+      helpModal.setAttribute('aria-hidden', 'true');
+
       helpButton.addEventListener('click', () => {
+        helpModal.style.display = 'flex';
         helpModal.classList.add('show');
         helpModal.setAttribute('aria-hidden', 'false');
       });
       
-      modalClose?.addEventListener('click', () => {
+      const closeModal = () => {
         helpModal.classList.remove('show');
+        helpModal.style.display = 'none';
         helpModal.setAttribute('aria-hidden', 'true');
-      });
+      };
+      
+      modalClose?.addEventListener('click', closeModal);
       
       helpModal.addEventListener('click', (e) => {
         if (e.target === helpModal) {
-          helpModal.classList.remove('show');
-          helpModal.setAttribute('aria-hidden', 'true');
+          closeModal();
         }
       });
     }
