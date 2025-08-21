@@ -6,7 +6,6 @@ export function renderComa() {
     <div class="container">
       ${renderProgressIndicator(2)}
       <h2>Coma Module</h2>
-      <p class="subtitle">ICH Risk Assessment for Comatose Patients</p>
       <div class="critical-alert">
         <h4><span class="alert-icon">🚨</span> Critical Patient</h4>
         <p>Patient is comatose (GCS &lt; 8). Rapid assessment required.</p>

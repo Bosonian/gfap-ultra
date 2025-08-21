@@ -62,7 +62,6 @@ export function renderResults(results, startTime) {
     <div class="container">
       ${renderProgressIndicator(3)}
       <h2>${t('resultsTitle')}</h2>
-      <p class="subtitle">${t('resultsSubtitle')}</p>
       ${criticalAlert}
       <div style="display: flex; flex-direction: column; gap: 20px;">
         ${ichHtml}

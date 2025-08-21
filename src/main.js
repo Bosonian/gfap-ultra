@@ -2,7 +2,6 @@ import { store } from './state/store.js';
 import { render } from './ui/render.js';
 import { APP_CONFIG } from './config.js';
 import { i18n, t } from './localization/i18n.js';
-import { initializeStrokeCenterMap } from './ui/components/stroke-center-map.js';
 
 class App {
   constructor() {
@@ -189,13 +188,7 @@ class App {
       modalTitle.textContent = t('helpTitle');
     }
     
-    // Initialize stroke center map if present
-    const currentState = store.getState();
-    if (currentState.currentScreen === 'results' && currentState.results) {
-      setTimeout(() => {
-        initializeStrokeCenterMap(currentState.results);
-      }, 100);
-    }
+    // Note: Stroke center map initialization is handled in render.js
   }
 
   toggleDarkMode() {

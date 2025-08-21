@@ -15,24 +15,18 @@ export const messages = {
     step3: 'Results',
 
     // Triage 1
-    triage1Title: 'Initial Assessment',
-    triage1Subtitle: 'Emergency Stroke Triage Protocol',
+    triage1Title: 'Patient Assessment',
     triage1Question: 'Is the patient comatose?',
     triage1Help: 'Glasgow Coma Scale < 8',
     triage1Yes: 'YES - Comatose',
     triage1No: 'NO - Conscious',
 
     // Triage 2
-    triage2Title: 'Clinical Assessment',
-    triage2Subtitle: 'Select appropriate assessment module',
-    triage2Question: 'Which assessment module should be used?',
-    triage2Help: 'Select based on available clinical data and examination findings',
-    triage2Coma: 'Coma Module',
-    triage2ComaDesc: 'For comatose patients (GCS < 8)',
-    triage2Limited: 'Limited Data Module',
-    triage2LimitedDesc: 'Basic vitals and limited examination',
-    triage2Full: 'Full Stroke Module', 
-    triage2FullDesc: 'Complete neurological assessment available',
+    triage2Title: 'Examination Capability',
+    triage2Question: 'Can the patient be reliably examined?',
+    triage2Help: 'Patient is not aphasic, confused, or uncooperative',
+    triage2Yes: 'YES - Full Exam Possible',
+    triage2No: 'NO - Limited Exam Only',
 
     // Forms
     ageLabel: 'Age (years)',
@@ -64,7 +58,6 @@ export const messages = {
 
     // Results
     resultsTitle: 'Assessment Results',
-    resultsSubtitle: 'Clinical Decision Support Analysis',
     ichProbability: 'ICH Probability',
     lvoProbability: 'LVO Probability',
     riskLevel: 'Risk Level',
@@ -184,24 +177,18 @@ export const messages = {
     step3: 'Ergebnisse',
 
     // Triage 1
-    triage1Title: 'Erstbeurteilung',
-    triage1Subtitle: 'Notfall-Schlaganfall-Triage-Protokoll',
+    triage1Title: 'Patientenbeurteilung',
     triage1Question: 'Ist der Patient komatös?',
     triage1Help: 'Glasgow Coma Scale < 8',
     triage1Yes: 'JA - Komatös',
     triage1No: 'NEIN - Bei Bewusstsein',
 
     // Triage 2
-    triage2Title: 'Klinische Bewertung',
-    triage2Subtitle: 'Wählen Sie das entsprechende Bewertungsmodul',
-    triage2Question: 'Welches Bewertungsmodul soll verwendet werden?',
-    triage2Help: 'Auswahl basierend auf verfügbaren klinischen Daten und Untersuchungsbefunden',
-    triage2Coma: 'Koma-Modul',
-    triage2ComaDesc: 'Für komatöse Patienten (GCS < 8)',
-    triage2Limited: 'Begrenzte-Daten-Modul',
-    triage2LimitedDesc: 'Grundvitalwerte und begrenzte Untersuchung',
-    triage2Full: 'Vollständiges Schlaganfall-Modul',
-    triage2FullDesc: 'Vollständige neurologische Bewertung verfügbar',
+    triage2Title: 'Untersuchungsfähigkeit',
+    triage2Question: 'Kann der Patient zuverlässig untersucht werden?',
+    triage2Help: 'Patient ist nicht aphasisch, verwirrt oder unkooperativ',
+    triage2Yes: 'JA - Vollständige Untersuchung möglich',
+    triage2No: 'NEIN - Nur begrenzte Untersuchung',
 
     // Forms
     ageLabel: 'Alter (Jahre)',
@@ -233,7 +220,6 @@ export const messages = {
 
     // Results
     resultsTitle: 'Bewertungsergebnisse',
-    resultsSubtitle: 'Klinische Entscheidungsunterstützungsanalyse',
     ichProbability: 'ICB-Wahrscheinlichkeit',
     lvoProbability: 'LVO-Wahrscheinlichkeit',
     riskLevel: 'Risikostufe',

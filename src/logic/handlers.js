@@ -1,6 +1,7 @@
 import { store } from '../state/store.js';
 import { validateForm, showValidationErrors } from './validate.js';
 import { predictComaIch, predictLimitedIch, predictFullStroke, APIError } from '../api/client.js';
+import { t } from '../localization/i18n.js';
 
 export function handleTriage1(isComatose) {
   store.logEvent('triage1_answer', { comatose: isComatose });
@@ -66,7 +67,7 @@ export async function handleSubmit(e, container) {
   const originalContent = button ? button.innerHTML : '';
   if (button) {
     button.disabled = true;
-    button.innerHTML = '<span class="loading-spinner"></span> Analyzing...';
+    button.innerHTML = `<span class="loading-spinner"></span> ${t('analyzing')}`;
   }
 
   try {

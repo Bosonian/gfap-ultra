@@ -1,18 +1,18 @@
 import { renderProgressIndicator } from '../components/progress.js';
+import { t } from '../../localization/i18n.js';
 
 export function renderTriage2() {
   return `
     <div class="container">
       ${renderProgressIndicator(1)}
-      <h2>Examination Capability</h2>
-      <p class="subtitle">Determine Assessment Module</p>
+      <h2>${t('triage2Title')}</h2>
       <div class="triage-question">
-        Can the patient be reliably examined?
-        <small>Patient is not aphasic, confused, or uncooperative</small>
+        ${t('triage2Question')}
+        <small>${t('triage2Help')}</small>
       </div>
       <div class="triage-buttons">
-        <button class="yes-btn" data-action="triage2" data-value="true">YES - Full Exam Possible</button>
-        <button class="no-btn" data-action="triage2" data-value="false">NO - Limited Exam Only</button>
+        <button class="yes-btn" data-action="triage2" data-value="true">${t('triage2Yes')}</button>
+        <button class="no-btn" data-action="triage2" data-value="false">${t('triage2No')}</button>
       </div>
     </div>
   `;

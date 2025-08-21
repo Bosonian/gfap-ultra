@@ -6,7 +6,6 @@ export function renderFull() {
     <div class="container">
       ${renderProgressIndicator(2)}
       <h2>Full Stroke Module</h2>
-      <p class="subtitle">Complete ICH and LVO Risk Assessment</p>
       <form data-module="full">
         <h3>Basic Information</h3>
         <div class="input-grid">

@@ -6,7 +6,6 @@ export function renderLimited() {
     <div class="container">
       ${renderProgressIndicator(2)}
       <h2>Limited Data Module</h2>
-      <p class="subtitle">ICH Risk Assessment with Limited Examination</p>
       <form data-module="limited">
         <div class="input-grid">
           <div class="input-group">
