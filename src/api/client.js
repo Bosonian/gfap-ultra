@@ -82,6 +82,9 @@ async function fetchJSON(url, payload) {
 export async function predictComaIch(payload) {
   const normalizedPayload = normalizeBooleans(payload);
   
+  // Debug log the payload being sent
+  console.log('Coma ICH API Payload:', normalizedPayload);
+  
   try {
     const response = await fetchJSON(API_URLS.COMA_ICH, normalizedPayload);
     
@@ -106,7 +109,20 @@ export async function predictComaIch(payload) {
 }
 
 export async function predictLimitedIch(payload) {
-  const normalizedPayload = normalizeBooleans(payload);
+  // Ensure all required fields are present for the Limited Data API
+  const fullPayload = {
+    age_years: payload.age_years,
+    systolic_bp: payload.systolic_bp,
+    diastolic_bp: payload.diastolic_bp,
+    gfap_value: payload.gfap_value,
+    // Ensure checkbox fields are present (default to 0 if missing/unchecked)
+    vigilanzminderung: payload.vigilanzminderung || 0
+  };
+  
+  const normalizedPayload = normalizeBooleans(fullPayload);
+  
+  // Debug log the payload being sent
+  console.log('Limited Data ICH API Payload:', normalizedPayload);
   
   try {
     const response = await fetchJSON(API_URLS.LDM_ICH, normalizedPayload);
@@ -151,6 +167,9 @@ export async function predictFullStroke(payload) {
   };
   
   const normalizedPayload = normalizeBooleans(fullPayload);
+  
+  // Debug log the payload being sent
+  console.log('Full Stroke API Payload:', normalizedPayload);
   
   try {
     const response = await fetchJSON(API_URLS.FULL_STROKE, normalizedPayload);
