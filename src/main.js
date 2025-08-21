@@ -160,7 +160,13 @@ class App {
             data[key] = value;
           }
         });
-        store.setFormData(module, data);
+        
+        // Only save if data has actually changed to prevent unnecessary re-renders
+        const currentData = store.getFormData(module);
+        const hasChanges = JSON.stringify(currentData) !== JSON.stringify(data);
+        if (hasChanges) {
+          store.setFormData(module, data);
+        }
       }
     });
   }
