@@ -102,6 +102,17 @@ body {
     letter-spacing: -0.02em;
 }
 
+.version-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-left: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 
 .header-controls {
     display: flex;
@@ -1612,6 +1623,12 @@ footer {
     
     .app-header h1 {
         font-size: 1.1rem;
+    }
+    
+    .version-badge {
+        font-size: 0.6rem;
+        padding: 1px 6px;
+        margin-left: 6px;
     }
     
     .header-controls {

@@ -1,6 +1,6 @@
 {
-  "name": "Stroke Triage Assistant - Professional Edition",
-  "short_name": "Stroke Triage",
+  "name": "Stroke Triage Assistant - Professional Edition v2.1.0",
+  "short_name": "Triage v2.1",
   "description": "Professional stroke triage assistant for emergency medical services",
   "start_url": "/",
   "display": "standalone",

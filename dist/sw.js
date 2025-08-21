@@ -1,7 +1,7 @@
 // Service Worker for Stroke Triage Assistant PWA
-const CACHE_NAME = 'stroke-triage-v2.0.1';
-const STATIC_CACHE = 'stroke-triage-static-v2.0.1';
-const DYNAMIC_CACHE = 'stroke-triage-dynamic-v2.0.1';
+const CACHE_NAME = 'stroke-triage-v2.1.0';
+const STATIC_CACHE = 'stroke-triage-static-v2.1.0';
+const DYNAMIC_CACHE = 'stroke-triage-dynamic-v2.1.0';
 
 // Files to cache for offline functionality
 const STATIC_FILES = [
