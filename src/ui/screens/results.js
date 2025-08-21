@@ -115,9 +115,6 @@ function renderRiskCard(type, data, results) {
           <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
             ${riskLevel}
           </div>
-          <div class="risk-confidence">
-            Confidence: ${Math.round((data.confidence || 0.8) * 100)}%
-          </div>
         </div>
       </div>
     </div>
@@ -131,13 +128,13 @@ function renderLVONotPossible() {
         <div class="risk-icon">🔍</div>
         <div class="risk-title">
           <h3>${t('lvoProbability')}</h3>
-          <span class="risk-module">Limited Assessment</span>
+          <span class="risk-module">${t('limitedAssessment')}</span>
         </div>
       </div>
       
       <div class="not-possible-content">
-        <p>LVO assessment not possible with limited data</p>
-        <p>Full neurological examination required for LVO screening</p>
+        <p>${t('lvoNotPossible')}</p>
+        <p>${t('fullExamRequired')}</p>
       </div>
     </div>
   `;
@@ -193,17 +190,17 @@ export function renderResults(results, startTime) {
         
         <button class="info-toggle" data-target="clinical-info">
           <span class="toggle-icon">ℹ️</span>
-          <span class="toggle-text">Clinical Information</span>
+          <span class="toggle-text">${t('clinicalInformation')}</span>
           <span class="toggle-arrow">▼</span>
         </button>
         <div class="collapsible-content" id="clinical-info" style="display: none;">
           <div class="clinical-recommendations">
-            <h4>Clinical Recommendations</h4>
+            <h4>${t('clinicalRecommendations')}</h4>
             <ul>
-              <li>Consider immediate imaging if ICH risk is high</li>
-              <li>Activate stroke team for LVO scores ≥ 50%</li>
-              <li>Monitor blood pressure closely</li>
-              <li>Document all findings thoroughly</li>
+              <li>${t('clinicalRec1')}</li>
+              <li>${t('clinicalRec2')}</li>
+              <li>${t('clinicalRec3')}</li>
+              <li>${t('clinicalRec4')}</li>
             </ul>
           </div>
         </div>

@@ -1391,8 +1391,9 @@ button:disabled {
 
 /* FAST-ED Calculator Modal */
 .fast-ed-modal {
-    max-width: 700px;
-    max-height: 85vh;
+    max-width: 600px;
+    max-height: 80vh;
+    transform: scale(0.95);
 }
 
 .fast-ed-component {
@@ -1520,9 +1521,10 @@ button:disabled {
 /* Mobile optimizations for FAST-ED modal */
 @media (max-width: 768px) {
     .fast-ed-modal {
-        max-width: 95vw;
-        max-height: 90vh;
-        margin: 10px;
+        max-width: 90vw;
+        max-height: 85vh;
+        margin: 20px auto;
+        transform: scale(0.9);
     }
     
     .fast-ed-component {

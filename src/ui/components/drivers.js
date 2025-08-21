@@ -1,4 +1,5 @@
 import { normalizeDrivers } from '../../logic/shap.js';
+import { t } from '../../localization/i18n.js';
 
 export function renderDriversSection(ich, lvo) {
   if (!ich?.drivers && !lvo?.drivers) return '';
@@ -6,8 +7,8 @@ export function renderDriversSection(ich, lvo) {
   let html = `
     <div class="drivers-section">
       <div class="drivers-header">
-        <h3><span class="driver-header-icon">🎯</span> Model Drivers</h3>
-        <p class="drivers-subtitle">Factors contributing to the prediction</p>
+        <h3><span class="driver-header-icon">🎯</span> ${t('modelDrivers')}</h3>
+        <p class="drivers-subtitle">${t('modelDriversSubtitle')}</p>
       </div>
       <div class="enhanced-drivers-grid">
   `;
@@ -137,11 +138,11 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
           <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
           <div class="panel-title">
             <h4>${title} Risk Factors</h4>
-            <span class="panel-subtitle">No driver data available</span>
+            <span class="panel-subtitle">${t('noDriverData')}</span>
           </div>
         </div>
         <p class="no-drivers-message">
-          Driver information not available from this prediction model.
+          ${t('driverInfoNotAvailable')}
         </p>
       </div>
     `;
@@ -156,11 +157,11 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
           <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
           <div class="panel-title">
             <h4>${title} Risk Factors</h4>
-            <span class="panel-subtitle">Driver analysis unavailable</span>
+            <span class="panel-subtitle">${t('driverAnalysisUnavailable')}</span>
           </div>
         </div>
         <p class="no-drivers-message">
-          Driver analysis not available for this prediction.
+          ${t('driverAnalysisNotAvailable')}
         </p>
       </div>
     `;
@@ -176,7 +177,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
         <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
         <div class="panel-title">
           <h4>${title} Risk Factors</h4>
-          <span class="panel-subtitle">Contributing factors (${allDrivers.length} shown)</span>
+          <span class="panel-subtitle">${t('contributingFactors')} (${allDrivers.length} ${t('factorsShown')})</span>
         </div>
       </div>
       
@@ -221,11 +222,11 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
       <div class="drivers-summary">
         <div class="summary-stats">
           <span class="stat-item">
-            <span class="stat-label">Positive factors:</span>
+            <span class="stat-label">${t('positiveFactors')}:</span>
             <span class="stat-value positive">${driversViewModel.positive.length}</span>
           </span>
           <span class="stat-item">
-            <span class="stat-label">Negative factors:</span>
+            <span class="stat-label">${t('negativeFactors')}:</span>
             <span class="stat-value negative">${driversViewModel.negative.length}</span>
           </span>
         </div>
