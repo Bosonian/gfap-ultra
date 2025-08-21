@@ -164,4 +164,32 @@ function attachEvents(container) {
       e.preventDefault();
     });
   }
+
+  // Collapsible info toggles handler
+  const infoToggles = container.querySelectorAll('.info-toggle');
+  infoToggles.forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      const targetId = toggle.dataset.target;
+      const targetContent = container.querySelector(`#${targetId}`);
+      const arrow = toggle.querySelector('.toggle-arrow');
+      
+      if (targetContent) {
+        const isVisible = targetContent.style.display !== 'none';
+        
+        if (isVisible) {
+          // Hide content
+          targetContent.style.display = 'none';
+          targetContent.classList.remove('show');
+          toggle.classList.remove('active');
+          arrow.style.transform = 'rotate(0deg)';
+        } else {
+          // Show content
+          targetContent.style.display = 'block';
+          targetContent.classList.add('show');
+          toggle.classList.add('active');
+          arrow.style.transform = 'rotate(180deg)';
+        }
+      }
+    });
+  });
 }

@@ -5,16 +5,19 @@ export function renderDriversSection(ich, lvo) {
   
   let html = `
     <div class="drivers-section">
-      <h3>Prediction Drivers</h3>
-      <div class="drivers-grid">
+      <div class="drivers-header">
+        <h3><span class="driver-header-icon">🎯</span> Model Drivers</h3>
+        <p class="drivers-subtitle">Factors contributing to the prediction</p>
+      </div>
+      <div class="enhanced-drivers-grid">
   `;
   
   if (ich?.drivers) {
-    html += renderDriversPanel(ich.drivers, 'ICH', 'ich');
+    html += renderEnhancedDriversPanel(ich.drivers, 'ICH', 'ich', ich.probability);
   }
   
   if (lvo?.drivers && !lvo.notPossible) {
-    html += renderDriversPanel(lvo.drivers, 'LVO', 'lvo');
+    html += renderEnhancedDriversPanel(lvo.drivers, 'LVO', 'lvo', lvo.probability);
   }
   
   html += `
@@ -123,5 +126,112 @@ export function renderDriversPanel(drivers, title, type) {
   }
 
   html += `</div>`;
+  return html;
+}
+
+export function renderEnhancedDriversPanel(drivers, title, type, probability) {
+  if (!drivers || Object.keys(drivers).length === 0) {
+    return `
+      <div class="enhanced-drivers-panel ${type}">
+        <div class="panel-header">
+          <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
+          <div class="panel-title">
+            <h4>${title} Risk Factors</h4>
+            <span class="panel-subtitle">No driver data available</span>
+          </div>
+        </div>
+        <p class="no-drivers-message">
+          Driver information not available from this prediction model.
+        </p>
+      </div>
+    `;
+  }
+
+  const driversViewModel = normalizeDrivers(drivers);
+  
+  if (driversViewModel.kind === 'unavailable') {
+    return `
+      <div class="enhanced-drivers-panel ${type}">
+        <div class="panel-header">
+          <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
+          <div class="panel-title">
+            <h4>${title} Risk Factors</h4>
+            <span class="panel-subtitle">Driver analysis unavailable</span>
+          </div>
+        </div>
+        <p class="no-drivers-message">
+          Driver analysis not available for this prediction.
+        </p>
+      </div>
+    `;
+  }
+
+  const allDrivers = [...driversViewModel.positive, ...driversViewModel.negative]
+    .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
+    .slice(0, 8); // Show top 8 most important factors
+
+  let html = `
+    <div class="enhanced-drivers-panel ${type}">
+      <div class="panel-header">
+        <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
+        <div class="panel-title">
+          <h4>${title} Risk Factors</h4>
+          <span class="panel-subtitle">Contributing factors (${allDrivers.length} shown)</span>
+        </div>
+      </div>
+      
+      <div class="drivers-chart">
+  `;
+
+  if (allDrivers.length > 0) {
+    const maxWeight = Math.max(...allDrivers.map(d => Math.abs(d.weight)));
+    
+    allDrivers.forEach((driver, index) => {
+      const weight = driver.weight;
+      const isPositive = weight > 0;
+      const percentage = Math.abs(weight * 100);
+      const barWidth = (Math.abs(weight) / maxWeight) * 100;
+      const cleanLabel = driver.label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      
+      html += `
+        <div class="enhanced-driver-item">
+          <div class="driver-info">
+            <span class="driver-label">${cleanLabel}</span>
+            <div class="driver-impact ${isPositive ? 'positive' : 'negative'}">
+              ${isPositive ? '↑' : '↓'} ${percentage.toFixed(1)}%
+            </div>
+          </div>
+          <div class="driver-bar-wrapper">
+            <div class="driver-bar-track">
+              <div class="driver-bar ${isPositive ? 'positive' : 'negative'}" 
+                   style="width: ${barWidth}%"
+                   data-weight="${weight.toFixed(3)}">
+                <div class="bar-glow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+  html += `
+      </div>
+      
+      <div class="drivers-summary">
+        <div class="summary-stats">
+          <span class="stat-item">
+            <span class="stat-label">Positive factors:</span>
+            <span class="stat-value positive">${driversViewModel.positive.length}</span>
+          </span>
+          <span class="stat-item">
+            <span class="stat-label">Negative factors:</span>
+            <span class="stat-value negative">${driversViewModel.negative.length}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+  
   return html;
 }
