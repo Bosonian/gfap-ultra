@@ -11,7 +11,7 @@ export function renderResults(results, startTime) {
   let ichHtml = '', lvoHtml = '';
 
   if (ich) {
-    const ichPercent = Math.round(ich.probability * 100);
+    const ichPercent = Math.round((ich.probability || 0) * 100);
     const isCritical = ichPercent > CRITICAL_THRESHOLDS.ich.critical;
 
     ichHtml = `
@@ -37,7 +37,7 @@ export function renderResults(results, startTime) {
         </div>
       `;
     } else {
-      const lvoPercent = Math.round(lvo.probability * 100);
+      const lvoPercent = Math.round((lvo.probability || 0) * 100);
       const isCritical = lvoPercent > CRITICAL_THRESHOLDS.lvo.critical;
 
       lvoHtml = `

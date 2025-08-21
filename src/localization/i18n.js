@@ -4,8 +4,8 @@ import { messages } from './messages.js';
 
 class I18n {
   constructor() {
-    this.currentLanguage = this.detectLanguage();
     this.supportedLanguages = ['en', 'de'];
+    this.currentLanguage = this.detectLanguage();
   }
 
   // Detect browser language and default to appropriate language

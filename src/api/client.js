@@ -22,6 +22,11 @@ function normalizeBooleans(payload) {
   return normalized;
 }
 
+function safeParseFloat(value, defaultValue = 0) {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? defaultValue : parsed;
+}
+
 async function fetchJSON(url, payload) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), APP_CONFIG.requestTimeout);
@@ -80,11 +85,14 @@ export async function predictComaIch(payload) {
   try {
     const response = await fetchJSON(API_URLS.COMA_ICH, normalizedPayload);
     
+    // Debug log the API response
+    console.log('Coma ICH API Response:', response);
+    
     // Normalize response format for consistency
     return {
-      probability: response.probability || response.ich_probability,
+      probability: safeParseFloat(response.probability || response.ich_probability, 0),
       drivers: response.drivers || null,
-      confidence: response.confidence || 0.75,
+      confidence: safeParseFloat(response.confidence, 0.75),
       module: 'Coma'
     };
   } catch (error) {
@@ -103,11 +111,14 @@ export async function predictLimitedIch(payload) {
   try {
     const response = await fetchJSON(API_URLS.LDM_ICH, normalizedPayload);
     
+    // Debug log the API response
+    console.log('Limited Data ICH API Response:', response);
+    
     // Normalize response format for consistency
     return {
-      probability: response.probability || response.ich_probability,
+      probability: safeParseFloat(response.probability || response.ich_probability, 0),
       drivers: response.drivers || null,
-      confidence: response.confidence || 0.65,
+      confidence: safeParseFloat(response.confidence, 0.65),
       module: 'Limited Data'
     };
   } catch (error) {
@@ -144,18 +155,21 @@ export async function predictFullStroke(payload) {
   try {
     const response = await fetchJSON(API_URLS.FULL_STROKE, normalizedPayload);
     
-    // Extract ICH and LVO predictions
+    // Debug log the API response
+    console.log('Full Stroke API Response:', response);
+    
+    // Extract ICH and LVO predictions with proper null checks
     const ichResult = {
-      probability: response.ich_probability || response.ich?.probability,
-      drivers: response.ich_drivers || response.ich?.drivers,
-      confidence: response.ich_confidence || response.ich?.confidence || 0.85,
+      probability: safeParseFloat(response.ich_probability || response.ich?.probability, 0),
+      drivers: response.ich_drivers || response.ich?.drivers || null,
+      confidence: safeParseFloat(response.ich_confidence || response.ich?.confidence, 0.85),
       module: 'Full Stroke'
     };
     
     const lvoResult = {
-      probability: response.lvo_probability || response.lvo?.probability,
-      drivers: response.lvo_drivers || response.lvo?.drivers,
-      confidence: response.lvo_confidence || response.lvo?.confidence || 0.85,
+      probability: safeParseFloat(response.lvo_probability || response.lvo?.probability, 0),
+      drivers: response.lvo_drivers || response.lvo?.drivers || null,
+      confidence: safeParseFloat(response.lvo_confidence || response.lvo?.confidence, 0.85),
       module: 'Full Stroke'
     };
     
