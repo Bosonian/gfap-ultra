@@ -2,18 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Viewport optimizations for mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <title>Stroke Triage Assistant - Professional Edition</title>
-    <meta name="theme-color" content="#00529B" />
+    <meta name="theme-color" content="#0066CC" />
     <meta name="description" content="Professional stroke triage assistant for emergency medical services" />
-  <script type="module" crossorigin src="/0825/assets/index-DyJpkY_p.js"></script>
-  <link rel="stylesheet" crossorigin href="/0825/assets/index-ExfMBStl.css">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/0825/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Stroke Triage" />
+    <meta name="msapplication-TileColor" content="#0066CC" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    
+    <!-- Favicon and Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
+    <link rel="mask-icon" href="/icons/icon-192x192.png" color="#0066CC" />
+    
+  <script type="module" crossorigin src="/0825/assets/index-BVayx83L.js"></script>
+  <link rel="stylesheet" crossorigin href="/0825/assets/index-Bdv5NQMs.css">
 </head>
 <body>
 <header class="app-header" role="banner">
     <div class="header-content">
         <h1>Stroke Triage Assistant</h1>
-        <span class="emergency-badge">Emergency Tool</span>
     </div>
     <div class="header-controls">
         <button id="languageToggle" aria-label="Toggle language" title="Language">🌐</button>

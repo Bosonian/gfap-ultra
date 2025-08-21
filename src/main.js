@@ -51,6 +51,9 @@ class App {
     // Set current year in footer
     this.setCurrentYear();
 
+    // Register PWA Service Worker
+    this.registerServiceWorker();
+
     // Initial render
     render(this.container);
 
@@ -258,6 +261,78 @@ class App {
 
   showDisclaimer() {
     alert('Medical Disclaimer: This tool is for clinical decision support only. Always use clinical judgment and follow local protocols.');
+  }
+
+  async registerServiceWorker() {
+    // Check if service workers are supported
+    if (!('serviceWorker' in navigator)) {
+      console.log('Service Workers not supported');
+      return;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.register('/0825/sw.js', {
+        scope: '/0825/'
+      });
+
+      console.log('Service Worker registered successfully:', registration);
+
+      // Handle service worker updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        console.log('New service worker found');
+
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            console.log('New service worker installed, update available');
+            // Could show update notification here
+            this.showUpdateNotification();
+          }
+        });
+      });
+
+      // Listen for service worker messages
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        console.log('Message from service worker:', event.data);
+      });
+
+    } catch (error) {
+      console.error('Service Worker registration failed:', error);
+    }
+  }
+
+  showUpdateNotification() {
+    // Show a subtle notification that an update is available
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1001;
+      font-size: 0.9rem;
+      max-width: 300px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    `;
+    notification.textContent = 'App update available - Tap to refresh';
+    
+    notification.addEventListener('click', () => {
+      window.location.reload();
+    });
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 10000);
   }
 
   destroy() {

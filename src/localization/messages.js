@@ -13,6 +13,11 @@ export const messages = {
     step1: 'Initial Assessment',
     step2: 'Data Collection', 
     step3: 'Results',
+    
+    // Module titles
+    comaModuleTitle: 'Coma Module',
+    limitedDataModuleTitle: 'Limited Data Module',
+    fullStrokeModuleTitle: 'Full Stroke Module',
 
     // Triage 1
     triage1Title: 'Patient Assessment',
@@ -55,6 +60,48 @@ export const messages = {
     analyzing: 'Analyzing...',
     printResults: 'Print Results',
     newAssessment: 'Start New Assessment',
+    startOver: 'Start Over',
+    goBack: 'Go Back',
+    goHome: 'Go Home',
+    
+    // Form sections
+    basicInformation: 'Basic Information',
+    biomarkersScores: 'Biomarkers & Scores',
+    clinicalSymptoms: 'Clinical Symptoms',
+    medicalHistory: 'Medical History',
+    
+    // Form labels with units
+    ageYearsLabel: 'Age (years)',
+    systolicBpLabel: 'Systolic BP (mmHg)',
+    diastolicBpLabel: 'Diastolic BP (mmHg)',
+    gfapValueLabel: 'GFAP Value (pg/mL)',
+    fastEdScoreLabel: 'FAST-ED Score',
+    
+    // Help text
+    ageYearsHelp: "Patient's age in years",
+    systolicBpHelp: 'Normal: 90-140 mmHg',
+    diastolicBpHelp: 'Normal: 60-90 mmHg',
+    gfapTooltip: 'Brain injury biomarker',
+    gfapTooltipLong: 'Glial Fibrillary Acidic Protein - Brain injury biomarker',
+    gfapRange: 'Range: {min} - {max} pg/mL',
+    fastEdTooltip: '0-9 scale for LVO screening',
+    
+    // Module buttons
+    analyzeIchRisk: 'Analyze ICH Risk',
+    analyzeStrokeRisk: 'Analyze Stroke Risk',
+    
+    // Alert messages
+    criticalPatient: 'Critical Patient',
+    comaAlert: 'Patient is comatose (GCS < 8). Rapid assessment required.',
+    vigilanceReduction: 'Vigilance Reduction (Decreased alertness)',
+    
+    // Additional symptom labels
+    armParesis: 'Arm Paresis',
+    legParesis: 'Leg Paresis',
+    eyeDeviation: 'Eye Deviation',
+    atrialFibrillation: 'Atrial Fibrillation',
+    onNoacDoac: 'On NOAC/DOAC',
+    onAntiplatelets: 'On Antiplatelets',
 
     // Results
     resultsTitle: 'Assessment Results',
@@ -105,6 +152,10 @@ export const messages = {
     disclaimerText: 'This tool is for clinical decision support only. Always use clinical judgment and follow local protocols. Not a replacement for physician assessment.',
     importantNote: 'Important',
     importantText: 'These results are for clinical decision support only. Always use clinical judgment and follow institutional protocols.',
+    
+    // Input Summary
+    inputSummaryTitle: 'Input Summary',
+    inputSummarySubtitle: 'Values used for this analysis',
 
     // Footer
     privacyLink: 'Privacy Policy',
@@ -148,6 +199,7 @@ export const messages = {
     travelTimeNote: 'Travel times calculated for emergency vehicles with sirens and priority routing.',
     calculatingTravelTimes: 'Calculating travel times',
     minutes: 'min',
+    poweredByOrs: 'Travel times powered by OpenRoute Service',
     
     // Center Types and Services
     comprehensiveCenter: 'Comprehensive Stroke Center',
@@ -178,6 +230,11 @@ export const messages = {
     step1: 'Erstbeurteilung',
     step2: 'Datenerhebung',
     step3: 'Ergebnisse',
+    
+    // Module titles
+    comaModuleTitle: 'Koma-Modul',
+    limitedDataModuleTitle: 'Begrenzte Daten Modul',
+    fullStrokeModuleTitle: 'Vollständiges Schlaganfall-Modul',
 
     // Triage 1
     triage1Title: 'Patientenbeurteilung',
@@ -220,6 +277,48 @@ export const messages = {
     analyzing: 'Analysiere...',
     printResults: 'Ergebnisse drucken',
     newAssessment: 'Neue Bewertung starten',
+    startOver: 'Von vorn beginnen',
+    goBack: 'Zurück',
+    goHome: 'Zur Startseite',
+    
+    // Form sections
+    basicInformation: 'Grundinformationen',
+    biomarkersScores: 'Biomarker & Scores',
+    clinicalSymptoms: 'Klinische Symptome',
+    medicalHistory: 'Anamnese',
+    
+    // Form labels with units
+    ageYearsLabel: 'Alter (Jahre)',
+    systolicBpLabel: 'Systolischer RR (mmHg)',
+    diastolicBpLabel: 'Diastolischer RR (mmHg)',
+    gfapValueLabel: 'GFAP-Wert (pg/mL)',
+    fastEdScoreLabel: 'FAST-ED-Score',
+    
+    // Help text
+    ageYearsHelp: 'Patientenalter in Jahren',
+    systolicBpHelp: 'Normal: 90-140 mmHg',
+    diastolicBpHelp: 'Normal: 60-90 mmHg',
+    gfapTooltip: 'Hirnverletzungs-Biomarker',
+    gfapTooltipLong: 'Glial Fibrillary Acidic Protein - Hirnverletzungs-Biomarker',
+    gfapRange: 'Bereich: {min} - {max} pg/mL',
+    fastEdTooltip: '0-9 Skala für LVO-Screening',
+    
+    // Module buttons
+    analyzeIchRisk: 'ICB-Risiko analysieren',
+    analyzeStrokeRisk: 'Schlaganfall-Risiko analysieren',
+    
+    // Alert messages
+    criticalPatient: 'Kritischer Patient',
+    comaAlert: 'Patient ist komatös (GCS < 8). Schnelle Beurteilung erforderlich.',
+    vigilanceReduction: 'Vigilanzminderung (Verminderte Wachheit)',
+    
+    // Additional symptom labels
+    armParesis: 'Armparese',
+    legParesis: 'Beinparese',
+    eyeDeviation: 'Blickdeviation',
+    atrialFibrillation: 'Vorhofflimmern',
+    onNoacDoac: 'NOAK/DOAK-Therapie',
+    onAntiplatelets: 'Thrombozytenaggregationshemmer',
 
     // Results
     resultsTitle: 'Bewertungsergebnisse',
@@ -266,6 +365,10 @@ export const messages = {
     disclaimerText: 'Dieses Tool dient nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie lokale Protokolle. Kein Ersatz für ärztliche Beurteilung.',
     importantNote: 'Wichtig',
     importantText: 'Diese Ergebnisse dienen nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie institutionelle Protokolle.',
+    
+    // Input Summary
+    inputSummaryTitle: 'Eingabezusammenfassung',
+    inputSummarySubtitle: 'Für diese Analyse verwendete Werte',
 
     // Footer
     privacyLink: 'Datenschutzrichtlinie',
@@ -309,6 +412,7 @@ export const messages = {
     travelTimeNote: 'Fahrzeiten berechnet für Rettungsfahrzeuge mit Sondersignalen und Vorfahrtsberechtigung.',
     calculatingTravelTimes: 'Fahrzeiten werden berechnet',
     minutes: 'Min',
+    poweredByOrs: 'Fahrzeiten bereitgestellt von OpenRoute Service',
     
     // Center Types and Services
     comprehensiveCenter: 'Überregionales Schlaganfall-Zentrum',

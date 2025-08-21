@@ -8,7 +8,8 @@ class Store {
       sessionId: null,
       startTime: null,
       formData: {},
-      validationErrors: {}
+      validationErrors: {},
+      screenHistory: []
     };
     
     this.listeners = new Set();
@@ -50,7 +51,39 @@ class Store {
   // Navigate to a new screen
   navigate(screen) {
     console.log(`Navigating from ${this.state.currentScreen} to ${screen}`);
-    this.setState({ currentScreen: screen });
+    const history = [...this.state.screenHistory];
+    
+    // Add current screen to history if not already there
+    if (this.state.currentScreen !== screen && !history.includes(this.state.currentScreen)) {
+      history.push(this.state.currentScreen);
+    }
+    
+    this.setState({ 
+      currentScreen: screen, 
+      screenHistory: history 
+    });
+  }
+  
+  // Navigate back to previous screen
+  goBack() {
+    const history = [...this.state.screenHistory];
+    if (history.length > 0) {
+      const previousScreen = history.pop();
+      this.setState({ 
+        currentScreen: previousScreen, 
+        screenHistory: history 
+      });
+      return true;
+    }
+    return false;
+  }
+  
+  // Navigate to home screen
+  goHome() {
+    this.setState({ 
+      currentScreen: 'triage1',
+      screenHistory: []
+    });
   }
   
   // Store form data for a specific module
@@ -93,7 +126,8 @@ class Store {
       sessionId: this.generateSessionId(),
       startTime: Date.now(),
       formData: {},
-      validationErrors: {}
+      validationErrors: {},
+      screenHistory: []
     };
     this.setState(newState);
     console.log('Store reset with new session:', newState.sessionId);

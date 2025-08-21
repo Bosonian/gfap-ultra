@@ -1,104 +1,105 @@
 import { renderProgressIndicator } from '../components/progress.js';
 import { GFAP_RANGES } from '../../config.js';
+import { t } from '../../localization/i18n.js';
 
 export function renderFull() {
   return `
     <div class="container">
       ${renderProgressIndicator(2)}
-      <h2>Full Stroke Module</h2>
+      <h2>${t('fullStrokeModuleTitle') || 'Full Stroke Module'}</h2>
       <form data-module="full">
-        <h3>Basic Information</h3>
+        <h3>${t('basicInformation')}</h3>
         <div class="input-grid">
           <div class="input-group">
-            <label for="age_years">Age (years)</label>
+            <label for="age_years">${t('ageYearsLabel')}</label>
             <input type="number" name="age_years" id="age_years" min="0" max="120" required>
           </div>
           <div class="input-group">
-            <label for="systolic_bp">Systolic BP (mmHg)</label>
+            <label for="systolic_bp">${t('systolicBpLabel')}</label>
             <input type="number" name="systolic_bp" id="systolic_bp" min="60" max="300" required>
           </div>
           <div class="input-group">
-            <label for="diastolic_bp">Diastolic BP (mmHg)</label>
+            <label for="diastolic_bp">${t('diastolicBpLabel')}</label>
             <input type="number" name="diastolic_bp" id="diastolic_bp" min="30" max="200" required>
           </div>
         </div>
 
-        <h3>Biomarkers & Scores</h3>
+        <h3>${t('biomarkersScores')}</h3>
         <div class="input-grid">
           <div class="input-group">
             <label for="gfap_value">
-              GFAP Value (pg/mL)
+              ${t('gfapValueLabel')}
               <span class="tooltip">ℹ️
-                <span class="tooltiptext">Brain injury biomarker</span>
+                <span class="tooltiptext">${t('gfapTooltip')}</span>
               </span>
             </label>
             <input type="number" name="gfap_value" id="gfap_value" min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" step="0.1" required>
           </div>
           <div class="input-group">
             <label for="fast_ed_score">
-              FAST-ED Score
+              ${t('fastEdScoreLabel')}
               <span class="tooltip">ℹ️
-                <span class="tooltiptext">0-9 scale for LVO screening</span>
+                <span class="tooltiptext">${t('fastEdTooltip')}</span>
               </span>
             </label>
             <input type="number" name="fast_ed_score" id="fast_ed_score" min="0" max="9" required>
           </div>
         </div>
 
-        <h3>Clinical Symptoms</h3>
+        <h3>${t('clinicalSymptoms')}</h3>
         <div class="input-grid">
           <div class="checkbox-group">
             <label class="checkbox-wrapper">
               <input type="checkbox" name="headache" id="headache">
-              <span class="checkbox-label">Headache</span>
+              <span class="checkbox-label">${t('headacheLabel')}</span>
             </label>
             <label class="checkbox-wrapper">
               <input type="checkbox" name="vigilanzminderung" id="vigilanzminderung">
-              <span class="checkbox-label">Vigilance Reduction</span>
+              <span class="checkbox-label">${t('vigilanzLabel')}</span>
             </label>
           </div>
           <div class="checkbox-group">
             <label class="checkbox-wrapper">
               <input type="checkbox" name="armparese" id="armparese">
-              <span class="checkbox-label">Arm Paresis</span>
+              <span class="checkbox-label">${t('armParesis')}</span>
             </label>
             <label class="checkbox-wrapper">
               <input type="checkbox" name="beinparese" id="beinparese">
-              <span class="checkbox-label">Leg Paresis</span>
+              <span class="checkbox-label">${t('legParesis')}</span>
             </label>
           </div>
           <div class="checkbox-group">
             <label class="checkbox-wrapper">
               <input type="checkbox" name="eye_deviation" id="eye_deviation">
-              <span class="checkbox-label">Eye Deviation</span>
+              <span class="checkbox-label">${t('eyeDeviation')}</span>
             </label>
           </div>
         </div>
 
-        <h3>Medical History</h3>
+        <h3>${t('medicalHistory')}</h3>
         <div class="input-grid">
           <div class="checkbox-group">
             <label class="checkbox-wrapper">
               <input type="checkbox" name="atrial_fibrillation" id="atrial_fibrillation">
-              <span class="checkbox-label">Atrial Fibrillation</span>
+              <span class="checkbox-label">${t('atrialFibrillation')}</span>
             </label>
           </div>
           <div class="checkbox-group">
             <label class="checkbox-wrapper">
               <input type="checkbox" name="anticoagulated_noak" id="anticoagulated_noak">
-              <span class="checkbox-label">On NOAC/DOAC</span>
+              <span class="checkbox-label">${t('onNoacDoac')}</span>
             </label>
           </div>
           <div class="checkbox-group">
             <label class="checkbox-wrapper">
               <input type="checkbox" name="antiplatelets" id="antiplatelets">
-              <span class="checkbox-label">On Antiplatelets</span>
+              <span class="checkbox-label">${t('onAntiplatelets')}</span>
             </label>
           </div>
         </div>
 
-        <button type="submit" class="primary">Analyze Stroke Risk</button>
-        <button type="button" class="secondary" data-action="reset">Start Over</button>
+        <button type="submit" class="primary">${t('analyzeStrokeRisk')}</button>
+        <button type="button" class="secondary" data-action="reset">${t('startOver')}</button>
       </form>
     </div>
   `;

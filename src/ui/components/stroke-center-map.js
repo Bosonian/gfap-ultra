@@ -144,6 +144,7 @@ async function showNearestCenters(lat, lng, results, resultsContainer) {
       
       <div class="travel-time-note">
         <small>${t('travelTimeNote')}</small>
+        <br><small class="powered-by">${t('poweredByOrs')}</small>
       </div>
     `;
     

@@ -34,6 +34,20 @@ export function reset() {
   store.reset();
 }
 
+export function goBack() {
+  const success = store.goBack();
+  if (success) {
+    store.logEvent('navigate_back');
+    window.scrollTo(0, 0);
+  }
+}
+
+export function goHome() {
+  store.logEvent('navigate_home');
+  store.goHome();
+  window.scrollTo(0, 0);
+}
+
 export async function handleSubmit(e, container) {
   e.preventDefault();
   const form = e.target;

@@ -5,7 +5,7 @@ import { renderComa } from './screens/coma.js';
 import { renderLimited } from './screens/limited.js';
 import { renderFull } from './screens/full.js';
 import { renderResults } from './screens/results.js';
-import { handleTriage1, handleTriage2, handleSubmit, reset } from '../logic/handlers.js';
+import { handleTriage1, handleTriage2, handleSubmit, reset, goBack, goHome } from '../logic/handlers.js';
 import { clearValidationErrors } from '../logic/validate.js';
 import { announceScreenChange, setPageTitle, focusMainHeading } from './a11y.js';
 import { initializeStrokeCenterMap } from './components/stroke-center-map.js';
@@ -106,6 +106,12 @@ function attachEvents(container) {
           break;
         case 'reset':
           reset();
+          break;
+        case 'goBack':
+          goBack();
+          break;
+        case 'goHome':
+          goHome();
           break;
       }
     });
