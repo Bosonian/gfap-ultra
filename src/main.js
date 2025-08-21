@@ -1,6 +1,8 @@
 import { store } from './state/store.js';
 import { render } from './ui/render.js';
 import { APP_CONFIG } from './config.js';
+import { i18n, t } from './localization/i18n.js';
+import { initializeStrokeCenterMap } from './ui/components/stroke-center-map.js';
 
 class App {
   constructor() {
@@ -26,11 +28,20 @@ class App {
       render(this.container);
     });
 
+    // Subscribe to language changes
+    window.addEventListener('languageChanged', () => {
+      this.updateUILanguage();
+      render(this.container);
+    });
+
     // Setup global event listeners
     this.setupGlobalEventListeners();
 
     // Initialize theme
     this.initializeTheme();
+    
+    // Initialize language
+    this.updateUILanguage();
 
     // Start auto-save
     this.startAutoSave();
@@ -48,6 +59,12 @@ class App {
   }
 
   setupGlobalEventListeners() {
+    // Language toggle
+    const languageToggle = document.getElementById('languageToggle');
+    if (languageToggle) {
+      languageToggle.addEventListener('click', () => this.toggleLanguage());
+    }
+
     // Dark mode toggle
     const darkModeToggle = document.getElementById('darkModeToggle');
     if (darkModeToggle) {
@@ -124,6 +141,60 @@ class App {
     if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.body.classList.add('dark-mode');
       if (darkModeToggle) darkModeToggle.textContent = '☀️';
+    }
+  }
+
+  toggleLanguage() {
+    i18n.toggleLanguage();
+    this.updateUILanguage();
+  }
+
+  updateUILanguage() {
+    // Update HTML lang attribute
+    document.documentElement.lang = i18n.getCurrentLanguage();
+    
+    // Update header text
+    const headerTitle = document.querySelector('.app-header h1');
+    if (headerTitle) {
+      headerTitle.textContent = t('appTitle');
+    }
+    
+    const emergencyBadge = document.querySelector('.emergency-badge');
+    if (emergencyBadge) {
+      emergencyBadge.textContent = t('emergencyBadge');
+    }
+    
+    // Update button tooltips
+    const languageToggle = document.getElementById('languageToggle');
+    if (languageToggle) {
+      languageToggle.title = t('languageToggle');
+      languageToggle.setAttribute('aria-label', t('languageToggle'));
+    }
+    
+    const helpButton = document.getElementById('helpButton');
+    if (helpButton) {
+      helpButton.title = t('helpButton');
+      helpButton.setAttribute('aria-label', t('helpButton'));
+    }
+    
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+      darkModeToggle.title = t('darkModeButton');
+      darkModeToggle.setAttribute('aria-label', t('darkModeButton'));
+    }
+    
+    // Update help modal
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle) {
+      modalTitle.textContent = t('helpTitle');
+    }
+    
+    // Initialize stroke center map if present
+    const currentState = store.getState();
+    if (currentState.currentScreen === 'results' && currentState.results) {
+      setTimeout(() => {
+        initializeStrokeCenterMap(currentState.results);
+      }, 100);
     }
   }
 

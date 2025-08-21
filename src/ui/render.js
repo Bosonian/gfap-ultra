@@ -8,6 +8,7 @@ import { renderResults } from './screens/results.js';
 import { handleTriage1, handleTriage2, handleSubmit, reset } from '../logic/handlers.js';
 import { clearValidationErrors } from '../logic/validate.js';
 import { announceScreenChange, setPageTitle, focusMainHeading } from './a11y.js';
+import { initializeStrokeCenterMap } from './components/stroke-center-map.js';
 
 export function render(container) {
   const state = store.getState();
@@ -52,6 +53,13 @@ export function render(container) {
 
   // Attach event listeners
   attachEvents(container);
+
+  // Initialize stroke center map if on results screen
+  if (currentScreen === 'results' && results) {
+    setTimeout(() => {
+      initializeStrokeCenterMap(results);
+    }, 100);
+  }
 
   // Accessibility updates
   announceScreenChange(currentScreen);
