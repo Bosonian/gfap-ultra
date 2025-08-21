@@ -664,4 +664,4 @@
       cursor: pointer;
       transition: all 0.3s ease;
     `,t.textContent="App update available - Tap to refresh",t.addEventListener("click",()=>{window.location.reload()}),document.body.appendChild(t),setTimeout(()=>{t.parentNode&&t.remove()},1e4)}destroy(){this.unsubscribe&&this.unsubscribe()}}const Ye=new je;Ye.init();
-//# sourceMappingURL=index-DZFzWtwM.js.map
+//# sourceMappingURL=index-CuMeTSY9.js.map
