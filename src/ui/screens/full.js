@@ -39,10 +39,11 @@ export function renderFull() {
             <label for="fast_ed_score">
               ${t('fastEdScoreLabel')}
               <span class="tooltip">ℹ️
-                <span class="tooltiptext">${t('fastEdTooltip')}</span>
+                <span class="tooltiptext">${t('fastEdCalculatorSubtitle')}</span>
               </span>
             </label>
-            <input type="number" name="fast_ed_score" id="fast_ed_score" min="0" max="9" required>
+            <input type="number" name="fast_ed_score" id="fast_ed_score" min="0" max="9" required readonly placeholder="${t('fastEdCalculatorSubtitle')}" style="cursor: pointer;">
+            <input type="hidden" name="armparese" id="armparese_hidden" value="false">
           </div>
         </div>
 
@@ -59,10 +60,6 @@ export function renderFull() {
             </label>
           </div>
           <div class="checkbox-group">
-            <label class="checkbox-wrapper">
-              <input type="checkbox" name="armparese" id="armparese">
-              <span class="checkbox-label">${t('armParesis')}</span>
-            </label>
             <label class="checkbox-wrapper">
               <input type="checkbox" name="beinparese" id="beinparese">
               <span class="checkbox-label">${t('legParesis')}</span>

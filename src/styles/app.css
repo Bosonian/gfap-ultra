@@ -832,6 +832,164 @@ button:disabled {
 
 .modal-close:hover { color: var(--danger-color); }
 
+/* FAST-ED Calculator Modal */
+.fast-ed-modal {
+    max-width: 700px;
+    max-height: 85vh;
+}
+
+.fast-ed-component {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.fast-ed-component h3 {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px 16px;
+    background: var(--container-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+    min-height: 48px; /* Touch target */
+}
+
+.radio-option:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 12px;
+    transform: scale(1.2);
+    accent-color: var(--primary-color);
+}
+
+.radio-option input[type="radio"]:checked + .radio-label {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.radio-label {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.fast-ed-total {
+    margin-top: 30px;
+    padding: 24px;
+    background: linear-gradient(135deg, var(--primary-light), var(--container-bg));
+    border-radius: 12px;
+    border: 2px solid var(--primary-color);
+}
+
+.score-display {
+    text-align: center;
+}
+
+.score-display h3 {
+    margin: 0 0 16px 0;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+}
+
+.total-score {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.risk-indicator {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.risk-indicator.low {
+    background: var(--success-light);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+.risk-indicator.high {
+    background: var(--danger-light);
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+    animation: pulse 2s infinite;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 0 0 0;
+    margin-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* Mobile optimizations for FAST-ED modal */
+@media (max-width: 768px) {
+    .fast-ed-modal {
+        max-width: 95vw;
+        max-height: 90vh;
+        margin: 10px;
+    }
+    
+    .fast-ed-component {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .radio-option {
+        padding: 16px 12px;
+        min-height: 52px; /* Larger touch targets on mobile */
+    }
+    
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+        padding: 16px;
+        font-size: 1rem;
+    }
+}
+
 /* Disclaimer */
 .disclaimer {
     background: var(--info-bg);

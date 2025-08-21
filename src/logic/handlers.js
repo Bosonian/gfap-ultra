@@ -77,6 +77,13 @@ export async function handleSubmit(e, container) {
       } else if (element.type === 'number') {
         const n = parseFloat(element.value);
         inputs[element.name] = isNaN(n) ? 0 : n;
+      } else if (element.type === 'hidden') {
+        // Handle hidden fields (like armparese from FAST-ED)
+        if (element.name === 'armparese') {
+          inputs[element.name] = element.value === 'true';
+        } else {
+          inputs[element.name] = element.value;
+        }
       } else {
         inputs[element.name] = element.value;
       }

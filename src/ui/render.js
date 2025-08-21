@@ -9,6 +9,7 @@ import { handleTriage1, handleTriage2, handleSubmit, reset, goBack, goHome } fro
 import { clearValidationErrors } from '../logic/validate.js';
 import { announceScreenChange, setPageTitle, focusMainHeading } from './a11y.js';
 import { initializeStrokeCenterMap } from './components/stroke-center-map.js';
+import { fastEdCalculator } from './components/fastEdModal.js';
 
 export function render(container) {
   const state = store.getState();
@@ -128,5 +129,39 @@ function attachEvents(container) {
   const printButton = container.querySelector('#printResults');
   if (printButton) {
     printButton.addEventListener('click', () => window.print());
+  }
+
+  // FAST-ED calculator handler
+  const fastEdInput = container.querySelector('#fast_ed_score');
+  if (fastEdInput) {
+    fastEdInput.addEventListener('click', (e) => {
+      e.preventDefault();
+      const currentValue = parseInt(fastEdInput.value) || 0;
+      
+      fastEdCalculator.show(currentValue, (result) => {
+        // Update FAST-ED score
+        fastEdInput.value = result.total;
+        
+        // Update hidden arm weakness field
+        const armPareseField = container.querySelector('#armparese_hidden');
+        if (armPareseField) {
+          armPareseField.value = result.armWeaknessBoolean ? 'true' : 'false';
+        }
+        
+        // Update eye deviation checkbox if exists
+        const eyeDeviationCheckbox = container.querySelector('#eye_deviation');
+        if (eyeDeviationCheckbox) {
+          eyeDeviationCheckbox.checked = result.eyeDeviationBoolean;
+        }
+        
+        // Trigger change event to save form data
+        fastEdInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+    
+    // Prevent manual typing
+    fastEdInput.addEventListener('keydown', (e) => {
+      e.preventDefault();
+    });
   }
 }
