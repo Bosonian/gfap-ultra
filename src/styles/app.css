@@ -52,19 +52,23 @@ body.dark-mode {
 html {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
 }
 
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
-    line-height: 1.65;
+    line-height: 1.5;
     background-color: var(--background-color);
     color: var(--text-color);
-    padding-top: 70px;
+    padding-top: 64px; /* Reduced from 70px for better mobile spacing */
     transition: background-color var(--transition-normal), color var(--transition-normal);
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     font-weight: 400;
     letter-spacing: -0.01em;
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* Header Styles */
@@ -72,7 +76,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 14px 20px;
+    height: 64px; /* Fixed height for consistency */
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
     color: white;
     position: fixed;
@@ -81,6 +86,7 @@ body {
     right: 0;
     z-index: 1000;
     box-shadow: var(--shadow-md);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 }
 
@@ -127,8 +133,8 @@ body {
 /* Container Styles */
 .container {
     max-width: 800px;
-    margin: 40px auto;
-    padding: 40px;
+    margin: 24px auto;
+    padding: 32px;
     background-color: var(--container-bg);
     border-radius: 16px;
     box-shadow: var(--shadow-lg);
@@ -466,12 +472,18 @@ button.tertiary {
     box-shadow: var(--shadow-sm);
 }
 
-button.tertiary:hover {
+button.tertiary:hover, button.tertiary:focus {
     background: var(--input-bg);
     color: var(--text-color);
     border-color: var(--primary-color);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
+}
+
+button.tertiary:active {
+    transform: translateY(0);
+    background: var(--primary-color);
+    color: white;
 }
 
 button:disabled {
@@ -864,13 +876,12 @@ footer {
 /* Large mobile and up */
 @media (max-width: 768px) {
     body {
-        padding-top: 60px; /* Smaller header on mobile */
+        padding-top: 56px; /* Optimized mobile header height */
     }
     
     .app-header {
         padding: 8px 16px;
-        position: fixed;
-        height: 60px;
+        height: 56px; /* Standard mobile header height */
     }
     
     .app-header h1 {
@@ -888,9 +899,9 @@ footer {
     }
     
     .container { 
-        margin: 10px; 
-        padding: 16px; 
-        border-radius: 8px;
+        margin: 16px; 
+        padding: 20px; 
+        border-radius: 12px;
     }
     
     /* Typography adjustments for mobile */

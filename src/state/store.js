@@ -67,14 +67,18 @@ class Store {
   // Navigate back to previous screen
   goBack() {
     const history = [...this.state.screenHistory];
+    console.log('goBack() - current history:', history);
+    console.log('goBack() - current screen:', this.state.currentScreen);
     if (history.length > 0) {
       const previousScreen = history.pop();
+      console.log('goBack() - navigating to:', previousScreen);
       this.setState({ 
         currentScreen: previousScreen, 
         screenHistory: history 
       });
       return true;
     }
+    console.log('goBack() - no history available');
     return false;
   }
   

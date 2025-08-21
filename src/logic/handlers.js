@@ -35,14 +35,20 @@ export function reset() {
 }
 
 export function goBack() {
+  console.log('goBack() called');
   const success = store.goBack();
+  console.log('goBack() success:', success);
   if (success) {
     store.logEvent('navigate_back');
     window.scrollTo(0, 0);
+  } else {
+    console.log('No history available, going home instead');
+    goHome();
   }
 }
 
 export function goHome() {
+  console.log('goHome() called');
   store.logEvent('navigate_home');
   store.goHome();
   window.scrollTo(0, 0);
@@ -60,18 +66,24 @@ export async function handleSubmit(e, container) {
     return;
   }
 
-  // Collect inputs
-  const formData = new FormData(form);
+  // Collect inputs - handle all form elements including unchecked checkboxes
   const inputs = {};
-  formData.forEach((value, key) => {
-    const element = form.elements[key];
-    if (element && element.type === 'checkbox') {
-      inputs[key] = element.checked;
-    } else {
-      const n = parseFloat(value);
-      inputs[key] = isNaN(n) ? value : n;
+  
+  // Process all form elements to ensure checkboxes are included
+  Array.from(form.elements).forEach(element => {
+    if (element.name) {
+      if (element.type === 'checkbox') {
+        inputs[element.name] = element.checked;
+      } else if (element.type === 'number') {
+        const n = parseFloat(element.value);
+        inputs[element.name] = isNaN(n) ? 0 : n;
+      } else {
+        inputs[element.name] = element.value;
+      }
     }
   });
+  
+  console.log('Collected form inputs:', inputs);
 
   // Store form data
   store.setFormData(module, inputs);
