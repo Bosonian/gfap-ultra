@@ -187,30 +187,38 @@ export async function predictFullStroke(payload) {
       }
     });
     
-    // Extract ICH and LVO predictions with flexible field name handling
+    // Extract ICH and LVO predictions based on actual API response structure
+    const ichProbability = safeParseFloat(
+      response.ich_prediction?.probability || 
+      response.ich_probability || 
+      response.ich?.probability || 
+      response.ICH_probability || 
+      response.ich_prob || 
+      response.probability?.ich ||
+      response.results?.ich_probability, 0);
+    
+    const lvoProbability = safeParseFloat(
+      response.lvo_prediction?.probability || 
+      response.lvo_probability || 
+      response.lvo?.probability || 
+      response.LVO_probability || 
+      response.lvo_prob ||
+      response.probability?.lvo ||
+      response.results?.lvo_probability, 0);
+      
+    console.log('Extracted probabilities:', { ich: ichProbability, lvo: lvoProbability });
+
     const ichResult = {
-      probability: safeParseFloat(
-        response.ich_probability || 
-        response.ich?.probability || 
-        response.ICH_probability || 
-        response.ich_prob || 
-        response.probability?.ich ||
-        response.results?.ich_probability, 0),
-      drivers: response.ich_drivers || response.ich?.drivers || response.drivers?.ich || null,
-      confidence: safeParseFloat(response.ich_confidence || response.ich?.confidence, 0.85),
+      probability: ichProbability,
+      drivers: response.ich_prediction?.drivers || response.ich_drivers || response.ich?.drivers || response.drivers?.ich || null,
+      confidence: safeParseFloat(response.ich_prediction?.confidence || response.ich_confidence || response.ich?.confidence, 0.85),
       module: 'Full Stroke'
     };
     
     const lvoResult = {
-      probability: safeParseFloat(
-        response.lvo_probability || 
-        response.lvo?.probability || 
-        response.LVO_probability || 
-        response.lvo_prob ||
-        response.probability?.lvo ||
-        response.results?.lvo_probability, 0),
-      drivers: response.lvo_drivers || response.lvo?.drivers || response.drivers?.lvo || null,
-      confidence: safeParseFloat(response.lvo_confidence || response.lvo?.confidence, 0.85),
+      probability: lvoProbability,
+      drivers: response.lvo_prediction?.drivers || response.lvo_drivers || response.lvo?.drivers || response.drivers?.lvo || null,
+      confidence: safeParseFloat(response.lvo_prediction?.confidence || response.lvo_confidence || response.lvo?.confidence, 0.85),
       module: 'Full Stroke'
     };
     
