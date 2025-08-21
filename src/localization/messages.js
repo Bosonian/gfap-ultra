@@ -145,6 +145,9 @@ export const messages = {
     geocodingNotImplemented: 'Location search not available. Please use GPS or enter coordinates manually.',
     tryManualEntry: 'Try entering your location manually or use GPS.',
     distanceNote: 'Distances are calculated as straight-line distances. Actual travel times may vary.',
+    travelTimeNote: 'Travel times calculated for emergency vehicles with sirens and priority routing.',
+    calculatingTravelTimes: 'Calculating travel times',
+    minutes: 'min',
     
     // Center Types and Services
     comprehensiveCenter: 'Comprehensive Stroke Center',
@@ -303,6 +306,9 @@ export const messages = {
     geocodingNotImplemented: 'Standortsuche nicht verfügbar. Bitte verwenden Sie GPS oder geben Sie Koordinaten manuell ein.',
     tryManualEntry: 'Versuchen Sie, Ihren Standort manuell einzugeben oder GPS zu verwenden.',
     distanceNote: 'Entfernungen werden als Luftlinie berechnet. Tatsächliche Fahrzeiten können variieren.',
+    travelTimeNote: 'Fahrzeiten berechnet für Rettungsfahrzeuge mit Sondersignalen und Vorfahrtsberechtigung.',
+    calculatingTravelTimes: 'Fahrzeiten werden berechnet',
+    minutes: 'Min',
     
     // Center Types and Services
     comprehensiveCenter: 'Überregionales Schlaganfall-Zentrum',

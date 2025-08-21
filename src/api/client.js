@@ -176,18 +176,40 @@ export async function predictFullStroke(payload) {
     
     // Debug log the API response
     console.log('Full Stroke API Response:', response);
+    console.log('Available keys in response:', Object.keys(response));
+    console.log('Response type:', typeof response);
     
-    // Extract ICH and LVO predictions with proper null checks
+    // Try to identify probability values
+    Object.keys(response).forEach(key => {
+      const value = response[key];
+      if (typeof value === 'number' && value >= 0 && value <= 1) {
+        console.log(`Potential probability field: ${key} = ${value}`);
+      }
+    });
+    
+    // Extract ICH and LVO predictions with flexible field name handling
     const ichResult = {
-      probability: safeParseFloat(response.ich_probability || response.ich?.probability, 0),
-      drivers: response.ich_drivers || response.ich?.drivers || null,
+      probability: safeParseFloat(
+        response.ich_probability || 
+        response.ich?.probability || 
+        response.ICH_probability || 
+        response.ich_prob || 
+        response.probability?.ich ||
+        response.results?.ich_probability, 0),
+      drivers: response.ich_drivers || response.ich?.drivers || response.drivers?.ich || null,
       confidence: safeParseFloat(response.ich_confidence || response.ich?.confidence, 0.85),
       module: 'Full Stroke'
     };
     
     const lvoResult = {
-      probability: safeParseFloat(response.lvo_probability || response.lvo?.probability, 0),
-      drivers: response.lvo_drivers || response.lvo?.drivers || null,
+      probability: safeParseFloat(
+        response.lvo_probability || 
+        response.lvo?.probability || 
+        response.LVO_probability || 
+        response.lvo_prob ||
+        response.probability?.lvo ||
+        response.results?.lvo_probability, 0),
+      drivers: response.lvo_drivers || response.lvo?.drivers || response.drivers?.lvo || null,
       confidence: safeParseFloat(response.lvo_confidence || response.lvo?.confidence, 0.85),
       module: 'Full Stroke'
     };

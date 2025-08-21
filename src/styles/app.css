@@ -1018,6 +1018,25 @@ footer {
     font-size: 0.9rem;
 }
 
+.travel-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.travel-time .time {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.travel-time .distance {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: normal;
+    margin-top: 2px;
+}
+
 .center-details {
     margin-bottom: 20px;
 }

@@ -1,5 +1,5 @@
 // GPS-based stroke center map component
-import { findNearestStrokeCenters, getRecommendedStrokeCenters } from '../../data/stroke-centers.js';
+import { findNearestStrokeCenters, getRecommendedStrokeCenters, findNearestStrokeCentersWithTravelTime, getRecommendedStrokeCentersWithTravelTime } from '../../data/stroke-centers.js';
 import { t } from '../../localization/i18n.js';
 
 export function renderStrokeCenterMap(results) {
@@ -110,33 +110,75 @@ async function geocodeLocation(locationString, results, resultsContainer) {
   showLocationError(t('geocodingNotImplemented'), resultsContainer);
 }
 
-function showNearestCenters(lat, lng, results, resultsContainer) {
+async function showNearestCenters(lat, lng, results, resultsContainer) {
   const conditionType = determineConditionType(results);
-  const recommendations = getRecommendedStrokeCenters(lat, lng, conditionType);
   
-  const html = `
+  // Show loading state
+  resultsContainer.innerHTML = `
     <div class="location-info">
       <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
     </div>
-    
-    <div class="recommended-centers">
-      <h4>${t('recommendedCenters')}</h4>
-      ${renderStrokeCenterList(recommendations.recommended, true)}
-    </div>
-    
-    ${recommendations.alternative.length > 0 ? `
-      <div class="alternative-centers">
-        <h4>${t('alternativeCenters')}</h4>
-        ${renderStrokeCenterList(recommendations.alternative, false)}
-      </div>
-    ` : ''}
-    
-    <div class="distance-note">
-      <small>${t('distanceNote')}</small>
-    </div>
+    <div class="loading">${t('calculatingTravelTimes')}...</div>
   `;
   
-  resultsContainer.innerHTML = html;
+  try {
+    // Try to get travel time recommendations
+    const recommendations = await getRecommendedStrokeCentersWithTravelTime(lat, lng, conditionType);
+    
+    const html = `
+      <div class="location-info">
+        <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+      </div>
+      
+      <div class="recommended-centers">
+        <h4>${t('recommendedCenters')}</h4>
+        ${renderStrokeCenterList(recommendations.recommended, true)}
+      </div>
+      
+      ${recommendations.alternative.length > 0 ? `
+        <div class="alternative-centers">
+          <h4>${t('alternativeCenters')}</h4>
+          ${renderStrokeCenterList(recommendations.alternative, false)}
+        </div>
+      ` : ''}
+      
+      <div class="travel-time-note">
+        <small>${t('travelTimeNote')}</small>
+      </div>
+    `;
+    
+    resultsContainer.innerHTML = html;
+    
+  } catch (error) {
+    console.warn('Travel time calculation failed, falling back to distance:', error);
+    
+    // Fallback to distance-based recommendations
+    const recommendations = getRecommendedStrokeCenters(lat, lng, conditionType);
+    
+    const html = `
+      <div class="location-info">
+        <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+      </div>
+      
+      <div class="recommended-centers">
+        <h4>${t('recommendedCenters')}</h4>
+        ${renderStrokeCenterList(recommendations.recommended, true)}
+      </div>
+      
+      ${recommendations.alternative.length > 0 ? `
+        <div class="alternative-centers">
+          <h4>${t('alternativeCenters')}</h4>
+          ${renderStrokeCenterList(recommendations.alternative, false)}
+        </div>
+      ` : ''}
+      
+      <div class="distance-note">
+        <small>${t('distanceNote')}</small>
+      </div>
+    `;
+    
+    resultsContainer.innerHTML = html;
+  }
 }
 
 function renderStrokeCenterList(centers, isRecommended = false) {
@@ -149,7 +191,14 @@ function renderStrokeCenterList(centers, isRecommended = false) {
       <div class="center-header">
         <h5>${center.name}</h5>
         <span class="center-type ${center.type}">${t(center.type + 'Center')}</span>
-        <span class="distance">${center.distance.toFixed(1)} km</span>
+        ${center.travelTime ? `
+          <span class="travel-time">
+            <span class="time">${center.travelTime} ${t('minutes')}</span>
+            <span class="distance">(${center.distance} km)</span>
+          </span>
+        ` : `
+          <span class="distance">${center.distance.toFixed(1)} km</span>
+        `}
       </div>
       
       <div class="center-details">

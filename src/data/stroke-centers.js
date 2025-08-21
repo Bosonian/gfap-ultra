@@ -341,7 +341,7 @@ export function getStrokeCenterById(id) {
   return strokeCenters.find(center => center.id === id);
 }
 
-// Calculate distance between two coordinates using Haversine formula
+// Calculate distance between two coordinates using Haversine formula (fallback)
 export function calculateDistance(lat1, lng1, lat2, lng2) {
   const R = 6371; // Earth's radius in kilometers
   const dLat = toRadians(lat2 - lat1);
@@ -358,7 +358,123 @@ function toRadians(degrees) {
   return degrees * (Math.PI / 180);
 }
 
-// Find nearest stroke centers to given coordinates
+// Calculate travel time using OpenRoute Service API
+export async function calculateTravelTime(fromLat, fromLng, toLat, toLng, profile = 'driving-car') {
+  try {
+    // Using OpenRoute Service (free tier)
+    const url = `https://api.openrouteservice.org/v2/directions/${profile}`;
+    const body = {
+      coordinates: [[fromLng, fromLat], [toLng, toLat]],
+      radiuses: [1000, 1000], // Allow 1km radius for routing
+      format: 'json'
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+        'Authorization': '5b3ce3597851110001cf624868c4c27b63ae476c9c26c8bffbc35688', // Free tier key
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Routing API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.routes && data.routes.length > 0) {
+      const route = data.routes[0];
+      return {
+        duration: Math.round(route.summary.duration / 60), // Convert to minutes
+        distance: Math.round(route.summary.distance / 1000), // Convert to km
+        source: 'routing'
+      };
+    } else {
+      throw new Error('No route found');
+    }
+  } catch (error) {
+    console.warn('Travel time calculation failed, using distance estimate:', error);
+    
+    // Fallback to distance-based time estimation
+    const distance = calculateDistance(fromLat, fromLng, toLat, toLng);
+    const estimatedTime = Math.round(distance / 0.8); // Assume 48 km/h average (urban + highway)
+    
+    return {
+      duration: estimatedTime,
+      distance: Math.round(distance),
+      source: 'estimated'
+    };
+  }
+}
+
+// Enhanced travel time calculation for emergency vehicles
+export async function calculateEmergencyTravelTime(fromLat, fromLng, toLat, toLng) {
+  try {
+    // For emergency vehicles, we can use a faster profile and adjust
+    const result = await calculateTravelTime(fromLat, fromLng, toLat, toLng, 'driving-car');
+    
+    // Reduce time by 25% for emergency vehicle (sirens, priority routing)
+    const emergencyDuration = Math.round(result.duration * 0.75);
+    
+    return {
+      duration: emergencyDuration,
+      distance: result.distance,
+      source: result.source === 'routing' ? 'emergency-routing' : 'emergency-estimated'
+    };
+  } catch (error) {
+    // Fallback calculation
+    const distance = calculateDistance(fromLat, fromLng, toLat, toLng);
+    const emergencyTime = Math.round(distance / 1.2); // Assume 72 km/h for emergency vehicles
+    
+    return {
+      duration: emergencyTime,
+      distance: Math.round(distance), 
+      source: 'emergency-estimated'
+    };
+  }
+}
+
+// Find nearest stroke centers with travel time calculation
+export async function findNearestStrokeCentersWithTravelTime(lat, lng, maxResults = 5, maxTime = 120, useEmergencyRouting = true) {
+  console.log('Calculating travel times to stroke centers...');
+  
+  const centersWithTravelTime = await Promise.all(
+    strokeCenters.map(async (center) => {
+      try {
+        const travelInfo = useEmergencyRouting 
+          ? await calculateEmergencyTravelTime(lat, lng, center.coordinates.lat, center.coordinates.lng)
+          : await calculateTravelTime(lat, lng, center.coordinates.lat, center.coordinates.lng);
+        
+        return {
+          ...center,
+          travelTime: travelInfo.duration,
+          distance: travelInfo.distance,
+          travelSource: travelInfo.source
+        };
+      } catch (error) {
+        console.warn(`Failed to calculate travel time to ${center.name}:`, error);
+        // Fallback to distance calculation
+        const distance = calculateDistance(lat, lng, center.coordinates.lat, center.coordinates.lng);
+        return {
+          ...center,
+          travelTime: Math.round(distance / 0.8), // Estimate: 48 km/h average
+          distance: Math.round(distance),
+          travelSource: 'fallback'
+        };
+      }
+    })
+  );
+
+  return centersWithTravelTime
+    .filter(center => center.travelTime <= maxTime)
+    .sort((a, b) => a.travelTime - b.travelTime)
+    .slice(0, maxResults);
+}
+
+// Find nearest stroke centers using distance (fallback/fast method)
 export function findNearestStrokeCenters(lat, lng, maxResults = 5, maxDistance = 100) {
   const centersWithDistance = strokeCenters.map(center => ({
     ...center,
@@ -371,7 +487,47 @@ export function findNearestStrokeCenters(lat, lng, maxResults = 5, maxDistance =
     .slice(0, maxResults);
 }
 
-// Get stroke center recommendations based on patient condition
+// Get stroke center recommendations with travel time (async)
+export async function getRecommendedStrokeCentersWithTravelTime(lat, lng, conditionType = 'stroke') {
+  const nearestCenters = await findNearestStrokeCentersWithTravelTime(lat, lng, 10, 120, true);
+  
+  if (conditionType === 'lvo' || conditionType === 'thrombectomy') {
+    // For LVO cases, prioritize comprehensive stroke centers within 60 minutes
+    const comprehensive = nearestCenters.filter(center => 
+      center.type === 'comprehensive' && 
+      center.services.includes('thrombectomy') &&
+      center.travelTime <= 60
+    );
+    
+    const primary = nearestCenters.filter(center => center.type === 'primary');
+    
+    return {
+      recommended: comprehensive.slice(0, 3),
+      alternative: primary.slice(0, 2)
+    };
+  }
+  
+  // For ICH cases, prioritize neurosurgical capabilities
+  if (conditionType === 'ich') {
+    const neurosurgical = nearestCenters.filter(center =>
+      center.services.includes('neurosurgery') &&
+      center.travelTime <= 45
+    );
+    
+    return {
+      recommended: neurosurgical.slice(0, 3),
+      alternative: nearestCenters.filter(c => !neurosurgical.includes(c)).slice(0, 2)
+    };
+  }
+  
+  // For general stroke cases, return nearest centers regardless of type
+  return {
+    recommended: nearestCenters.slice(0, 5),
+    alternative: []
+  };
+}
+
+// Get stroke center recommendations based on patient condition (fallback - distance only)
 export function getRecommendedStrokeCenters(lat, lng, conditionType = 'stroke') {
   const nearestCenters = findNearestStrokeCenters(lat, lng, 10);
   
