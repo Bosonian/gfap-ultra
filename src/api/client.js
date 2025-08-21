@@ -121,7 +121,25 @@ export async function predictLimitedIch(payload) {
 }
 
 export async function predictFullStroke(payload) {
-  const normalizedPayload = normalizeBooleans(payload);
+  // Ensure all required fields are present for the Full Stroke API
+  const fullPayload = {
+    age_years: payload.age_years,
+    systolic_bp: payload.systolic_bp,
+    diastolic_bp: payload.diastolic_bp,
+    gfap_value: payload.gfap_value,
+    fast_ed_score: payload.fast_ed_score,
+    // Ensure all checkbox fields are present (default to 0 if missing)
+    headache: payload.headache || 0,
+    vigilanzminderung: payload.vigilanzminderung || 0,
+    armparese: payload.armparese || 0,
+    beinparese: payload.beinparese || 0,
+    eye_deviation: payload.eye_deviation || 0,
+    atrial_fibrillation: payload.atrial_fibrillation || 0,
+    anticoagulated_noak: payload.anticoagulated_noak || 0,
+    antiplatelets: payload.antiplatelets || 0
+  };
+  
+  const normalizedPayload = normalizeBooleans(fullPayload);
   
   try {
     const response = await fetchJSON(API_URLS.FULL_STROKE, normalizedPayload);

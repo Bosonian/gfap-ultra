@@ -1,7 +1,6 @@
 import { renderProgressIndicator } from '../components/progress.js';
 import { renderCriticalAlert } from '../components/alerts.js';
 import { renderDriversSection } from '../components/drivers.js';
-import { renderRecommendations } from '../components/recommendations.js';
 import { getRiskLevel, formatTime } from '../../logic/formatters.js';
 import { CRITICAL_THRESHOLDS } from '../../config.js';
 
@@ -22,7 +21,6 @@ export function renderResults(results, startTime) {
           <div class="probability-marker" style="left: ${ichPercent}%">${ichPercent}%</div>
         </div>
         <p><strong>Risk Level:</strong> ${getRiskLevel(ichPercent, 'ich')}</p>
-        <p><strong>Confidence:</strong> ${(ich.confidence * 100).toFixed(0)}%</p>
       </div>
     `;
   }
@@ -49,14 +47,12 @@ export function renderResults(results, startTime) {
             <div class="probability-marker" style="left: ${lvoPercent}%">${lvoPercent}%</div>
           </div>
           <p><strong>Risk Level:</strong> ${getRiskLevel(lvoPercent, 'lvo')}</p>
-          <p><strong>Confidence:</strong> ${(lvo.confidence * 100).toFixed(0)}%</p>
         </div>
       `;
     }
   }
 
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
-  const recommendationsHtml = renderRecommendations(ich, lvo, startTime);
   const driversHtml = renderDriversSection(ich, lvo);
 
   return `
@@ -68,7 +64,6 @@ export function renderResults(results, startTime) {
       <div style="display: flex; flex-direction: column; gap: 20px;">
         ${ichHtml}
         ${lvoHtml}
-        ${recommendationsHtml}
       </div>
       ${driversHtml}
       <button type="button" class="primary" id="printResults"> 📄 Print Results </button>
