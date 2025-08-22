@@ -1,4 +1,5 @@
 import { API_URLS, APP_CONFIG } from '../config.js';
+import { extractDriversFromResponse, extractProbabilityFromResponse, extractConfidenceFromResponse } from './drivers.js';
 
 // Warm up Google Cloud Functions on app load
 export async function warmUpFunctions() {
@@ -261,38 +262,31 @@ export async function predictFullStroke(payload) {
       }
     });
     
-    // Extract ICH and LVO predictions based on actual API response structure
-    const ichProbability = safeParseFloat(
-      response.ich_prediction?.probability || 
-      response.ich_probability || 
-      response.ich?.probability || 
-      response.ICH_probability || 
-      response.ich_prob || 
-      response.probability?.ich ||
-      response.results?.ich_probability, 0);
+    // Clean extraction with proper API mapping
+    const ichProbability = extractProbabilityFromResponse(response, 'ICH');
+    const lvoProbability = extractProbabilityFromResponse(response, 'LVO');
     
-    const lvoProbability = safeParseFloat(
-      response.lvo_prediction?.probability || 
-      response.lvo_probability || 
-      response.lvo?.probability || 
-      response.LVO_probability || 
-      response.lvo_prob ||
-      response.probability?.lvo ||
-      response.results?.lvo_probability, 0);
-      
-    console.log('Extracted probabilities:', { ich: ichProbability, lvo: lvoProbability });
+    const ichDrivers = extractDriversFromResponse(response, 'ICH');
+    const lvoDrivers = extractDriversFromResponse(response, 'LVO');
+    
+    const ichConfidence = extractConfidenceFromResponse(response, 'ICH');
+    const lvoConfidence = extractConfidenceFromResponse(response, 'LVO');
+    
+    console.log('✅ Clean extraction results:');
+    console.log('  ICH:', { probability: ichProbability, hasDrivers: !!ichDrivers });
+    console.log('  LVO:', { probability: lvoProbability, hasDrivers: !!lvoDrivers });
 
     const ichResult = {
       probability: ichProbability,
-      drivers: response.ich_prediction?.drivers || response.ich_drivers || response.ich?.drivers || response.drivers?.ich || null,
-      confidence: safeParseFloat(response.ich_prediction?.confidence || response.ich_confidence || response.ich?.confidence, 0.85),
+      drivers: ichDrivers,
+      confidence: ichConfidence,
       module: 'Full Stroke'
     };
     
     const lvoResult = {
       probability: lvoProbability,
-      drivers: response.lvo_prediction?.drivers || response.lvo_drivers || response.lvo?.drivers || response.drivers?.lvo || null,
-      confidence: safeParseFloat(response.lvo_prediction?.confidence || response.lvo_confidence || response.lvo?.confidence, 0.85),
+      drivers: lvoDrivers,
+      confidence: lvoConfidence,
       module: 'Full Stroke'
     };
     

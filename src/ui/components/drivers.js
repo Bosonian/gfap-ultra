@@ -2,14 +2,23 @@ import { normalizeDrivers } from '../../logic/shap.js';
 import { t } from '../../localization/i18n.js';
 
 export function renderDriversSection(ich, lvo) {
-  // Debug logging for driver analysis
-  console.log('=== DRIVER DEBUG ===');
-  console.log('ICH result:', ich);
-  console.log('LVO result:', lvo);
-  console.log('ICH drivers raw:', ich?.drivers);
-  console.log('LVO drivers raw:', lvo?.drivers);
+  console.log('=== DRIVER RENDERING SECTION ===');
+  console.log('🧠 ICH result received:', { 
+    probability: ich?.probability, 
+    hasDrivers: !!ich?.drivers,
+    module: ich?.module 
+  });
+  console.log('🩸 LVO result received:', { 
+    probability: lvo?.probability, 
+    hasDrivers: !!lvo?.drivers,
+    module: lvo?.module,
+    notPossible: lvo?.notPossible 
+  });
   
-  if (!ich?.drivers && !lvo?.drivers) return '';
+  if (!ich?.drivers && !lvo?.drivers) {
+    console.log('❌ No drivers available for rendering');
+    return '';
+  }
   
   let html = `
     <div class="drivers-section">
@@ -21,10 +30,12 @@ export function renderDriversSection(ich, lvo) {
   `;
   
   if (ich?.drivers) {
+    console.log('🧠 Rendering ICH drivers panel');
     html += renderEnhancedDriversPanel(ich.drivers, 'ICH', 'ich', ich.probability);
   }
   
   if (lvo?.drivers && !lvo.notPossible) {
+    console.log('🩸 Rendering LVO drivers panel');
     html += renderEnhancedDriversPanel(lvo.drivers, 'LVO', 'lvo', lvo.probability);
   }
   
