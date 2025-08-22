@@ -157,7 +157,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     return `
       <div class="enhanced-drivers-panel ${type}">
         <div class="panel-header">
-          <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
+          <div class="panel-icon ${type}">${type === 'ich' ? '🩸' : '🧠'}</div>
           <div class="panel-title">
             <h4>${title} ${t('riskFactors')}</h4>
             <span class="panel-subtitle">${t('noDriverData')}</span>
@@ -178,7 +178,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     return `
       <div class="enhanced-drivers-panel ${type}">
         <div class="panel-header">
-          <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
+          <div class="panel-icon ${type}">${type === 'ich' ? '🩸' : '🧠'}</div>
           <div class="panel-title">
             <h4>${title} ${t('riskFactors')}</h4>
             <span class="panel-subtitle">${t('driverAnalysisUnavailable')}</span>
@@ -213,7 +213,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   let html = `
     <div class="enhanced-drivers-panel ${type}">
       <div class="panel-header">
-        <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
+        <div class="panel-icon ${type}">${type === 'ich' ? '🩸' : '🧠'}</div>
         <div class="panel-title">
           <h4>${title} ${t('riskFactors')}</h4>
           <span class="panel-subtitle">${t('contributingFactors')}</span>
