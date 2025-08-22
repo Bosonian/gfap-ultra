@@ -66,10 +66,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Skip API calls and external resources for now
+  // Skip non-cacheable requests
   if (request.url.includes('/api/') || 
       request.url.includes('googleapis.com') || 
-      request.url.includes('openrouteservice.org')) {
+      request.url.includes('openrouteservice.org') ||
+      request.url.startsWith('chrome-extension://') ||
+      request.url.startsWith('moz-extension://') ||
+      request.url.startsWith('safari-extension://') ||
+      request.url.includes('cloudfunctions.net')) {
     return;
   }
   
@@ -92,11 +96,14 @@ self.addEventListener('fetch', (event) => {
             // Clone the response
             const responseClone = networkResponse.clone();
             
-            // Add to dynamic cache
+            // Add to dynamic cache with error handling
             caches.open(DYNAMIC_CACHE)
               .then((cache) => {
                 console.log('[SW] Caching dynamic resource:', request.url);
-                cache.put(request, responseClone);
+                return cache.put(request, responseClone);
+              })
+              .catch((error) => {
+                console.warn('[SW] Failed to cache resource:', request.url, error);
               });
             
             return networkResponse;
