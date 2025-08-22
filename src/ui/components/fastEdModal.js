@@ -27,7 +27,7 @@ export class FastEdCalculator {
     const riskLevel = this.getRiskLevel();
     
     return `
-      <div id="fastEdModal" class="modal" role="dialog" aria-labelledby="fastEdModalTitle" aria-hidden="true" style="display: none;">
+      <div id="fastEdModal" class="modal" role="dialog" aria-labelledby="fastEdModalTitle" aria-hidden="true" style="display: none !important;">
         <div class="modal-content fast-ed-modal">
           <div class="modal-header">
             <h2 id="fastEdModalTitle">${t('fastEdCalculatorTitle')}</h2>
@@ -222,9 +222,9 @@ export class FastEdCalculator {
     
     this.setupEventListeners();
     
+    this.modal.setAttribute('aria-hidden', 'false');
     this.modal.style.display = 'flex';
     this.modal.classList.add('show');
-    this.modal.setAttribute('aria-hidden', 'false');
     
     // Focus first radio button
     const firstRadio = this.modal.querySelector('input[type="radio"]');

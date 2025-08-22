@@ -201,6 +201,13 @@ export async function predictFullStroke(payload) {
   // Debug log the payload being sent
   console.log('Full Stroke API Payload:', normalizedPayload);
   
+  // Specific FAST-ED debugging
+  if (normalizedPayload.fast_ed_score) {
+    console.log('🎯 FAST-ED Score being sent:', normalizedPayload.fast_ed_score);
+  } else {
+    console.log('⚠️  No FAST-ED score in payload!');
+  }
+  
   try {
     const response = await fetchJSON(API_URLS.FULL_STROKE, normalizedPayload);
     

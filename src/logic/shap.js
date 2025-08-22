@@ -79,6 +79,18 @@ function normalizeShapValues(drivers) {
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
   
   console.log('📊 All SHAP features sorted by weight:', features);
+  
+  // Specific check for FAST-ED related features
+  const fastEdFeatures = features.filter(f => 
+    f.label.toLowerCase().includes('fast') || 
+    f.label.toLowerCase().includes('ed') ||
+    f.label.includes('fast_ed')
+  );
+  if (fastEdFeatures.length > 0) {
+    console.log('🚨 FAST-ED Features Found:', fastEdFeatures);
+  } else {
+    console.log('⚠️  No FAST-ED features found in drivers!');
+  }
 
   const positive = features.filter(f => f.weight > 0);
   const negative = features.filter(f => f.weight < 0);
