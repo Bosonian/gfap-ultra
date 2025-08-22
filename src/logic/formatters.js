@@ -4,12 +4,10 @@ export function getRiskLevel(probabilityPercent, type) {
   const p = Number(probabilityPercent);
   const thresholds = CRITICAL_THRESHOLDS[type];
   
-  if (p >= thresholds.critical) {
-    return '🔴 CRITICAL RISK';
-  } else if (p >= thresholds.high) {
-    return '🟠 HIGH RISK';
-  } else if (p >= 30) {
-    return '🟡 MODERATE RISK';
+  if (p >= thresholds.high) {
+    return '🔴 HIGH RISK';
+  } else if (p >= thresholds.medium) {
+    return '🟡 MEDIUM RISK';
   } else {
     return '🟢 LOW RISK';
   }

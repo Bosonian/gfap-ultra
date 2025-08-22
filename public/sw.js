@@ -1,7 +1,8 @@
 // Service Worker for Stroke Triage Assistant PWA
-const CACHE_NAME = 'stroke-triage-v2.1.0';
-const STATIC_CACHE = 'stroke-triage-static-v2.1.0';
-const DYNAMIC_CACHE = 'stroke-triage-dynamic-v2.1.0';
+const VERSION = '2.2.0-' + Date.now(); // Add timestamp for cache busting
+const CACHE_NAME = 'stroke-triage-v' + VERSION;
+const STATIC_CACHE = 'stroke-triage-static-v' + VERSION;
+const DYNAMIC_CACHE = 'stroke-triage-dynamic-v' + VERSION;
 
 // Files to cache for offline functionality
 const STATIC_FILES = [
@@ -13,7 +14,10 @@ const STATIC_FILES = [
 
 // Install event - cache static files
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker');
+  console.log('[SW] Installing service worker version:', VERSION);
+  
+  // Skip waiting immediately to activate new version
+  self.skipWaiting();
   
   event.waitUntil(
     caches.open(STATIC_CACHE)
@@ -23,7 +27,6 @@ self.addEventListener('install', (event) => {
       })
       .then(() => {
         console.log('[SW] Static files cached successfully');
-        return self.skipWaiting();
       })
       .catch((error) => {
         console.error('[SW] Failed to cache static files:', error);

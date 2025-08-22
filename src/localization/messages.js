@@ -109,15 +109,13 @@ export const messages = {
     lvoProbability: 'LVO Probability',
     riskLevel: 'Risk Level',
     lowRisk: 'Low Risk',
-    moderateRisk: 'Moderate Risk', 
+    mediumRisk: 'Medium Risk', 
     highRisk: 'High Risk',
-    criticalRisk: 'Critical Risk',
 
     // Risk levels
     riskLow: 'Low',
-    riskModerate: 'Moderate',
-    riskHigh: 'High', 
-    riskCritical: 'Critical',
+    riskMedium: 'Medium',
+    riskHigh: 'High',
 
     // Drivers
     driversTitle: 'Model Drivers',
@@ -385,12 +383,14 @@ export const messages = {
     ichProbability: 'ICB-Wahrscheinlichkeit',
     lvoProbability: 'LVO-Wahrscheinlichkeit',
     riskLevel: 'Risikostufe',
+    lowRisk: 'Niedriges Risiko',
+    mediumRisk: 'Mittleres Risiko',
+    highRisk: 'Hohes Risiko',
 
     // Risk levels
     riskLow: 'Niedrig',
-    riskModerate: 'Mäßig',
+    riskMedium: 'Mittel',
     riskHigh: 'Hoch',
-    riskCritical: 'Kritisch',
 
     // Drivers
     driversTitle: 'Modelltreiber',

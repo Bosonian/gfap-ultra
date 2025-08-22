@@ -8,12 +8,12 @@ export const API_URLS = {
 
 export const CRITICAL_THRESHOLDS = {
   ich: { 
-    high: 60, 
-    critical: 80 
+    medium: 25,
+    high: 50
   },
   lvo: { 
-    high: 50, 
-    critical: 70 
+    medium: 25,
+    high: 50
   }
 };
 

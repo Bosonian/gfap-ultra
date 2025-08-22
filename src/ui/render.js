@@ -13,10 +13,16 @@ import { fastEdCalculator } from './components/fastEdModal.js';
 
 export function render(container) {
   const state = store.getState();
-  const { currentScreen, results, startTime } = state;
+  const { currentScreen, results, startTime, navigationHistory } = state;
 
   // Clear container
   container.innerHTML = '';
+  
+  // Show/hide back button based on navigation history
+  const backButton = document.getElementById('backButton');
+  if (backButton) {
+    backButton.style.display = navigationHistory && navigationHistory.length > 0 ? 'flex' : 'none';
+  }
 
   // Render the appropriate screen
   let html = '';

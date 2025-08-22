@@ -1,5 +1,35 @@
 import { API_URLS, APP_CONFIG } from '../config.js';
 
+// Warm up Google Cloud Functions on app load
+export async function warmUpFunctions() {
+  console.log('Warming up Cloud Functions...');
+  
+  // Send lightweight ping requests to wake up cold functions
+  const warmUpPromises = Object.values(API_URLS).map(async (url) => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout for warm-up
+      
+      await fetch(url, {
+        method: 'OPTIONS', // Use OPTIONS to avoid triggering actual processing
+        signal: controller.signal,
+        mode: 'cors'
+      });
+      
+      clearTimeout(timeoutId);
+      console.log(`Warmed up: ${url}`);
+    } catch (error) {
+      // Ignore warm-up errors - they're not critical
+      console.log(`Warm-up failed for ${url}, but continuing...`);
+    }
+  });
+  
+  // Don't wait for warm-up to complete - do it in background
+  Promise.all(warmUpPromises).then(() => {
+    console.log('All functions warmed up');
+  });
+}
+
 class APIError extends Error {
   constructor(message, status, url) {
     super(message);

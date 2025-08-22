@@ -2,6 +2,7 @@ import { store } from './state/store.js';
 import { render } from './ui/render.js';
 import { APP_CONFIG } from './config.js';
 import { i18n, t } from './localization/i18n.js';
+import { warmUpFunctions } from './api/client.js';
 
 class App {
   constructor() {
@@ -53,14 +54,34 @@ class App {
 
     // Register PWA Service Worker
     this.registerServiceWorker();
+    
+    // Warm up Cloud Functions in background
+    warmUpFunctions();
 
     // Initial render
     render(this.container);
 
-    console.log('Stroke Triage Assistant initialized');
+    console.log('iGFAP Stroke Triage Assistant initialized');
   }
 
   setupGlobalEventListeners() {
+    // Navigation buttons
+    const backButton = document.getElementById('backButton');
+    if (backButton) {
+      backButton.addEventListener('click', () => {
+        store.goBack();
+        render(this.container);
+      });
+    }
+    
+    const homeButton = document.getElementById('homeButton');
+    if (homeButton) {
+      homeButton.addEventListener('click', () => {
+        store.goHome();
+        render(this.container);
+      });
+    }
+
     // Language toggle
     const languageToggle = document.getElementById('languageToggle');
     if (languageToggle) {
@@ -158,6 +179,14 @@ class App {
   toggleLanguage() {
     i18n.toggleLanguage();
     this.updateUILanguage();
+    
+    // Update flag icon
+    const languageToggle = document.getElementById('languageToggle');
+    if (languageToggle) {
+      const currentLang = i18n.getCurrentLanguage();
+      languageToggle.textContent = currentLang === 'en' ? '🇬🇧' : '🇩🇪';
+      languageToggle.dataset.lang = currentLang;
+    }
   }
 
   updateUILanguage() {

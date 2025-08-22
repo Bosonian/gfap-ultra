@@ -97,20 +97,40 @@ body {
 }
 
 .app-header h1 {
-    font-size: 1.35rem;
-    font-weight: 650;
+    font-size: 1.5rem;
+    font-weight: 700;
     letter-spacing: -0.02em;
+    margin: 0;
 }
 
-.version-badge {
-    background: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.9);
-    padding: 2px 8px;
-    border-radius: 12px;
+.app-subtitle {
+    display: block;
     font-size: 0.7rem;
-    font-weight: 500;
-    margin-left: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 400;
+    margin-top: -2px;
+}
+
+#backButton, #homeButton {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+#backButton:hover, #homeButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
 }
 
 
@@ -1754,13 +1774,18 @@ footer {
     }
     
     .app-header h1 {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
     
-    .version-badge {
+    .app-subtitle {
         font-size: 0.6rem;
-        padding: 1px 6px;
-        margin-left: 6px;
+    }
+    
+    #backButton, #homeButton {
+        width: 36px;
+        height: 36px;
+        margin-right: 6px;
+        font-size: 1rem;
     }
     
     .header-controls {
