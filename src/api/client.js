@@ -199,31 +199,55 @@ export async function predictFullStroke(payload) {
   const normalizedPayload = normalizeBooleans(fullPayload);
   
   // Debug log the payload being sent
-  console.log('Full Stroke API Payload:', normalizedPayload);
+  console.log('=== BACKEND DATA MAPPING TEST ===');
+  console.log('📤 Full Stroke API Payload:', normalizedPayload);
   
-  // Specific FAST-ED debugging
-  if (normalizedPayload.fast_ed_score) {
-    console.log('🎯 FAST-ED Score being sent:', normalizedPayload.fast_ed_score);
-  } else {
-    console.log('⚠️  No FAST-ED score in payload!');
-  }
+  // Test all key clinical variables
+  console.log('🧪 Clinical Variables Being Sent:');
+  console.log('  📊 FAST-ED Score:', normalizedPayload.fast_ed_score);
+  console.log('  🩸 Systolic BP:', normalizedPayload.systolic_bp);
+  console.log('  🩸 Diastolic BP:', normalizedPayload.diastolic_bp);
+  console.log('  🧬 GFAP Value:', normalizedPayload.gfap_value);
+  console.log('  👤 Age:', normalizedPayload.age_years);
+  console.log('  🤕 Headache:', normalizedPayload.headache);
+  console.log('  😵 Vigilanz:', normalizedPayload.vigilanzminderung);
+  console.log('  💪 Arm Parese:', normalizedPayload.armparese);
+  console.log('  🦵 Leg Parese:', normalizedPayload.beinparese);
+  console.log('  👁️ Eye Deviation:', normalizedPayload.eye_deviation);
+  console.log('  💓 Atrial Fib:', normalizedPayload.atrial_fibrillation);
+  console.log('  💊 Anticoag NOAK:', normalizedPayload.anticoagulated_noak);
+  console.log('  💊 Antiplatelets:', normalizedPayload.antiplatelets);
   
   try {
     const response = await fetchJSON(API_URLS.FULL_STROKE, normalizedPayload);
     
     // Debug log the API response
-    console.log('Full Stroke API Response:', response);
-    console.log('Available keys in response:', Object.keys(response));
-    console.log('Response type:', typeof response);
+    console.log('📥 Full Stroke API Response:', response);
+    console.log('🔑 Available keys in response:', Object.keys(response));
+    
+    // Test backend data mapping accuracy
+    console.log('=== BACKEND MAPPING VERIFICATION ===');
+    
+    // Check if backend returns any feature names that match our inputs
+    const responseStr = JSON.stringify(response).toLowerCase();
+    console.log('🔍 Backend Feature Name Analysis:');
+    console.log('  Contains "fast":', responseStr.includes('fast'));
+    console.log('  Contains "ed":', responseStr.includes('ed'));
+    console.log('  Contains "fast_ed":', responseStr.includes('fast_ed'));
+    console.log('  Contains "systolic":', responseStr.includes('systolic'));
+    console.log('  Contains "diastolic":', responseStr.includes('diastolic'));
+    console.log('  Contains "gfap":', responseStr.includes('gfap'));
+    console.log('  Contains "age":', responseStr.includes('age'));
+    console.log('  Contains "headache":', responseStr.includes('headache'));
     
     // Debug driver extraction
-    console.log('ICH driver sources:');
+    console.log('🧠 ICH driver sources:');
     console.log('  response.ich_prediction?.drivers:', response.ich_prediction?.drivers);
     console.log('  response.ich_drivers:', response.ich_drivers);
     console.log('  response.ich?.drivers:', response.ich?.drivers);
     console.log('  response.drivers?.ich:', response.drivers?.ich);
     
-    console.log('LVO driver sources:');
+    console.log('🩸 LVO driver sources:');
     console.log('  response.lvo_prediction?.drivers:', response.lvo_prediction?.drivers);
     console.log('  response.lvo_drivers:', response.lvo_drivers);
     console.log('  response.lvo?.drivers:', response.lvo?.drivers);
