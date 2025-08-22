@@ -311,37 +311,76 @@ class App {
   }
 
   showUpdateNotification() {
-    // Show a subtle notification that an update is available
-    const notification = document.createElement('div');
-    notification.style.cssText = `
+    // Create modal dialog for update notification
+    const modal = document.createElement('div');
+    modal.className = 'modal show update-modal';
+    modal.style.cssText = `
+      display: flex;
       position: fixed;
-      top: 70px;
-      right: 20px;
-      background: var(--primary-color);
-      color: white;
-      padding: 12px 16px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 1001;
-      font-size: 0.9rem;
-      max-width: 300px;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
     `;
-    notification.textContent = 'App update available - Tap to refresh';
     
-    notification.addEventListener('click', () => {
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    modalContent.style.cssText = `
+      background-color: var(--container-bg);
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 400px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    `;
+    
+    modalContent.innerHTML = `
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 3rem; margin-bottom: 16px;">🔄</div>
+        <h3 style="margin: 0 0 12px 0; color: var(--text-color);">Update Available</h3>
+        <p style="color: var(--text-secondary); margin: 0 0 24px 0; line-height: 1.5;">
+          A new version with improvements is ready to install.
+        </p>
+      </div>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button id="updateNow" class="primary" style="flex: 1; max-width: 140px;">
+          Refresh Now
+        </button>
+        <button id="updateLater" class="secondary" style="flex: 1; max-width: 140px;">
+          Later
+        </button>
+      </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Handle buttons
+    const updateNow = modal.querySelector('#updateNow');
+    const updateLater = modal.querySelector('#updateLater');
+    
+    updateNow.addEventListener('click', () => {
       window.location.reload();
     });
     
-    document.body.appendChild(notification);
+    updateLater.addEventListener('click', () => {
+      modal.remove();
+      // Show again in 5 minutes
+      setTimeout(() => this.showUpdateNotification(), 5 * 60 * 1000);
+    });
     
-    // Auto-remove after 10 seconds
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.remove();
+    // Close on backdrop click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        updateLater.click();
       }
-    }, 10000);
+    });
   }
 
   destroy() {

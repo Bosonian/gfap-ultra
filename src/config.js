@@ -26,7 +26,7 @@ export const GFAP_RANGES = {
 };
 
 export const APP_CONFIG = {
-  autoSaveInterval: 30000, // Increased from 5s to 30s to reduce blinking
+  autoSaveInterval: 180000, // 3 minutes to reduce irritating screen blinks
   sessionTimeout: 30 * 60 * 1000, // 30 minutes
   requestTimeout: 10000 // 10 seconds
 };
