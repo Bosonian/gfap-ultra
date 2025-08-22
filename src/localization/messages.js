@@ -122,12 +122,18 @@ export const messages = {
     // Drivers
     driversTitle: 'Model Drivers',
     driversSubtitle: 'Factors contributing to the prediction',
+    riskFactors: 'Risk Factors',
     ichDrivers: 'ICH Risk Factors',
     lvoDrivers: 'LVO Risk Factors',
 
     // Critical Alert
     criticalAlertTitle: 'CRITICAL RISK DETECTED',
     criticalAlertMessage: 'High probability of intracerebral hemorrhage detected. Immediate medical attention required.',
+    immediateActionsRequired: 'Immediate actions required',
+    initiateStrokeProtocol: 'Initiate stroke protocol immediately',
+    urgentCtImaging: 'Urgent CT imaging required',
+    considerBpManagement: 'Consider blood pressure management',
+    prepareNeurosurgicalConsult: 'Prepare for potential neurosurgical consultation',
 
     // Help Modal
     helpTitle: 'Quick Reference Guide',
@@ -385,12 +391,18 @@ export const messages = {
     // Drivers
     driversTitle: 'Modelltreiber',
     driversSubtitle: 'Faktoren, die zur Vorhersage beitragen',
+    riskFactors: 'Risikofaktoren',
     ichDrivers: 'ICB-Risikofaktoren',
     lvoDrivers: 'LVO-Risikofaktoren',
 
     // Critical Alert
     criticalAlertTitle: 'KRITISCHES RISIKO ERKANNT',
     criticalAlertMessage: 'Hohe Wahrscheinlichkeit einer intrazerebralen Blutung erkannt. Sofortige medizinische Behandlung erforderlich.',
+    immediateActionsRequired: 'Sofortige Maßnahmen erforderlich',
+    initiateStrokeProtocol: 'Schlaganfall-Protokoll sofort einleiten',
+    urgentCtImaging: 'Dringende CT-Bildgebung erforderlich',
+    considerBpManagement: 'Blutdruckmanagement erwägen',
+    prepareNeurosurgicalConsult: 'Neurochirurgische Konsultation vorbereiten',
 
     // Help Modal
     helpTitle: 'Kurzreferenzleitfaden',

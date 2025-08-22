@@ -34,7 +34,7 @@ export function renderDriversPanel(drivers, title, type) {
       <div class="drivers-panel">
         <h4>
           <span class="driver-icon ${type}">${type === 'ich' ? 'I' : 'L'}</span>
-          ${title} Risk Factors
+          ${title} ${t('riskFactors')}
         </h4>
         <p style="color: var(--text-secondary); font-style: italic;">
           Driver information not available from this prediction model.
@@ -50,7 +50,7 @@ export function renderDriversPanel(drivers, title, type) {
       <div class="drivers-panel">
         <h4>
           <span class="driver-icon ${type}">${type === 'ich' ? 'I' : 'L'}</span>
-          ${title} Risk Factors
+          ${title} ${t('riskFactors')}
         </h4>
         <p style="color: var(--text-secondary); font-style: italic;">
           Driver analysis not available for this prediction.
@@ -137,7 +137,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
         <div class="panel-header">
           <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
           <div class="panel-title">
-            <h4>${title} Risk Factors</h4>
+            <h4>${title} ${t('riskFactors')}</h4>
             <span class="panel-subtitle">${t('noDriverData')}</span>
           </div>
         </div>
@@ -156,7 +156,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
         <div class="panel-header">
           <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
           <div class="panel-title">
-            <h4>${title} Risk Factors</h4>
+            <h4>${title} ${t('riskFactors')}</h4>
             <span class="panel-subtitle">${t('driverAnalysisUnavailable')}</span>
           </div>
         </div>
