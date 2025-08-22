@@ -209,6 +209,19 @@ export async function predictFullStroke(payload) {
     console.log('Available keys in response:', Object.keys(response));
     console.log('Response type:', typeof response);
     
+    // Debug driver extraction
+    console.log('ICH driver sources:');
+    console.log('  response.ich_prediction?.drivers:', response.ich_prediction?.drivers);
+    console.log('  response.ich_drivers:', response.ich_drivers);
+    console.log('  response.ich?.drivers:', response.ich?.drivers);
+    console.log('  response.drivers?.ich:', response.drivers?.ich);
+    
+    console.log('LVO driver sources:');
+    console.log('  response.lvo_prediction?.drivers:', response.lvo_prediction?.drivers);
+    console.log('  response.lvo_drivers:', response.lvo_drivers);
+    console.log('  response.lvo?.drivers:', response.lvo?.drivers);
+    console.log('  response.drivers?.lvo:', response.drivers?.lvo);
+    
     // Try to identify probability values
     Object.keys(response).forEach(key => {
       const value = response[key];

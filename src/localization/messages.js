@@ -3,7 +3,7 @@
 export const messages = {
   en: {
     // Header
-    appTitle: 'Stroke Triage Assistant',
+    appTitle: 'iGFAP',
     emergencyBadge: 'Emergency Tool',
     helpButton: 'Help and Instructions',
     darkModeButton: 'Toggle dark mode',
@@ -278,7 +278,7 @@ export const messages = {
 
   de: {
     // Header
-    appTitle: 'Schlaganfall-Triage-Assistent',
+    appTitle: 'iGFAP',
     emergencyBadge: 'Notfall-Tool',
     helpButton: 'Hilfe und Anweisungen',
     darkModeButton: 'Dunklen Modus umschalten',

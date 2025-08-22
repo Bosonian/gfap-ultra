@@ -188,22 +188,6 @@ export function renderResults(results, startTime) {
           ${strokeCenterHtml}
         </div>
         
-        <button class="info-toggle" data-target="clinical-info">
-          <span class="toggle-icon">ℹ️</span>
-          <span class="toggle-text">${t('clinicalInformation')}</span>
-          <span class="toggle-arrow">▼</span>
-        </button>
-        <div class="collapsible-content" id="clinical-info" style="display: none;">
-          <div class="clinical-recommendations">
-            <h4>${t('clinicalRecommendations')}</h4>
-            <ul>
-              <li>${t('clinicalRec1')}</li>
-              <li>${t('clinicalRec2')}</li>
-              <li>${t('clinicalRec3')}</li>
-              <li>${t('clinicalRec4')}</li>
-            </ul>
-          </div>
-        </div>
       </div>
       
       <div class="results-actions">

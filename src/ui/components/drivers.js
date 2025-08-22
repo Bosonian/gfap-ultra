@@ -2,6 +2,13 @@ import { normalizeDrivers } from '../../logic/shap.js';
 import { t } from '../../localization/i18n.js';
 
 export function renderDriversSection(ich, lvo) {
+  // Debug logging for driver analysis
+  console.log('=== DRIVER DEBUG ===');
+  console.log('ICH result:', ich);
+  console.log('LVO result:', lvo);
+  console.log('ICH drivers raw:', ich?.drivers);
+  console.log('LVO drivers raw:', lvo?.drivers);
+  
   if (!ich?.drivers && !lvo?.drivers) return '';
   
   let html = `
@@ -131,7 +138,12 @@ export function renderDriversPanel(drivers, title, type) {
 }
 
 export function renderEnhancedDriversPanel(drivers, title, type, probability) {
+  console.log(`--- ${title} Driver Panel Debug ---`);
+  console.log('Raw drivers input:', drivers);
+  console.log('Title:', title, 'Type:', type, 'Probability:', probability);
+  
   if (!drivers || Object.keys(drivers).length === 0) {
+    console.log(`No drivers data for ${title}`);
     return `
       <div class="enhanced-drivers-panel ${type}">
         <div class="panel-header">
@@ -149,6 +161,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   }
 
   const driversViewModel = normalizeDrivers(drivers);
+  console.log(`${title} normalized drivers:`, driversViewModel);
   
   if (driversViewModel.kind === 'unavailable') {
     return `
@@ -175,6 +188,10 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   const negativeDrivers = driversViewModel.negative
     .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
     .slice(0, 3); // Top 3 negative drivers
+
+  console.log(`🎯 ${title} Final displayed drivers:`);
+  console.log('  Top positive:', positiveDrivers.map(d => `${d.label}: +${(Math.abs(d.weight) * 100).toFixed(1)}%`));
+  console.log('  Top negative:', negativeDrivers.map(d => `${d.label}: -${(Math.abs(d.weight) * 100).toFixed(1)}%`));
 
   const maxWeight = Math.max(
     ...positiveDrivers.map(d => Math.abs(d.weight)),

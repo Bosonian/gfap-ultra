@@ -90,10 +90,20 @@ body {
     backdrop-filter: blur(10px);
 }
 
-.header-content {
+.header-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
 }
 
 .app-header h1 {
@@ -138,6 +148,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex: 0 0 auto;
 }
 
 #darkModeToggle, #helpButton {
@@ -1784,8 +1795,11 @@ footer {
     #backButton, #homeButton {
         width: 36px;
         height: 36px;
-        margin-right: 6px;
         font-size: 1rem;
+    }
+    
+    .header-left {
+        gap: 6px;
     }
     
     .header-controls {

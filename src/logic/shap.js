@@ -44,6 +44,7 @@ export function normalizeDrivers(drivers) {
 }
 
 function normalizeShapValues(drivers) {
+  console.log('🔍 Normalizing SHAP values:', drivers);
   const shapData = drivers.shap_values || drivers;
   const features = [];
 
@@ -76,9 +77,14 @@ function normalizeShapValues(drivers) {
 
   // Sort by absolute weight value
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
+  
+  console.log('📊 All SHAP features sorted by weight:', features);
 
   const positive = features.filter(f => f.weight > 0);
   const negative = features.filter(f => f.weight < 0);
+  
+  console.log('📈 Positive drivers (top 5):', positive.slice(0, 5));
+  console.log('📉 Negative drivers (top 5):', negative.slice(0, 5));
 
   const meta = {};
   if (drivers.base_value !== undefined) meta.base_value = drivers.base_value;
