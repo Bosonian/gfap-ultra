@@ -60,20 +60,26 @@ self.addEventListener('activate', (event) => {
 // Fetch event - serve from cache with network fallback
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+  const url = request.url;
   
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
   }
   
-  // Skip non-cacheable requests
-  if (request.url.includes('/api/') || 
-      request.url.includes('googleapis.com') || 
-      request.url.includes('openrouteservice.org') ||
-      request.url.startsWith('chrome-extension://') ||
-      request.url.startsWith('moz-extension://') ||
-      request.url.startsWith('safari-extension://') ||
-      request.url.includes('cloudfunctions.net')) {
+  // Skip non-cacheable requests - comprehensive filtering
+  if (url.includes('/api/') || 
+      url.includes('googleapis.com') || 
+      url.includes('openrouteservice.org') ||
+      url.includes('cloudfunctions.net') ||
+      url.startsWith('chrome-extension://') ||
+      url.startsWith('moz-extension://') ||
+      url.startsWith('safari-extension://') ||
+      url.startsWith('chrome://') ||
+      url.startsWith('about:') ||
+      url.includes('extension') ||
+      url.includes('executor.js')) {
+    console.log('[SW] Skipping non-cacheable request:', url);
     return;
   }
   
@@ -90,6 +96,13 @@ self.addEventListener('fetch', (event) => {
           .then((networkResponse) => {
             // Don't cache if response is not ok
             if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+              console.log('[SW] Not caching response:', request.url, 'Status:', networkResponse?.status);
+              return networkResponse;
+            }
+            
+            // Additional check to avoid caching problematic URLs
+            if (request.url.includes('extension') || request.url.includes('executor')) {
+              console.log('[SW] Skipping cache for extension resource:', request.url);
               return networkResponse;
             }
             

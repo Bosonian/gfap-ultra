@@ -52,8 +52,8 @@ class App {
     // Set current year in footer
     this.setCurrentYear();
 
-    // Register PWA Service Worker
-    this.registerServiceWorker();
+    // Register PWA Service Worker (temporarily disabled for debugging)
+    // this.registerServiceWorker();
     
     // Warm up Cloud Functions in background
     warmUpFunctions();
