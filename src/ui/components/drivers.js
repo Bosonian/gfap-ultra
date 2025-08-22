@@ -167,68 +167,94 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     `;
   }
 
-  const allDrivers = [...driversViewModel.positive, ...driversViewModel.negative]
+  // Sort drivers by absolute impact and limit to top 6 most important
+  const positiveDrivers = driversViewModel.positive
     .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
-    .slice(0, 8); // Show top 8 most important factors
+    .slice(0, 3); // Top 3 positive drivers
+  
+  const negativeDrivers = driversViewModel.negative
+    .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
+    .slice(0, 3); // Top 3 negative drivers
+
+  const maxWeight = Math.max(
+    ...positiveDrivers.map(d => Math.abs(d.weight)),
+    ...negativeDrivers.map(d => Math.abs(d.weight)),
+    0.01 // Prevent division by zero
+  );
 
   let html = `
     <div class="enhanced-drivers-panel ${type}">
       <div class="panel-header">
         <div class="panel-icon ${type}">${type === 'ich' ? '🧠' : '🩸'}</div>
         <div class="panel-title">
-          <h4>${title} Risk Factors</h4>
-          <span class="panel-subtitle">${t('contributingFactors')} (${allDrivers.length} ${t('factorsShown')})</span>
+          <h4>${title} ${t('riskFactors')}</h4>
+          <span class="panel-subtitle">${t('contributingFactors')}</span>
         </div>
       </div>
       
-      <div class="drivers-chart">
+      <div class="drivers-split-view">
+        <div class="drivers-column positive-column">
+          <div class="column-header">
+            <span class="column-icon">↑</span>
+            <span class="column-title">${t('increaseRisk')}</span>
+          </div>
+          <div class="compact-drivers">
   `;
 
-  if (allDrivers.length > 0) {
-    const maxWeight = Math.max(...allDrivers.map(d => Math.abs(d.weight)));
-    
-    allDrivers.forEach((driver, index) => {
-      const weight = driver.weight;
-      const isPositive = weight > 0;
-      const percentage = Math.abs(weight * 100);
-      const barWidth = (Math.abs(weight) / maxWeight) * 100;
+  // Render positive drivers
+  if (positiveDrivers.length > 0) {
+    positiveDrivers.forEach((driver) => {
+      const percentage = Math.abs(driver.weight * 100);
+      const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
       const cleanLabel = driver.label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       
       html += `
-        <div class="enhanced-driver-item">
-          <div class="driver-info">
-            <span class="driver-label">${cleanLabel}</span>
-            <div class="driver-impact ${isPositive ? 'positive' : 'negative'}">
-              ${isPositive ? '↑' : '↓'} ${percentage.toFixed(1)}%
-            </div>
-          </div>
-          <div class="driver-bar-wrapper">
-            <div class="driver-bar-track">
-              <div class="driver-bar ${isPositive ? 'positive' : 'negative'}" 
-                   style="width: ${barWidth}%"
-                   data-weight="${weight.toFixed(3)}">
-                <div class="bar-glow"></div>
-              </div>
-            </div>
+        <div class="compact-driver-item">
+          <div class="compact-driver-label">${cleanLabel}</div>
+          <div class="compact-driver-bar positive" style="width: ${barWidth}%">
+            <span class="compact-driver-value">+${percentage.toFixed(0)}%</span>
           </div>
         </div>
       `;
     });
+  } else {
+    html += `<div class="no-factors">${t('noPositiveFactors')}</div>`;
   }
-  
+
   html += `
-      </div>
+          </div>
+        </div>
+        
+        <div class="drivers-column negative-column">
+          <div class="column-header">
+            <span class="column-icon">↓</span>
+            <span class="column-title">${t('decreaseRisk')}</span>
+          </div>
+          <div class="compact-drivers">
+  `;
+
+  // Render negative drivers
+  if (negativeDrivers.length > 0) {
+    negativeDrivers.forEach((driver) => {
+      const percentage = Math.abs(driver.weight * 100);
+      const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
+      const cleanLabel = driver.label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       
-      <div class="drivers-summary">
-        <div class="summary-stats">
-          <span class="stat-item">
-            <span class="stat-label">${t('positiveFactors')}:</span>
-            <span class="stat-value positive">${driversViewModel.positive.length}</span>
-          </span>
-          <span class="stat-item">
-            <span class="stat-label">${t('negativeFactors')}:</span>
-            <span class="stat-value negative">${driversViewModel.negative.length}</span>
-          </span>
+      html += `
+        <div class="compact-driver-item">
+          <div class="compact-driver-label">${cleanLabel}</div>
+          <div class="compact-driver-bar negative" style="width: ${barWidth}%">
+            <span class="compact-driver-value">-${percentage.toFixed(0)}%</span>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    html += `<div class="no-factors">${t('noNegativeFactors')}</div>`;
+  }
+
+  html += `
+          </div>
         </div>
       </div>
     </div>

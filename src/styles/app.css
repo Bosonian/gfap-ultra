@@ -944,6 +944,113 @@ button:disabled {
     margin: 24px 0;
 }
 
+/* Compact Split View Drivers */
+.drivers-split-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.drivers-column {
+    background: var(--input-bg);
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.positive-column {
+    border-left: 3px solid var(--danger-color);
+}
+
+.negative-column {
+    border-left: 3px solid var(--success-color);
+}
+
+.column-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.column-icon {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.positive-column .column-icon {
+    color: var(--danger-color);
+}
+
+.negative-column .column-icon {
+    color: var(--success-color);
+}
+
+.column-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.compact-drivers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.compact-driver-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.compact-driver-label {
+    font-size: 0.7rem;
+    color: var(--text-color);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.compact-driver-bar {
+    height: 18px;
+    border-radius: 9px;
+    position: relative;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 6px;
+    transition: all 0.3s ease;
+}
+
+.compact-driver-bar.positive {
+    background: linear-gradient(90deg, var(--danger-color), #ff4757);
+}
+
+.compact-driver-bar.negative {
+    background: linear-gradient(90deg, var(--success-color), #2ecc71);
+}
+
+.compact-driver-value {
+    font-size: 0.65rem;
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.no-factors {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 12px 0;
+}
+
 .drivers-header {
     text-align: center;
     margin-bottom: 20px;
@@ -1306,6 +1413,31 @@ button:disabled {
     .summary-stats {
         flex-direction: column;
         gap: 12px;
+    }
+    
+    /* Compact drivers mobile optimization */
+    .drivers-split-view {
+        gap: 8px;
+    }
+    
+    .drivers-column {
+        padding: 8px;
+    }
+    
+    .column-title {
+        font-size: 0.7rem;
+    }
+    
+    .compact-driver-label {
+        font-size: 0.65rem;
+    }
+    
+    .compact-driver-bar {
+        height: 16px;
+    }
+    
+    .compact-driver-value {
+        font-size: 0.6rem;
     }
 }
 

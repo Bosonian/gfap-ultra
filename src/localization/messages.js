@@ -123,6 +123,10 @@ export const messages = {
     driversTitle: 'Model Drivers',
     driversSubtitle: 'Factors contributing to the prediction',
     riskFactors: 'Risk Factors',
+    increaseRisk: 'INCREASE',
+    decreaseRisk: 'DECREASE',
+    noPositiveFactors: 'No increasing factors',
+    noNegativeFactors: 'No decreasing factors',
     ichDrivers: 'ICH Risk Factors',
     lvoDrivers: 'LVO Risk Factors',
 
@@ -392,6 +396,10 @@ export const messages = {
     driversTitle: 'Modelltreiber',
     driversSubtitle: 'Faktoren, die zur Vorhersage beitragen',
     riskFactors: 'Risikofaktoren',
+    increaseRisk: 'ERHÖHEN',
+    decreaseRisk: 'VERRINGERN',
+    noPositiveFactors: 'Keine erhöhenden Faktoren',
+    noNegativeFactors: 'Keine verringernden Faktoren',
     ichDrivers: 'ICB-Risikofaktoren',
     lvoDrivers: 'LVO-Risikofaktoren',
 
