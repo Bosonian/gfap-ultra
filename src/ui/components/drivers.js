@@ -1,4 +1,3 @@
-import { normalizeDrivers } from '../../logic/shap.js';
 import { t } from '../../localization/i18n.js';
 
 export function renderDriversSection(ich, lvo) {
@@ -171,8 +170,9 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     `;
   }
 
-  const driversViewModel = normalizeDrivers(drivers);
-  console.log(`${title} normalized drivers:`, driversViewModel);
+  // Drivers are already in the correct format from our new extraction
+  const driversViewModel = drivers;
+  console.log(`${title} drivers ready for display:`, driversViewModel);
   
   if (driversViewModel.kind === 'unavailable') {
     return `

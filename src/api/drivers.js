@@ -1,65 +1,84 @@
 // Clean driver extraction - ensuring LVO drivers come from LVO API, ICH from ICH API
 
 /**
- * Extract drivers with clear API source tracking
+ * Extract and format drivers from new backend flat dictionary format
  */
 export function extractDriversFromResponse(response, predictionType) {
   console.log(`=== EXTRACTING ${predictionType.toUpperCase()} DRIVERS ===`);
   console.log('Full response:', response);
   
-  let drivers = null;
+  let rawDrivers = null;
   
   if (predictionType === 'ICH') {
-    // ICH drivers only from ICH prediction
-    drivers = response.ich_prediction?.drivers || null;
-    console.log('🧠 ICH drivers extracted:', drivers);
-    
-    if (!drivers) {
-      console.log('❌ No ICH drivers found in ich_prediction.drivers');
-      console.log('Available ICH prediction keys:', Object.keys(response.ich_prediction || {}));
-    }
-    
+    rawDrivers = response.ich_prediction?.drivers || null;
+    console.log('🧠 ICH raw drivers extracted:', rawDrivers);
   } else if (predictionType === 'LVO') {
-    // LVO drivers only from LVO prediction  
-    drivers = response.lvo_prediction?.drivers || null;
-    console.log('🩸 LVO drivers extracted:', drivers);
-    
-    if (!drivers) {
-      console.log('❌ No LVO drivers found in lvo_prediction.drivers');
-      console.log('Available LVO prediction keys:', Object.keys(response.lvo_prediction || {}));
-    }
+    rawDrivers = response.lvo_prediction?.drivers || null;
+    console.log('🩸 LVO raw drivers extracted:', rawDrivers);
   }
   
-  if (drivers) {
-    console.log(`✅ ${predictionType} drivers successfully extracted:`, drivers);
-    console.log(`📊 ${predictionType} driver type:`, drivers.kind || 'unknown');
-    
-    // Log specific features for debugging
-    if (drivers.positive) {
-      console.log(`📈 ${predictionType} positive features:`, drivers.positive.map(d => `${d.label}: ${d.weight}`));
-    }
-    if (drivers.negative) {
-      console.log(`📉 ${predictionType} negative features:`, drivers.negative.map(d => `${d.label}: ${d.weight}`));
-    }
-    
-    // Check for FAST-ED specifically
-    const allFeatures = [...(drivers.positive || []), ...(drivers.negative || [])];
-    const fastEdFeature = allFeatures.find(f => 
-      f.label && (
-        f.label.toLowerCase().includes('fast') || 
-        f.label.includes('fast_ed') ||
-        f.label.toLowerCase().includes('ed')
-      )
-    );
-    
-    if (fastEdFeature) {
-      console.log(`🎯 FAST-ED found in ${predictionType}:`, fastEdFeature);
-    } else {
-      console.log(`⚠️  FAST-ED NOT found in ${predictionType} drivers`);
-    }
+  if (!rawDrivers) {
+    console.log(`❌ No ${predictionType} drivers found`);
+    return null;
   }
   
-  return drivers;
+  // Convert flat dictionary to structured format
+  const formattedDrivers = formatDriversFromDictionary(rawDrivers, predictionType);
+  
+  console.log(`✅ ${predictionType} drivers formatted:`, formattedDrivers);
+  
+  // Check for FAST-ED specifically
+  const allFeatures = [...formattedDrivers.positive, ...formattedDrivers.negative];
+  const fastEdFeature = allFeatures.find(f => 
+    f.label && (
+      f.label.toLowerCase().includes('fast') || 
+      f.label.includes('fast_ed')
+    )
+  );
+  
+  if (fastEdFeature) {
+    console.log(`🎯 FAST-ED found in ${predictionType}:`, `${fastEdFeature.label}: ${fastEdFeature.weight > 0 ? '+' : ''}${fastEdFeature.weight.toFixed(4)}`);
+  } else {
+    console.log(`⚠️  FAST-ED NOT found in ${predictionType} drivers`);
+  }
+  
+  return formattedDrivers;
+}
+
+/**
+ * Convert backend flat dictionary to structured positive/negative arrays
+ */
+function formatDriversFromDictionary(drivers, predictionType) {
+  console.log(`🔄 Formatting ${predictionType} drivers from dictionary:`, drivers);
+  
+  const positive = [];
+  const negative = [];
+  
+  Object.entries(drivers).forEach(([label, weight]) => {
+    if (typeof weight === 'number') {
+      if (weight > 0) {
+        positive.push({ label, weight });
+      } else if (weight < 0) {
+        negative.push({ label, weight: Math.abs(weight) }); // Store as positive value
+      }
+      // Skip zero weights
+    }
+  });
+  
+  // Sort by weight (descending)
+  positive.sort((a, b) => b.weight - a.weight);
+  negative.sort((a, b) => b.weight - a.weight);
+  
+  console.log(`📈 ${predictionType} positive drivers:`, positive.slice(0, 5));
+  console.log(`📉 ${predictionType} negative drivers:`, negative.slice(0, 5));
+  
+  return {
+    kind: 'flat_dictionary',
+    units: 'logit',
+    positive,
+    negative,
+    meta: {}
+  };
 }
 
 /**
