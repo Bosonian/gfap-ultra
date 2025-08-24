@@ -44,6 +44,7 @@ export function renderFull() {
             </label>
             <input type="number" name="fast_ed_score" id="fast_ed_score" min="0" max="9" required readonly placeholder="${t('fastEdCalculatorSubtitle')}" style="cursor: pointer;">
             <input type="hidden" name="armparese" id="armparese_hidden" value="false">
+            <input type="hidden" name="eye_deviation" id="eye_deviation_hidden" value="false">
           </div>
         </div>
 
@@ -63,12 +64,6 @@ export function renderFull() {
             <label class="checkbox-wrapper">
               <input type="checkbox" name="beinparese" id="beinparese">
               <span class="checkbox-label">${t('legParesis')}</span>
-            </label>
-          </div>
-          <div class="checkbox-group">
-            <label class="checkbox-wrapper">
-              <input type="checkbox" name="eye_deviation" id="eye_deviation">
-              <span class="checkbox-label">${t('eyeDeviation')}</span>
             </label>
           </div>
         </div>

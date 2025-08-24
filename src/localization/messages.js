@@ -433,9 +433,9 @@ export const messages = {
     // FAST-ED Calculator Modal
     fastEdCalculatorTitle: 'FAST-ED-Score-Rechner',
     fastEdCalculatorSubtitle: 'Klicken Sie, um FAST-ED-Score-Komponenten zu berechnen',
-    facialPalsyTitle: 'Faziale Parese',
-    facialPalsyNormal: 'Normal (0)',
-    facialPalsyMild: 'Leichte Mundwinkelasymmetrie (1)',
+    facialPalsyTitle: 'Fazialisparese',
+    facialPalsyNormal: 'Nein (0)',
+    facialPalsyMild: 'Ja (1)',
     armWeaknessTitle: 'Armschwäche',
     armWeaknessNormal: 'Normal (0)',
     armWeaknessMild: 'Leichter Armabfall (1)',

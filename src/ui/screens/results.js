@@ -4,7 +4,7 @@ import { renderDriversSection } from '../components/drivers.js';
 import { renderStrokeCenterMap } from '../components/stroke-center-map.js';
 import { getRiskLevel, formatTime } from '../../logic/formatters.js';
 import { CRITICAL_THRESHOLDS } from '../../config.js';
-import { t } from '../../localization/i18n.js';
+import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
 
 function renderInputSummary() {
@@ -84,8 +84,12 @@ function renderRiskCard(type, data, results) {
   const isCritical = percent > CRITICAL_THRESHOLDS[type].critical;
   const isHigh = percent > CRITICAL_THRESHOLDS[type].high;
   
-  const icons = { ich: '🧠', lvo: '🩸' };
+  const icons = { ich: '🩸', lvo: '🧠' };
   const titles = { ich: t('ichProbability'), lvo: t('lvoProbability') };
+  const subtitles = { 
+    ich: 'ICH', 
+    lvo: i18n.getCurrentLanguage() === 'de' ? 'Großgefäßverschluss' : 'Large Vessel Occlusion' 
+  };
   
   return `
     <div class="enhanced-risk-card ${type} ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
@@ -93,6 +97,7 @@ function renderRiskCard(type, data, results) {
         <div class="risk-icon">${icons[type]}</div>
         <div class="risk-title">
           <h3>${titles[type]}</h3>
+          <span class="risk-subtitle">${subtitles[type]}</span>
           <span class="risk-module">${data.module} Module</span>
         </div>
       </div>

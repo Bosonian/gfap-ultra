@@ -154,10 +154,10 @@ function attachEvents(container) {
           armPareseField.value = result.armWeaknessBoolean ? 'true' : 'false';
         }
         
-        // Update eye deviation checkbox if exists
-        const eyeDeviationCheckbox = container.querySelector('#eye_deviation');
-        if (eyeDeviationCheckbox) {
-          eyeDeviationCheckbox.checked = result.eyeDeviationBoolean;
+        // Update eye deviation hidden field if exists
+        const eyeDeviationField = container.querySelector('#eye_deviation_hidden');
+        if (eyeDeviationField) {
+          eyeDeviationField.value = result.eyeDeviationBoolean ? 'true' : 'false';
         }
         
         // Trigger change event to save form data
