@@ -9,10 +9,15 @@ export async function warmUpFunctions() {
   const warmUpPromises = Object.values(API_URLS).map(async (url) => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout for warm-up
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout for warm-up
       
+      // Use minimal POST with empty data to warm up
       await fetch(url, {
-        method: 'OPTIONS', // Use OPTIONS to avoid triggering actual processing
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}), // Empty body will fail validation but still warms up the function
         signal: controller.signal,
         mode: 'cors'
       });
@@ -21,13 +26,14 @@ export async function warmUpFunctions() {
       console.log(`Warmed up: ${url}`);
     } catch (error) {
       // Ignore warm-up errors - they're not critical
-      console.log(`Warm-up failed for ${url}, but continuing...`);
+      // The function is still warmed up even if it returns an error
+      console.log(`Warm-up attempt for ${url.split('/').pop()} completed`);
     }
   });
   
   // Don't wait for warm-up to complete - do it in background
   Promise.all(warmUpPromises).then(() => {
-    console.log('All functions warmed up');
+    console.log('Cloud Functions warm-up complete');
   });
 }
 
