@@ -355,11 +355,11 @@ h4 {
     height: 300px;
 }
 
-.yes-btn { background: linear-gradient(135deg, var(--danger-color), #ff1744); }
-.yes-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 0, 26, 0.3); }
+.yes-btn { background: linear-gradient(135deg, var(--success-color), #2ecc71); }
+.yes-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3); }
 
-.no-btn { background: linear-gradient(135deg, var(--success-color), #2ecc71); }
-.no-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3); }
+.no-btn { background: linear-gradient(135deg, var(--danger-color), #ff1744); }
+.no-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 0, 26, 0.3); }
 
 /* Form Styles */
 .input-grid {
