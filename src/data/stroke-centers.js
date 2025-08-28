@@ -1,326 +1,315 @@
-// Stroke centers in Baden-Württemberg, Germany
-// Data includes comprehensive stroke centers and stroke units
+// Stroke centers in Bayern (Bavaria), Germany
+// Data includes comprehensive stroke centers and stroke units with neurosurgical capabilities
 
 export const strokeCenters = [
+  // Major comprehensive stroke centers in München
   {
-    id: 'uniklinik-freiburg',
-    name: 'Universitätsklinikum Freiburg',
-    type: 'comprehensive', // comprehensive, primary, telemedicine
-    address: 'Hugstetter Str. 55, 79106 Freiburg im Breisgau',
+    id: 'klinikum-grosshadern-muenchen',
+    name: 'LMU Klinikum München - Großhadern',
+    type: 'comprehensive',
+    address: 'Marchioninistraße 15, 81377 München',
     coordinates: {
-      lat: 48.0025,
-      lng: 7.8347
+      lat: 48.1106,
+      lng: 11.4684
     },
-    phone: '+49 761 270-0',
-    emergency: '+49 761 270-34010',
+    phone: '+49 89 4400-0',
+    emergency: '+49 89 4400-73331',
     services: ['thrombectomy', 'neurosurgery', 'icu', 'telemedicine'],
     certified: true,
     certification: 'DSG/DGN',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'uniklinik-heidelberg',
-    name: 'Universitätsklinikum Heidelberg',
+    id: 'klinikum-rechts-der-isar-muenchen',
+    name: 'Klinikum rechts der Isar München (TUM)',
     type: 'comprehensive',
-    address: 'Im Neuenheimer Feld 400, 69120 Heidelberg',
+    address: 'Ismaninger Str. 22, 81675 München',
     coordinates: {
-      lat: 49.4178,
-      lng: 8.6706
+      lat: 48.1497,
+      lng: 11.6052
     },
-    phone: '+49 6221 56-0',
-    emergency: '+49 6221 56-36643',
+    phone: '+49 89 4140-0',
+    emergency: '+49 89 4140-2249',
     services: ['thrombectomy', 'neurosurgery', 'icu', 'telemedicine'],
     certified: true,
     certification: 'DSG/DGN',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'uniklinik-tuebingen',
-    name: 'Universitätsklinikum Tübingen',
+    id: 'klinikum-schwabing-muenchen',
+    name: 'Städtisches Klinikum München Schwabing',
     type: 'comprehensive',
-    address: 'Geissweg 3, 72076 Tübingen',
+    address: 'Kölner Platz 1, 80804 München',
     coordinates: {
-      lat: 48.5378,
-      lng: 9.0538
+      lat: 48.1732,
+      lng: 11.5755
     },
-    phone: '+49 7071 29-0',
-    emergency: '+49 7071 29-82211',
-    services: ['thrombectory', 'neurosurgery', 'icu', 'telemedicine'],
-    certified: true,
-    certification: 'DSG/DGN',
-    lastUpdated: '2024-01-01'
-  },
-  {
-    id: 'uniklinik-ulm',
-    name: 'Universitätsklinikum Ulm',
-    type: 'comprehensive',
-    address: 'Albert-Einstein-Allee 23, 89081 Ulm',
-    coordinates: {
-      lat: 48.4196,
-      lng: 9.9592
-    },
-    phone: '+49 731 500-0',
-    emergency: '+49 731 500-63001',
-    services: ['thrombectomy', 'neurosurgery', 'icu', 'telemedicine'],
-    certified: true,
-    certification: 'DSG/DGN',
-    lastUpdated: '2024-01-01'
-  },
-  {
-    id: 'klinikum-stuttgart',
-    name: 'Klinikum Stuttgart - Katharinenhospital',
-    type: 'comprehensive',
-    address: 'Kriegsbergstraße 60, 70174 Stuttgart',
-    coordinates: {
-      lat: 48.7784,
-      lng: 9.1682
-    },
-    phone: '+49 711 278-0',
-    emergency: '+49 711 278-32001',
+    phone: '+49 89 3068-0',
+    emergency: '+49 89 3068-2050',
     services: ['thrombectomy', 'neurosurgery', 'icu'],
     certified: true,
     certification: 'DSG/DGN',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'robert-bosch-stuttgart',
-    name: 'Robert-Bosch-Krankenhaus Stuttgart',
-    type: 'primary',
-    address: 'Auerbachstraße 110, 70376 Stuttgart',
-    coordinates: {
-      lat: 48.7447,
-      lng: 9.2294
-    },
-    phone: '+49 711 8101-0',
-    emergency: '+49 711 8101-3456',
-    services: ['stroke_unit', 'telemedicine'],
-    certified: true,
-    certification: 'DSG',
-    lastUpdated: '2024-01-01'
-  },
-  {
-    id: 'diakonie-stuttgart',
-    name: 'Diakonie-Klinikum Stuttgart',
-    type: 'primary',
-    address: 'Rosenbergstraße 38, 70176 Stuttgart',
-    coordinates: {
-      lat: 48.7861,
-      lng: 9.1736
-    },
-    phone: '+49 711 991-0',
-    emergency: '+49 711 991-2201',
-    services: ['stroke_unit', 'telemedicine'],
-    certified: true,
-    certification: 'DSG',
-    lastUpdated: '2024-01-01'
-  },
-  {
-    id: 'rkh-ludwigsburg',
-    name: 'RKH Klinikum Ludwigsburg',
-    type: 'primary',
-    address: 'Posilipostraße 4, 71640 Ludwigsburg',
-    coordinates: {
-      lat: 48.8901,
-      lng: 9.1953
-    },
-    phone: '+49 7141 99-0',
-    emergency: '+49 7141 99-67201',
-    services: ['stroke_unit', 'telemedicine'],
-    certified: true,
-    certification: 'DSG',
-    lastUpdated: '2024-01-01'
-  },
-  {
-    id: 'klinikum-karlsruhe',
-    name: 'Städtisches Klinikum Karlsruhe',
+    id: 'klinikum-bogenhausen-muenchen',
+    name: 'Städtisches Klinikum München Bogenhausen',
     type: 'comprehensive',
-    address: 'Moltkestraße 90, 76133 Karlsruhe',
+    address: 'Englschalkinger Str. 77, 81925 München',
     coordinates: {
-      lat: 49.0047,
-      lng: 8.3858
+      lat: 48.1614,
+      lng: 11.6254
     },
-    phone: '+49 721 974-0',
-    emergency: '+49 721 974-2301',
+    phone: '+49 89 9270-0',
+    emergency: '+49 89 9270-2050',
     services: ['thrombectomy', 'neurosurgery', 'icu'],
     certified: true,
     certification: 'DSG/DGN',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
+
+  // Major centers in other Bayern cities
   {
-    id: 'vincentius-karlsruhe',
-    name: 'ViDia Kliniken Karlsruhe - St. Vincentius',
-    type: 'primary',
-    address: 'Südendstraße 32, 76135 Karlsruhe',
-    coordinates: {
-      lat: 48.9903,
-      lng: 8.3711
-    },
-    phone: '+49 721 8108-0',
-    emergency: '+49 721 8108-9201',
-    services: ['stroke_unit', 'telemedicine'],
-    certified: true,
-    certification: 'DSG',
-    lastUpdated: '2024-01-01'
-  },
-  {
-    id: 'klinikum-mannheim',
-    name: 'Universitätsmedizin Mannheim',
+    id: 'uniklinikum-erlangen',
+    name: 'Universitätsklinikum Erlangen',
     type: 'comprehensive',
-    address: 'Theodor-Kutzer-Ufer 1-3, 68167 Mannheim',
+    address: 'Maximiliansplatz 2, 91054 Erlangen',
     coordinates: {
-      lat: 49.4828,
-      lng: 8.4664
+      lat: 49.5982,
+      lng: 11.0037
     },
-    phone: '+49 621 383-0',
-    emergency: '+49 621 383-2251',
+    phone: '+49 9131 85-0',
+    emergency: '+49 9131 85-39003',
     services: ['thrombectomy', 'neurosurgery', 'icu', 'telemedicine'],
     certified: true,
     certification: 'DSG/DGN',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'theresienkrankenhaus-mannheim',
-    name: 'Theresienkrankenhaus Mannheim',
-    type: 'primary',
-    address: 'Bassermannstraße 1, 68165 Mannheim',
+    id: 'uniklinikum-regensburg',
+    name: 'Universitätsklinikum Regensburg',
+    type: 'comprehensive',
+    address: 'Franz-Josef-Strauß-Allee 11, 93053 Regensburg',
     coordinates: {
-      lat: 49.4904,
-      lng: 8.4594
+      lat: 49.0134,
+      lng: 12.0991
     },
-    phone: '+49 621 424-0',
-    emergency: '+49 621 424-2101',
+    phone: '+49 941 944-0',
+    emergency: '+49 941 944-7501',
+    services: ['thrombectomy', 'neurosurgery', 'icu', 'telemedicine'],
+    certified: true,
+    certification: 'DSG/DGN',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'uniklinikum-wuerzburg',
+    name: 'Universitätsklinikum Würzburg',
+    type: 'comprehensive',
+    address: 'Oberdürrbacher Str. 6, 97080 Würzburg',
+    coordinates: {
+      lat: 49.7840,
+      lng: 9.9721
+    },
+    phone: '+49 931 201-0',
+    emergency: '+49 931 201-24444',
+    services: ['thrombectomy', 'neurosurgery', 'icu', 'telemedicine'],
+    certified: true,
+    certification: 'DSG/DGN',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-nuernberg',
+    name: 'Klinikum Nürnberg Nord',
+    type: 'comprehensive',
+    address: 'Prof.-Ernst-Nathan-Str. 1, 90419 Nürnberg',
+    coordinates: {
+      lat: 49.4521,
+      lng: 11.0767
+    },
+    phone: '+49 911 398-0',
+    emergency: '+49 911 398-2369',
+    services: ['thrombectomy', 'neurosurgery', 'icu'],
+    certified: true,
+    certification: 'DSG/DGN',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-augsburg',
+    name: 'Universitätsklinikum Augsburg',
+    type: 'comprehensive',
+    address: 'Stenglinstr. 2, 86156 Augsburg',
+    coordinates: {
+      lat: 48.3668,
+      lng: 10.9093
+    },
+    phone: '+49 821 400-01',
+    emergency: '+49 821 400-2356',
+    services: ['thrombectomy', 'neurosurgery', 'icu', 'telemedicine'],
+    certified: true,
+    certification: 'DSG/DGN',
+    lastUpdated: '2024-08-01'
+  },
+
+  // Primary stroke centers
+  {
+    id: 'klinikum-ingolstadt',
+    name: 'Klinikum Ingolstadt',
+    type: 'primary',
+    address: 'Krumenauerstraße 25, 85049 Ingolstadt',
+    coordinates: {
+      lat: 48.7665,
+      lng: 11.4364
+    },
+    phone: '+49 841 880-0',
+    emergency: '+49 841 880-2201',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'klinikum-pforzheim',
-    name: 'Helios Klinikum Pforzheim',
+    id: 'klinikum-passau',
+    name: 'Klinikum Passau',
     type: 'primary',
-    address: 'Kanzlerstraße 2-6, 75175 Pforzheim',
+    address: 'Bischof-Pilgrim-Str. 1, 94032 Passau',
     coordinates: {
-      lat: 48.8833,
-      lng: 8.6936
+      lat: 48.5665,
+      lng: 13.4513
     },
-    phone: '+49 7231 969-0',
-    emergency: '+49 7231 969-2301',
+    phone: '+49 851 5300-0',
+    emergency: '+49 851 5300-2100',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'zollernalb-klinikum',
-    name: 'Zollernalb Klinikum Albstadt',
+    id: 'klinikum-bamberg',
+    name: 'Sozialstiftung Bamberg Klinikum',
     type: 'primary',
-    address: 'Zollernring 10-14, 72488 Sigmaringen',
+    address: 'Buger Str. 80, 96049 Bamberg',
     coordinates: {
-      lat: 48.0878,
-      lng: 9.2233
+      lat: 49.8988,
+      lng: 10.9027
     },
-    phone: '+49 7571 100-0',
-    emergency: '+49 7571 100-1501',
+    phone: '+49 951 503-0',
+    emergency: '+49 951 503-11101',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'klinikum-konstanz',
-    name: 'Gesundheitsverbund Landkreis Konstanz',
+    id: 'klinikum-bayreuth',
+    name: 'Klinikum Bayreuth',
     type: 'primary',
-    address: 'Mainaustraße 14, 78464 Konstanz',
+    address: 'Preuschwitzer Str. 101, 95445 Bayreuth',
     coordinates: {
-      lat: 47.6779,
-      lng: 9.1732
+      lat: 49.9459,
+      lng: 11.5779
     },
-    phone: '+49 7531 801-0',
-    emergency: '+49 7531 801-2301',
+    phone: '+49 921 400-0',
+    emergency: '+49 921 400-5401',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'klinikum-friedrichshafen',
-    name: 'Klinikum Friedrichshafen',
+    id: 'klinikum-landshut',
+    name: 'Klinikum Landshut',
     type: 'primary',
-    address: 'Röntgenstraße 2, 88048 Friedrichshafen',
+    address: 'Robert-Koch-Str. 1, 84034 Landshut',
     coordinates: {
-      lat: 47.6587,
-      lng: 9.4685
+      lat: 48.5436,
+      lng: 12.1619
     },
-    phone: '+49 7541 96-0',
-    emergency: '+49 7541 96-2401',
+    phone: '+49 871 698-0',
+    emergency: '+49 871 698-3333',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'oberschwabenklinik-ravensburg',
-    name: 'Oberschwabenklinik Ravensburg',
+    id: 'klinikum-rosenheim',
+    name: 'RoMed Klinikum Rosenheim',
     type: 'primary',
-    address: 'Elisabethenstraße 17, 88212 Ravensburg',
+    address: 'Pettenkoferstr. 10, 83022 Rosenheim',
     coordinates: {
-      lat: 47.7815,
-      lng: 9.6078
+      lat: 47.8567,
+      lng: 12.1265
     },
-    phone: '+49 751 87-0',
-    emergency: '+49 751 87-2201',
+    phone: '+49 8031 365-0',
+    emergency: '+49 8031 365-3711',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'alb-donau-klinikum',
-    name: 'Alb Donau Klinikum Ehingen',
+    id: 'klinikum-memmingen',
+    name: 'Klinikum Memmingen',
     type: 'primary',
-    address: 'Schwörhausgasse 7, 89584 Ehingen',
+    address: 'Bismarckstr. 23, 87700 Memmingen',
     coordinates: {
-      lat: 48.2833,
-      lng: 9.7262
+      lat: 47.9833,
+      lng: 10.1833
     },
-    phone: '+49 7391 789-0',
-    emergency: '+49 7391 789-1801',
+    phone: '+49 8331 70-0',
+    emergency: '+49 8331 70-2500',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'ortenau-klinikum-offenburg',
-    name: 'Ortenau Klinikum Offenburg',
+    id: 'klinikum-kempten',
+    name: 'Klinikum Kempten-Oberallgäu',
     type: 'primary',
-    address: 'Ebertplatz 12, 77654 Offenburg',
+    address: 'Robert-Weixler-Str. 50, 87439 Kempten',
     coordinates: {
-      lat: 48.4706,
-      lng: 7.9444
+      lat: 47.7261,
+      lng: 10.3097
     },
-    phone: '+49 781 472-0',
-    emergency: '+49 781 472-2001',
+    phone: '+49 831 530-0',
+    emergency: '+49 831 530-2201',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
   },
   {
-    id: 'klinikum-baden-baden',
-    name: 'Klinikum Mittelbaden Baden-Baden',
+    id: 'klinikum-coburg',
+    name: 'Klinikum Coburg',
     type: 'primary',
-    address: 'Balger Str. 50, 76532 Baden-Baden',
+    address: 'Ketschendorfer Str. 33, 96450 Coburg',
     coordinates: {
-      lat: 48.7606,
-      lng: 8.2275
+      lat: 50.2596,
+      lng: 10.9685
     },
-    phone: '+49 7221 91-0',
-    emergency: '+49 7221 91-1701',
+    phone: '+49 9561 22-0',
+    emergency: '+49 9561 22-6300',
     services: ['stroke_unit', 'telemedicine'],
     certified: true,
     certification: 'DSG',
-    lastUpdated: '2024-01-01'
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-aschaffenburg',
+    name: 'Klinikum Aschaffenburg-Alzenau',
+    type: 'primary',
+    address: 'Am Hasenkopf 1, 63739 Aschaffenburg',
+    coordinates: {
+      lat: 49.9747,
+      lng: 9.1581
+    },
+    phone: '+49 6021 32-0',
+    emergency: '+49 6021 32-2700',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
   }
 ];
 

@@ -105,9 +105,51 @@ function requestUserLocation(results, resultsContainer) {
 async function geocodeLocation(locationString, results, resultsContainer) {
   resultsContainer.innerHTML = `<div class="loading">${t('searchingLocation')}...</div>`;
   
-  // Simple geocoding using a free service (in a real app, you'd use a proper geocoding service)
-  // For now, we'll show a placeholder and allow manual coordinate entry
-  showLocationError(t('geocodingNotImplemented'), resultsContainer);
+  try {
+    // Use Nominatim (OpenStreetMap) geocoding service - free and reliable
+    const encodedLocation = encodeURIComponent(locationString + ', Deutschland'); // Add Deutschland for German locations
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&countrycodes=de&format=json&limit=1&addressdetails=1`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'iGFAP-StrokeTriage/2.1.0' // Required by Nominatim
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Geocoding API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data && data.length > 0) {
+      const location = data[0];
+      const lat = parseFloat(location.lat);
+      const lng = parseFloat(location.lon);
+      const locationName = location.display_name || locationString;
+      
+      // Show success message and then proceed with location
+      resultsContainer.innerHTML = `
+        <div class="location-success">
+          <p>📍 Found: ${locationName}</p>
+        </div>
+      `;
+      
+      // Wait a moment to show the found location, then show centers
+      setTimeout(() => {
+        showNearestCenters(lat, lng, results, resultsContainer);
+      }, 1000);
+      
+    } else {
+      showLocationError(`Location "${locationString}" not found. Please try a more specific address or city name.`, resultsContainer);
+    }
+    
+  } catch (error) {
+    console.warn('Geocoding failed:', error);
+    showLocationError(`Unable to find location "${locationString}". Please check the spelling or try a different location.`, resultsContainer);
+  }
 }
 
 async function showNearestCenters(lat, lng, results, resultsContainer) {
