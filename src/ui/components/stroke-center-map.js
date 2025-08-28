@@ -113,6 +113,9 @@ async function geocodeLocation(locationString, results, resultsContainer) {
 async function showNearestCenters(lat, lng, results, resultsContainer) {
   const conditionType = determineConditionType(results);
   
+  // Generate routing explanation based on condition
+  const routingExplanation = getRoutingExplanation(conditionType, results);
+  
   // Show loading state
   resultsContainer.innerHTML = `
     <div class="location-info">
@@ -128,6 +131,7 @@ async function showNearestCenters(lat, lng, results, resultsContainer) {
     const html = `
       <div class="location-info">
         <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+        ${routingExplanation}
       </div>
       
       <div class="recommended-centers">
@@ -159,6 +163,7 @@ async function showNearestCenters(lat, lng, results, resultsContainer) {
     const html = `
       <div class="location-info">
         <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+        ${routingExplanation}
       </div>
       
       <div class="recommended-centers">
@@ -234,17 +239,43 @@ function renderStrokeCenterList(centers, isRecommended = false) {
 function determineConditionType(results) {
   if (!results) return 'stroke';
   
-  // If LVO probability is high, recommend comprehensive centers with thrombectomy
-  if (results.lvo && results.lvo.probability > 0.5) {
-    return 'lvo';
-  }
-  
-  // If ICH probability is high, recommend comprehensive centers with neurosurgery
-  if (results.ich && results.ich.probability > 0.6) {
+  // PRIORITIZE ICH - Check for ICH first as it requires neurosurgery
+  // Lower threshold to 0.3 (30%) for more sensitive routing to neurosurgical centers
+  if (results.ich && results.ich.probability > 0.3) {
     return 'ich';
   }
   
+  // Only consider LVO if ICH is low (secondary consideration)
+  if (results.lvo && results.lvo.probability > 0.5 && (!results.ich || results.ich.probability < 0.3)) {
+    return 'lvo';
+  }
+  
   return 'stroke';
+}
+
+function getRoutingExplanation(conditionType, results) {
+  if (conditionType === 'ich') {
+    const ichPercent = Math.round((results?.ich?.probability || 0) * 100);
+    return `
+      <div class="routing-explanation ich-routing">
+        <strong>⚠️ ${t('neurosurgeryRouting') || 'Neurosurgical Centers Recommended'}</strong>
+        <p>${t('ichRoutingExplanation') || `ICH risk ${ichPercent}% - Routing to centers with neurosurgery capability`}</p>
+      </div>
+    `;
+  } else if (conditionType === 'lvo') {
+    return `
+      <div class="routing-explanation lvo-routing">
+        <strong>⚡ ${t('thrombectomyRouting') || 'Thrombectomy Centers Recommended'}</strong>
+        <p>${t('lvoRoutingExplanation') || 'Possible LVO - Routing to centers with thrombectomy capability'}</p>
+      </div>
+    `;
+  }
+  
+  return `
+    <div class="routing-explanation general-routing">
+      <p>${t('generalStrokeRouting') || 'Showing nearest stroke-capable centers'}</p>
+    </div>
+  `;
 }
 
 function showLocationError(message, container) {
