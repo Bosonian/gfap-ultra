@@ -12,7 +12,7 @@ export function renderStrokeCenterMap(results) {
             📍 ${t('useCurrentLocation')}
           </button>
           <div class="location-manual" style="display: none;">
-            <input type="text" id="locationInput" placeholder="${t('enterLocationPlaceholder')}" />
+            <input type="text" id="locationInput" placeholder="${t('enterLocationPlaceholder') || 'e.g. München, Bad Tölz, or 48.1351, 11.5820'}" />
             <button type="button" id="searchLocationButton" class="secondary">${t('search')}</button>
           </div>
           <button type="button" id="manualLocationButton" class="secondary">
@@ -105,10 +105,48 @@ function requestUserLocation(results, resultsContainer) {
 async function geocodeLocation(locationString, results, resultsContainer) {
   resultsContainer.innerHTML = `<div class="loading">${t('searchingLocation')}...</div>`;
   
+  // Check if user entered coordinates (format: lat, lng or lat,lng)
+  const coordPattern = /^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/;
+  const coordMatch = locationString.trim().match(coordPattern);
+  
+  if (coordMatch) {
+    // Direct coordinate input
+    const lat = parseFloat(coordMatch[1]);
+    const lng = parseFloat(coordMatch[2]);
+    
+    // Validate coordinates are within Germany's approximate bounds
+    if (lat >= 47.2 && lat <= 55.1 && lng >= 5.9 && lng <= 15.0) {
+      resultsContainer.innerHTML = `
+        <div class="location-success">
+          <p>📍 Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+        </div>
+      `;
+      setTimeout(() => {
+        showNearestCenters(lat, lng, results, resultsContainer);
+      }, 500);
+      return;
+    } else {
+      showLocationError(`Coordinates appear to be outside Germany. Please check the values.`, resultsContainer);
+      return;
+    }
+  }
+  
   try {
+    // Clean up the location string
+    let searchLocation = locationString.trim();
+    
+    // If it doesn't already include country/state info, add it
+    if (!searchLocation.toLowerCase().includes('bayern') && 
+        !searchLocation.toLowerCase().includes('bavaria') && 
+        !searchLocation.toLowerCase().includes('deutschland') &&
+        !searchLocation.toLowerCase().includes('germany')) {
+      searchLocation = searchLocation + ', Bayern, Deutschland';
+    }
+    
     // Use Nominatim (OpenStreetMap) geocoding service - free and reliable
-    const encodedLocation = encodeURIComponent(locationString + ', Deutschland'); // Add Deutschland for German locations
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&countrycodes=de&format=json&limit=1&addressdetails=1`;
+    // Note: encodeURIComponent properly handles umlauts (ä, ö, ü, ß)
+    const encodedLocation = encodeURIComponent(searchLocation);
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&countrycodes=de&format=json&limit=3&addressdetails=1`;
     
     const response = await fetch(url, {
       method: 'GET',
@@ -125,7 +163,15 @@ async function geocodeLocation(locationString, results, resultsContainer) {
     const data = await response.json();
     
     if (data && data.length > 0) {
-      const location = data[0];
+      // Prefer the first result that's actually in Bayern if multiple results
+      let location = data[0];
+      for (const result of data) {
+        if (result.address && result.address.state === 'Bayern') {
+          location = result;
+          break;
+        }
+      }
+      
       const lat = parseFloat(location.lat);
       const lng = parseFloat(location.lon);
       const locationName = location.display_name || locationString;
@@ -134,6 +180,7 @@ async function geocodeLocation(locationString, results, resultsContainer) {
       resultsContainer.innerHTML = `
         <div class="location-success">
           <p>📍 Found: ${locationName}</p>
+          <small style="color: #666;">Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}</small>
         </div>
       `;
       
@@ -143,12 +190,23 @@ async function geocodeLocation(locationString, results, resultsContainer) {
       }, 1000);
       
     } else {
-      showLocationError(`Location "${locationString}" not found. Please try a more specific address or city name.`, resultsContainer);
+      showLocationError(`
+        <strong>Location "${locationString}" not found.</strong><br>
+        <small>Try:</small>
+        <ul style="text-align: left; font-size: 0.9em; margin: 10px 0;">
+          <li>City name: "München" or "Augsburg"</li>
+          <li>Address: "Marienplatz 1, München"</li>
+          <li>Coordinates: "48.1351, 11.5820"</li>
+        </ul>
+      `, resultsContainer);
     }
     
   } catch (error) {
     console.warn('Geocoding failed:', error);
-    showLocationError(`Unable to find location "${locationString}". Please check the spelling or try a different location.`, resultsContainer);
+    showLocationError(`
+      <strong>Unable to search location.</strong><br>
+      <small>Please try entering coordinates directly (e.g., "48.1351, 11.5820")</small>
+    `, resultsContainer);
   }
 }
 
