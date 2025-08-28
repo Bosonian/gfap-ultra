@@ -240,13 +240,13 @@ function determineConditionType(results) {
   if (!results) return 'stroke';
   
   // PRIORITIZE ICH - Check for ICH first as it requires neurosurgery
-  // Lower threshold to 0.3 (30%) for more sensitive routing to neurosurgical centers
-  if (results.ich && results.ich.probability > 0.3) {
+  // Set threshold to 0.5 (50%) for routing to neurosurgical centers
+  if (results.ich && results.ich.probability > 0.5) {
     return 'ich';
   }
   
   // Only consider LVO if ICH is low (secondary consideration)
-  if (results.lvo && results.lvo.probability > 0.5 && (!results.ich || results.ich.probability < 0.3)) {
+  if (results.lvo && results.lvo.probability > 0.5 && (!results.ich || results.ich.probability < 0.5)) {
     return 'lvo';
   }
   
