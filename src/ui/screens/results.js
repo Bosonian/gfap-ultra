@@ -305,13 +305,17 @@ function renderICHDriversOnly(ich) {
     return '<p class="no-drivers">No driver data available</p>';
   }
   
-  // Format drivers as before but only for ICH
-  const drivers = Object.entries(ich.drivers)
-    .map(([key, value]) => ({ name: key, value: value }))
-    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+  // Drivers are already formatted from API with positive/negative arrays
+  const driversData = ich.drivers;
   
-  const positiveDrivers = drivers.filter(d => d.value > 0);
-  const negativeDrivers = drivers.filter(d => d.value < 0);
+  // Check if drivers have the correct structure
+  if (!driversData.positive && !driversData.negative) {
+    // Fallback for unexpected format
+    return '<p class="no-drivers">Driver format error</p>';
+  }
+  
+  const positiveDrivers = driversData.positive || [];
+  const negativeDrivers = driversData.negative || [];
   
   return `
     <div class="drivers-split-view">
@@ -322,7 +326,7 @@ function renderICHDriversOnly(ich) {
         </div>
         <div class="compact-drivers">
           ${positiveDrivers.length > 0 ? 
-            positiveDrivers.map(d => renderCompactDriver(d, 'positive')).join('') :
+            positiveDrivers.slice(0, 5).map(d => renderCompactDriver(d, 'positive')).join('') :
             `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
           }
         </div>
@@ -335,7 +339,7 @@ function renderICHDriversOnly(ich) {
         </div>
         <div class="compact-drivers">
           ${negativeDrivers.length > 0 ?
-            negativeDrivers.map(d => renderCompactDriver(d, 'negative')).join('') :
+            negativeDrivers.slice(0, 5).map(d => renderCompactDriver(d, 'negative')).join('') :
             `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
           }
         </div>
@@ -345,12 +349,13 @@ function renderICHDriversOnly(ich) {
 }
 
 function renderCompactDriver(driver, type) {
-  const percentage = Math.abs(driver.value * 100);
+  // Driver object has 'label' and 'weight' properties
+  const percentage = Math.abs(driver.weight * 100);
   const width = Math.min(percentage * 2, 100); // Scale for display
   
   return `
     <div class="compact-driver-item">
-      <div class="compact-driver-label">${formatDriverName(driver.name)}</div>
+      <div class="compact-driver-label">${formatDriverName(driver.label)}</div>
       <div class="compact-driver-bar ${type}" style="width: ${width}%;">
         <span class="compact-driver-value">${percentage.toFixed(1)}%</span>
       </div>
