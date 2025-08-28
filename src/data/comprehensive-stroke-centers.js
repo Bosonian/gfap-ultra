@@ -121,6 +121,58 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         thrombolysis: true,
         beds: 1740,
         network: "TEMPiS"
+      },
+      {
+        id: "BY-NS-010",
+        name: "Klinikum Aschaffenburg-Alzenau",
+        address: "Am Hasenkopf 1, 63739 Aschaffenburg",
+        coordinates: { lat: 49.9737, lng: 9.1570 },
+        phone: "+49 6021 32-0",
+        emergency: "+49 6021 32-2800",
+        neurosurgery: true,
+        thrombectomy: true,
+        thrombolysis: true,
+        beds: 40,
+        network: "TRANSIT"
+      },
+      {
+        id: "BY-NS-011", 
+        name: "Klinikum Landshut",
+        address: "Robert-Koch-Str. 1, 84034 Landshut",
+        coordinates: { lat: 48.5665, lng: 12.1512 },
+        phone: "+49 871 698-0",
+        emergency: "+49 871 698-3333",
+        neurosurgery: true,
+        thrombectomy: true,
+        thrombolysis: true,
+        beds: 505,
+        network: "TEMPiS"
+      },
+      {
+        id: "BY-NS-012",
+        name: "Klinikum Coburg",
+        address: "Ketschendorfer Str. 33, 96450 Coburg",
+        coordinates: { lat: 50.2596, lng: 10.9644 },
+        phone: "+49 9561 22-0",
+        emergency: "+49 9561 22-6800",
+        neurosurgery: true,
+        thrombectomy: true,
+        thrombolysis: true,
+        beds: 547,
+        network: "STENO"
+      },
+      {
+        id: "BY-NS-013",
+        name: "Klinikum Passau",
+        address: "Bischof-Pilgrim-Str. 1, 94032 Passau",
+        coordinates: { lat: 48.5665, lng: 13.4777 },
+        phone: "+49 851 5300-0",
+        emergency: "+49 851 5300-2222",
+        neurosurgery: true,
+        thrombectomy: true,
+        thrombolysis: true,
+        beds: 696,
+        network: "TEMPiS"
       }
     ],
 
@@ -541,6 +593,32 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         thrombectomy: true,
         thrombolysis: true,
         beds: 1200,
+        network: "NEVANO+"
+      },
+      {
+        id: "NRW-NS-006",
+        name: "Klinikum Dortmund",
+        address: "Beurhausstraße 40, 44137 Dortmund",
+        coordinates: { lat: 51.5036, lng: 7.4663 },
+        phone: "+49 231 953-0",
+        emergency: "+49 231 953-20050",
+        neurosurgery: true,
+        thrombectomy: true,
+        thrombolysis: true,
+        beds: 1200,
+        network: "NVNR"
+      },
+      {
+        id: "NRW-NS-007",
+        name: "Rhein-Maas Klinikum Würselen",
+        address: "Mauerfeldstraße 25, 52146 Würselen",
+        coordinates: { lat: 50.8178, lng: 6.1264 },
+        phone: "+49 2405 62-0",
+        emergency: "+49 2405 62-2222",
+        neurosurgery: true,
+        thrombectomy: true,
+        thrombolysis: true,
+        beds: 420,
         network: "NEVANO+"
       }
     ],
