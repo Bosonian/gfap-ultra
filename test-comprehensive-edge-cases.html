@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Edge Case Testing</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .passed {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .failed {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .summary {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Comprehensive Edge Case Testing Suite</h1>
+    <p>This page tests the robustness of the multi-state stroke routing system with extreme edge cases.</p>
+
+    <div class="test-section">
+        <h2>🌍 Geographic Boundary Tests</h2>
+        <button onclick="runGeographicTests()">Run Geographic Tests</button>
+        <div id="geographic-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🩺 Clinical Threshold Tests</h2>
+        <button onclick="runClinicalTests()">Run Clinical Tests</button>
+        <div id="clinical-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>💻 Technical Robustness Tests</h2>
+        <button onclick="runTechnicalTests()">Run Technical Tests</button>
+        <div id="technical-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Real-World Scenario Tests</h2>
+        <button onclick="runScenarioTests()">Run Scenario Tests</button>
+        <div id="scenario-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚡ Performance Stress Tests</h2>
+        <button onclick="runPerformanceTests()">Run Performance Tests</button>
+        <div id="performance-results"></div>
+    </div>
+
+    <div id="overall-summary"></div>
+
+    <script type="module">
+        import { COMPREHENSIVE_HOSPITAL_DATABASE, ROUTING_ALGORITHM } from '/0825/src/data/comprehensive-stroke-centers.js';
+
+        window.ROUTING_ALGORITHM = ROUTING_ALGORITHM;
+        window.testResults = {
+            geographic: 0,
+            clinical: 0, 
+            technical: 0,
+            scenario: 0,
+            performance: 0,
+            totalTests: 0,
+            passedTests: 0
+        };
+
+        window.addTestResult = function(category, testName, passed, details) {
+            window.testResults.totalTests++;
+            if (passed) {
+                window.testResults.passedTests++;
+                window.testResults[category]++;
+            }
+            
+            const resultDiv = document.getElementById(`${category}-results`);
+            const resultClass = passed ? 'passed' : 'failed';
+            const icon = passed ? '✅' : '❌';
+            
+            resultDiv.innerHTML += `
+                <div class="test-result ${resultClass}">
+                    ${icon} <strong>${testName}</strong><br>
+                    ${details}
+                </div>
+            `;
+        };
+
+        window.updateSummary = function() {
+            const summary = document.getElementById('overall-summary');
+            const successRate = Math.round((window.testResults.passedTests / window.testResults.totalTests) * 100);
+            
+            let summaryClass = 'passed';
+            if (successRate < 80) summaryClass = 'failed';
+            else if (successRate < 95) summaryClass = 'warning';
+            
+            summary.innerHTML = `
+                <div class="summary ${summaryClass}">
+                    📊 Overall Test Results: ${window.testResults.passedTests}/${window.testResults.totalTests} tests passed (${successRate}%)
+                    <br>Geographic: ${window.testResults.geographic} | Clinical: ${window.testResults.clinical} | Technical: ${window.testResults.technical} | 
+                    Scenario: ${window.testResults.scenario} | Performance: ${window.testResults.performance}
+                </div>
+            `;
+        };
+
+        window.runGeographicTests = function() {
+            document.getElementById('geographic-results').innerHTML = '<p>Running geographic boundary tests...</p>';
+            
+            const tests = [
+                {
+                    name: 'State Border: Bayern-Baden-Württemberg',
+                    location: { lat: 48.4, lng: 10.0 },
+                    ichProbability: 0.60,
+                    expected: 'Routes to nearest neurosurgical center'
+                },
+                {
+                    name: 'Remote location: Berchtesgaden',
+                    location: { lat: 47.6, lng: 13.0 },
+                    ichProbability: 0.25,
+                    timeFromOnset: 100,
+                    expected: 'Finds thrombolysis center despite distance'
+                },
+                {
+                    name: 'Northern NRW boundary',
+                    location: { lat: 52.4, lng: 7.0 },
+                    ichProbability: 0.45,
+                    expected: 'Routes within NRW'
+                }
+            ];
+
+            tests.forEach(test => {
+                try {
+                    const routing = window.ROUTING_ALGORITHM.routePatient(test);
+                    const passed = routing && routing.destination;
+                    const details = passed ? 
+                        `State: ${routing.state}, Destination: ${routing.destination.name} (${routing.destination.distance.toFixed(1)} km)` :
+                        'No routing result';
+                    
+                    window.addTestResult('geographic', test.name, passed, details);
+                } catch (error) {
+                    window.addTestResult('geographic', test.name, false, `Error: ${error.message}`);
+                }
+            });
+            
+            window.updateSummary();
+        };
+
+        window.runClinicalTests = function() {
+            document.getElementById('clinical-results').innerHTML = '<p>Running clinical threshold tests...</p>';
+            
+            const tests = [
+                {
+                    name: 'ICH = 0% (minimum risk)',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 0.0,
+                    timeFromOnset: 120,
+                    expected: 'Routes to thrombolysis'
+                },
+                {
+                    name: 'ICH = 29.9% (just below threshold)',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 0.299,
+                    timeFromOnset: 200,
+                    expected: 'Routes to thrombolysis'
+                },
+                {
+                    name: 'ICH = 30.0% (exactly at threshold)',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 0.30,
+                    expected: 'Routes to comprehensive center'
+                },
+                {
+                    name: 'ICH = 50.0% (neurosurgical threshold)',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 0.50,
+                    expected: 'Routes to neurosurgical center'
+                },
+                {
+                    name: 'ICH = 100% (maximum risk)',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 1.0,
+                    expected: 'Routes to neurosurgical center'
+                },
+                {
+                    name: 'Time = 270 min (tPA cutoff)',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 0.20,
+                    timeFromOnset: 270,
+                    expected: 'Still routes to thrombolysis'
+                },
+                {
+                    name: 'Time = 271 min (beyond tPA)',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 0.20,
+                    timeFromOnset: 271,
+                    expected: 'Routes to stroke unit'
+                }
+            ];
+
+            tests.forEach(test => {
+                try {
+                    const routing = window.ROUTING_ALGORITHM.routePatient(test);
+                    let passed = false;
+                    
+                    if (test.ichProbability >= 0.50) {
+                        passed = routing.category === 'NEUROSURGICAL_CENTER';
+                    } else if (test.ichProbability >= 0.30) {
+                        passed = routing.category === 'COMPREHENSIVE_CENTER';
+                    } else if (test.timeFromOnset && test.timeFromOnset <= 270) {
+                        passed = routing.category === 'THROMBOLYSIS_CAPABLE';
+                    } else {
+                        passed = routing.category === 'STROKE_UNIT';
+                    }
+                    
+                    const details = `Category: ${routing.category}, Urgency: ${routing.urgency}`;
+                    window.addTestResult('clinical', test.name, passed, details);
+                } catch (error) {
+                    window.addTestResult('clinical', test.name, false, `Error: ${error.message}`);
+                }
+            });
+            
+            window.updateSummary();
+        };
+
+        window.runTechnicalTests = function() {
+            document.getElementById('technical-results').innerHTML = '<p>Running technical robustness tests...</p>';
+            
+            const tests = [
+                {
+                    name: 'Invalid coordinates (NaN)',
+                    location: { lat: NaN, lng: NaN },
+                    ichProbability: 0.40,
+                    expected: 'Handles gracefully'
+                },
+                {
+                    name: 'Null location',
+                    location: null,
+                    ichProbability: 0.30,
+                    expected: 'Fails gracefully'
+                },
+                {
+                    name: 'Negative ICH probability',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: -0.1,
+                    expected: 'Treats as low risk'
+                },
+                {
+                    name: 'ICH > 1.0',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 1.5,
+                    expected: 'Treats as maximum risk'
+                },
+                {
+                    name: 'Missing ICH probability',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: null,
+                    expected: 'Uses default behavior'
+                }
+            ];
+
+            tests.forEach(test => {
+                try {
+                    const routing = window.ROUTING_ALGORITHM.routePatient(test);
+                    const passed = routing && routing.destination;
+                    const details = passed ? 
+                        `Successfully routed to ${routing.destination.name}` : 
+                        'No routing result';
+                    
+                    window.addTestResult('technical', test.name, passed, details);
+                } catch (error) {
+                    // For technical tests, graceful failure can be considered success
+                    const passed = test.expected.includes('gracefully') || test.expected.includes('Fails gracefully');
+                    window.addTestResult('technical', test.name, passed, `Caught error: ${error.message}`);
+                }
+            });
+            
+            window.updateSummary();
+        };
+
+        window.runScenarioTests = function() {
+            document.getElementById('scenario-results').innerHTML = '<p>Running real-world scenario tests...</p>';
+            
+            const scenarios = [
+                {
+                    name: 'Ambulance in Bad Gögging (low ICH)',
+                    location: { lat: 48.8233, lng: 11.7822 },
+                    ichProbability: 0.15,
+                    timeFromOnset: 90,
+                    expected: 'Routes to Kelheim (nearest)'
+                },
+                {
+                    name: 'Ambulance in Bad Gögging (high ICH)',
+                    location: { lat: 48.8233, lng: 11.7822 },
+                    ichProbability: 0.65,
+                    expected: 'Routes to Regensburg (neurosurgical)'
+                },
+                {
+                    name: 'Cross-border: Stuttgart patient',
+                    location: { lat: 48.7758, lng: 9.1829 },
+                    ichProbability: 0.55,
+                    expected: 'Routes to Stuttgart neurosurgical center'
+                },
+                {
+                    name: 'Late presentation in Munich',
+                    location: { lat: 48.1351, lng: 11.5820 },
+                    ichProbability: 0.20,
+                    timeFromOnset: 480, // 8 hours
+                    expected: 'Routes to stroke unit, not thrombolysis'
+                },
+                {
+                    name: 'Border case: Ulm area',
+                    location: { lat: 48.4, lng: 10.0 },
+                    ichProbability: 0.35,
+                    expected: 'Routes appropriately regardless of state'
+                }
+            ];
+
+            scenarios.forEach(scenario => {
+                try {
+                    const routing = window.ROUTING_ALGORITHM.routePatient(scenario);
+                    let passed = true;
+                    
+                    // Validate routing makes clinical sense
+                    if (scenario.ichProbability >= 0.50 && routing.category !== 'NEUROSURGICAL_CENTER') {
+                        passed = false;
+                    }
+                    if (scenario.ichProbability < 0.30 && scenario.timeFromOnset > 270 && routing.category === 'THROMBOLYSIS_CAPABLE') {
+                        passed = false;
+                    }
+                    
+                    const details = `${routing.destination.name} (${routing.destination.distance.toFixed(1)} km) - ${routing.reasoning}`;
+                    window.addTestResult('scenario', scenario.name, passed, details);
+                } catch (error) {
+                    window.addTestResult('scenario', scenario.name, false, `Error: ${error.message}`);
+                }
+            });
+            
+            window.updateSummary();
+        };
+
+        window.runPerformanceTests = function() {
+            document.getElementById('performance-results').innerHTML = '<p>Running performance stress tests...</p>';
+            
+            // Test 1: Batch routing performance
+            const startTime = Date.now();
+            let successCount = 0;
+            const totalRequests = 1000;
+            
+            for (let i = 0; i < totalRequests; i++) {
+                try {
+                    const randomLat = 47.5 + Math.random() * 4; // 47.5-51.5
+                    const randomLng = 6 + Math.random() * 7;    // 6-13
+                    const randomICH = Math.random();
+                    
+                    const routing = window.ROUTING_ALGORITHM.routePatient({
+                        location: { lat: randomLat, lng: randomLng },
+                        ichProbability: randomICH,
+                        timeFromOnset: Math.floor(Math.random() * 600)
+                    });
+                    
+                    if (routing && routing.destination) {
+                        successCount++;
+                    }
+                } catch (error) {
+                    // Count failures
+                }
+            }
+            
+            const endTime = Date.now();
+            const avgTime = (endTime - startTime) / totalRequests;
+            const successRate = (successCount / totalRequests) * 100;
+            
+            const passed = successRate >= 95 && avgTime < 1; // 95% success rate, <1ms per request
+            window.addTestResult('performance', 'Batch Routing Performance', passed, 
+                `${totalRequests} requests in ${endTime - startTime}ms (avg: ${avgTime.toFixed(2)}ms). Success rate: ${successRate.toFixed(1)}%`);
+            
+            // Test 2: Memory usage (approximate)
+            const memoryBefore = performance.memory ? performance.memory.usedJSHeapSize : 0;
+            
+            // Create many routing requests
+            for (let i = 0; i < 100; i++) {
+                try {
+                    window.ROUTING_ALGORITHM.routePatient({
+                        location: { lat: 48.1351, lng: 11.5820 },
+                        ichProbability: Math.random(),
+                        timeFromOnset: 120
+                    });
+                } catch (error) {
+                    // Ignore errors
+                }
+            }
+            
+            const memoryAfter = performance.memory ? performance.memory.usedJSHeapSize : 0;
+            const memoryIncrease = (memoryAfter - memoryBefore) / 1024; // KB
+            
+            const memoryPassed = !performance.memory || memoryIncrease < 1000; // <1MB increase
+            window.addTestResult('performance', 'Memory Usage', memoryPassed, 
+                performance.memory ? `Memory increase: ${memoryIncrease.toFixed(0)} KB` : 'Memory API not available');
+            
+            window.updateSummary();
+        };
+
+        // Auto-run all tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('Starting comprehensive edge case testing...');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

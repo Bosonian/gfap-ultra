@@ -628,9 +628,14 @@ const ROUTING_ALGORITHM = {
     // Enhanced decision tree based on ICH probability
     if (ichProbability >= 0.50) {
       // HIGH ICH RISK - Direct to neurosurgery
+      const destination = this.findNearest(location, database.neurosurgicalCenters);
+      if (!destination) {
+        throw new Error(`No neurosurgical centers available in ${detectedState}`);
+      }
+      
       return {
         category: "NEUROSURGICAL_CENTER",
-        destination: this.findNearest(location, database.neurosurgicalCenters),
+        destination,
         urgency: "IMMEDIATE",
         reasoning: "High bleeding probability (≥50%) - neurosurgical evaluation required",
         preAlert: "Activate neurosurgery team",
@@ -753,13 +758,25 @@ const ROUTING_ALGORITHM = {
   
   // Helper function to find nearest hospital
   findNearest: function(userLocation, hospitals) {
-    if (!hospitals || hospitals.length === 0) return null;
+    if (!hospitals || hospitals.length === 0) {
+      console.warn('No hospitals available in database');
+      return null;
+    }
     
     return hospitals
-      .map(hospital => ({
-        ...hospital,
-        distance: this.calculateDistance(userLocation, hospital.coordinates)
-      }))
+      .map(hospital => {
+        // Validate hospital has coordinates
+        if (!hospital.coordinates || typeof hospital.coordinates.lat !== 'number') {
+          console.warn(`Hospital ${hospital.name} missing valid coordinates`);
+          return null;
+        }
+        
+        return {
+          ...hospital,
+          distance: this.calculateDistance(userLocation, hospital.coordinates)
+        };
+      })
+      .filter(hospital => hospital !== null) // Remove invalid hospitals
       .sort((a, b) => a.distance - b.distance)[0];
   },
   
