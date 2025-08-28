@@ -310,6 +310,120 @@ export const strokeCenters = [
     certified: true,
     certification: 'DSG',
     lastUpdated: '2024-08-01'
+  },
+
+  // Additional smaller stroke units in Bayern
+  {
+    id: 'goldberg-klinik-kelheim',
+    name: 'Goldberg-Klinik Kelheim',
+    type: 'primary',
+    address: 'Traubenweg 3, 93309 Kelheim',
+    coordinates: {
+      lat: 48.9166,
+      lng: 11.8742
+    },
+    phone: '+49 9441 702-0',
+    emergency: '+49 9441 702-6800',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-deggendorf',
+    name: 'DONAUISAR Klinikum Deggendorf',
+    type: 'primary',
+    address: 'Perlasberger Str. 41, 94469 Deggendorf',
+    coordinates: {
+      lat: 48.8372,
+      lng: 12.9619
+    },
+    phone: '+49 991 380-0',
+    emergency: '+49 991 380-2201',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-straubing',
+    name: 'Klinikum St. Elisabeth Straubing',
+    type: 'primary',
+    address: 'St.-Elisabeth-Str. 23, 94315 Straubing',
+    coordinates: {
+      lat: 48.8742,
+      lng: 12.5733
+    },
+    phone: '+49 9421 710-0',
+    emergency: '+49 9421 710-2000',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-freising',
+    name: 'Klinikum Freising',
+    type: 'primary',
+    address: 'Mainburger Str. 29, 85356 Freising',
+    coordinates: {
+      lat: 48.4142,
+      lng: 11.7461
+    },
+    phone: '+49 8161 24-0',
+    emergency: '+49 8161 24-2800',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-erding',
+    name: 'Klinikum Landkreis Erding',
+    type: 'primary',
+    address: 'Bajuwarenstr. 5, 85435 Erding',
+    coordinates: {
+      lat: 48.3061,
+      lng: 11.9067
+    },
+    phone: '+49 8122 59-0',
+    emergency: '+49 8122 59-2201',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'helios-dachau',
+    name: 'Helios Amper-Klinikum Dachau',
+    type: 'primary',
+    address: 'Krankenhausstr. 15, 85221 Dachau',
+    coordinates: {
+      lat: 48.2599,
+      lng: 11.4342
+    },
+    phone: '+49 8131 76-0',
+    emergency: '+49 8131 76-2201',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
+  },
+  {
+    id: 'klinikum-fuerstenfeldbruck',
+    name: 'Klinikum Fürstenfeldbruck',
+    type: 'primary',
+    address: 'Dachauer Str. 33, 82256 Fürstenfeldbruck',
+    coordinates: {
+      lat: 48.1772,
+      lng: 11.2578
+    },
+    phone: '+49 8141 99-0',
+    emergency: '+49 8141 99-2201',
+    services: ['stroke_unit', 'telemedicine'],
+    certified: true,
+    certification: 'DSG',
+    lastUpdated: '2024-08-01'
   }
 ];
 

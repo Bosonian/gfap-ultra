@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Geocoding Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        iframe {
+            width: 100%;
+            height: 700px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .controls {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        .test-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #e3f2fd;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗺️ iGFAP App - Geocoding Live Test</h1>
+    
+    <div class="controls">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li>App will load below - click through to Results screen</li>
+            <li>Open the hospital map section</li>
+            <li>Click "Enter Manually" button</li>
+            <li>Test these locations:</li>
+            <ul>
+                <li><strong>Cities:</strong> München, Bad Tölz, Fürstenfeldbruck</li>
+                <li><strong>Addresses:</strong> Marienplatz 1, München</li>
+                <li><strong>Coordinates:</strong> 48.1351, 11.5820</li>
+            </ul>
+        </ol>
+        
+        <div class="test-status">
+            <h4>Quick Test Locations (copy & paste):</h4>
+            <p><code>München</code> - Should find LMU Großhadern and other Munich hospitals</p>
+            <p><code>Nürnberg</code> - Should find Klinikum Nürnberg Nord</p>
+            <p><code>Bad Tölz</code> - Should find nearest hospitals from this smaller town</p>
+            <p><code>48.1351, 11.5820</code> - Direct coordinates (München center)</p>
+            <p><code>49.4521, 11.0767</code> - Direct coordinates (Nürnberg)</p>
+        </div>
+    </div>
+    
+    <h2>Live App:</h2>
+    <iframe src="http://localhost:8080/0825/" title="iGFAP App"></iframe>
+    
+    <div class="controls">
+        <h3>Expected Results:</h3>
+        <ul>
+            <li>✅ All major Bayern cities should be found</li>
+            <li>✅ Most smaller towns should work (Bad Tölz, Dachau, etc.)</li>
+            <li>✅ Coordinates should work instantly without API call</li>
+            <li>✅ Should see "Found: [location name]" message</li>
+            <li>✅ Should show nearest hospitals with neurosurgery for ICH >50%</li>
+            <li>✅ Should display distance/travel time to hospitals</li>
+        </ul>
+    </div>
+</body>
+</html>

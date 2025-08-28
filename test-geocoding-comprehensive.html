@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geocoding Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #ddd;
+        }
+        .test-item.success {
+            border-left-color: #4CAF50;
+            background: #f1f8f1;
+        }
+        .test-item.failed {
+            border-left-color: #f44336;
+            background: #fff1f0;
+        }
+        .test-item.pending {
+            border-left-color: #2196F3;
+            background: #f0f7ff;
+        }
+        .location-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .coordinates {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .error {
+            color: #f44336;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Bayern Geocoding Test Suite</h1>
+    
+    <div class="test-container">
+        <h2>Test Locations</h2>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+        
+        <div id="test-results"></div>
+        <div id="summary" class="summary" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Test locations for Bayern
+        const testLocations = [
+            // Major cities
+            { input: "München", type: "Major City" },
+            { input: "Nürnberg", type: "Major City" },
+            { input: "Augsburg", type: "Major City" },
+            { input: "Regensburg", type: "Major City" },
+            { input: "Würzburg", type: "Major City" },
+            
+            // Medium cities
+            { input: "Erlangen", type: "Medium City" },
+            { input: "Ingolstadt", type: "Medium City" },
+            { input: "Passau", type: "Medium City" },
+            { input: "Bamberg", type: "Medium City" },
+            
+            // Small towns with special characters
+            { input: "Bad Tölz", type: "Small Town" },
+            { input: "Fürstenfeldbruck", type: "Small Town" },
+            { input: "Garmisch-Partenkirchen", type: "Small Town" },
+            { input: "Bad Wörishofen", type: "Small Town" },
+            
+            // Specific addresses
+            { input: "Marienplatz 1, München", type: "Address" },
+            { input: "Hauptstraße 5, Augsburg", type: "Address" },
+            { input: "Bahnhofstraße 10, Rosenheim", type: "Address" },
+            
+            // Coordinates
+            { input: "48.1351, 11.5820", type: "Coordinates", expectedName: "München area" },
+            { input: "49.4521, 11.0767", type: "Coordinates", expectedName: "Nürnberg area" },
+            { input: "48.3668, 10.9093", type: "Coordinates", expectedName: "Augsburg area" },
+            
+            // Edge cases
+            { input: "Nonexistent Village XYZ", type: "Invalid", shouldFail: true },
+            { input: "Berlin", type: "Outside Bayern", shouldWarn: true },
+        ];
+
+        async function testGeocoding(location) {
+            const searchLocation = location.input.includes(',') && location.type === "Coordinates" 
+                ? location.input 
+                : location.input + ', Bayern, Deutschland';
+            
+            const encodedLocation = encodeURIComponent(searchLocation);
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&countrycodes=de&format=json&limit=3&addressdetails=1`;
+            
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    // Check if it's a coordinate input
+                    if (location.type === "Coordinates") {
+                        const coords = location.input.split(',').map(c => parseFloat(c.trim()));
+                        return {
+                            success: true,
+                            lat: coords[0],
+                            lon: coords[1],
+                            display_name: `Direct coordinates: ${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}`,
+                            inBayern: true
+                        };
+                    }
+                    
+                    // Find Bayern result
+                    let bestResult = data[0];
+                    for (const result of data) {
+                        if (result.address && result.address.state === 'Bayern') {
+                            bestResult = result;
+                            break;
+                        }
+                    }
+                    
+                    const inBayern = bestResult.address && bestResult.address.state === 'Bayern';
+                    
+                    return {
+                        success: true,
+                        lat: parseFloat(bestResult.lat),
+                        lon: parseFloat(bestResult.lon),
+                        display_name: bestResult.display_name,
+                        inBayern: inBayern
+                    };
+                } else {
+                    return {
+                        success: false,
+                        error: 'No results found'
+                    };
+                }
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function runAllTests() {
+            const resultsDiv = document.getElementById('test-results');
+            const summaryDiv = document.getElementById('summary');
+            resultsDiv.innerHTML = '<p>Running tests...</p>';
+            summaryDiv.style.display = 'none';
+            
+            let html = '';
+            let successCount = 0;
+            let failCount = 0;
+            let warnCount = 0;
+            
+            for (const location of testLocations) {
+                const result = await testGeocoding(location);
+                
+                let status = 'pending';
+                let statusText = '';
+                
+                if (location.shouldFail) {
+                    if (!result.success) {
+                        status = 'success';
+                        statusText = '✅ Expected failure';
+                        successCount++;
+                    } else {
+                        status = 'failed';
+                        statusText = '❌ Should have failed';
+                        failCount++;
+                    }
+                } else if (location.shouldWarn && result.success && !result.inBayern) {
+                    status = 'success';
+                    statusText = '⚠️ Outside Bayern (as expected)';
+                    warnCount++;
+                } else if (result.success) {
+                    if (!location.shouldWarn && !result.inBayern) {
+                        status = 'failed';
+                        statusText = '⚠️ Not in Bayern';
+                        warnCount++;
+                    } else {
+                        status = 'success';
+                        statusText = '✅ Found';
+                        successCount++;
+                    }
+                } else {
+                    status = 'failed';
+                    statusText = '❌ Not found';
+                    failCount++;
+                }
+                
+                html += `
+                    <div class="test-item ${status}">
+                        <div class="location-name">
+                            ${statusText} ${location.input} 
+                            <span style="color: #666; font-weight: normal;">(${location.type})</span>
+                        </div>
+                        ${result.success ? `
+                            <div class="coordinates">
+                                📍 ${result.lat.toFixed(4)}, ${result.lon.toFixed(4)}
+                                ${result.display_name ? `<br><small>${result.display_name.substring(0, 100)}...</small>` : ''}
+                            </div>
+                        ` : `
+                            <div class="error">Error: ${result.error}</div>
+                        `}
+                    </div>
+                `;
+                
+                // Add a small delay to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            resultsDiv.innerHTML = html;
+            
+            // Show summary
+            summaryDiv.innerHTML = `
+                <h3>Test Summary</h3>
+                <p>✅ Successful: ${successCount}</p>
+                <p>❌ Failed: ${failCount}</p>
+                <p>⚠️ Warnings: ${warnCount}</p>
+                <p><strong>Total Tests: ${testLocations.length}</strong></p>
+                <p>Success Rate: ${Math.round((successCount / testLocations.length) * 100)}%</p>
+            `;
+            summaryDiv.style.display = 'block';
+        }
+        
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
