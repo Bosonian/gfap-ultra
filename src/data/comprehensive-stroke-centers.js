@@ -423,6 +423,19 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         thrombolysis: true,
         beds: 1570,
         network: "FAST"
+      },
+      {
+        id: "BW-NS-007",
+        name: "Klinikum Ludwigsburg",
+        address: "Posilipostraße 4, 71640 Ludwigsburg",
+        coordinates: { lat: 48.8901, lng: 9.1953 },
+        phone: "+49 7141 99-0",
+        emergency: "+49 7141 99-67201",
+        neurosurgery: true,
+        thrombectomy: true,
+        thrombolysis: true,
+        beds: 720,
+        network: "FAST"
       }
     ],
 
