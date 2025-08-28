@@ -105,8 +105,14 @@ export const messages = {
 
     // Results
     resultsTitle: 'Assessment Results',
+    bleedingRiskAssessment: 'Bleeding Risk Assessment',
     ichProbability: 'ICH Probability',
     lvoProbability: 'LVO Probability',
+    lvoMayBePossible: 'Large vessel occlusion possible - further evaluation recommended',
+    riskFactorsTitle: 'Main Risk Factors',
+    increasingRisk: 'Increasing Risk',
+    decreasingRisk: 'Decreasing Risk',
+    noFactors: 'No factors',
     riskLevel: 'Risk Level',
     lowRisk: 'Low Risk',
     mediumRisk: 'Medium Risk', 
@@ -380,8 +386,14 @@ export const messages = {
 
     // Results
     resultsTitle: 'Bewertungsergebnisse',
+    bleedingRiskAssessment: 'Blutungsrisiko-Bewertung',
     ichProbability: 'ICB-Wahrscheinlichkeit',
     lvoProbability: 'LVO-Wahrscheinlichkeit',
+    lvoMayBePossible: 'Großgefäßverschluss möglich - weitere Abklärung empfohlen',
+    riskFactorsTitle: 'Hauptrisikofaktoren',
+    increasingRisk: 'Risikoerhöhend',
+    decreasingRisk: 'Risikomindernd',
+    noFactors: 'Keine Faktoren',
     riskLevel: 'Risikostufe',
     lowRisk: 'Niedriges Risiko',
     mediumRisk: 'Mittleres Risiko',

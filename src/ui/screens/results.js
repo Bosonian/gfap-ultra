@@ -148,29 +148,39 @@ function renderLVONotPossible() {
 export function renderResults(results, startTime) {
   const { ich, lvo } = results;
   
-  const ichHtml = renderRiskCard('ich', ich, results);
-  const lvoHtml = lvo?.notPossible ? renderLVONotPossible() : renderRiskCard('lvo', lvo, results);
+  // Detect which module was used based on the data
+  const isLimitedOrComa = ich?.module === 'Limited' || ich?.module === 'Coma' || lvo?.notPossible === true;
+  const isFullModule = ich?.module === 'Full';
   
+  // For limited/coma modules - only show ICH
+  if (isLimitedOrComa) {
+    return renderICHFocusedResults(ich, results, startTime);
+  }
+  
+  // For full module - show ICH prominently with conditional LVO text
+  return renderFullModuleResults(ich, lvo, results, startTime);
+}
+
+function renderICHFocusedResults(ich, results, startTime) {
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
-  const driversHtml = renderDriversSection(ich, lvo);
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
-
+  
   return `
     <div class="container">
       ${renderProgressIndicator(3)}
-      <h2>${t('resultsTitle')}</h2>
+      <h2>${t('bleedingRiskAssessment') || 'Blutungsrisiko-Bewertung / Bleeding Risk Assessment'}</h2>
       ${criticalAlert}
       
-      <!-- Primary Risk Results -->
-      <div class="risk-results-grid">
-        ${ichHtml}
-        ${lvoHtml}
+      <!-- Single ICH Risk Card -->
+      <div class="risk-results-single">
+        ${renderRiskCard('ich', ich, results)}
       </div>
       
-      <!-- Model Drivers - Prominent Display -->
+      <!-- ICH Drivers Only -->
       <div class="enhanced-drivers-section">
-        ${driversHtml}
+        <h3>${t('riskFactorsTitle') || 'Hauptrisikofaktoren / Main Risk Factors'}</h3>
+        ${renderICHDriversOnly(ich)}
       </div>
       
       <!-- Collapsible Additional Information -->
@@ -192,7 +202,6 @@ export function renderResults(results, startTime) {
         <div class="collapsible-content" id="stroke-centers" style="display: none;">
           ${strokeCenterHtml}
         </div>
-        
       </div>
       
       <div class="results-actions">
@@ -211,4 +220,147 @@ export function renderResults(results, startTime) {
       </div>
     </div>
   `;
+}
+
+function renderFullModuleResults(ich, lvo, results, startTime) {
+  const ichPercent = Math.round((ich?.probability || 0) * 100);
+  const lvoPercent = Math.round((lvo?.probability || 0) * 100);
+  
+  const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
+  const strokeCenterHtml = renderStrokeCenterMap(results);
+  const inputSummaryHtml = renderInputSummary();
+  
+  // Determine if we should show LVO notification
+  const showLVONotification = ichPercent < 30 && lvoPercent > 50;
+  
+  return `
+    <div class="container">
+      ${renderProgressIndicator(3)}
+      <h2>${t('resultsTitle')}</h2>
+      ${criticalAlert}
+      
+      <!-- Primary ICH Risk Display -->
+      <div class="risk-results-single">
+        ${renderRiskCard('ich', ich, results)}
+        ${showLVONotification ? renderLVONotification() : ''}
+      </div>
+      
+      <!-- ICH Drivers Only -->
+      <div class="enhanced-drivers-section">
+        <h3>${t('riskFactorsTitle') || 'Risikofaktoren / Risk Factors'}</h3>
+        ${renderICHDriversOnly(ich)}
+      </div>
+      
+      <!-- Collapsible Additional Information -->
+      <div class="additional-info-section">
+        <button class="info-toggle" data-target="input-summary">
+          <span class="toggle-icon">📋</span>
+          <span class="toggle-text">${t('inputSummaryTitle')}</span>
+          <span class="toggle-arrow">▼</span>
+        </button>
+        <div class="collapsible-content" id="input-summary" style="display: none;">
+          ${inputSummaryHtml}
+        </div>
+        
+        <button class="info-toggle" data-target="stroke-centers">
+          <span class="toggle-icon">🏥</span>
+          <span class="toggle-text">${t('nearestCentersTitle')}</span>
+          <span class="toggle-arrow">▼</span>
+        </button>
+        <div class="collapsible-content" id="stroke-centers" style="display: none;">
+          ${strokeCenterHtml}
+        </div>
+      </div>
+      
+      <div class="results-actions">
+        <div class="primary-actions">
+          <button type="button" class="primary" id="printResults"> 📄 ${t('printResults')} </button>
+          <button type="button" class="secondary" data-action="reset"> ${t('newAssessment')} </button>
+        </div>
+        <div class="navigation-actions">
+          <button type="button" class="tertiary" data-action="goBack"> ← ${t('goBack')} </button>
+          <button type="button" class="tertiary" data-action="goHome"> 🏠 ${t('goHome')} </button>
+        </div>
+      </div>
+      
+      <div class="disclaimer">
+        <strong>⚠️ ${t('importantNote')}:</strong> ${t('importantText')} Results generated at ${new Date().toLocaleTimeString()}.
+      </div>
+    </div>
+  `;
+}
+
+function renderLVONotification() {
+  return `
+    <div class="secondary-notification">
+      <p class="lvo-possible">
+        ⚡ ${t('lvoMayBePossible') || 'Großgefäßverschluss möglich / Large vessel occlusion possible'}
+      </p>
+    </div>
+  `;
+}
+
+function renderICHDriversOnly(ich) {
+  if (!ich || !ich.drivers) {
+    return '<p class="no-drivers">No driver data available</p>';
+  }
+  
+  // Format drivers as before but only for ICH
+  const drivers = Object.entries(ich.drivers)
+    .map(([key, value]) => ({ name: key, value: value }))
+    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+  
+  const positiveDrivers = drivers.filter(d => d.value > 0);
+  const negativeDrivers = drivers.filter(d => d.value < 0);
+  
+  return `
+    <div class="drivers-split-view">
+      <div class="drivers-column positive-column">
+        <div class="column-header">
+          <span class="column-icon">⬆</span>
+          <span class="column-title">${t('increasingRisk') || 'Risikoerhöhend / Increasing Risk'}</span>
+        </div>
+        <div class="compact-drivers">
+          ${positiveDrivers.length > 0 ? 
+            positiveDrivers.map(d => renderCompactDriver(d, 'positive')).join('') :
+            `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
+          }
+        </div>
+      </div>
+      
+      <div class="drivers-column negative-column">
+        <div class="column-header">
+          <span class="column-icon">⬇</span>
+          <span class="column-title">${t('decreasingRisk') || 'Risikomindernd / Decreasing Risk'}</span>
+        </div>
+        <div class="compact-drivers">
+          ${negativeDrivers.length > 0 ?
+            negativeDrivers.map(d => renderCompactDriver(d, 'negative')).join('') :
+            `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
+          }
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCompactDriver(driver, type) {
+  const percentage = Math.abs(driver.value * 100);
+  const width = Math.min(percentage * 2, 100); // Scale for display
+  
+  return `
+    <div class="compact-driver-item">
+      <div class="compact-driver-label">${formatDriverName(driver.name)}</div>
+      <div class="compact-driver-bar ${type}" style="width: ${width}%;">
+        <span class="compact-driver-value">${percentage.toFixed(1)}%</span>
+      </div>
+    </div>
+  `;
+}
+
+function formatDriverName(name) {
+  // Convert snake_case to readable format
+  const formatted = name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  // Try to get translation, fallback to formatted name
+  return t(`driver_${name}`) || formatted;
 }

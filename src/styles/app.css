@@ -2535,6 +2535,29 @@ footer {
     opacity: 0.6;
 }
 
+/* Single risk card display for ICH-only */
+.risk-results-single {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+/* Secondary notification for LVO */
+.secondary-notification {
+    margin-top: 15px;
+    padding: 12px 16px;
+    background: var(--info-bg);
+    border-left: 4px solid var(--warning-color);
+    border-radius: 8px;
+}
+
+.lvo-possible {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.4;
+}
+
 /* Results Actions Layout */
 .results-actions {
     margin: 40px 0 30px 0;
