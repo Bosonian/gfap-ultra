@@ -1,5 +1,6 @@
 // GPS-based stroke center map component
-import { findNearestStrokeCenters, getRecommendedStrokeCenters, findNearestStrokeCentersWithTravelTime, getRecommendedStrokeCentersWithTravelTime } from '../../data/stroke-centers.js';
+import { COMPREHENSIVE_HOSPITAL_DATABASE, ROUTING_ALGORITHM } from '../../data/comprehensive-stroke-centers.js';
+import { calculateDistance, calculateTravelTime, calculateEmergencyTravelTime } from '../../data/stroke-centers.js';
 import { t } from '../../localization/i18n.js';
 
 export function renderStrokeCenterMap(results) {
@@ -12,7 +13,7 @@ export function renderStrokeCenterMap(results) {
             📍 ${t('useCurrentLocation')}
           </button>
           <div class="location-manual" style="display: none;">
-            <input type="text" id="locationInput" placeholder="${t('enterLocationPlaceholder') || 'e.g. München, Bad Tölz, or 48.1351, 11.5820'}" />
+            <input type="text" id="locationInput" placeholder="${t('enterLocationPlaceholder') || 'e.g. München, Köln, Stuttgart, or 48.1351, 11.5820'}" />
             <button type="button" id="searchLocationButton" class="secondary">${t('search')}</button>
           </div>
           <button type="button" id="manualLocationButton" class="secondary">
@@ -114,8 +115,8 @@ async function geocodeLocation(locationString, results, resultsContainer) {
     const lat = parseFloat(coordMatch[1]);
     const lng = parseFloat(coordMatch[2]);
     
-    // Validate coordinates are within Germany's approximate bounds
-    if (lat >= 47.2 && lat <= 55.1 && lng >= 5.9 && lng <= 15.0) {
+    // Validate coordinates are within supported German states (Bayern, BW, NRW)
+    if (lat >= 47.2 && lat <= 52.5 && lng >= 5.9 && lng <= 15.0) {
       resultsContainer.innerHTML = `
         <div class="location-success">
           <p>📍 Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
@@ -135,12 +136,14 @@ async function geocodeLocation(locationString, results, resultsContainer) {
     // Clean up the location string
     let searchLocation = locationString.trim();
     
-    // If it doesn't already include country/state info, add it
-    if (!searchLocation.toLowerCase().includes('bayern') && 
-        !searchLocation.toLowerCase().includes('bavaria') && 
-        !searchLocation.toLowerCase().includes('deutschland') &&
-        !searchLocation.toLowerCase().includes('germany')) {
-      searchLocation = searchLocation + ', Bayern, Deutschland';
+    // If it doesn't already include country info, add it
+    if (!searchLocation.toLowerCase().includes('deutschland') &&
+        !searchLocation.toLowerCase().includes('germany') &&
+        !searchLocation.toLowerCase().includes('bayern') &&
+        !searchLocation.toLowerCase().includes('bavaria') &&
+        !searchLocation.toLowerCase().includes('nordrhein') &&
+        !searchLocation.toLowerCase().includes('baden')) {
+      searchLocation = searchLocation + ', Deutschland';
     }
     
     // Use Nominatim (OpenStreetMap) geocoding service - free and reliable
@@ -163,10 +166,12 @@ async function geocodeLocation(locationString, results, resultsContainer) {
     const data = await response.json();
     
     if (data && data.length > 0) {
-      // Prefer the first result that's actually in Bayern if multiple results
+      // Prefer results from supported states (Bayern, Baden-Württemberg, NRW)
       let location = data[0];
+      const supportedStates = ['Bayern', 'Baden-Württemberg', 'Nordrhein-Westfalen'];
+      
       for (const result of data) {
-        if (result.address && result.address.state === 'Bayern') {
+        if (result.address && supportedStates.includes(result.address.state)) {
           location = result;
           break;
         }
@@ -194,7 +199,7 @@ async function geocodeLocation(locationString, results, resultsContainer) {
         <strong>Location "${locationString}" not found.</strong><br>
         <small>Try:</small>
         <ul style="text-align: left; font-size: 0.9em; margin: 10px 0;">
-          <li>City name: "München" or "Augsburg"</li>
+          <li>City name: "München", "Köln", "Stuttgart"</li>
           <li>Address: "Marienplatz 1, München"</li>
           <li>Coordinates: "48.1351, 11.5820"</li>
         </ul>
@@ -211,79 +216,137 @@ async function geocodeLocation(locationString, results, resultsContainer) {
 }
 
 async function showNearestCenters(lat, lng, results, resultsContainer) {
-  const conditionType = determineConditionType(results);
+  const location = { lat, lng };
   
-  // Generate routing explanation based on condition
-  const routingExplanation = getRoutingExplanation(conditionType, results);
+  // Use the enhanced routing algorithm
+  const routing = ROUTING_ALGORITHM.routePatient({
+    location,
+    ichProbability: results?.ich?.probability || 0,
+    timeFromOnset: results?.timeFromOnset || null,
+    clinicalFactors: results?.clinicalFactors || {}
+  });
+  
+  if (!routing || !routing.destination) {
+    resultsContainer.innerHTML = `
+      <div class="location-error">
+        <p>⚠️ No suitable stroke centers found in this area.</p>
+        <p><small>Please try a different location or contact emergency services directly.</small></p>
+      </div>
+    `;
+    return;
+  }
+
+  // Generate routing explanation
+  const routingExplanation = getEnhancedRoutingExplanation(routing, results);
   
   // Show loading state
   resultsContainer.innerHTML = `
     <div class="location-info">
       <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+      <p><strong>Detected State:</strong> ${getStateName(routing.state)}</p>
     </div>
     <div class="loading">${t('calculatingTravelTimes')}...</div>
   `;
   
   try {
-    // Try to get travel time recommendations
-    const recommendations = await getRecommendedStrokeCentersWithTravelTime(lat, lng, conditionType);
+    // Get all relevant hospitals for this routing decision
+    const database = COMPREHENSIVE_HOSPITAL_DATABASE[routing.state];
+    const allHospitals = [
+      ...database.neurosurgicalCenters,
+      ...database.comprehensiveStrokeCenters,
+      ...database.regionalStrokeUnits,
+      ...(database.thrombolysisHospitals || [])
+    ];
+
+    // Add distance and travel time to primary destination
+    const destination = routing.destination;
+    destination.distance = calculateDistance(lat, lng, destination.coordinates.lat, destination.coordinates.lng);
+    
+    try {
+      const travelInfo = await calculateEmergencyTravelTime(lat, lng, destination.coordinates.lat, destination.coordinates.lng);
+      destination.travelTime = travelInfo.duration;
+      destination.travelSource = travelInfo.source;
+    } catch (error) {
+      destination.travelTime = Math.round(destination.distance / 0.8); // Estimate
+      destination.travelSource = 'estimated';
+    }
+
+    // Find 3-4 alternative hospitals nearby
+    const alternatives = allHospitals
+      .filter(h => h.id !== destination.id)
+      .map(hospital => ({
+        ...hospital,
+        distance: calculateDistance(lat, lng, hospital.coordinates.lat, hospital.coordinates.lng)
+      }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 3);
+
+    // Add travel times to alternatives
+    for (const alt of alternatives) {
+      try {
+        const travelInfo = await calculateEmergencyTravelTime(lat, lng, alt.coordinates.lat, alt.coordinates.lng);
+        alt.travelTime = travelInfo.duration;
+        alt.travelSource = travelInfo.source;
+      } catch (error) {
+        alt.travelTime = Math.round(alt.distance / 0.8);
+        alt.travelSource = 'estimated';
+      }
+    }
     
     const html = `
       <div class="location-info">
         <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+        <p><strong>State:</strong> ${getStateName(routing.state)}</p>
         ${routingExplanation}
       </div>
       
       <div class="recommended-centers">
-        <h4>${t('recommendedCenters')}</h4>
-        ${renderStrokeCenterList(recommendations.recommended, true)}
+        <h4>🏥 ${routing.urgency === 'IMMEDIATE' ? 'Emergency' : 'Recommended'} Destination</h4>
+        ${renderEnhancedStrokeCenterCard(destination, true, routing)}
       </div>
       
-      ${recommendations.alternative.length > 0 ? `
+      ${alternatives.length > 0 ? `
         <div class="alternative-centers">
-          <h4>${t('alternativeCenters')}</h4>
-          ${renderStrokeCenterList(recommendations.alternative, false)}
+          <h4>Alternative Centers</h4>
+          ${alternatives.map(alt => renderEnhancedStrokeCenterCard(alt, false, routing)).join('')}
         </div>
       ` : ''}
       
       <div class="travel-time-note">
-        <small>${t('travelTimeNote')}</small>
-        <br><small class="powered-by">${t('poweredByOrs')}</small>
+        <small>${t('travelTimeNote') || 'Travel times estimated for emergency vehicles'}</small>
       </div>
     `;
     
     resultsContainer.innerHTML = html;
     
   } catch (error) {
-    console.warn('Travel time calculation failed, falling back to distance:', error);
+    console.warn('Enhanced routing failed, using basic display:', error);
     
-    // Fallback to distance-based recommendations
-    const recommendations = getRecommendedStrokeCenters(lat, lng, conditionType);
-    
-    const html = `
+    // Fallback to basic display
+    resultsContainer.innerHTML = `
       <div class="location-info">
         <p><strong>${t('yourLocation')}:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
         ${routingExplanation}
       </div>
       
       <div class="recommended-centers">
-        <h4>${t('recommendedCenters')}</h4>
-        ${renderStrokeCenterList(recommendations.recommended, true)}
+        <h4>Recommended Center</h4>
+        <div class="stroke-center-card recommended">
+          <div class="center-header">
+            <h5>${routing.destination.name}</h5>
+            <span class="distance">${routing.destination.distance?.toFixed(1) || '?'} km</span>
+          </div>
+          <div class="center-details">
+            <p class="address">📍 ${routing.destination.address}</p>
+            <p class="phone">📞 ${routing.destination.emergency || routing.destination.phone}</p>
+          </div>
+        </div>
       </div>
       
-      ${recommendations.alternative.length > 0 ? `
-        <div class="alternative-centers">
-          <h4>${t('alternativeCenters')}</h4>
-          ${renderStrokeCenterList(recommendations.alternative, false)}
-        </div>
-      ` : ''}
-      
-      <div class="distance-note">
-        <small>${t('distanceNote')}</small>
+      <div class="routing-reasoning">
+        <p><strong>Routing Logic:</strong> ${routing.reasoning}</p>
       </div>
     `;
-    
-    resultsContainer.innerHTML = html;
   }
 }
 
@@ -336,44 +399,94 @@ function renderStrokeCenterList(centers, isRecommended = false) {
   `).join('');
 }
 
-function determineConditionType(results) {
-  if (!results) return 'stroke';
-  
-  // PRIORITIZE ICH - Check for ICH first as it requires neurosurgery
-  // Set threshold to 0.5 (50%) for routing to neurosurgical centers
-  if (results.ich && results.ich.probability > 0.5) {
-    return 'ich';
-  }
-  
-  // Only consider LVO if ICH is low (secondary consideration)
-  if (results.lvo && results.lvo.probability > 0.5 && (!results.ich || results.ich.probability < 0.5)) {
-    return 'lvo';
-  }
-  
-  return 'stroke';
+// Helper functions for enhanced routing system
+function getStateName(stateCode) {
+  const stateNames = {
+    'bayern': 'Bayern (Bavaria)',
+    'badenWuerttemberg': 'Baden-Württemberg',
+    'nordrheinWestfalen': 'Nordrhein-Westfalen (NRW)'
+  };
+  return stateNames[stateCode] || stateCode;
 }
 
-function getRoutingExplanation(conditionType, results) {
-  if (conditionType === 'ich') {
-    const ichPercent = Math.round((results?.ich?.probability || 0) * 100);
-    return `
-      <div class="routing-explanation ich-routing">
-        <strong>⚠️ ${t('neurosurgeryRouting') || 'Neurosurgical Centers Recommended'}</strong>
-        <p>${t('ichRoutingExplanation') || `ICH risk ${ichPercent}% - Routing to centers with neurosurgery capability`}</p>
-      </div>
-    `;
-  } else if (conditionType === 'lvo') {
-    return `
-      <div class="routing-explanation lvo-routing">
-        <strong>⚡ ${t('thrombectomyRouting') || 'Thrombectomy Centers Recommended'}</strong>
-        <p>${t('lvoRoutingExplanation') || 'Possible LVO - Routing to centers with thrombectomy capability'}</p>
-      </div>
-    `;
-  }
+function getEnhancedRoutingExplanation(routing, results) {
+  const ichPercent = Math.round((results?.ich?.probability || 0) * 100);
+  
+  let urgencyIcon = '🏥';
+  if (routing.urgency === 'IMMEDIATE') urgencyIcon = '🚨';
+  else if (routing.urgency === 'TIME_CRITICAL') urgencyIcon = '⏰';
+  else if (routing.urgency === 'URGENT') urgencyIcon = '⚠️';
   
   return `
-    <div class="routing-explanation general-routing">
-      <p>${t('generalStrokeRouting') || 'Showing nearest stroke-capable centers'}</p>
+    <div class="routing-explanation ${routing.category.toLowerCase()}">
+      <div class="routing-header">
+        <strong>${urgencyIcon} ${routing.category.replace('_', ' ')} - ${routing.urgency}</strong>
+      </div>
+      <div class="routing-details">
+        <p><strong>ICH Risk:</strong> ${ichPercent}% ${routing.threshold ? `(${routing.threshold})` : ''}</p>
+        ${routing.timeWindow ? `<p><strong>Time Window:</strong> ${routing.timeWindow}</p>` : ''}
+        <p><strong>Routing Logic:</strong> ${routing.reasoning}</p>
+        <p><strong>Pre-Alert:</strong> ${routing.preAlert}</p>
+        ${routing.bypassLocal ? '<p class="bypass-warning">⚠️ Bypassing local hospitals</p>' : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderEnhancedStrokeCenterCard(center, isRecommended, routing) {
+  const capabilities = [];
+  if (center.neurosurgery) capabilities.push('🧠 Neurosurgery');
+  if (center.thrombectomy) capabilities.push('🩸 Thrombectomy');
+  if (center.thrombolysis) capabilities.push('💉 Thrombolysis');
+  
+  const networkBadge = center.network ? `<span class="network-badge">${center.network}</span>` : '';
+  
+  return `
+    <div class="stroke-center-card ${isRecommended ? 'recommended' : 'alternative'} enhanced">
+      <div class="center-header">
+        <h5>${center.name}</h5>
+        <div class="center-badges">
+          ${center.neurosurgery ? '<span class="capability-badge neurosurgery">NS</span>' : ''}
+          ${center.thrombectomy ? '<span class="capability-badge thrombectomy">TE</span>' : ''}
+          ${networkBadge}
+        </div>
+      </div>
+      
+      <div class="center-metrics">
+        ${center.travelTime ? `
+          <div class="travel-info">
+            <span class="travel-time">${center.travelTime} min</span>
+            <span class="distance">${center.distance.toFixed(1)} km</span>
+          </div>
+        ` : `
+          <div class="distance-only">
+            <span class="distance">${center.distance.toFixed(1)} km</span>
+          </div>
+        `}
+        <div class="bed-info">
+          <span class="beds">${center.beds} beds</span>
+        </div>
+      </div>
+      
+      <div class="center-details">
+        <p class="address">📍 ${center.address}</p>
+        <p class="phone">📞 ${center.emergency || center.phone}</p>
+        
+        ${capabilities.length > 0 ? `
+          <div class="capabilities">
+            ${capabilities.join(' • ')}
+          </div>
+        ` : ''}
+      </div>
+      
+      <div class="center-actions">
+        <button class="call-button" onclick="window.open('tel:${center.emergency || center.phone}')">
+          📞 Call
+        </button>
+        <button class="directions-button" onclick="window.open('https://maps.google.com/maps?daddr=${center.coordinates.lat},${center.coordinates.lng}', '_blank')">
+          🧭 Directions
+        </button>
+      </div>
     </div>
   `;
 }
