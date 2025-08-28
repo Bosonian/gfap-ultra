@@ -1,4 +1,5 @@
 import { t } from '../../localization/i18n.js';
+import { formatDriverName } from '../../utils/label-formatter.js';
 
 export function renderDriversSection(ich, lvo) {
   console.log('=== DRIVER RENDERING SECTION ===');
@@ -22,8 +23,8 @@ export function renderDriversSection(ich, lvo) {
   let html = `
     <div class="drivers-section">
       <div class="drivers-header">
-        <h3><span class="driver-header-icon">🎯</span> ${t('modelDrivers')}</h3>
-        <p class="drivers-subtitle">${t('modelDriversSubtitle')}</p>
+        <h3><span class="driver-header-icon">🎯</span> ${t('riskAnalysis')}</h3>
+        <p class="drivers-subtitle">${t('riskAnalysisSubtitle')}</p>
       </div>
       <div class="enhanced-drivers-grid">
   `;
@@ -234,7 +235,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     positiveDrivers.forEach((driver) => {
       const percentage = Math.abs(driver.weight * 100);
       const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
-      const cleanLabel = driver.label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const cleanLabel = formatDriverName(driver.label);
       
       html += `
         <div class="compact-driver-item">
@@ -266,7 +267,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     negativeDrivers.forEach((driver) => {
       const percentage = Math.abs(driver.weight * 100);
       const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
-      const cleanLabel = driver.label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const cleanLabel = formatDriverName(driver.label);
       
       html += `
         <div class="compact-driver-item">

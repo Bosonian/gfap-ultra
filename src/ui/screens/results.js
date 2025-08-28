@@ -6,6 +6,7 @@ import { getRiskLevel, formatTime } from '../../logic/formatters.js';
 import { CRITICAL_THRESHOLDS } from '../../config.js';
 import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
+import { formatSummaryLabel, formatDisplayValue } from '../../utils/label-formatter.js';
 
 function renderInputSummary() {
   const state = store.getState();
@@ -27,20 +28,11 @@ function renderInputSummary() {
         // Skip empty values
         if (value === '' || value === null || value === undefined) return;
         
-        // Get friendly label name
-        let label = key;
-        if (t(`${key}Label`)) {
-          label = t(`${key}Label`);
-        } else {
-          // Fallback: convert snake_case to Title Case
-          label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        }
+        // Use consistent medical terminology from input forms
+        let label = formatSummaryLabel(key);
         
-        // Format value
-        let displayValue = value;
-        if (typeof value === 'boolean') {
-          displayValue = value ? '✓' : '✗';
-        }
+        // Format value with appropriate units
+        let displayValue = formatDisplayValue(value, key);
         
         itemsHtml += `
           <div class="summary-item">

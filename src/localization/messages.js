@@ -123,16 +123,16 @@ export const messages = {
     riskMedium: 'Medium',
     riskHigh: 'High',
 
-    // Drivers
-    driversTitle: 'Model Drivers',
-    driversSubtitle: 'Factors contributing to the prediction',
+    // Risk Factors Analysis
+    riskFactorsAnalysis: 'Risk Factors',
+    contributingFactors: 'Contributing factors to the assessment',
     riskFactors: 'Risk Factors',
     increaseRisk: 'INCREASE',
     decreaseRisk: 'DECREASE',
     noPositiveFactors: 'No increasing factors',
     noNegativeFactors: 'No decreasing factors',
-    ichDrivers: 'ICH Risk Factors',
-    lvoDrivers: 'LVO Risk Factors',
+    ichRiskFactors: 'ICH Risk Factors',
+    lvoRiskFactors: 'LVO Risk Factors',
 
     // Critical Alert
     criticalAlertTitle: 'CRITICAL RISK DETECTED',
@@ -191,8 +191,8 @@ export const messages = {
     cancel: 'Cancel',
     
     // Results Screen Enhancements
-    modelDrivers: 'Model Drivers',
-    modelDriversSubtitle: 'Factors contributing to the prediction',
+    riskAnalysis: 'Risk Analysis',
+    riskAnalysisSubtitle: 'Clinical factors in this assessment',
     contributingFactors: 'Contributing factors',
     factorsShown: 'shown',
     positiveFactors: 'Positive factors',
@@ -279,7 +279,8 @@ export const messages = {
     call: 'Call',
     directions: 'Directions',
     emergency: 'Emergency',
-    certified: 'Certified'
+    certified: 'Certified',
+    
   },
 
   de: {
@@ -404,16 +405,16 @@ export const messages = {
     riskMedium: 'Mittel',
     riskHigh: 'Hoch',
 
-    // Drivers
-    driversTitle: 'Modelltreiber',
-    driversSubtitle: 'Faktoren, die zur Vorhersage beitragen',
+    // Risk Factors Analysis
+    riskFactorsAnalysis: 'Risikofaktoren',
+    contributingFactors: 'Beitragende Faktoren zur Bewertung',
     riskFactors: 'Risikofaktoren',
     increaseRisk: 'ERHÖHEN',
     decreaseRisk: 'VERRINGERN',
     noPositiveFactors: 'Keine erhöhenden Faktoren',
     noNegativeFactors: 'Keine verringernden Faktoren',
-    ichDrivers: 'ICB-Risikofaktoren',
-    lvoDrivers: 'LVO-Risikofaktoren',
+    ichRiskFactors: 'ICB-Risikofaktoren',
+    lvoRiskFactors: 'LVO-Risikofaktoren',
 
     // Critical Alert
     criticalAlertTitle: 'KRITISCHES RISIKO ERKANNT',
@@ -472,8 +473,8 @@ export const messages = {
     cancel: 'Abbrechen',
     
     // Results Screen Enhancements
-    modelDrivers: 'Modelltreiber',
-    modelDriversSubtitle: 'Faktoren, die zur Vorhersage beitragen',
+    riskAnalysis: 'Risikoanalyse',
+    riskAnalysisSubtitle: 'Klinische Faktoren in dieser Bewertung',
     contributingFactors: 'Beitragende Faktoren',
     factorsShown: 'angezeigt',
     positiveFactors: 'Positive Faktoren',
@@ -560,6 +561,7 @@ export const messages = {
     call: 'Anrufen',
     directions: 'Wegbeschreibung',
     emergency: 'Notfall',
-    certified: 'Zertifiziert'
+    certified: 'Zertifiziert',
+    
   }
 };
