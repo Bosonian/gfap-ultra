@@ -6,7 +6,7 @@ import { getRiskLevel, formatTime } from '../../logic/formatters.js';
 import { CRITICAL_THRESHOLDS } from '../../config.js';
 import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
-import { formatSummaryLabel, formatDisplayValue } from '../../utils/label-formatter.js';
+import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
 
 function renderInputSummary() {
   const state = store.getState();
@@ -355,9 +355,3 @@ function renderCompactDriver(driver, type) {
   `;
 }
 
-function formatDriverName(name) {
-  // Convert snake_case to readable format
-  const formatted = name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  // Try to get translation, fallback to formatted name
-  return t(`driver_${name}`) || formatted;
-}
