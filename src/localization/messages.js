@@ -136,7 +136,7 @@ export const messages = {
 
     // Critical Alert
     criticalAlertTitle: 'CRITICAL RISK DETECTED',
-    criticalAlertMessage: 'High probability of intracerebral hemorrhage detected. Immediate medical attention required.',
+    criticalAlertMessage: 'High probability of intracerebral hemorrhage detected.',
     immediateActionsRequired: 'Immediate actions required',
     initiateStrokeProtocol: 'Initiate stroke protocol immediately',
     urgentCtImaging: 'Urgent CT imaging required',
@@ -418,7 +418,7 @@ export const messages = {
 
     // Critical Alert
     criticalAlertTitle: 'KRITISCHES RISIKO ERKANNT',
-    criticalAlertMessage: 'Hohe Wahrscheinlichkeit einer intrazerebralen Blutung erkannt. Sofortige medizinische Behandlung erforderlich.',
+    criticalAlertMessage: 'Hohe Wahrscheinlichkeit einer intrazerebralen Blutung erkannt.',
     immediateActionsRequired: 'Sofortige Maßnahmen erforderlich',
     initiateStrokeProtocol: 'Schlaganfall-Protokoll sofort einleiten',
     urgentCtImaging: 'Dringende CT-Bildgebung erforderlich',
