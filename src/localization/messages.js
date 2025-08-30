@@ -224,7 +224,7 @@ export const messages = {
     // Footer
     privacyLink: 'Privacy Policy',
     disclaimerLink: 'Medical Disclaimer', 
-    versionLink: 'Version 2.0.1',
+    versionLink: 'Version 2.1.0 - Research Preview',
 
     // Privacy and disclaimers
     privacyPolicy: 'Privacy Policy: This tool processes data locally. No patient data is stored or transmitted.',
@@ -506,7 +506,7 @@ export const messages = {
     // Footer
     privacyLink: 'Datenschutzrichtlinie',
     disclaimerLink: 'Medizinischer Haftungsausschluss',
-    versionLink: 'Version 2.0.1',
+    versionLink: 'Version 2.1.0 - Research Preview',
 
     // Privacy and disclaimers
     privacyPolicy: 'Datenschutzrichtlinie: Dieses Tool verarbeitet Daten lokal. Keine Patientendaten werden gespeichert oder übertragen.',
