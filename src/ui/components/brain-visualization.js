@@ -406,8 +406,10 @@ function drawVolumeFluid(canvas, volume) {
     const circumference = 2 * Math.PI * radius;
     const progressOffset = circumference * (1 - volumePercent);
     
-    // Progress ring
-    ctx.strokeStyle = '#dc2626'; // Red progress
+    // Progress ring (dark mode aware)
+    const progressColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color').trim() || 
+                         '#dc2626';
+    ctx.strokeStyle = progressColor;
     ctx.lineWidth = 8;
     ctx.setLineDash([]);
     ctx.lineCap = 'round';
