@@ -115,6 +115,9 @@ function renderRiskCard(type, data, results) {
               </svg>
             </div>
             <div class="circle-label">ICH Risk</div>
+            <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
+              ${riskLevel}
+            </div>
           </div>
           
           ${type === 'ich' && percent >= 50 ? `
@@ -126,9 +129,6 @@ function renderRiskCard(type, data, results) {
         </div>
         
         <div class="risk-assessment">
-          <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
-            ${riskLevel}
-          </div>
           ${type === 'ich' && percent >= 50 && getCurrentGfapValue() > 0 ? `
             <div class="mortality-assessment">
               ${t('predictedMortality')}: ${calculateICHVolume(getCurrentGfapValue()).mortalityRate}
