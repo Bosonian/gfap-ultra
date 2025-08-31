@@ -434,7 +434,6 @@ function drawVolumeFluid(canvas, volume) {
       requestAnimationFrame(draw);
     }
   }
-  }
   
   // Start animation
   draw();
