@@ -1,0 +1,449 @@
+/* ICH Volume Visualization Components */
+
+/* ================================
+   COMPACT VOLUME DISPLAY
+================================ */
+.compact-volume-display {
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  background: var(--surface-color, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  font-size: 0.9rem;
+}
+
+.compact-volume-display.error {
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.volume-metric {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.volume-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.volume-primary, .volume-secondary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.volume-label, .mortality-label {
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+  font-size: 0.85rem;
+}
+
+.volume-value {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.mortality-value {
+  font-weight: 600;
+  color: var(--text-primary, #374151);
+}
+
+.volume-warning {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.warning-text {
+  color: #92400e;
+  font-weight: 500;
+}
+
+/* ================================
+   DETAILED VOLUME CARD
+================================ */
+.volume-detail-card {
+  margin: 16px 0;
+  border-radius: 12px;
+  background: var(--surface-color, #ffffff);
+  border: 2px solid var(--border-color, #e5e7eb);
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.volume-detail-card.critical {
+  border-color: #dc2626;
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.1);
+}
+
+.volume-detail-card.high {
+  border-color: #f97316;
+  box-shadow: 0 4px 6px rgba(249, 115, 22, 0.1);
+}
+
+.volume-detail-card.moderate {
+  border-color: #f59e0b;
+  box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
+}
+
+.volume-header {
+  padding: 16px 20px;
+  background: var(--header-bg, #f8fafc);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.volume-header:hover {
+  background: var(--header-hover, #f1f5f9);
+}
+
+.volume-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary, #374151);
+}
+
+.expand-icon {
+  font-size: 1.2rem;
+  color: var(--text-secondary, #6b7280);
+  transition: transform 0.3s ease;
+}
+
+.volume-detail-card.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+/* ================================
+   VOLUME CONTENT (EXPANDED)
+================================ */
+.volume-content {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.brain-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.volume-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.primary-metric {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 16px;
+  background: var(--accent-bg, #f0f9ff);
+  border-radius: 8px;
+  border: 1px solid var(--accent-border, #0ea5e9);
+}
+
+.metric-label, .range-label, .classification-label, .mortality-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 4px;
+}
+
+.metric-value.large {
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: block;
+}
+
+.range-value, .classification-value {
+  font-weight: 600;
+  color: var(--text-primary, #374151);
+}
+
+.mortality-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.mortality-value.critical {
+  color: #dc2626;
+}
+
+.mortality-value.high {
+  color: #f97316;
+}
+
+.mortality-value.moderate {
+  color: #f59e0b;
+}
+
+.mortality-value.low {
+  color: #10b981;
+}
+
+/* ================================
+   CLINICAL CONTEXT
+================================ */
+.clinical-context {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.calculation-basis {
+  margin-bottom: 12px;
+}
+
+.basis-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6b7280);
+  font-style: italic;
+}
+
+.threshold-alert {
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.threshold-alert.critical {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+}
+
+.threshold-alert.warning {
+  background: #fffbeb;
+  border: 1px solid #fbbf24;
+  color: #d97706;
+}
+
+.research-citation {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light, #f3f4f6);
+}
+
+.citation-text {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #9ca3af);
+  font-style: italic;
+}
+
+/* ================================
+   VOLUME INDICATOR (FOR RISK CARDS)
+================================ */
+.volume-indicator {
+  margin-top: 12px;
+  padding: 10px;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 6px;
+  border: 1px solid var(--border-light, #f1f5f9);
+}
+
+.volume-row, .mortality-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.volume-icon, .mortality-icon {
+  font-size: 0.9rem;
+  width: 16px;
+  text-align: center;
+}
+
+.volume-label, .mortality-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6b7280);
+  flex: 1;
+}
+
+.volume-value {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.mortality-value {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary, #374151);
+}
+
+/* ================================
+   BRAIN VISUALIZATION STYLES
+================================ */
+.brain-visualization {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.brain-visualization.compact {
+  max-width: 120px;
+  max-height: 120px;
+}
+
+.brain-visualization.detailed {
+  max-width: 200px;
+  max-height: 200px;
+}
+
+.brain-svg {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.brain-icon {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+/* ================================
+   COLLAPSED/SUMMARY STATES
+================================ */
+.volume-summary {
+  padding: 12px 20px;
+  background: var(--bg-light, #f9fafb);
+}
+
+.summary-metric {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.summary-volume {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary, #374151);
+}
+
+.summary-risk {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.no-volume-message {
+  text-align: center;
+  color: var(--text-secondary, #6b7280);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+@media (max-width: 480px) {
+  .volume-metrics {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .volume-content {
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .brain-visualization.detailed {
+    max-width: 160px;
+    max-height: 160px;
+  }
+  
+  .metric-value.large {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .compact-volume-display {
+    padding: 10px;
+  }
+  
+  .volume-details {
+    font-size: 0.8rem;
+  }
+  
+  .brain-visualization.compact {
+    max-width: 100px;
+    max-height: 100px;
+  }
+}
+
+/* ================================
+   DARK MODE SUPPORT
+================================ */
+@media (prefers-color-scheme: dark) {
+  .volume-detail-card {
+    background: var(--surface-dark, #1f2937);
+    border-color: var(--border-dark, #374151);
+  }
+  
+  .volume-header {
+    background: var(--header-dark, #111827);
+    border-color: var(--border-dark, #374151);
+  }
+  
+  .brain-container {
+    background: var(--bg-dark, #111827);
+  }
+  
+  .primary-metric {
+    background: var(--accent-dark, #1e3a8a);
+    border-color: var(--accent-border-dark, #3b82f6);
+  }
+}
+
+/* ================================
+   ACCESSIBILITY
+================================ */
+.volume-header:focus {
+  outline: 2px solid var(--focus-color, #3b82f6);
+  outline-offset: 2px;
+}
+
+.volume-detail-card [role="button"] {
+  min-height: 44px; /* Touch target size */
+  min-width: 44px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .volume-detail-card {
+    border-width: 3px;
+  }
+  
+  .volume-warning {
+    border-width: 2px;
+  }
+}

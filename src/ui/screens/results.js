@@ -7,6 +7,8 @@ import { CRITICAL_THRESHOLDS } from '../../config.js';
 import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
+import { renderCompactVolumeDisplay } from '../components/volume-display.js';
+import { renderCompactBrainIcon } from '../components/brain-visualization.js';
 
 function renderInputSummary() {
   const state = store.getState();
@@ -108,6 +110,8 @@ function renderRiskCard(type, data, results) {
           </svg>
         </div>
         
+        ${type === 'ich' ? renderICHVolumeDisplay(data) : ''}
+        
         <div class="risk-assessment">
           <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
             ${riskLevel}
@@ -116,6 +120,44 @@ function renderRiskCard(type, data, results) {
       </div>
     </div>
   `;
+}
+
+/**
+ * Render ICH volume display for integration into risk card
+ * @param {object} data - ICH risk data containing GFAP value
+ * @returns {string} HTML for volume display
+ */
+function renderICHVolumeDisplay(data) {
+  // Get GFAP value from the data
+  const gfapValue = data.gfap_value || getCurrentGfapValue();
+  
+  if (!gfapValue || gfapValue <= 0) {
+    return '';
+  }
+  
+  return `
+    <div class="volume-display-container">
+      ${renderCompactVolumeDisplay(gfapValue)}
+    </div>
+  `;
+}
+
+/**
+ * Get current GFAP value from form data
+ * @returns {number} GFAP value or 0 if not available
+ */
+function getCurrentGfapValue() {
+  const state = store.getState();
+  const formData = state.formData;
+  
+  // Check all modules for GFAP value
+  for (const module of ['coma', 'limited', 'full']) {
+    if (formData[module]?.gfap_value) {
+      return parseFloat(formData[module].gfap_value);
+    }
+  }
+  
+  return 0;
 }
 
 function renderLVONotPossible() {

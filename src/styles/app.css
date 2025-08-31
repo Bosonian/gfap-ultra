@@ -878,6 +878,33 @@ button:disabled {
     gap: 24px;
 }
 
+/* Volume display integration */
+.volume-display-container {
+    flex: 1;
+    max-width: 280px;
+}
+
+.volume-display-container .compact-volume-display {
+    margin: 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+}
+
+/* ICH card specific layout for side-by-side display */
+.enhanced-risk-card.ich .risk-probability {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.enhanced-risk-card.ich .risk-assessment {
+    grid-column: 1 / -1;
+    justify-self: center;
+    margin-top: 16px;
+}
+
 .probability-circle {
     position: relative;
     display: flex;
