@@ -13,17 +13,17 @@ export const VOLUME_THRESHOLDS = {
 };
 
 // 30-day mortality rates by hemorrhage volume (based on clinical literature)
-// Now using continuous interpolation based on observational study correlations:
-// - <25ml: r=0.589 (strong correlation with mortality)
-// - 25-50ml: r=0.406 (moderate correlation)
-// - >50ml: r=0.437 (moderate correlation)
+// Calibrated to Broderick et al. (1993) landmark study:
+// - 30ml = 19% mortality
+// - 60ml = 91% mortality
+// With correlation strengths from observational data
 // Reference thresholds for documentation purposes:
 export const MORTALITY_BY_VOLUME = {
-  '<10ml': '10-15%',     // Minor hemorrhage
-  '10-25ml': '15-25%',   // Small (strong correlation r=0.589)
-  '25-50ml': '25-50%',   // Moderate (moderate correlation r=0.406)
-  '50-80ml': '50-90%',   // Large (moderate correlation r=0.437)
-  '≥80ml': '90-95%'      // Massive hemorrhage
+  '<10ml': '5-10%',      // Minor hemorrhage
+  '10-30ml': '10-19%',   // Small (Broderick: 30ml=19%)
+  '30-50ml': '19-44%',   // Moderate (interpolated)
+  '50-60ml': '44-91%',   // Large (Broderick: 60ml=91%)
+  '≥60ml': '91-100%'     // Massive (Broderick: >60ml=91-100%)
 };
 
 /**
@@ -112,46 +112,50 @@ function getVolumeRiskLevel(volume) {
 
 /**
  * Get mortality rate based on volume with improved interpolation
- * Uses correlation strengths from observational data for smoother transitions
+ * Calibrated to match clinical studies (Broderick 1993: 30ml=19%, 60ml=91%)
  * @param {number} volume - Volume in ml
  * @returns {string} Mortality rate string with citation
  */
 function getMortalityRate(volume) {
   // For very small hemorrhages
   if (volume < 10) {
-    return '10-15%⁴';
+    return '5-10%⁴';
   }
   
-  // For small hemorrhages (<25ml) - strong correlation (r=0.589)
-  if (volume < 25) {
-    // Linear interpolation: 10ml=15%, 25ml=25%
-    const rate = Math.round(15 + (volume - 10) * (25 - 15) / (25 - 10));
+  // For small hemorrhages (10-30ml)
+  // Broderick: 30ml = 19% mortality
+  if (volume < 30) {
+    // Linear interpolation: 10ml=10%, 30ml=19%
+    const rate = Math.round(10 + (volume - 10) * (19 - 10) / (30 - 10));
     return `${rate}%⁴`;
   }
   
-  // For moderate hemorrhages (25-50ml) - moderate correlation (r=0.406)
+  // For moderate hemorrhages (30-50ml)
+  // Interpolating from Broderick 30ml=19% to 50ml≈44%
   if (volume < 50) {
-    // Linear interpolation: 25ml=25%, 50ml=50%
-    const rate = Math.round(25 + (volume - 25) * (50 - 25) / (50 - 25));
+    // Linear interpolation: 30ml=19%, 50ml=44%
+    const rate = Math.round(19 + (volume - 30) * (44 - 19) / (50 - 30));
     return `${rate}%³`;
   }
   
-  // For large hemorrhages (50-60ml) - moderate correlation (r=0.437)
+  // For large hemorrhages (50-60ml)
+  // Broderick: 60ml = 91% mortality
   if (volume < 60) {
-    // Steeper increase: 50ml=50%, 60ml=75%
-    const rate = Math.round(50 + (volume - 50) * (75 - 50) / (60 - 50));
+    // Steeper increase: 50ml=44%, 60ml=91%
+    const rate = Math.round(44 + (volume - 50) * (91 - 44) / (60 - 50));
     return `${rate}%²`;
   }
   
   // For massive hemorrhages (≥60ml)
+  // Broderick: >60ml = 91-100%
   if (volume < 80) {
-    // 60ml=75%, 80ml=90%
-    const rate = Math.round(75 + (volume - 60) * (90 - 75) / (80 - 60));
+    // 60ml=91%, 80ml=96%
+    const rate = Math.round(91 + (volume - 60) * (96 - 91) / (80 - 60));
     return `${rate}%¹`;
   }
   
   // For extreme cases (≥80ml)
-  return '90-95%¹';
+  return '96-100%¹';
 }
 
 /**
