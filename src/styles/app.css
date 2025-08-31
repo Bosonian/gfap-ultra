@@ -913,7 +913,7 @@ button:disabled {
 
 .volume-number {
     position: absolute;
-    font-size: 1.2rem;
+    font-size: 2rem;
     font-weight: 700;
     text-align: center;
     color: var(--text-primary);
@@ -925,6 +925,27 @@ button:disabled {
     border-radius: 50%;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
     background: #f9fafb;
+}
+
+/* Dark mode support for volume circle */
+body.dark-mode .volume-canvas {
+    background: var(--container-bg);
+}
+
+body.dark-mode .volume-number {
+    color: var(--text-color);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+@media (prefers-color-scheme: dark) {
+    .volume-canvas {
+        background: var(--container-bg, #1a1f2e);
+    }
+    
+    .volume-number {
+        color: var(--text-color, #e1e8ed);
+        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
 }
 
 /* Risk assessment centered below both circles */

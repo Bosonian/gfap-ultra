@@ -323,18 +323,49 @@ function drawVolumeFluid(canvas, volume) {
   let animationFrame = 0;
   let isAnimating = true;
   
+  // Check dark mode once
+  const isDarkMode = document.body.classList.contains('dark-mode') || 
+                    window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
   function draw() {
     if (!isAnimating) return;
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw white circle background
-    ctx.fillStyle = '#ffffff';
+    // Draw circle background (dark mode aware)
+    ctx.fillStyle = isDarkMode ? '#1a1f2e' : '#ffffff';
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fill();
     
+    // Draw brain background
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius - 4, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.globalAlpha = 0.6;
+    
+    // Create brain pattern if image not available
+    ctx.fillStyle = isDarkMode ? '#4a5568' : '#e2e8f0';
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY - 5, radius * 0.7, radius * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Brain hemisphere line
+    ctx.strokeStyle = isDarkMode ? '#2d3748' : '#cbd5e0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY - radius * 0.5);
+    ctx.lineTo(centerX, centerY + radius * 0.5);
+    ctx.stroke();
+    
+    ctx.restore();
+    
+    drawFluidLayer();
+  }
+  
+  function drawFluidLayer() {
     // Calculate fill level based on volume
     const maxVolume = 80; // ml (practical maximum for visualization)
     const fillPercentage = Math.min(volume / maxVolume, 0.9);
@@ -380,8 +411,8 @@ function drawVolumeFluid(canvas, volume) {
       ctx.restore();
     }
     
-    // Draw circle border
-    ctx.strokeStyle = '#dee2e6';
+    // Draw circle border (dark mode aware)
+    ctx.strokeStyle = isDarkMode ? '#374151' : '#dee2e6';
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -402,6 +433,7 @@ function drawVolumeFluid(canvas, volume) {
     if (volume > 0) {
       requestAnimationFrame(draw);
     }
+  }
   }
   
   // Start animation

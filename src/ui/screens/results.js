@@ -117,7 +117,7 @@ function renderRiskCard(type, data, results) {
           ${type === 'ich' ? `
             <div class="circle-item">
               ${renderICHVolumeDisplay(data)}
-              <div class="circle-label">Est. Volume</div>
+              <div class="circle-label">ICH Volume</div>
             </div>
           ` : ''}
         </div>
