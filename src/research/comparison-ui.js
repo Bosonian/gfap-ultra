@@ -8,21 +8,11 @@ import { ResearchDataLogger, isResearchModeEnabled } from './data-logger.js';
 import { t } from '../localization/i18n.js';
 
 /**
- * Render research toggle button (subtle, in footer)
- * @returns {string} - HTML for research toggle
+ * Render research toggle button (no longer used - header button handles this)
+ * @returns {string} - Empty string (header button replaces this)
  */
 export function renderResearchToggle() {
-  if (!isResearchModeEnabled()) {
-    return '';
-  }
-
-  return `
-    <div class="research-toggle-container">
-      <button id="researchToggle" class="research-toggle" title="Research Mode Active">
-        🔬 Research
-      </button>
-    </div>
-  `;
+  return ''; // Header button now handles research panel toggling
 }
 
 /**
@@ -33,10 +23,6 @@ export function renderResearchToggle() {
  * @returns {string} - HTML for comparison panel
  */
 export function renderModelComparison(mainResults, legacyResults, inputs) {
-  if (!isResearchModeEnabled()) {
-    return '';
-  }
-
   // Show debug info if legacy results are invalid
   if (!legacyResults?.isValid) {
     console.log('🔬 Legacy model results invalid:', legacyResults);
@@ -223,19 +209,10 @@ function renderModelMetrics() {
  * Initialize research mode event handlers
  */
 export function initializeResearchMode() {
-  if (!isResearchModeEnabled()) {
+  // Always initialize if research panel exists
+  const researchPanel = document.getElementById('researchPanel');
+  if (!researchPanel) {
     return;
-  }
-
-  // Research toggle button
-  const researchToggle = document.getElementById('researchToggle');
-  if (researchToggle) {
-    researchToggle.addEventListener('click', () => {
-      const panel = document.getElementById('researchPanel');
-      if (panel) {
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      }
-    });
   }
 
   // Close research panel

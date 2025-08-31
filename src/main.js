@@ -27,6 +27,8 @@ class App {
     // Subscribe to store changes
     this.unsubscribe = store.subscribe(() => {
       render(this.container);
+      // Update research button visibility after each render
+      setTimeout(() => this.initializeResearchMode(), 200);
     });
 
     // Subscribe to language changes
@@ -257,36 +259,42 @@ class App {
   initializeResearchMode() {
     const researchModeToggle = document.getElementById('researchModeToggle');
     if (researchModeToggle) {
-      const isEnabled = isResearchModeEnabled();
-      researchModeToggle.style.opacity = isEnabled ? '1' : '0.5';
-      researchModeToggle.style.background = isEnabled ? 
-        'rgba(0, 102, 204, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+      // Check if we're on results screen with stroke module
+      const currentModule = this.getCurrentModuleFromResults();
+      const shouldShow = currentModule === 'limited' || currentModule === 'full';
+      
+      researchModeToggle.style.display = shouldShow ? 'flex' : 'none';
+      researchModeToggle.style.opacity = shouldShow ? '1' : '0.5';
     }
   }
 
-  toggleResearchMode() {
-    const currentMode = isResearchModeEnabled();
-    const newMode = !currentMode;
+  getCurrentModuleFromResults() {
+    const state = store.getState();
+    if (state.currentScreen !== 'results' || !state.results?.ich?.module) {
+      return null;
+    }
     
-    if (setResearchMode(newMode)) {
+    const module = state.results.ich.module.toLowerCase();
+    if (module.includes('coma')) return 'coma';
+    if (module.includes('limited')) return 'limited';
+    if (module.includes('full')) return 'full';
+    return null;
+  }
+
+  toggleResearchMode() {
+    // Simply toggle the research panel visibility
+    const researchPanel = document.getElementById('researchPanel');
+    if (researchPanel) {
+      const isVisible = researchPanel.style.display !== 'none';
+      researchPanel.style.display = isVisible ? 'none' : 'block';
+      
       const researchModeToggle = document.getElementById('researchModeToggle');
       if (researchModeToggle) {
-        researchModeToggle.style.opacity = newMode ? '1' : '0.5';
-        researchModeToggle.style.background = newMode ? 
-          'rgba(0, 102, 204, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+        researchModeToggle.style.background = isVisible ? 
+          'rgba(255, 255, 255, 0.1)' : 'rgba(0, 102, 204, 0.2)';
       }
       
-      console.log(`🔬 Research mode ${newMode ? 'ENABLED' : 'DISABLED'}`);
-      
-      // Show activation message and refresh
-      if (newMode) {
-        this.showResearchActivationMessage();
-      }
-      
-      // Refresh page to apply changes
-      setTimeout(() => {
-        window.location.reload();
-      }, newMode ? 1000 : 100);
+      console.log(`🔬 Research panel ${isVisible ? 'HIDDEN' : 'SHOWN'}`);
     }
   }
 

@@ -69,12 +69,10 @@ export function render(container) {
     }, 100);
   }
 
-  // Initialize research mode if on results screen (non-breaking)
-  if (currentScreen === 'results') {
-    setTimeout(() => {
-      initializeResearchMode();
-    }, 150);
-  }
+  // Initialize research mode components (non-breaking)
+  setTimeout(() => {
+    initializeResearchMode();
+  }, 150);
 
   // Accessibility updates
   announceScreenChange(currentScreen);

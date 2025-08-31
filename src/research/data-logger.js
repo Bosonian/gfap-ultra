@@ -278,16 +278,36 @@ export function safeLogResearchData(mainResults, legacyResults, inputs) {
 }
 
 /**
- * Check if research mode is enabled
+ * Check if research mode is enabled for current module
+ * @param {string} module - Current module (coma/limited/full)
  * @returns {boolean} - True if research features should be active
  */
-export function isResearchModeEnabled() {
-  // Multiple activation methods
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlEnabled = urlParams.get('research') === 'true';
-  const storageEnabled = localStorage.getItem('research_mode') === 'true';
+export function isResearchModeEnabled(module = null) {
+  // Never enable research mode for coma module
+  if (module === 'coma') {
+    return false;
+  }
   
-  return urlEnabled || storageEnabled;
+  // Always enable for stroke modules (limited/full)
+  if (module === 'limited' || module === 'full') {
+    return true;
+  }
+  
+  // Fallback: check if any stroke module data exists
+  if (typeof window !== 'undefined') {
+    try {
+      const store = window.store || require('../state/store.js')?.store;
+      if (store) {
+        const formData = store.getState().formData;
+        const hasStrokeData = formData.limited || formData.full;
+        return hasStrokeData; // Enable if stroke module data exists
+      }
+    } catch (error) {
+      // Silently fail - research mode just won't work
+    }
+  }
+  
+  return false;
 }
 
 /**

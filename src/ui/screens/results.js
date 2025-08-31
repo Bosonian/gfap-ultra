@@ -202,12 +202,16 @@ function renderLVONotPossible() {
 export function renderResults(results, startTime) {
   const { ich, lvo } = results;
   
-  // Calculate legacy model for research comparison (background, non-breaking)
-  const legacyResults = calculateLegacyFromResults(results);
+  // Determine current module
+  const currentModule = getCurrentModuleName(ich);
+  
+  // Calculate legacy model for research comparison (only for stroke modules)
+  const legacyResults = currentModule !== 'coma' ? calculateLegacyFromResults(results) : null;
   
   // Debug logging for research mode
-  if (isResearchModeEnabled()) {
+  if (isResearchModeEnabled(currentModule)) {
     console.log('🔬 Research Debug:', {
+      module: currentModule,
       mainResults: ich,
       legacyResults: legacyResults,
       patientInputs: getPatientInputs()
@@ -215,7 +219,7 @@ export function renderResults(results, startTime) {
   }
   
   // Log research data if research mode is enabled (background, non-breaking)
-  if (legacyResults && isResearchModeEnabled()) {
+  if (legacyResults && isResearchModeEnabled(currentModule)) {
     safeLogResearchData(ich, legacyResults, getPatientInputs());
   }
   
@@ -227,10 +231,10 @@ export function renderResults(results, startTime) {
   
   // For limited/coma modules - only show ICH
   if (isLimitedOrComa) {
-    resultsHtml = renderICHFocusedResults(ich, results, startTime, legacyResults);
+    resultsHtml = renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule);
   } else {
     // For full module - show ICH prominently with conditional LVO text
-    resultsHtml = renderFullModuleResults(ich, lvo, results, startTime, legacyResults);
+    resultsHtml = renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule);
   }
   
   // Initialize volume animations after DOM update
@@ -241,12 +245,13 @@ export function renderResults(results, startTime) {
   return resultsHtml;
 }
 
-function renderICHFocusedResults(ich, results, startTime, legacyResults) {
+function renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule) {
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
-  const researchToggleHtml = renderResearchToggle();
-  const researchComparisonHtml = legacyResults ? renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
+  const researchToggleHtml = isResearchModeEnabled(currentModule) ? renderResearchToggle() : '';
+  const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule)) ? 
+    renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
   
   return `
     <div class="container">
@@ -310,15 +315,16 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults) {
   `;
 }
 
-function renderFullModuleResults(ich, lvo, results, startTime, legacyResults) {
+function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule) {
   const ichPercent = Math.round((ich?.probability || 0) * 100);
   const lvoPercent = Math.round((lvo?.probability || 0) * 100);
   
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
-  const researchToggleHtml = renderResearchToggle();
-  const researchComparisonHtml = legacyResults ? renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
+  const researchToggleHtml = isResearchModeEnabled(currentModule) ? renderResearchToggle() : '';
+  const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule)) ? 
+    renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
   
   // Determine if we should show LVO notification
   const showLVONotification = ichPercent < 30 && lvoPercent > 50;
@@ -547,5 +553,21 @@ function getPatientInputs() {
     age: parseInt(age) || null,
     gfap: parseFloat(gfap) || null
   };
+}
+
+/**
+ * Get current module name from results
+ * @param {object} ich - ICH results containing module information
+ * @returns {string} - Module name ('coma', 'limited', 'full')
+ */
+function getCurrentModuleName(ich) {
+  if (!ich?.module) return 'unknown';
+  
+  const module = ich.module.toLowerCase();
+  if (module.includes('coma')) return 'coma';
+  if (module.includes('limited')) return 'limited';
+  if (module.includes('full')) return 'full';
+  
+  return 'unknown';
 }
 
