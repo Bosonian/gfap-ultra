@@ -8,6 +8,31 @@ Successfully fixed mobile ring alignment issues. Both ICH Risk and Volume rings 
 - Date: August 31, 2025, 21:50 CEST
 - State: All rings perfectly aligned on mobile devices (iPhone & Android)
 
+### How to Restore to This Exact Point
+```bash
+# View current status
+git log --oneline -5
+
+# Restore to this exact code state (CAUTION: saves current changes first)
+git stash                    # Save any current uncommitted changes
+git checkout ab9622a         # Go to restore point
+# OR to make a new branch from this point:
+git checkout -b restore-point-aug31 ab9622a
+
+# To return to latest version
+git checkout main
+
+# To see what any file looked like at this point
+git show ab9622a:src/ui/screens/results.js
+git show ab9622a:src/styles/app.css
+
+# To compare current code with restore point
+git diff ab9622a HEAD
+
+# If you need to permanently revert (CAUTION: loses changes after this point)
+git reset --hard ab9622a    # Only if you're sure!
+```
+
 ## Architecture Overview
 
 ### Core Structure
