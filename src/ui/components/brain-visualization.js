@@ -333,34 +333,15 @@ function drawVolumeFluid(canvas, volume) {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw circle background (dark mode aware)
-    ctx.fillStyle = isDarkMode ? '#1a1f2e' : '#ffffff';
+    // Draw circle background matching ICH risk circle
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--container-bg').trim() || 
+                   (isDarkMode ? '#1a1f2e' : '#ffffff');
+    ctx.fillStyle = bgColor;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fill();
     
-    // Draw brain background
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius - 4, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.globalAlpha = 0.6;
-    
-    // Create brain pattern if image not available
-    ctx.fillStyle = isDarkMode ? '#4a5568' : '#e2e8f0';
-    ctx.beginPath();
-    ctx.ellipse(centerX, centerY - 5, radius * 0.7, radius * 0.6, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Brain hemisphere line
-    ctx.strokeStyle = isDarkMode ? '#2d3748' : '#cbd5e0';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY - radius * 0.5);
-    ctx.lineTo(centerX, centerY + radius * 0.5);
-    ctx.stroke();
-    
-    ctx.restore();
+    // No brain background - clean circle like ICH risk
     
     drawFluidLayer();
   }
@@ -411,8 +392,10 @@ function drawVolumeFluid(canvas, volume) {
       ctx.restore();
     }
     
-    // Draw circle border (dark mode aware)
-    ctx.strokeStyle = isDarkMode ? '#374151' : '#dee2e6';
+    // Draw circle border matching ICH risk circle
+    const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || 
+                       (isDarkMode ? '#374151' : '#dee2e6');
+    ctx.strokeStyle = borderColor;
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
