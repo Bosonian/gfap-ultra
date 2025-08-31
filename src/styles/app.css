@@ -918,7 +918,6 @@ button:disabled {
     text-align: center;
     color: var(--text-primary);
     z-index: 10;
-    text-shadow: 0 1px 3px rgba(255,255,255,0.8);
 }
 
 .volume-canvas {
@@ -934,7 +933,6 @@ body.dark-mode .volume-canvas {
 
 body.dark-mode .volume-number {
     color: var(--text-color);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -944,7 +942,6 @@ body.dark-mode .volume-number {
     
     .volume-number {
         color: var(--text-color, #e1e8ed);
-        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     }
 }
 
