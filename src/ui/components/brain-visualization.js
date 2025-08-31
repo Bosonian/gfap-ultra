@@ -397,9 +397,8 @@ function drawVolumeFluid(canvas, volume) {
       ctx.restore();
     }
     
-    // Draw circle border matching ICH risk circle
-    const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || 
-                       (isDarkMode ? '#374151' : '#dee2e6');
+    // Draw circle border with darker color for better definition
+    const borderColor = isDarkMode ? '#4b5563' : '#9ca3af'; // Darker border
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 8;
     ctx.beginPath();
