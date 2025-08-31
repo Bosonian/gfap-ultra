@@ -103,7 +103,11 @@ class App {
     // Research mode toggle
     const researchModeToggle = document.getElementById('researchModeToggle');
     if (researchModeToggle) {
-      researchModeToggle.addEventListener('click', () => this.toggleResearchMode());
+      researchModeToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleResearchMode();
+      });
     }
 
     // Help modal
@@ -265,6 +269,8 @@ class App {
       
       researchModeToggle.style.display = shouldShow ? 'flex' : 'none';
       researchModeToggle.style.opacity = shouldShow ? '1' : '0.5';
+      
+      console.log(`🔬 Research button visibility: ${shouldShow ? 'VISIBLE' : 'HIDDEN'} (module: ${currentModule})`);
     }
   }
 
@@ -282,20 +288,27 @@ class App {
   }
 
   toggleResearchMode() {
-    // Simply toggle the research panel visibility
+    // Simply toggle the research panel visibility without affecting app state
     const researchPanel = document.getElementById('researchPanel');
-    if (researchPanel) {
-      const isVisible = researchPanel.style.display !== 'none';
-      researchPanel.style.display = isVisible ? 'none' : 'block';
-      
-      const researchModeToggle = document.getElementById('researchModeToggle');
-      if (researchModeToggle) {
-        researchModeToggle.style.background = isVisible ? 
-          'rgba(255, 255, 255, 0.1)' : 'rgba(0, 102, 204, 0.2)';
-      }
-      
-      console.log(`🔬 Research panel ${isVisible ? 'HIDDEN' : 'SHOWN'}`);
+    if (!researchPanel) {
+      console.warn('🔬 Research panel not found - likely not on results screen');
+      return;
     }
+    
+    const isVisible = researchPanel.style.display !== 'none';
+    researchPanel.style.display = isVisible ? 'none' : 'block';
+    
+    // Update button visual state
+    const researchModeToggle = document.getElementById('researchModeToggle');
+    if (researchModeToggle) {
+      researchModeToggle.style.background = isVisible ? 
+        'rgba(255, 255, 255, 0.1)' : 'rgba(0, 102, 204, 0.2)';
+    }
+    
+    console.log(`🔬 Research panel ${isVisible ? 'HIDDEN' : 'SHOWN'}`);
+    
+    // DO NOT trigger any navigation or state changes
+    return false;
   }
 
   showResearchActivationMessage() {

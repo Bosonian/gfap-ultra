@@ -209,14 +209,14 @@ export function renderResults(results, startTime) {
   const legacyResults = currentModule !== 'coma' ? calculateLegacyFromResults(results) : null;
   
   // Debug logging for research mode
-  if (isResearchModeEnabled(currentModule)) {
-    console.log('🔬 Research Debug:', {
-      module: currentModule,
-      mainResults: ich,
-      legacyResults: legacyResults,
-      patientInputs: getPatientInputs()
-    });
-  }
+  console.log('🔬 Research Debug - Always Active:', {
+    module: currentModule,
+    researchEnabled: isResearchModeEnabled(currentModule),
+    mainResults: ich,
+    legacyResults: legacyResults,
+    patientInputs: getPatientInputs(),
+    legacyCalculationAttempted: currentModule !== 'coma'
+  });
   
   // Log research data if research mode is enabled (background, non-breaking)
   if (legacyResults && isResearchModeEnabled(currentModule)) {
