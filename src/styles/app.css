@@ -926,7 +926,7 @@ button:disabled {
 
 .volume-canvas {
     border-radius: 50%;
-    background: var(--container-bg);
+    background: transparent;
     position: relative;
 }
 

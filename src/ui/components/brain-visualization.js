@@ -330,24 +330,11 @@ function drawVolumeFluid(canvas, volume) {
   function draw() {
     if (!isAnimating) return;
     
-    // Clear canvas
+    // Clear canvas completely
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw circle background matching ICH risk circle
-    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--container-bg').trim() || 
-                   (isDarkMode ? '#1a1f2e' : '#ffffff');
-    
-    // Fill entire canvas with transparent background (let CSS handle the background)
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw the circle with proper background color
-    ctx.fillStyle = bgColor;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // No brain background - clean circle like ICH risk
-    
+    // Don't draw background - let CSS handle it
+    // Just draw the fluid and border
     drawFluidLayer();
   }
   
@@ -397,13 +384,16 @@ function drawVolumeFluid(canvas, volume) {
       ctx.restore();
     }
     
-    // Draw circle border with darker color for better definition
-    const borderColor = isDarkMode ? '#4b5563' : '#9ca3af'; // Darker border
+    // Draw background border circle (like ICH risk ring)
+    const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim() || 
+                       (isDarkMode ? '#8899a6' : '#6c757d');
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 8;
+    ctx.globalAlpha = 0.4;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.globalAlpha = 1;
     
     // Draw volume progress ring (like ICH risk circle)
     const volumePercent = Math.min(volume / 100, 1); // Max 100ml = 100%
