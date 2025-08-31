@@ -780,6 +780,16 @@ button:disabled {
 
 @keyframes shimmer { to { left: 100%; } }
 
+@keyframes subtle-glow {
+    0%, 100% { opacity: 0.95; filter: drop-shadow(0 0 4px currentColor); }
+    50% { opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+}
+
+@keyframes danger-glow {
+    0%, 100% { filter: drop-shadow(0 0 8px var(--danger-color)); }
+    50% { filter: drop-shadow(0 0 12px var(--danger-color)); }
+}
+
 .driver-bar.positive { background: linear-gradient(90deg, #ff6b6b, #ff4757); }
 .driver-bar.negative { background: linear-gradient(90deg, #51cf66, #2ecc71); }
 
@@ -922,13 +932,15 @@ button:disabled {
 
 .volume-canvas {
     border-radius: 50%;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+    filter: drop-shadow(0 0 6px rgba(220, 38, 38, 0.2));
     background: #f9fafb;
+    position: relative;
 }
 
 /* Dark mode support for volume circle */
 body.dark-mode .volume-canvas {
     background: var(--container-bg);
+    filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.25));
 }
 
 body.dark-mode .volume-number {
@@ -983,20 +995,36 @@ body.dark-mode .volume-number {
 
 .probability-ring {
     transform: rotate(-90deg);
+    filter: drop-shadow(0 0 6px rgba(0, 102, 204, 0.15));
 }
 
 .probability-progress {
     transition: stroke-dashoffset 1s ease-in-out;
+    filter: drop-shadow(0 0 4px currentColor);
+    opacity: 0.95;
+    animation: subtle-glow 3s ease-in-out infinite;
 }
 
 .enhanced-risk-card.critical .probability-progress {
     stroke: var(--danger-color);
-    filter: drop-shadow(0 0 8px var(--danger-color));
+    filter: drop-shadow(0 0 10px var(--danger-color));
+    animation: danger-glow 2s ease-in-out infinite;
 }
 
 .enhanced-risk-card.high .probability-progress {
     stroke: var(--warning-color);
+    filter: drop-shadow(0 0 8px var(--warning-color));
 }
+
+/* Enhanced glow for high-risk volume circles */
+.enhanced-risk-card.critical .volume-canvas {
+    filter: drop-shadow(0 0 10px rgba(220, 38, 38, 0.4));
+}
+
+.enhanced-risk-card.high .volume-canvas {
+    filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.3));
+}
+
 
 .enhanced-risk-card.normal .probability-progress {
     stroke: var(--success-color);
