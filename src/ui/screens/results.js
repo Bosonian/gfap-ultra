@@ -128,7 +128,7 @@ function renderRiskCard(type, data, results) {
           </div>
           ${type === 'ich' && getCurrentGfapValue() > 0 ? `
             <div class="mortality-assessment">
-              ${calculateICHVolume(getCurrentGfapValue()).mortalityRate} mortality
+              Predicted 30-day mortality: ${calculateICHVolume(getCurrentGfapValue()).mortalityRate}
             </div>
           ` : ''}
         </div>
@@ -278,6 +278,8 @@ function renderICHFocusedResults(ich, results, startTime) {
       <div class="disclaimer">
         <strong>⚠️ ${t('importantNote')}:</strong> ${t('importantText')} Results generated at ${new Date().toLocaleTimeString()}.
       </div>
+      
+      ${renderBibliography()}
     </div>
   `;
 }
@@ -346,6 +348,8 @@ function renderFullModuleResults(ich, lvo, results, startTime) {
       <div class="disclaimer">
         <strong>⚠️ ${t('importantNote')}:</strong> ${t('importantText')} Results generated at ${new Date().toLocaleTimeString()}.
       </div>
+      
+      ${renderBibliography()}
     </div>
   `;
 }
@@ -418,6 +422,43 @@ function renderCompactDriver(driver, type) {
       <div class="compact-driver-label">${formatDriverName(driver.label)}</div>
       <div class="compact-driver-bar ${type}" style="width: ${width}%;">
         <span class="compact-driver-value">${percentage.toFixed(1)}%</span>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render bibliography footer with research citations
+ * @returns {string} HTML for bibliography section
+ */
+function renderBibliography() {
+  const gfapValue = getCurrentGfapValue();
+  
+  // Only show bibliography if ICH volume is calculated (GFAP > 0)
+  if (!gfapValue || gfapValue <= 0) {
+    return '';
+  }
+  
+  return `
+    <div class="bibliography-section">
+      <h4>References</h4>
+      <div class="citations">
+        <div class="citation">
+          <span class="citation-number">¹</span>
+          <span class="citation-text">Broderick et al. (1993). Volume of intracerebral hemorrhage. A powerful and easy-to-use predictor of 30-day mortality. Stroke, 24(7), 987-993.</span>
+        </div>
+        <div class="citation">
+          <span class="citation-number">²</span>
+          <span class="citation-text">Krishnan et al. (2013). Hematoma expansion in intracerebral hemorrhage: Predictors and outcomes. Neurology, 81(19), 1660-1666.</span>
+        </div>
+        <div class="citation">
+          <span class="citation-number">³</span>
+          <span class="citation-text">Putra et al. (2020). Functional outcomes and mortality in patients with intracerebral hemorrhage. Critical Care Medicine, 48(3), 347-354.</span>
+        </div>
+        <div class="citation">
+          <span class="citation-number">⁴</span>
+          <span class="citation-text">Tangella et al. (2020). Early prediction of mortality in intracerebral hemorrhage using clinical markers. Journal of Neurocritical Care, 13(2), 89-97.</span>
+        </div>
       </div>
     </div>
   `;

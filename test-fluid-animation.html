@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluid Animation Test</title>
+    <link rel="stylesheet" href="./src/styles/app.css">
+    <link rel="stylesheet" href="./src/styles/volume-components.css">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 20px;
+            background: #f9fafb;
+        }
+        .test-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin: 40px 0;
+        }
+        .circle-test {
+            text-align: center;
+        }
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        input {
+            margin: 10px;
+            padding: 8px;
+        }
+        .enhanced-risk-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Fluid Animation Test</h1>
+    
+    <div class="controls">
+        <label>GFAP Value: </label>
+        <input type="number" id="gfap-input" value="1000" min="0" max="5000" step="50">
+        <button onclick="updateTest()">Update</button>
+    </div>
+    
+    <div class="enhanced-risk-card ich">
+        <div class="risk-probability">
+            <div class="circles-container">
+                <div class="circle-item">
+                    <div class="probability-circle" data-percent="75">
+                        <div class="probability-number">75<span>%</span></div>
+                        <svg class="probability-ring" width="120" height="120">
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="#dc2626" stroke-width="8" 
+                                    stroke-dasharray="339.29" 
+                                    stroke-dashoffset="84.82"
+                                    stroke-linecap="round" 
+                                    transform="rotate(-90 60 60)"
+                                    class="probability-progress"/>
+                        </svg>
+                    </div>
+                    <div class="circle-label">ICH Risk</div>
+                </div>
+                
+                <div class="circle-item">
+                    <div id="volume-display-test"></div>
+                    <div class="circle-label">Est. Volume</div>
+                </div>
+            </div>
+            
+            <div class="risk-assessment">
+                <div class="risk-level critical">Critical Risk</div>
+                <div class="mortality-assessment">~19% mortality</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { calculateICHVolume } from './src/logic/ich-volume-calculator.js';
+        import { renderCircularBrainDisplay, initializeVolumeAnimations } from './src/ui/components/brain-visualization.js';
+        
+        window.updateTest = function() {
+            const gfapValue = parseFloat(document.getElementById('gfap-input').value) || 0;
+            const volumeResult = calculateICHVolume(gfapValue);
+            
+            console.log(`Testing GFAP: ${gfapValue}, Volume: ${volumeResult.displayVolume}`);
+            
+            // Update volume display
+            const container = document.getElementById('volume-display-test');
+            container.innerHTML = renderCircularBrainDisplay(volumeResult.volume);
+            
+            // Initialize animations
+            setTimeout(() => {
+                initializeVolumeAnimations();
+            }, 100);
+        };
+        
+        // Initialize on load
+        window.addEventListener('load', updateTest);
+    </script>
+</body>
+</html>

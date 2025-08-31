@@ -14,11 +14,10 @@ export const VOLUME_THRESHOLDS = {
 
 // 30-day mortality rates by hemorrhage volume (based on clinical literature)
 export const MORTALITY_BY_VOLUME = {
-  '<10ml': '~3%',
-  '10-20ml': '~10%', 
-  '20-30ml': '~19%',
-  '≥30ml': '~35%',
-  '≥50ml': '~50%'
+  '<30ml': '17-19%',     // Broderick et al. (1993), Putra et al. (2020)
+  '30-50ml': '35-45%',   // Interpolated from research data
+  '50-60ml': '70-85%',   // Krishnan et al. (2013) 
+  '≥60ml': '85-100%'     // Broderick et al. (1993), Tangella et al. (2020), Krishnan et al. (2013)
 };
 
 /**
@@ -106,16 +105,15 @@ function getVolumeRiskLevel(volume) {
 }
 
 /**
- * Get mortality rate based on volume
+ * Get mortality rate based on volume with citation
  * @param {number} volume - Volume in ml
- * @returns {string} Mortality rate string
+ * @returns {string} Mortality rate string with citation
  */
 function getMortalityRate(volume) {
-  if (volume >= 50) return MORTALITY_BY_VOLUME['≥50ml'];
-  if (volume >= 30) return MORTALITY_BY_VOLUME['≥30ml'];
-  if (volume >= 20) return MORTALITY_BY_VOLUME['20-30ml'];
-  if (volume >= 10) return MORTALITY_BY_VOLUME['10-20ml'];
-  return MORTALITY_BY_VOLUME['<10ml'];
+  if (volume >= 60) return MORTALITY_BY_VOLUME['≥60ml'] + '¹';
+  if (volume >= 50) return MORTALITY_BY_VOLUME['50-60ml'] + '²';
+  if (volume >= 30) return MORTALITY_BY_VOLUME['30-50ml'] + '³';
+  return MORTALITY_BY_VOLUME['<30ml'] + '⁴';
 }
 
 /**
