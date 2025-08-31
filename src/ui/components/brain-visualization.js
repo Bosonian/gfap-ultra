@@ -285,51 +285,49 @@ export function renderCircularBrainDisplay(volume) {
   const maxRadius = 25; // Maximum radius in 120px circle
   const hemorrhageRadius = Math.max(2, (hemorrhagePercent / 70) * maxRadius);
   
+  const volumeResult = calculateICHVolume(volume);
+  const formattedVolume = formatVolumeDisplay(volume);
+  
   return `
-    <div class="circular-brain-display">
-      <div class="brain-circle">
-        <svg class="brain-svg-circle" width="120" height="120">
-          <!-- 3D Brain background -->
-          <defs>
-            <clipPath id="brain-clip">
-              <circle cx="60" cy="60" r="54"/>
-            </clipPath>
-          </defs>
-          
-          <image 
-            x="6" y="6" 
-            width="108" height="108"
-            href="./src/assets/brain-3d.png"
-            clip-path="url(#brain-clip)"
-            opacity="0.95"
-            preserveAspectRatio="xMidYMid meet"
-          />
-          
-          <!-- Brain circle border -->
-          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--border-color)" stroke-width="8"/>
-          
-          <!-- Red hemorrhage dot -->
-          <circle 
-            cx="${hemorrhageX}" 
-            cy="${hemorrhageY}" 
-            r="${hemorrhageRadius}"
-            fill="#dc2626"
-            opacity="0.9"
-            class="hemorrhage-dot"
-          >
-            <animate 
-              attributeName="opacity" 
-              values="0.7;1;0.7" 
-              dur="2s" 
-              repeatCount="indefinite"
-            />
-          </circle>
-        </svg>
+    <div class="volume-circle" data-volume="${volume}">
+      <div class="volume-number">${formattedVolume}</div>
+      <svg class="volume-ring" width="120" height="120">
+        <!-- 3D Brain background -->
+        <defs>
+          <clipPath id="brain-clip-${Math.random().toString(36).substr(2, 9)}">
+            <circle cx="60" cy="60" r="54"/>
+          </clipPath>
+        </defs>
         
-        <div class="volume-label-overlay">
-          ${formatVolumeDisplay(volume)}
-        </div>
-      </div>
+        <image 
+          x="6" y="6" 
+          width="108" height="108"
+          href="./src/assets/brain-3d.png"
+          clip-path="url(#brain-clip-${Math.random().toString(36).substr(2, 9)})"
+          opacity="0.9"
+          preserveAspectRatio="xMidYMid meet"
+        />
+        
+        <!-- Brain circle border -->
+        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--border-color)" stroke-width="8"/>
+        
+        <!-- Red hemorrhage dot -->
+        <circle 
+          cx="${hemorrhageX}" 
+          cy="${hemorrhageY}" 
+          r="${hemorrhageRadius}"
+          fill="#dc2626"
+          opacity="0.9"
+          class="hemorrhage-dot"
+        >
+          <animate 
+            attributeName="opacity" 
+            values="0.7;1;0.7" 
+            dur="2s" 
+            repeatCount="indefinite"
+          />
+        </circle>
+      </svg>
     </div>
   `;
 }
