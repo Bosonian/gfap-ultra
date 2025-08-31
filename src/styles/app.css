@@ -3222,31 +3222,27 @@ footer {
     }
     
     .probability-circle, .volume-circle {
-        transform: scale(0.85);
         position: relative;
-        width: 102px;
-        height: 102px;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .probability-ring {
-        width: 102px !important;
-        height: 102px !important;
+        width: 100px !important;
+        height: 100px !important;
         position: absolute;
         top: 0;
         left: 0;
     }
     
     .volume-canvas {
-        width: 102px !important;
-        height: 102px !important;
+        width: 100px !important;
+        height: 100px !important;
         display: block;
-        margin: 0 auto;
-    }
-    
-    .probability-ring circle {
-        cx: 51;
-        cy: 51;
-        r: 46;
+        position: relative;
     }
     
     .probability-number, .volume-number {
@@ -3305,10 +3301,12 @@ footer {
     }
     
     .probability-circle, .volume-circle {
-        transform: scale(0.75);
         position: relative;
         width: 90px;
         height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         flex-shrink: 0;
         margin: 0;
     }
@@ -3325,18 +3323,7 @@ footer {
         width: 90px !important;
         height: 90px !important;
         display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-    }
-    
-    .probability-ring circle {
-        cx: 45;
-        cy: 45;
-        r: 40;
+        position: relative;
     }
     
     .probability-number, .volume-number {
@@ -3383,35 +3370,31 @@ footer {
     }
     
     .probability-circle, .volume-circle {
-        transform: scale(0.7);
         position: relative;
-        width: 84px;
-        height: 84px;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .probability-ring {
-        width: 84px !important;
-        height: 84px !important;
+        width: 80px !important;
+        height: 80px !important;
         position: absolute;
         top: 0;
         left: 0;
     }
     
     .volume-canvas {
-        width: 84px !important;
-        height: 84px !important;
+        width: 80px !important;
+        height: 80px !important;
         display: block;
-        margin: 0 auto;
-    }
-    
-    .probability-ring circle {
-        cx: 42;
-        cy: 42;
-        r: 38;
+        position: relative;
     }
     
     .probability-number, .volume-number {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         position: absolute;
         top: 50%;
         left: 50%;

@@ -105,7 +105,7 @@ function renderRiskCard(type, data, results) {
             <div class="circle-item">
               <div class="probability-circle" data-percent="${percent}">
                 <div class="probability-number">${percent}<span>%</span></div>
-                <svg class="probability-ring" width="120" height="120">
+                <svg class="probability-ring" viewBox="0 0 120 120" preserveAspectRatio="xMidYMid meet">
                   <circle cx="60" cy="60" r="54" fill="none" stroke="var(--text-secondary)" stroke-width="8" opacity="0.4"/>
                   <circle cx="60" cy="60" r="54" fill="none" stroke-width="8" 
                           stroke-dasharray="${2 * Math.PI * 54}" 

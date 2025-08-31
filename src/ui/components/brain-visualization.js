@@ -289,7 +289,7 @@ export function renderCircularBrainDisplay(volume) {
   return `
     <div class="volume-circle" data-volume="${volume}">
       <div class="volume-number">${formattedVolume}</div>
-      <canvas id="${canvasId}" class="volume-canvas" width="120" height="120" 
+      <canvas id="${canvasId}" class="volume-canvas" 
               data-volume="${volume}" data-canvas-id="${canvasId}"></canvas>
     </div>
   `;
@@ -303,6 +303,12 @@ export function initializeVolumeAnimations() {
   const canvases = document.querySelectorAll('.volume-canvas');
   
   canvases.forEach(canvas => {
+    // Set canvas internal size to match CSS size
+    const cssWidth = canvas.offsetWidth || 120;
+    const cssHeight = canvas.offsetHeight || 120;
+    canvas.width = cssWidth;
+    canvas.height = cssHeight;
+    
     const volume = parseFloat(canvas.dataset.volume) || 0;
     if (volume > 0) {
       drawVolumeFluid(canvas, volume);
@@ -317,9 +323,9 @@ export function initializeVolumeAnimations() {
  */
 function drawVolumeFluid(canvas, volume) {
   const ctx = canvas.getContext('2d');
-  const centerX = 60;
-  const centerY = 60;
-  const radius = 54;
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const radius = canvas.width * 0.45; // 45% of canvas width for the circle
   let animationFrame = 0;
   let isAnimating = true;
   
