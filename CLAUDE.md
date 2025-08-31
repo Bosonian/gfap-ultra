@@ -1,7 +1,12 @@
 # Stroke Triage Assistant - Project Context
 
-## Restore Point: 2025-08-31
+## Restore Point: 2025-08-31 21:50:52 CEST
 Successfully fixed mobile ring alignment issues. Both ICH Risk and Volume rings display correctly.
+
+### Git Commit at Restore Point
+- Commit: ab9622a (Fix mobile ring alignment by removing transform scale conflicts)
+- Date: August 31, 2025, 21:50 CEST
+- State: All rings perfectly aligned on mobile devices (iPhone & Android)
 
 ## Architecture Overview
 
