@@ -884,6 +884,15 @@ button:disabled {
 /* Symmetric circles container */
 .circles-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    overflow: visible;
+}
+
+/* Rings row for side-by-side layout */
+.rings-row {
+    display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 40px;
@@ -952,6 +961,16 @@ button:disabled {
     align-items: center;
     justify-content: center;
     overflow: visible;
+    width: 120px;
+    height: 120px;
+}
+
+.probability-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 120px;
 }
 
 .probability-number {
@@ -3182,6 +3201,11 @@ footer {
 /* Responsive circles and rings for small devices */
 @media (max-width: 480px) {
     .circles-container {
+        gap: 16px;
+        align-items: center;
+    }
+    
+    .rings-row {
         gap: 20px;
         justify-content: center;
         align-items: flex-start;
@@ -3200,9 +3224,19 @@ footer {
     .probability-circle, .volume-circle {
         transform: scale(0.85);
         position: relative;
+        width: 102px;
+        height: 102px;
     }
     
-    .probability-ring, .volume-canvas {
+    .probability-ring {
+        width: 102px !important;
+        height: 102px !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    .volume-canvas {
         width: 102px !important;
         height: 102px !important;
         display: block;
@@ -3235,6 +3269,7 @@ footer {
         padding: 6px 12px;
         text-align: center;
         white-space: nowrap;
+        margin-top: 8px;
     }
 }
 
@@ -3243,9 +3278,14 @@ footer {
        (max-width: 480px) and (max-height: 1000px) and (min-height: 800px),
        (max-width: 430px) and (min-aspect-ratio: 19/9) {
     .circles-container {
-        gap: 20px;
-        justify-content: center;
+        gap: 12px;
         align-items: center;
+    }
+    
+    .rings-row {
+        gap: 18px;
+        justify-content: center;
+        align-items: flex-start;
         flex-wrap: nowrap;
         width: 100%;
         margin: 0 auto;
@@ -3266,9 +3306,6 @@ footer {
     
     .probability-circle, .volume-circle {
         transform: scale(0.75);
-        display: flex;
-        align-items: center;
-        justify-content: center;
         position: relative;
         width: 90px;
         height: 90px;
@@ -3279,11 +3316,9 @@ footer {
     .probability-ring {
         width: 90px !important;
         height: 90px !important;
-        display: block;
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 0;
+        left: 0;
     }
     
     .volume-canvas {
@@ -3329,7 +3364,7 @@ footer {
         padding: 5px 10px;
         text-align: center;
         white-space: nowrap;
-        margin-top: 6px;
+        margin-top: 12px;
         border-radius: 6px;
     }
 }
@@ -3337,6 +3372,11 @@ footer {
 /* Extra small devices (older iPhones) */
 @media (max-width: 375px) {
     .circles-container {
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .rings-row {
         gap: 15px;
         justify-content: center;
         align-items: center;
@@ -3344,14 +3384,24 @@ footer {
     
     .probability-circle, .volume-circle {
         transform: scale(0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: relative;
+        width: 84px;
+        height: 84px;
     }
     
-    .probability-ring, .volume-canvas {
+    .probability-ring {
         width: 84px !important;
         height: 84px !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    .volume-canvas {
+        width: 84px !important;
+        height: 84px !important;
+        display: block;
+        margin: 0 auto;
     }
     
     .probability-ring circle {
@@ -3362,15 +3412,25 @@ footer {
     
     .probability-number, .volume-number {
         font-size: 1.3rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
     }
     
     .circle-label {
         font-size: 0.75rem;
+        text-align: center;
+        white-space: nowrap;
     }
     
     .risk-level {
         font-size: 0.8rem;
         padding: 4px 10px;
+        text-align: center;
+        white-space: nowrap;
+        margin-top: 10px;
     }
 }
 

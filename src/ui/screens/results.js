@@ -101,31 +101,34 @@ function renderRiskCard(type, data, results) {
       
       <div class="risk-probability">
         <div class="circles-container">
-          <div class="circle-item">
-            <div class="probability-circle" data-percent="${percent}">
-              <div class="probability-number">${percent}<span>%</span></div>
-              <svg class="probability-ring" width="120" height="120">
-                <circle cx="60" cy="60" r="54" fill="none" stroke="var(--text-secondary)" stroke-width="8" opacity="0.4"/>
-                <circle cx="60" cy="60" r="54" fill="none" stroke-width="8" 
-                        stroke-dasharray="${2 * Math.PI * 54}" 
-                        stroke-dashoffset="${2 * Math.PI * 54 * (1 - percent / 100)}"
-                        stroke-linecap="round" 
-                        transform="rotate(-90 60 60)"
-                        class="probability-progress"/>
-              </svg>
+          <div class="rings-row">
+            <div class="circle-item">
+              <div class="probability-circle" data-percent="${percent}">
+                <div class="probability-number">${percent}<span>%</span></div>
+                <svg class="probability-ring" width="120" height="120">
+                  <circle cx="60" cy="60" r="54" fill="none" stroke="var(--text-secondary)" stroke-width="8" opacity="0.4"/>
+                  <circle cx="60" cy="60" r="54" fill="none" stroke-width="8" 
+                          stroke-dasharray="${2 * Math.PI * 54}" 
+                          stroke-dashoffset="${2 * Math.PI * 54 * (1 - percent / 100)}"
+                          stroke-linecap="round" 
+                          transform="rotate(-90 60 60)"
+                          class="probability-progress"/>
+                </svg>
+              </div>
+              <div class="circle-label">ICH Risk</div>
             </div>
-            <div class="circle-label">ICH Risk</div>
-            <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
-              ${riskLevel}
-            </div>
+            
+            ${type === 'ich' && percent >= 50 ? `
+              <div class="circle-item">
+                ${renderICHVolumeDisplay(data)}
+                <div class="circle-label">${t('ichVolumeLabel')}</div>
+              </div>
+            ` : ''}
           </div>
           
-          ${type === 'ich' && percent >= 50 ? `
-            <div class="circle-item">
-              ${renderICHVolumeDisplay(data)}
-              <div class="circle-label">${t('ichVolumeLabel')}</div>
-            </div>
-          ` : ''}
+          <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
+            ${riskLevel}
+          </div>
         </div>
         
         <div class="risk-assessment">
