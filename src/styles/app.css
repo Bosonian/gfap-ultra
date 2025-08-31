@@ -924,10 +924,20 @@ button:disabled {
     z-index: 10;
 }
 
-.volume-canvas {
-    border-radius: 50%;
-    background: transparent;
-    position: relative;
+.volume-ring {
+    transform: rotate(-90deg);
+    overflow: visible;
+}
+
+.volume-ring circle:first-child {
+    stroke: var(--text-secondary);
+    opacity: 0.4;
+}
+
+.volume-progress {
+    transition: stroke-dashoffset 1s ease-in-out;
+    opacity: 1;
+    stroke: var(--primary-color);
 }
 
 
