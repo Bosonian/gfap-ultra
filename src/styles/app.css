@@ -3163,3 +3163,138 @@ footer {
         left: 10px;
     }
 }
+
+/* Responsive circles and rings for small devices */
+@media (max-width: 480px) {
+    .circles-container {
+        gap: 20px;
+        justify-content: space-around;
+    }
+    
+    .circle-item {
+        gap: 8px;
+    }
+    
+    .probability-circle, .volume-circle {
+        transform: scale(0.8);
+    }
+    
+    .probability-ring, .volume-ring {
+        width: 96px !important;
+        height: 96px !important;
+    }
+    
+    .probability-ring circle, .volume-ring circle {
+        cx: 48;
+        cy: 48;
+        r: 43;
+    }
+    
+    .probability-number, .volume-number {
+        font-size: 1.5rem;
+    }
+    
+    .circle-label {
+        font-size: 0.8rem;
+    }
+    
+    .risk-level {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+}
+
+/* Extra small devices (older iPhones) */
+@media (max-width: 375px) {
+    .circles-container {
+        gap: 15px;
+    }
+    
+    .probability-circle, .volume-circle {
+        transform: scale(0.7);
+    }
+    
+    .probability-ring, .volume-ring {
+        width: 84px !important;
+        height: 84px !important;
+    }
+    
+    .probability-ring circle, .volume-ring circle {
+        cx: 42;
+        cy: 42;
+        r: 38;
+    }
+    
+    .probability-number, .volume-number {
+        font-size: 1.3rem;
+    }
+    
+    .circle-label {
+        font-size: 0.75rem;
+    }
+    
+    .risk-level {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
+}
+
+/* Header controls alignment fix for small screens */
+@media (max-width: 480px) {
+    .header-controls {
+        gap: 8px;
+    }
+    
+    .header-controls button {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #languageToggle {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 375px) {
+    .header-controls {
+        gap: 6px;
+    }
+    
+    .header-controls button {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+    
+    #languageToggle {
+        font-size: 0.9rem;
+    }
+    
+    /* Additional small screen optimizations */
+    .container {
+        margin: 6px;
+        padding: 10px;
+    }
+    
+    .enhanced-risk-card {
+        padding: 16px;
+    }
+    
+    .risk-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .input-group label {
+        font-size: 0.9rem;
+    }
+    
+    .primary, .secondary {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
