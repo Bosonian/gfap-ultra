@@ -169,8 +169,13 @@ export class LegacyICHModel {
       };
     }
 
-    const mainProb = mainResults.probability || 0;
-    const legacyProb = legacyResults.probability || 0;
+    // Normalize probabilities to percentage scale (0-100)
+    let mainProb = mainResults.probability || 0;
+    if (mainProb <= 1) {
+      mainProb = mainProb * 100; // Convert 0.65 to 65%
+    }
+    
+    const legacyProb = legacyResults.probability || 0; // Already in percentage
     
     const absoluteDifference = mainProb - legacyProb;
     const relativeDifference = legacyProb > 0 ? (absoluteDifference / legacyProb) * 100 : 0;

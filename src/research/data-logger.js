@@ -4,6 +4,8 @@
  * All data stays local - no external transmission
  */
 
+import { LegacyICHModel } from './legacy-ich-model.js';
+
 export class ResearchDataLogger {
   static STORAGE_KEY = 'igfap_research_data';
   static MAX_ENTRIES = 1000; // Prevent unlimited storage growth

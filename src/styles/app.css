@@ -3076,6 +3076,26 @@ footer {
     color: var(--danger-color);
 }
 
+.research-error {
+    background: var(--critical-bg);
+    border: 1px solid var(--danger-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+
+.research-error p {
+    color: var(--danger-color);
+    font-weight: 500;
+    margin: 0 0 8px 0;
+}
+
+.research-error small {
+    color: var(--text-secondary);
+    font-family: monospace;
+    font-size: 0.75rem;
+}
+
 .research-activation-toast {
     position: fixed;
     top: 70px;

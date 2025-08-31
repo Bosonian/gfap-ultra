@@ -205,6 +205,15 @@ export function renderResults(results, startTime) {
   // Calculate legacy model for research comparison (background, non-breaking)
   const legacyResults = calculateLegacyFromResults(results);
   
+  // Debug logging for research mode
+  if (isResearchModeEnabled()) {
+    console.log('🔬 Research Debug:', {
+      mainResults: ich,
+      legacyResults: legacyResults,
+      patientInputs: getPatientInputs()
+    });
+  }
+  
   // Log research data if research mode is enabled (background, non-breaking)
   if (legacyResults && isResearchModeEnabled()) {
     safeLogResearchData(ich, legacyResults, getPatientInputs());

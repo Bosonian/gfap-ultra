@@ -33,8 +33,25 @@ export function renderResearchToggle() {
  * @returns {string} - HTML for comparison panel
  */
 export function renderModelComparison(mainResults, legacyResults, inputs) {
-  if (!isResearchModeEnabled() || !legacyResults?.isValid) {
+  if (!isResearchModeEnabled()) {
     return '';
+  }
+
+  // Show debug info if legacy results are invalid
+  if (!legacyResults?.isValid) {
+    console.log('🔬 Legacy model results invalid:', legacyResults);
+    return `
+      <div class="research-panel" id="researchPanel" style="display: none;">
+        <div class="research-header">
+          <h4>🔬 Model Comparison (Research)</h4>
+          <button class="close-research" id="closeResearch">×</button>
+        </div>
+        <div class="research-error">
+          <p>⚠️ Legacy model calculation failed</p>
+          <small>Debug: ${legacyResults?.reason || 'Unknown error'}</small>
+        </div>
+      </div>
+    `;
   }
 
   const comparison = LegacyICHModel.compareModels(mainResults, legacyResults);
@@ -77,24 +94,30 @@ export function renderModelComparison(mainResults, legacyResults, inputs) {
  * @returns {string} - HTML for probability bars
  */
 function renderProbabilityBars(mainResults, legacyResults) {
-  const mainProb = mainResults.probability || 0;
+  // Convert main model probability to percentage if it's in decimal form (0-1)
+  let mainProb = mainResults.probability || 0;
+  if (mainProb <= 1) {
+    mainProb = mainProb * 100; // Convert 0.65 to 65%
+  }
+  
+  // Legacy model already returns percentage (0-100)
   const legacyProb = legacyResults.probability || 0;
   
   return `
     <div class="probability-comparison">
       <div class="bar-group">
-        <label class="bar-label">Main Model (Complex)</label>
+        <label class="bar-label">Main Model (Complex) - ${mainResults.module || 'Unknown'}</label>
         <div class="probability-bar">
-          <div class="bar-fill main-model" style="width: ${mainProb}%">
+          <div class="bar-fill main-model" style="width: ${Math.min(mainProb, 100)}%">
             <span class="bar-value">${mainProb.toFixed(1)}%</span>
           </div>
         </div>
       </div>
       
       <div class="bar-group">
-        <label class="bar-label">Legacy Model (Age + GFAP)</label>
+        <label class="bar-label">Legacy Model (Age + GFAP Only)</label>
         <div class="probability-bar">
-          <div class="bar-fill legacy-model" style="width: ${legacyProb}%">
+          <div class="bar-fill legacy-model" style="width: ${Math.min(legacyProb, 100)}%">
             <span class="bar-value">${legacyProb.toFixed(1)}%</span>
           </div>
         </div>
