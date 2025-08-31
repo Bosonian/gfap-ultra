@@ -321,119 +321,100 @@ function drawVolumeFluid(canvas, volume) {
   const centerY = 60;
   const radius = 54;
   let animationFrame = 0;
-  
-  // Wave parameters for subtle animation
-  const waves = [
-    { amplitude: 3, frequency: 0.03, speed: 0.02, phase: 0, opacity: 0.4 },
-    { amplitude: 2, frequency: 0.04, speed: 0.03, phase: Math.PI / 3, opacity: 0.3 }
-  ];
+  let isAnimating = true;
   
   function draw() {
+    if (!isAnimating) return;
+    
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw brain background image
-    const brain = new Image();
-    brain.onload = () => {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(brain, 6, 6, 108, 108);
-      ctx.restore();
-      
-      // Continue with fluid rendering after brain loads
-      drawFluid();
-    };
-    brain.src = './src/assets/brain-3d.png';
-    
-    // If brain doesn't load, draw fluid anyway
-    setTimeout(drawFluid, 50);
-  }
-  
-  function drawFluid() {
-    // Calculate fill level (volume as percentage of max visible area)
-    const maxVolume = 100; // ml
-    const fillPercentage = Math.min(volume / maxVolume, 0.8); // Max 80% fill
-    const fillLevel = centerY + radius - (fillPercentage * radius * 2);
-    
-    // Set up clipping for circular container
-    ctx.save();
+    // Draw white circle background
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
-    ctx.clip();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.fill();
     
-    // Draw animated fluid waves
-    const color = '#dc2626'; // Always red
+    // Calculate fill level based on volume
+    const maxVolume = 80; // ml (practical maximum for visualization)
+    const fillPercentage = Math.min(volume / maxVolume, 0.9);
+    const fillHeight = fillPercentage * (radius * 1.8);
+    const baseLevel = centerY + radius - 4 - fillHeight;
     
-    waves.forEach(wave => {
+    // Draw fluid fill with waves
+    if (volume > 0) {
+      ctx.save();
+      
+      // Clip to circle
       ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.globalAlpha = wave.opacity;
+      ctx.arc(centerX, centerY, radius - 4, 0, Math.PI * 2);
+      ctx.clip();
       
-      // Draw wave line
-      for (let x = centerX - radius; x <= centerX + radius; x += 2) {
-        const relX = x - (centerX - radius);
-        const waveY = fillLevel + 
-          Math.sin((relX * wave.frequency) + animationFrame * wave.speed + wave.phase) * 
-          wave.amplitude;
-        
-        // Check if point is within circle
-        const dx = x - centerX;
-        const dy = waveY - centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance <= radius - 2) {
-          if (x === centerX - radius + 2) {
-            ctx.moveTo(x, waveY);
-          } else {
-            ctx.lineTo(x, waveY);
-          }
-        }
+      // Draw base fluid rectangle
+      ctx.fillStyle = '#dc2626';
+      ctx.globalAlpha = 0.7;
+      ctx.fillRect(0, baseLevel + 5, canvas.width, canvas.height);
+      
+      // Draw animated wave surface
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      
+      // Create wave path
+      let startX = centerX - radius + 4;
+      ctx.moveTo(startX, baseLevel);
+      
+      for (let x = startX; x <= centerX + radius - 4; x += 2) {
+        const waveOffset1 = Math.sin((x * 0.05) + animationFrame * 0.08) * 3;
+        const waveOffset2 = Math.sin((x * 0.08) + animationFrame * 0.12 + 1) * 2;
+        const y = baseLevel + waveOffset1 + waveOffset2;
+        ctx.lineTo(x, y);
       }
       
-      // Complete fill area to bottom of circle
-      for (let x = centerX + radius; x >= centerX - radius; x -= 2) {
-        const dx = x - centerX;
-        const maxY = Math.sqrt((radius - 2) * (radius - 2) - dx * dx);
-        if (!isNaN(maxY)) {
-          const bottomY = centerY + maxY;
-          ctx.lineTo(x, bottomY);
-        }
-      }
-      
+      // Complete wave fill
+      ctx.lineTo(centerX + radius - 4, canvas.height);
+      ctx.lineTo(startX, canvas.height);
       ctx.closePath();
       ctx.fill();
-    });
-    
-    ctx.restore();
+      
+      ctx.restore();
+    }
     
     // Draw circle border
-    ctx.strokeStyle = 'var(--border-color)';
+    ctx.strokeStyle = '#dee2e6';
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.stroke();
     
-    // Glass effect
+    // Glass shine effect
     ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([]);
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius - 1, 0, Math.PI * 2);
-    const gradient = ctx.createLinearGradient(centerX, centerY - radius, centerX, centerY + radius);
-    gradient.addColorStop(0, 'rgba(255,255,255,0.3)');
-    gradient.addColorStop(0.5, 'rgba(255,255,255,0)');
-    gradient.addColorStop(1, 'rgba(0,0,0,0.1)');
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = 2;
+    ctx.arc(centerX - 12, centerY - 12, 18, 0.3, 2.8);
     ctx.stroke();
     ctx.restore();
     
     // Continue animation
-    animationFrame += 0.03;
-    requestAnimationFrame(draw);
+    animationFrame += 1;
+    if (volume > 0) {
+      requestAnimationFrame(draw);
+    }
   }
   
+  // Start animation
   draw();
+  
+  // Stop animation when canvas is removed from DOM
+  const observer = new MutationObserver(() => {
+    if (!document.contains(canvas)) {
+      isAnimating = false;
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
 /**
