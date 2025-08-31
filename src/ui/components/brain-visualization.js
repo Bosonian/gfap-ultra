@@ -401,15 +401,19 @@ function drawVolumeFluid(canvas, volume) {
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.stroke();
     
-    // Glass shine effect
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-    ctx.lineWidth = 4;
+    // Draw volume progress ring (like ICH risk circle)
+    const volumePercent = Math.min(volume / 100, 1); // Max 100ml = 100%
+    const circumference = 2 * Math.PI * radius;
+    const progressOffset = circumference * (1 - volumePercent);
+    
+    // Progress ring
+    ctx.strokeStyle = '#dc2626'; // Red progress
+    ctx.lineWidth = 8;
     ctx.setLineDash([]);
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(centerX - 12, centerY - 12, 18, 0.3, 2.8);
+    ctx.arc(centerX, centerY, radius, -Math.PI/2, -Math.PI/2 + (volumePercent * 2 * Math.PI));
     ctx.stroke();
-    ctx.restore();
     
     // Continue animation
     animationFrame += 1;
