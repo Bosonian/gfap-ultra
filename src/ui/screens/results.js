@@ -519,11 +519,20 @@ function renderBibliography(ichData) {
 function calculateLegacyFromResults(results) {
   try {
     const patientInputs = getPatientInputs();
+    console.log('🔍 Legacy calculation inputs:', patientInputs);
+    
     if (!patientInputs.age || !patientInputs.gfap) {
+      console.warn('🔍 Missing required inputs for legacy model:', { 
+        age: patientInputs.age, 
+        gfap: patientInputs.gfap 
+      });
       return null;
     }
     
-    return calculateLegacyICH(patientInputs);
+    const legacyResult = calculateLegacyICH(patientInputs);
+    console.log('🔍 Legacy calculation result:', legacyResult);
+    
+    return legacyResult;
   } catch (error) {
     console.warn('Legacy model calculation failed (non-critical):', error);
     return null;
@@ -538,21 +547,27 @@ function getPatientInputs() {
   const state = store.getState();
   const formData = state.formData;
   
+  console.log('🔍 Debug formData structure:', formData);
+  
   // Extract age and GFAP from any module
   let age = null;
   let gfap = null;
   
   for (const module of ['coma', 'limited', 'full']) {
     if (formData[module]) {
+      console.log(`🔍 ${module} module data:`, formData[module]);
       age = age || formData[module].age_years;
       gfap = gfap || formData[module].gfap_value;
     }
   }
   
-  return {
+  const result = {
     age: parseInt(age) || null,
     gfap: parseFloat(gfap) || null
   };
+  
+  console.log('🔍 Extracted patient inputs:', result);
+  return result;
 }
 
 /**
