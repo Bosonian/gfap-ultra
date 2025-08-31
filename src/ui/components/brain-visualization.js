@@ -278,36 +278,19 @@ export function renderCircularBrainDisplay(volume) {
     return `
       <div class="volume-circle" data-volume="0">
         <div class="volume-number">0<span> ml</span></div>
-        <svg class="volume-ring" width="120" height="120">
-          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--text-secondary)" stroke-width="8" opacity="0.4"/>
-          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--primary-color)" stroke-width="8" 
-                  stroke-dasharray="${2 * Math.PI * 54}" 
-                  stroke-dashoffset="${2 * Math.PI * 54}"
-                  stroke-linecap="round" 
-                  transform="rotate(-90 60 60)"
-                  class="volume-progress"/>
-        </svg>
+        <canvas class="volume-canvas" width="120" height="120"></canvas>
       </div>
     `;
   }
   
   const formattedVolume = formatVolumeDisplay(volume);
-  // Calculate percentage fill based on volume (max around 200ml for full ring)
-  const maxVolume = 200;
-  const fillPercent = Math.min((volume / maxVolume) * 100, 100);
+  const canvasId = `volume-canvas-${Math.random().toString(36).substr(2, 9)}`;
   
   return `
     <div class="volume-circle" data-volume="${volume}">
       <div class="volume-number">${formattedVolume}</div>
-      <svg class="volume-ring" width="120" height="120">
-        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--text-secondary)" stroke-width="8" opacity="0.4"/>
-        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--primary-color)" stroke-width="8" 
-                stroke-dasharray="${2 * Math.PI * 54}" 
-                stroke-dashoffset="${2 * Math.PI * 54 * (1 - fillPercent / 100)}"
-                stroke-linecap="round" 
-                transform="rotate(-90 60 60)"
-                class="volume-progress"/>
-      </svg>
+      <canvas id="${canvasId}" class="volume-canvas" width="120" height="120" 
+              data-volume="${volume}" data-canvas-id="${canvasId}"></canvas>
     </div>
   `;
 }
@@ -317,11 +300,13 @@ export function renderCircularBrainDisplay(volume) {
  * Call this after DOM is updated with new volume circles
  */
 export function initializeVolumeAnimations() {
-  const volumeRings = document.querySelectorAll('.volume-progress');
+  const canvases = document.querySelectorAll('.volume-canvas');
   
-  volumeRings.forEach(ring => {
-    // Volume rings now use same animation approach as probability rings
-    ring.style.strokeDashoffset = ring.getAttribute('stroke-dashoffset');
+  canvases.forEach(canvas => {
+    const volume = parseFloat(canvas.dataset.volume) || 0;
+    if (volume > 0) {
+      drawVolumeFluid(canvas, volume);
+    }
   });
 }
 

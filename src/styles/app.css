@@ -924,20 +924,10 @@ button:disabled {
     z-index: 10;
 }
 
-.volume-ring {
-    transform: rotate(-90deg);
-    overflow: visible;
-}
-
-.volume-ring circle:first-child {
-    stroke: var(--text-secondary);
-    opacity: 0.4;
-}
-
-.volume-progress {
-    transition: stroke-dashoffset 1s ease-in-out;
-    opacity: 1;
-    stroke: var(--primary-color);
+.volume-canvas {
+    border-radius: 50%;
+    background: transparent;
+    position: relative;
 }
 
 
@@ -3196,12 +3186,12 @@ footer {
         justify-content: center;
     }
     
-    .probability-ring, .volume-ring {
+    .probability-ring, .volume-canvas {
         width: 96px !important;
         height: 96px !important;
     }
     
-    .probability-ring circle, .volume-ring circle {
+    .probability-ring circle {
         cx: 48;
         cy: 48;
         r: 43;
@@ -3236,12 +3226,12 @@ footer {
         justify-content: center;
     }
     
-    .probability-ring, .volume-ring {
+    .probability-ring, .volume-canvas {
         width: 84px !important;
         height: 84px !important;
     }
     
-    .probability-ring circle, .volume-ring circle {
+    .probability-ring circle {
         cx: 42;
         cy: 42;
         r: 38;
