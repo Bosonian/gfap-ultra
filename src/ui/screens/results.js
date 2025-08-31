@@ -9,6 +9,9 @@ import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
 import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
+import { calculateLegacyICH } from '../../research/legacy-ich-model.js';
+import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-logger.js';
+import { renderModelComparison, renderResearchToggle } from '../../research/comparison-ui.js';
 
 function renderInputSummary() {
   const state = store.getState();
@@ -199,6 +202,14 @@ function renderLVONotPossible() {
 export function renderResults(results, startTime) {
   const { ich, lvo } = results;
   
+  // Calculate legacy model for research comparison (background, non-breaking)
+  const legacyResults = calculateLegacyFromResults(results);
+  
+  // Log research data if research mode is enabled (background, non-breaking)
+  if (legacyResults && isResearchModeEnabled()) {
+    safeLogResearchData(ich, legacyResults, getPatientInputs());
+  }
+  
   // Detect which module was used based on the data
   const isLimitedOrComa = ich?.module === 'Limited' || ich?.module === 'Coma' || lvo?.notPossible === true;
   const isFullModule = ich?.module === 'Full';
@@ -207,10 +218,10 @@ export function renderResults(results, startTime) {
   
   // For limited/coma modules - only show ICH
   if (isLimitedOrComa) {
-    resultsHtml = renderICHFocusedResults(ich, results, startTime);
+    resultsHtml = renderICHFocusedResults(ich, results, startTime, legacyResults);
   } else {
     // For full module - show ICH prominently with conditional LVO text
-    resultsHtml = renderFullModuleResults(ich, lvo, results, startTime);
+    resultsHtml = renderFullModuleResults(ich, lvo, results, startTime, legacyResults);
   }
   
   // Initialize volume animations after DOM update
@@ -221,10 +232,12 @@ export function renderResults(results, startTime) {
   return resultsHtml;
 }
 
-function renderICHFocusedResults(ich, results, startTime) {
+function renderICHFocusedResults(ich, results, startTime, legacyResults) {
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
+  const researchToggleHtml = renderResearchToggle();
+  const researchComparisonHtml = legacyResults ? renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
   
   return `
     <div class="container">
@@ -236,6 +249,9 @@ function renderICHFocusedResults(ich, results, startTime) {
       <div class="risk-results-single">
         ${renderRiskCard('ich', ich, results)}
       </div>
+      
+      <!-- Research Model Comparison (hidden unless research mode) -->
+      ${researchComparisonHtml}
       
       <!-- ICH Drivers Only -->
       <div class="enhanced-drivers-section">
@@ -280,17 +296,20 @@ function renderICHFocusedResults(ich, results, startTime) {
       </div>
       
       ${renderBibliography(ich)}
+      ${researchToggleHtml}
     </div>
   `;
 }
 
-function renderFullModuleResults(ich, lvo, results, startTime) {
+function renderFullModuleResults(ich, lvo, results, startTime, legacyResults) {
   const ichPercent = Math.round((ich?.probability || 0) * 100);
   const lvoPercent = Math.round((lvo?.probability || 0) * 100);
   
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
+  const researchToggleHtml = renderResearchToggle();
+  const researchComparisonHtml = legacyResults ? renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
   
   // Determine if we should show LVO notification
   const showLVONotification = ichPercent < 30 && lvoPercent > 50;
@@ -306,6 +325,9 @@ function renderFullModuleResults(ich, lvo, results, startTime) {
         ${renderRiskCard('ich', ich, results)}
         ${showLVONotification ? renderLVONotification() : ''}
       </div>
+      
+      <!-- Research Model Comparison (hidden unless research mode) -->
+      ${researchComparisonHtml}
       
       <!-- ICH Drivers Only -->
       <div class="enhanced-drivers-section">
@@ -350,6 +372,7 @@ function renderFullModuleResults(ich, lvo, results, startTime) {
       </div>
       
       ${renderBibliography(ich)}
+      ${researchToggleHtml}
     </div>
   `;
 }
@@ -471,5 +494,49 @@ function renderBibliography(ichData) {
       </div>
     </div>
   `;
+}
+
+/**
+ * Calculate legacy model results from current results data (background, non-breaking)
+ * @param {object} results - Main model results
+ * @returns {object|null} - Legacy model results or null if not possible
+ */
+function calculateLegacyFromResults(results) {
+  try {
+    const patientInputs = getPatientInputs();
+    if (!patientInputs.age || !patientInputs.gfap) {
+      return null;
+    }
+    
+    return calculateLegacyICH(patientInputs);
+  } catch (error) {
+    console.warn('Legacy model calculation failed (non-critical):', error);
+    return null;
+  }
+}
+
+/**
+ * Get patient input data from store for research logging
+ * @returns {object} - Patient input data
+ */
+function getPatientInputs() {
+  const state = store.getState();
+  const formData = state.formData;
+  
+  // Extract age and GFAP from any module
+  let age = null;
+  let gfap = null;
+  
+  for (const module of ['coma', 'limited', 'full']) {
+    if (formData[module]) {
+      age = age || formData[module].age_years;
+      gfap = gfap || formData[module].gfap_value;
+    }
+  }
+  
+  return {
+    age: parseInt(age) || null,
+    gfap: parseFloat(gfap) || null
+  };
 }
 

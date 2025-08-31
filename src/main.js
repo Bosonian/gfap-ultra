@@ -3,6 +3,7 @@ import { render } from './ui/render.js';
 import { APP_CONFIG } from './config.js';
 import { i18n, t } from './localization/i18n.js';
 import { warmUpFunctions } from './api/client.js';
+import { setResearchMode, isResearchModeEnabled } from './research/data-logger.js';
 
 class App {
   constructor() {
@@ -39,6 +40,9 @@ class App {
 
     // Initialize theme
     this.initializeTheme();
+    
+    // Initialize research mode
+    this.initializeResearchMode();
     
     // Initialize language
     this.updateUILanguage();
@@ -92,6 +96,12 @@ class App {
     const darkModeToggle = document.getElementById('darkModeToggle');
     if (darkModeToggle) {
       darkModeToggle.addEventListener('click', () => this.toggleDarkMode());
+    }
+
+    // Research mode toggle
+    const researchModeToggle = document.getElementById('researchModeToggle');
+    if (researchModeToggle) {
+      researchModeToggle.addEventListener('click', () => this.toggleResearchMode());
     }
 
     // Help modal
@@ -242,6 +252,61 @@ class App {
     }
     
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+
+  initializeResearchMode() {
+    const researchModeToggle = document.getElementById('researchModeToggle');
+    if (researchModeToggle) {
+      const isEnabled = isResearchModeEnabled();
+      researchModeToggle.style.opacity = isEnabled ? '1' : '0.5';
+      researchModeToggle.style.background = isEnabled ? 
+        'rgba(0, 102, 204, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+    }
+  }
+
+  toggleResearchMode() {
+    const currentMode = isResearchModeEnabled();
+    const newMode = !currentMode;
+    
+    if (setResearchMode(newMode)) {
+      const researchModeToggle = document.getElementById('researchModeToggle');
+      if (researchModeToggle) {
+        researchModeToggle.style.opacity = newMode ? '1' : '0.5';
+        researchModeToggle.style.background = newMode ? 
+          'rgba(0, 102, 204, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+      }
+      
+      console.log(`🔬 Research mode ${newMode ? 'ENABLED' : 'DISABLED'}`);
+      
+      // Show activation message and refresh
+      if (newMode) {
+        this.showResearchActivationMessage();
+      }
+      
+      // Refresh page to apply changes
+      setTimeout(() => {
+        window.location.reload();
+      }, newMode ? 1000 : 100);
+    }
+  }
+
+  showResearchActivationMessage() {
+    const message = document.createElement('div');
+    message.className = 'research-activation-toast';
+    message.innerHTML = `
+      <div class="toast-content">
+        🔬 <strong>Research Mode Activated</strong><br>
+        <small>Model comparison features enabled</small>
+      </div>
+    `;
+    
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+      if (document.body.contains(message)) {
+        document.body.removeChild(message);
+      }
+    }, 3000);
   }
 
   startAutoSave() {

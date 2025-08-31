@@ -10,6 +10,7 @@ import { clearValidationErrors } from '../logic/validate.js';
 import { announceScreenChange, setPageTitle, focusMainHeading } from './a11y.js';
 import { initializeStrokeCenterMap } from './components/stroke-center-map.js';
 import { fastEdCalculator } from './components/fastEdModal.js';
+import { initializeResearchMode } from '../research/comparison-ui.js';
 
 export function render(container) {
   const state = store.getState();
@@ -66,6 +67,13 @@ export function render(container) {
     setTimeout(() => {
       initializeStrokeCenterMap(results);
     }, 100);
+  }
+
+  // Initialize research mode if on results screen (non-breaking)
+  if (currentScreen === 'results') {
+    setTimeout(() => {
+      initializeResearchMode();
+    }, 150);
   }
 
   // Accessibility updates
