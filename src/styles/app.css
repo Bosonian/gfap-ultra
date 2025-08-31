@@ -815,7 +815,7 @@ button:disabled {
     border: 2px solid var(--border-color);
     transition: all var(--transition-medium);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .enhanced-risk-card::before {
@@ -888,6 +888,7 @@ button:disabled {
     align-items: center;
     gap: 20px;
     padding: 20px;
+    overflow: visible;
 }
 
 /* Symmetric circles container */
@@ -897,6 +898,8 @@ button:disabled {
     align-items: flex-start;
     gap: 40px;
     flex-wrap: wrap;
+    overflow: visible;
+    padding: 15px;
 }
 
 .circle-item {
@@ -904,6 +907,8 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    overflow: visible;
+    padding: 10px;
 }
 
 .circle-label {
@@ -933,27 +938,18 @@ button:disabled {
 .volume-canvas {
     border-radius: 50%;
     filter: drop-shadow(0 0 6px rgba(220, 38, 38, 0.2));
-    background: #f9fafb;
+    background: var(--container-bg);
     position: relative;
 }
 
 /* Dark mode support for volume circle */
 body.dark-mode .volume-canvas {
-    background: var(--container-bg);
     filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.25));
-}
-
-body.dark-mode .volume-number {
-    color: var(--text-color);
 }
 
 @media (prefers-color-scheme: dark) {
     .volume-canvas {
-        background: var(--container-bg, #1a1f2e);
-    }
-    
-    .volume-number {
-        color: var(--text-color, #e1e8ed);
+        filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.25));
     }
 }
 
@@ -977,6 +973,8 @@ body.dark-mode .volume-number {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 15px;
+    overflow: visible;
 }
 
 .probability-number {

@@ -337,11 +337,11 @@ function drawVolumeFluid(canvas, volume) {
     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--container-bg').trim() || 
                    (isDarkMode ? '#1a1f2e' : '#ffffff');
     
-    // Fill entire canvas with background color first
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Fill entire canvas with transparent background (let CSS handle the background)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Then draw the circle with same background
+    // Draw the circle with proper background color
+    ctx.fillStyle = bgColor;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fill();
