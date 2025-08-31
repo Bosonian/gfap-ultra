@@ -3168,15 +3168,20 @@ footer {
 @media (max-width: 480px) {
     .circles-container {
         gap: 20px;
-        justify-content: space-around;
+        justify-content: center;
+        align-items: center;
     }
     
     .circle-item {
         gap: 8px;
+        align-items: center;
     }
     
     .probability-circle, .volume-circle {
         transform: scale(0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .probability-ring, .volume-ring {
@@ -3208,10 +3213,15 @@ footer {
 @media (max-width: 375px) {
     .circles-container {
         gap: 15px;
+        justify-content: center;
+        align-items: center;
     }
     
     .probability-circle, .volume-circle {
         transform: scale(0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .probability-ring, .volume-ring {
