@@ -990,8 +990,10 @@ button:disabled {
 }
 
 .probability-progress {
-    transition: stroke-dashoffset 1s ease-in-out;
+    transition: stroke-dashoffset 1s ease-in-out, stroke 0.5s ease-in-out, stroke-width 0.3s ease-in-out;
     opacity: 1;
+    stroke: var(--primary-color);
+    stroke-width: 8;
 }
 
 .enhanced-risk-card.critical .probability-progress {

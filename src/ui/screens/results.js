@@ -78,7 +78,7 @@ function renderRiskCard(type, data, results) {
   
   const percent = Math.round((data.probability || 0) * 100);
   const riskLevel = getRiskLevel(percent, type);
-  const isCritical = percent > CRITICAL_THRESHOLDS[type].critical;
+  const isCritical = percent > 70; // Very high risk threshold
   const isHigh = percent > CRITICAL_THRESHOLDS[type].high;
   
   const icons = { ich: '🩸', lvo: '🧠' };
@@ -106,7 +106,7 @@ function renderRiskCard(type, data, results) {
               <div class="probability-number">${percent}<span>%</span></div>
               <svg class="probability-ring" width="120" height="120">
                 <circle cx="60" cy="60" r="54" fill="none" stroke="var(--text-secondary)" stroke-width="8" opacity="0.4"/>
-                <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="8" 
+                <circle cx="60" cy="60" r="54" fill="none" stroke-width="8" 
                         stroke-dasharray="${2 * Math.PI * 54}" 
                         stroke-dashoffset="${2 * Math.PI * 54 * (1 - percent / 100)}"
                         stroke-linecap="round" 
