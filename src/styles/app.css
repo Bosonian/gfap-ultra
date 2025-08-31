@@ -921,12 +921,10 @@ button:disabled {
     text-shadow: 0 1px 3px rgba(255,255,255,0.8);
 }
 
-.volume-ring {
+.volume-canvas {
+    border-radius: 50%;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
-}
-
-.hemorrhage-dot {
-    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
+    background: #f9fafb;
 }
 
 /* Risk assessment centered below both circles */

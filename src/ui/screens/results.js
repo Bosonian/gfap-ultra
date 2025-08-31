@@ -8,7 +8,7 @@ import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
 import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
-import { renderCircularBrainDisplay } from '../components/brain-visualization.js';
+import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
 
 function renderInputSummary() {
   const state = store.getState();
@@ -203,13 +203,22 @@ export function renderResults(results, startTime) {
   const isLimitedOrComa = ich?.module === 'Limited' || ich?.module === 'Coma' || lvo?.notPossible === true;
   const isFullModule = ich?.module === 'Full';
   
+  let resultsHtml;
+  
   // For limited/coma modules - only show ICH
   if (isLimitedOrComa) {
-    return renderICHFocusedResults(ich, results, startTime);
+    resultsHtml = renderICHFocusedResults(ich, results, startTime);
+  } else {
+    // For full module - show ICH prominently with conditional LVO text
+    resultsHtml = renderFullModuleResults(ich, lvo, results, startTime);
   }
   
-  // For full module - show ICH prominently with conditional LVO text
-  return renderFullModuleResults(ich, lvo, results, startTime);
+  // Initialize volume animations after DOM update
+  setTimeout(() => {
+    initializeVolumeAnimations();
+  }, 100);
+  
+  return resultsHtml;
 }
 
 function renderICHFocusedResults(ich, results, startTime) {

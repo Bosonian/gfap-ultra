@@ -274,62 +274,166 @@ export function renderCompactBrainIcon(volume, size = 24) {
  * @returns {string} HTML for circular brain display
  */
 export function renderCircularBrainDisplay(volume) {
-  if (!volume || volume <= 0) return '';
+  if (!volume || volume <= 0) {
+    return `
+      <div class="volume-circle" data-volume="0">
+        <div class="volume-number">0 ml</div>
+        <canvas class="volume-canvas" width="120" height="120"></canvas>
+      </div>
+    `;
+  }
   
-  // Calculate hemorrhage position in basal ganglia region
-  const hemorrhageX = 60 + 8; // 8px right of center (120px circle)
-  const hemorrhageY = 60 + 3; // 3px below center
-  
-  // Scale hemorrhage radius based on volume
-  const hemorrhagePercent = calculateHemorrhageSizePercent(volume);
-  const maxRadius = 25; // Maximum radius in 120px circle
-  const hemorrhageRadius = Math.max(2, (hemorrhagePercent / 70) * maxRadius);
-  
-  const volumeResult = calculateICHVolume(volume);
   const formattedVolume = formatVolumeDisplay(volume);
+  const canvasId = `volume-canvas-${Math.random().toString(36).substr(2, 9)}`;
   
   return `
     <div class="volume-circle" data-volume="${volume}">
       <div class="volume-number">${formattedVolume}</div>
-      <svg class="volume-ring" width="120" height="120">
-        <!-- 3D Brain background -->
-        <defs>
-          <clipPath id="brain-clip-${Math.random().toString(36).substr(2, 9)}">
-            <circle cx="60" cy="60" r="54"/>
-          </clipPath>
-        </defs>
-        
-        <image 
-          x="6" y="6" 
-          width="108" height="108"
-          href="./src/assets/brain-3d.png"
-          clip-path="url(#brain-clip-${Math.random().toString(36).substr(2, 9)})"
-          opacity="0.9"
-          preserveAspectRatio="xMidYMid meet"
-        />
-        
-        <!-- Brain circle border -->
-        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--border-color)" stroke-width="8"/>
-        
-        <!-- Red hemorrhage dot -->
-        <circle 
-          cx="${hemorrhageX}" 
-          cy="${hemorrhageY}" 
-          r="${hemorrhageRadius}"
-          fill="#dc2626"
-          opacity="0.9"
-          class="hemorrhage-dot"
-        >
-          <animate 
-            attributeName="opacity" 
-            values="0.7;1;0.7" 
-            dur="2s" 
-            repeatCount="indefinite"
-          />
-        </circle>
-      </svg>
+      <canvas id="${canvasId}" class="volume-canvas" width="120" height="120" 
+              data-volume="${volume}" data-canvas-id="${canvasId}"></canvas>
     </div>
   `;
+}
+
+/**
+ * Initialize fluid fill animation for volume canvas
+ * Call this after DOM is updated with new volume circles
+ */
+export function initializeVolumeAnimations() {
+  const canvases = document.querySelectorAll('.volume-canvas');
+  
+  canvases.forEach(canvas => {
+    const volume = parseFloat(canvas.dataset.volume) || 0;
+    if (volume > 0) {
+      drawVolumeFluid(canvas, volume);
+    }
+  });
+}
+
+/**
+ * Draw fluid fill animation on canvas
+ * @param {HTMLCanvasElement} canvas - Canvas element
+ * @param {number} volume - ICH volume in ml
+ */
+function drawVolumeFluid(canvas, volume) {
+  const ctx = canvas.getContext('2d');
+  const centerX = 60;
+  const centerY = 60;
+  const radius = 54;
+  let animationFrame = 0;
+  
+  // Wave parameters for subtle animation
+  const waves = [
+    { amplitude: 3, frequency: 0.03, speed: 0.02, phase: 0, opacity: 0.4 },
+    { amplitude: 2, frequency: 0.04, speed: 0.03, phase: Math.PI / 3, opacity: 0.3 }
+  ];
+  
+  function draw() {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw brain background image
+    const brain = new Image();
+    brain.onload = () => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(brain, 6, 6, 108, 108);
+      ctx.restore();
+      
+      // Continue with fluid rendering after brain loads
+      drawFluid();
+    };
+    brain.src = './src/assets/brain-3d.png';
+    
+    // If brain doesn't load, draw fluid anyway
+    setTimeout(drawFluid, 50);
+  }
+  
+  function drawFluid() {
+    // Calculate fill level (volume as percentage of max visible area)
+    const maxVolume = 100; // ml
+    const fillPercentage = Math.min(volume / maxVolume, 0.8); // Max 80% fill
+    const fillLevel = centerY + radius - (fillPercentage * radius * 2);
+    
+    // Set up clipping for circular container
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
+    ctx.clip();
+    
+    // Draw animated fluid waves
+    const color = '#dc2626'; // Always red
+    
+    waves.forEach(wave => {
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.globalAlpha = wave.opacity;
+      
+      // Draw wave line
+      for (let x = centerX - radius; x <= centerX + radius; x += 2) {
+        const relX = x - (centerX - radius);
+        const waveY = fillLevel + 
+          Math.sin((relX * wave.frequency) + animationFrame * wave.speed + wave.phase) * 
+          wave.amplitude;
+        
+        // Check if point is within circle
+        const dx = x - centerX;
+        const dy = waveY - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance <= radius - 2) {
+          if (x === centerX - radius + 2) {
+            ctx.moveTo(x, waveY);
+          } else {
+            ctx.lineTo(x, waveY);
+          }
+        }
+      }
+      
+      // Complete fill area to bottom of circle
+      for (let x = centerX + radius; x >= centerX - radius; x -= 2) {
+        const dx = x - centerX;
+        const maxY = Math.sqrt((radius - 2) * (radius - 2) - dx * dx);
+        if (!isNaN(maxY)) {
+          const bottomY = centerY + maxY;
+          ctx.lineTo(x, bottomY);
+        }
+      }
+      
+      ctx.closePath();
+      ctx.fill();
+    });
+    
+    ctx.restore();
+    
+    // Draw circle border
+    ctx.strokeStyle = 'var(--border-color)';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Glass effect
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius - 1, 0, Math.PI * 2);
+    const gradient = ctx.createLinearGradient(centerX, centerY - radius, centerX, centerY + radius);
+    gradient.addColorStop(0, 'rgba(255,255,255,0.3)');
+    gradient.addColorStop(0.5, 'rgba(255,255,255,0)');
+    gradient.addColorStop(1, 'rgba(0,0,0,0.1)');
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+    
+    // Continue animation
+    animationFrame += 0.03;
+    requestAnimationFrame(draw);
+  }
+  
+  draw();
 }
 
 /**
