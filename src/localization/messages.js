@@ -217,6 +217,11 @@ export const messages = {
     importantNote: 'Important',
     importantText: 'These results are for clinical decision support only. Always use clinical judgment and follow institutional protocols.',
     
+    // ICH Volume and Mortality
+    predictedMortality: 'Predicted 30-day mortality',
+    ichVolumeLabel: 'ICH Volume',
+    references: 'References',
+    
     // Input Summary
     inputSummaryTitle: 'Input Summary',
     inputSummarySubtitle: 'Values used for this analysis',
@@ -498,6 +503,11 @@ export const messages = {
     disclaimerText: 'Dieses Tool dient nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie lokale Protokolle. Kein Ersatz für ärztliche Beurteilung.',
     importantNote: 'Wichtig',
     importantText: 'Diese Ergebnisse dienen nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie institutionelle Protokolle.',
+    
+    // ICH Volume and Mortality
+    predictedMortality: 'Vorhergesagte 30-Tage-Mortalität',
+    ichVolumeLabel: 'ICB-Volumen',
+    references: 'Referenzen',
     
     // Input Summary
     inputSummaryTitle: 'Eingabezusammenfassung',

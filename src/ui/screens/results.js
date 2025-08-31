@@ -114,10 +114,10 @@ function renderRiskCard(type, data, results) {
             <div class="circle-label">ICH Risk</div>
           </div>
           
-          ${type === 'ich' ? `
+          ${type === 'ich' && percent >= 50 ? `
             <div class="circle-item">
               ${renderICHVolumeDisplay(data)}
-              <div class="circle-label">ICH Volume</div>
+              <div class="circle-label">${t('ichVolumeLabel')}</div>
             </div>
           ` : ''}
         </div>
@@ -126,9 +126,9 @@ function renderRiskCard(type, data, results) {
           <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
             ${riskLevel}
           </div>
-          ${type === 'ich' && getCurrentGfapValue() > 0 ? `
+          ${type === 'ich' && percent >= 50 && getCurrentGfapValue() > 0 ? `
             <div class="mortality-assessment">
-              Predicted 30-day mortality: ${calculateICHVolume(getCurrentGfapValue()).mortalityRate}
+              ${t('predictedMortality')}: ${calculateICHVolume(getCurrentGfapValue()).mortalityRate}
             </div>
           ` : ''}
         </div>
@@ -279,7 +279,7 @@ function renderICHFocusedResults(ich, results, startTime) {
         <strong>⚠️ ${t('importantNote')}:</strong> ${t('importantText')} Results generated at ${new Date().toLocaleTimeString()}.
       </div>
       
-      ${renderBibliography()}
+      ${renderBibliography(ich)}
     </div>
   `;
 }
@@ -349,7 +349,7 @@ function renderFullModuleResults(ich, lvo, results, startTime) {
         <strong>⚠️ ${t('importantNote')}:</strong> ${t('importantText')} Results generated at ${new Date().toLocaleTimeString()}.
       </div>
       
-      ${renderBibliography()}
+      ${renderBibliography(ich)}
     </div>
   `;
 }
@@ -429,19 +429,28 @@ function renderCompactDriver(driver, type) {
 
 /**
  * Render bibliography footer with research citations
+ * @param {object} ichData - ICH risk data containing probability
  * @returns {string} HTML for bibliography section
  */
-function renderBibliography() {
-  const gfapValue = getCurrentGfapValue();
+function renderBibliography(ichData) {
+  // Only show bibliography if ICH risk is >= 50%
+  if (!ichData || !ichData.probability) {
+    return '';
+  }
   
-  // Only show bibliography if ICH volume is calculated (GFAP > 0)
+  const ichPercent = Math.round((ichData.probability || 0) * 100);
+  if (ichPercent < 50) {
+    return '';
+  }
+  
+  const gfapValue = getCurrentGfapValue();
   if (!gfapValue || gfapValue <= 0) {
     return '';
   }
   
   return `
     <div class="bibliography-section">
-      <h4>References</h4>
+      <h4>${t('references')}</h4>
       <div class="citations">
         <div class="citation">
           <span class="citation-number">¹</span>
