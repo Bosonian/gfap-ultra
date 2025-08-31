@@ -336,7 +336,12 @@ function drawVolumeFluid(canvas, volume) {
     // Draw circle background matching ICH risk circle
     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--container-bg').trim() || 
                    (isDarkMode ? '#1a1f2e' : '#ffffff');
+    
+    // Fill entire canvas with background color first
     ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Then draw the circle with same background
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fill();
