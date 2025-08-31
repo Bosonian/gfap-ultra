@@ -880,29 +880,56 @@ button:disabled {
 
 /* Volume display integration */
 .volume-display-container {
-    flex: 1;
-    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
 }
 
-.volume-display-container .compact-volume-display {
-    margin: 0;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.85rem;
+/* Circular brain display matching ICH risk circle */
+.circular-brain-display {
+    position: relative;
 }
 
-/* ICH card specific layout for side-by-side display */
-.enhanced-risk-card.ich .risk-probability {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 20px;
-    align-items: start;
+.brain-circle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.enhanced-risk-card.ich .risk-assessment {
-    grid-column: 1 / -1;
-    justify-self: center;
-    margin-top: 16px;
+.brain-svg-circle {
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+
+.volume-label-overlay {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.volume-info {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.volume-metric-text, .mortality-metric-text {
+    margin: 2px 0;
+}
+
+.volume-value, .mortality-value {
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .probability-circle {

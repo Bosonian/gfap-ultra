@@ -7,8 +7,8 @@ import { CRITICAL_THRESHOLDS } from '../../config.js';
 import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
-import { renderCompactVolumeDisplay } from '../components/volume-display.js';
-import { renderCompactBrainIcon } from '../components/brain-visualization.js';
+import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
+import { renderCircularBrainDisplay } from '../components/brain-visualization.js';
 
 function renderInputSummary() {
   const state = store.getState();
@@ -135,9 +135,21 @@ function renderICHVolumeDisplay(data) {
     return '';
   }
   
+  const volumeResult = calculateICHVolume(gfapValue);
+  
   return `
     <div class="volume-display-container">
-      ${renderCompactVolumeDisplay(gfapValue)}
+      ${renderCircularBrainDisplay(volumeResult.volume)}
+      <div class="volume-info">
+        <div class="volume-metric-text">
+          <span class="volume-label">Volume:</span>
+          <span class="volume-value">${formatVolumeDisplay(volumeResult.volume)}</span>
+        </div>
+        <div class="mortality-metric-text">
+          <span class="mortality-label">30-day:</span>
+          <span class="mortality-value">${volumeResult.mortalityRate}</span>
+        </div>
+      </div>
     </div>
   `;
 }
