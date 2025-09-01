@@ -594,7 +594,7 @@ function renderComaAlternativeDiagnoses(probability) {
       <div class="alternative-diagnosis-card">
         <div class="diagnosis-header">
           <span class="lightning-icon">⚡</span>
-          <h3>${isDE ? 'Alternative Diagnosen' : 'Alternative Diagnoses'}</h3>
+          <h3>${isDE ? 'Differentialdiagnosen' : 'Differential Diagnoses'}</h3>
         </div>
         <div class="diagnosis-content">
           <ul class="diagnosis-list">
@@ -602,6 +602,12 @@ function renderComaAlternativeDiagnoses(probability) {
               ${isDE ? 
                 'Alternative Diagnosen sind SAB, SDH, EDH (Subarachnoidalblutung, Subduralhämatom, Epiduralhämatom)' : 
                 'Alternative diagnoses include SAH, SDH, EDH (Subarachnoid Hemorrhage, Subdural Hematoma, Epidural Hematoma)'
+              }
+            </li>
+            <li>
+              ${isDE ? 
+                'Bei unklarem Zeitfenster seit Symptombeginn oder im erweiterten Zeitfenster kommen auch ein demarkierter Infarkt oder hypoxischer Hirnschaden in Frage' : 
+                'In cases of unclear time window since symptom onset or extended time window, demarcated infarction or hypoxic brain injury should also be considered'
               }
             </li>
           </ul>
@@ -614,7 +620,7 @@ function renderComaAlternativeDiagnoses(probability) {
       <div class="alternative-diagnosis-card">
         <div class="diagnosis-header">
           <span class="lightning-icon">⚡</span>
-          <h3>${isDE ? 'Alternative Diagnosen' : 'Alternative Diagnoses'}</h3>
+          <h3>${isDE ? 'Differentialdiagnosen' : 'Differential Diagnoses'}</h3>
         </div>
         <div class="diagnosis-content">
           <ul class="diagnosis-list">

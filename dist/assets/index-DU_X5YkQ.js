@@ -735,12 +735,15 @@ var fe=Object.defineProperty;var ve=(a,e,t)=>e in a?fe(a,e,{enumerable:!0,config
       <div class="alternative-diagnosis-card">
         <div class="diagnosis-header">
           <span class="lightning-icon">⚡</span>
-          <h3>${t?"Alternative Diagnosen":"Alternative Diagnoses"}</h3>
+          <h3>${t?"Differentialdiagnosen":"Differential Diagnoses"}</h3>
         </div>
         <div class="diagnosis-content">
           <ul class="diagnosis-list">
             <li>
               ${t?"Alternative Diagnosen sind SAB, SDH, EDH (Subarachnoidalblutung, Subduralhämatom, Epiduralhämatom)":"Alternative diagnoses include SAH, SDH, EDH (Subarachnoid Hemorrhage, Subdural Hematoma, Epidural Hematoma)"}
+            </li>
+            <li>
+              ${t?"Bei unklarem Zeitfenster seit Symptombeginn oder im erweiterten Zeitfenster kommen auch ein demarkierter Infarkt oder hypoxischer Hirnschaden in Frage":"In cases of unclear time window since symptom onset or extended time window, demarcated infarction or hypoxic brain injury should also be considered"}
             </li>
           </ul>
         </div>
@@ -749,7 +752,7 @@ var fe=Object.defineProperty;var ve=(a,e,t)=>e in a?fe(a,e,{enumerable:!0,config
       <div class="alternative-diagnosis-card">
         <div class="diagnosis-header">
           <span class="lightning-icon">⚡</span>
-          <h3>${t?"Alternative Diagnosen":"Alternative Diagnoses"}</h3>
+          <h3>${t?"Differentialdiagnosen":"Differential Diagnoses"}</h3>
         </div>
         <div class="diagnosis-content">
           <ul class="diagnosis-list">
@@ -921,4 +924,4 @@ var fe=Object.defineProperty;var ve=(a,e,t)=>e in a?fe(a,e,{enumerable:!0,config
         </button>
       </div>
     `,e.appendChild(t),document.body.appendChild(e);const i=e.querySelector("#updateNow"),n=e.querySelector("#updateLater");i.addEventListener("click",()=>{window.location.reload()}),n.addEventListener("click",()=>{e.remove(),setTimeout(()=>this.showUpdateNotification(),5*60*1e3)}),e.addEventListener("click",s=>{s.target===e&&n.click()})}destroy(){this.unsubscribe&&this.unsubscribe()}}const At=new Tt;At.init();
-//# sourceMappingURL=index-CSAaaUqU.js.map
+//# sourceMappingURL=index-DU_X5YkQ.js.map
