@@ -276,11 +276,13 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
       <!-- Research Model Comparison (hidden unless research mode) -->
       ${researchComparisonHtml}
       
-      <!-- ICH Drivers Only -->
-      <div class="enhanced-drivers-section">
-        <h3>${t('riskFactorsTitle') || 'Hauptrisikofaktoren / Main Risk Factors'}</h3>
-        ${renderICHDriversOnly(ich)}
-      </div>
+      <!-- ICH Drivers Only (not shown for Coma module) -->
+      ${ich?.module !== 'Coma' ? `
+        <div class="enhanced-drivers-section">
+          <h3>${t('riskFactorsTitle') || 'Hauptrisikofaktoren / Main Risk Factors'}</h3>
+          ${renderICHDriversOnly(ich)}
+        </div>
+      ` : ''}
       
       <!-- Collapsible Additional Information -->
       <div class="additional-info-section">
