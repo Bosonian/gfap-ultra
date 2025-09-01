@@ -894,10 +894,12 @@ button:disabled {
 .rings-row {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     gap: 40px;
     flex-wrap: wrap;
     overflow: visible;
+    width: auto;
+    max-width: 100%;
 }
 
 .circle-item {
@@ -906,6 +908,8 @@ button:disabled {
     align-items: center;
     gap: 12px;
     overflow: visible;
+    flex: 0 0 auto;
+    width: auto;
 }
 
 .circle-label {
@@ -922,6 +926,8 @@ button:disabled {
     align-items: center;
     justify-content: center;
     overflow: visible;
+    width: 120px;
+    height: 120px;
 }
 
 .volume-number {
@@ -934,9 +940,14 @@ button:disabled {
 }
 
 .volume-canvas {
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     background: transparent;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
 }
 
 
@@ -3260,11 +3271,54 @@ footer {
     .circles-container {
         gap: 30px;
         justify-content: center;
-        align-items: flex-start;
+        align-items: center;
+    }
+    
+    .rings-row {
+        gap: 30px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
     }
     
     .circle-item {
         align-items: center;
+        flex: 0 0 auto;
+    }
+    
+    .probability-circle, .volume-circle {
+        width: 110px;
+        height: 110px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .probability-ring {
+        width: 110px !important;
+        height: 110px !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    .volume-canvas {
+        width: 110px !important;
+        height: 110px !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    .probability-number, .volume-number {
+        font-size: 1.8rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
     }
 }
 
