@@ -2,11 +2,17 @@ import { store } from '../state/store.js';
 import { validateForm, showValidationErrors } from './validate.js';
 import { predictComaIch, predictLimitedIch, predictFullStroke, APIError } from '../api/client.js';
 import { t } from '../localization/i18n.js';
+import { showPrerequisitesModal } from '../ui/components/prerequisites-modal.js';
 
 export function handleTriage1(isComatose) {
   store.logEvent('triage1_answer', { comatose: isComatose });
-  const nextScreen = isComatose ? 'coma' : 'triage2';
-  navigate(nextScreen);
+  
+  if (isComatose) {
+    navigate('coma');
+  } else {
+    // Show prerequisites modal for conscious patients
+    showPrerequisitesModal();
+  }
 }
 
 export function handleTriage2(isExaminable) {
