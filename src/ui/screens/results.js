@@ -256,6 +256,9 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
   const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule)) ? 
     renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
   
+  // Add alternative diagnoses for coma module
+  const alternativeDiagnosesHtml = (ich?.module === 'Coma') ? renderComaAlternativeDiagnoses(ich.probability) : '';
+  
   return `
     <div class="container">
       ${renderProgressIndicator(3)}
@@ -266,6 +269,9 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
       <div class="risk-results-single">
         ${renderRiskCard('ich', ich, results)}
       </div>
+      
+      <!-- Alternative Diagnoses for Coma Module -->
+      ${alternativeDiagnosesHtml}
       
       <!-- Research Model Comparison (hidden unless research mode) -->
       ${researchComparisonHtml}
@@ -571,6 +577,64 @@ function getPatientInputs() {
   
   console.log('🔍 Extracted patient inputs:', result);
   return result;
+}
+
+/**
+ * Render alternative diagnoses for coma module
+ * @param {number} probability - ICH probability (0-1)
+ * @returns {string} HTML for alternative diagnoses
+ */
+function renderComaAlternativeDiagnoses(probability) {
+  const percent = Math.round(probability * 100);
+  const isDE = i18n.getCurrentLanguage() === 'de';
+  
+  if (percent > 25) {
+    // High probability - show SAB, SDH, EDH
+    return `
+      <div class="alternative-diagnosis-card">
+        <div class="diagnosis-header">
+          <span class="lightning-icon">⚡</span>
+          <h3>${isDE ? 'Alternative Diagnosen' : 'Alternative Diagnoses'}</h3>
+        </div>
+        <div class="diagnosis-content">
+          <ul class="diagnosis-list">
+            <li>
+              ${isDE ? 
+                'Alternative Diagnosen sind SAB, SDH, EDH (Subarachnoidalblutung, Subduralhämatom, Epiduralhämatom)' : 
+                'Alternative diagnoses include SAH, SDH, EDH (Subarachnoid Hemorrhage, Subdural Hematoma, Epidural Hematoma)'
+              }
+            </li>
+          </ul>
+        </div>
+      </div>
+    `;
+  } else {
+    // Low probability - other causes of altered consciousness
+    return `
+      <div class="alternative-diagnosis-card">
+        <div class="diagnosis-header">
+          <span class="lightning-icon">⚡</span>
+          <h3>${isDE ? 'Alternative Diagnosen' : 'Alternative Diagnoses'}</h3>
+        </div>
+        <div class="diagnosis-content">
+          <ul class="diagnosis-list">
+            <li>
+              ${isDE ? 
+                'Alternative Diagnose von Vigilanzminderung wahrscheinlich' : 
+                'Alternative diagnosis for reduced consciousness likely'
+              }
+            </li>
+            <li>
+              ${isDE ? 
+                'Ein Verschluss der Arteria Basilaris ist nicht ausgeschlossen' : 
+                'Basilar artery occlusion cannot be excluded'
+              }
+            </li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
 }
 
 /**

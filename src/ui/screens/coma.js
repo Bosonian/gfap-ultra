@@ -7,10 +7,6 @@ export function renderComa() {
     <div class="container">
       ${renderProgressIndicator(2)}
       <h2>${t('comaModuleTitle') || 'Coma Module'}</h2>
-      <div class="critical-alert">
-        <h4><span class="alert-icon">🚨</span> ${t('criticalPatient')}</h4>
-        <p>${t('comaAlert')}</p>
-      </div>
       <form data-module="coma">
         <div class="input-grid">
           <div class="input-group">
