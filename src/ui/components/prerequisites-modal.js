@@ -1,4 +1,5 @@
 import { t, i18n } from '../../localization/i18n.js';
+import { navigate } from '../../logic/handlers.js';
 
 /**
  * Prerequisites checklist items
@@ -111,7 +112,6 @@ export function initPrerequisitesModal() {
   const closeModal = () => {
     modal.style.display = 'none';
     // Navigate back to welcome screen if cancelled
-    const navigate = window.navigate || ((screen) => { window.location.hash = `#${screen}`; });
     navigate('welcome');
   };
   
@@ -125,8 +125,7 @@ export function initPrerequisitesModal() {
     
     if (allChecked) {
       modal.style.display = 'none';
-      // Proceed to triage2
-      const navigate = window.navigate || ((screen) => { window.location.hash = `#${screen}`; });
+      // Proceed to triage2 (stroke module selection)
       navigate('triage2');
     } else {
       // Show warning
