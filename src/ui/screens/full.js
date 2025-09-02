@@ -16,11 +16,17 @@ export function renderFull() {
           </div>
           <div class="input-group">
             <label for="systolic_bp">${t('systolicBpLabel')}</label>
-            <input type="number" name="systolic_bp" id="systolic_bp" min="60" max="300" required>
+            <div class="input-with-unit">
+              <input type="number" name="systolic_bp" id="systolic_bp" min="60" max="300" required inputmode="numeric">
+              <span class="unit">mmHg</span>
+            </div>
           </div>
           <div class="input-group">
             <label for="diastolic_bp">${t('diastolicBpLabel')}</label>
-            <input type="number" name="diastolic_bp" id="diastolic_bp" min="30" max="200" required>
+            <div class="input-with-unit">
+              <input type="number" name="diastolic_bp" id="diastolic_bp" min="30" max="200" required inputmode="numeric">
+              <span class="unit">mmHg</span>
+            </div>
           </div>
         </div>
 
@@ -33,7 +39,10 @@ export function renderFull() {
                 <span class="tooltiptext">${t('gfapTooltip')}</span>
               </span>
             </label>
-            <input type="number" name="gfap_value" id="gfap_value" min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" step="0.1" required>
+            <div class="input-with-unit">
+              <input type="number" name="gfap_value" id="gfap_value" min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" step="0.1" required inputmode="decimal">
+              <span class="unit">pg/mL</span>
+            </div>
           </div>
           <div class="input-group">
             <label for="fast_ed_score">

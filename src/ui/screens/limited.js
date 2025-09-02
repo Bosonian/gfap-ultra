@@ -16,12 +16,18 @@ export function renderLimited() {
           </div>
           <div class="input-group">
             <label for="systolic_bp">${t('systolicBpLabel')}</label>
-            <input type="number" name="systolic_bp" id="systolic_bp" min="60" max="300" required aria-describedby="sbp-help">
+            <div class="input-with-unit">
+              <input type="number" name="systolic_bp" id="systolic_bp" min="60" max="300" required aria-describedby="sbp-help" inputmode="numeric">
+              <span class="unit">mmHg</span>
+            </div>
             <div id="sbp-help" class="input-help">${t('systolicBpHelp')}</div>
           </div>
           <div class="input-group">
             <label for="diastolic_bp">${t('diastolicBpLabel')}</label>
-            <input type="number" name="diastolic_bp" id="diastolic_bp" min="30" max="200" required aria-describedby="dbp-help">
+            <div class="input-with-unit">
+              <input type="number" name="diastolic_bp" id="diastolic_bp" min="30" max="200" required aria-describedby="dbp-help" inputmode="numeric">
+              <span class="unit">mmHg</span>
+            </div>
             <div id="dbp-help" class="input-help">${t('diastolicBpHelp')}</div>
           </div>
           <div class="input-group">
@@ -31,7 +37,10 @@ export function renderLimited() {
                 <span class="tooltiptext">${t('gfapTooltipLong')}</span>
               </span>
             </label>
-            <input type="number" name="gfap_value" id="gfap_value" min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" step="0.1" required>
+            <div class="input-with-unit">
+              <input type="number" name="gfap_value" id="gfap_value" min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" step="0.1" required inputmode="decimal">
+              <span class="unit">pg/mL</span>
+            </div>
           </div>
         </div>
         <div class="checkbox-group">

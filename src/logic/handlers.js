@@ -69,6 +69,23 @@ export async function handleSubmit(e, container) {
   const validation = validateForm(form);
   if (!validation.isValid) {
     showValidationErrors(container, validation.validationErrors);
+    try {
+      // Focus first invalid field and announce summary for screen readers
+      const firstErrorName = Object.keys(validation.validationErrors)[0];
+      if (firstErrorName && form.elements[firstErrorName]) {
+        const el = form.elements[firstErrorName];
+        el.focus({ preventScroll: true });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      const sr = document.createElement('div');
+      sr.className = 'sr-only';
+      sr.setAttribute('role', 'status');
+      sr.setAttribute('aria-live', 'polite');
+      const errorCount = Object.keys(validation.validationErrors).length;
+      sr.textContent = `${errorCount} field${errorCount === 1 ? '' : 's'} need attention.`;
+      document.body.appendChild(sr);
+      setTimeout(() => sr.remove(), 1200);
+    } catch {}
     return;
   }
 
