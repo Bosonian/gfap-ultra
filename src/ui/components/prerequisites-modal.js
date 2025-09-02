@@ -5,33 +5,11 @@ import { navigate } from '../../logic/handlers.js';
  * Prerequisites checklist items
  */
 const getPrerequisites = () => {
-  const isDE = i18n.getCurrentLanguage() === 'de';
-  
   return [
-    {
-      id: 'acute_deficit',
-      labelDE: 'Akutes (schweres) neurologisches Defizit vorhanden',
-      labelEN: 'Acute (severe) neurological deficit present',
-      checked: false
-    },
-    {
-      id: 'symptom_onset',
-      labelDE: 'Symptombeginn innerhalb 6h',
-      labelEN: 'Symptom onset within 6 hours',
-      checked: false
-    },
-    {
-      id: 'no_preexisting',
-      labelDE: 'Keine vorbestehende schwere neurologische Defizite',
-      labelEN: 'No pre-existing severe neurological deficits',
-      checked: false
-    },
-    {
-      id: 'no_trauma',
-      labelDE: 'Kein Schädelhirntrauma vorhanden',
-      labelEN: 'No traumatic brain injury present',
-      checked: false
-    }
+    { id: 'acute_deficit', checked: false },
+    { id: 'symptom_onset', checked: false },
+    { id: 'no_preexisting', checked: false },
+    { id: 'no_trauma', checked: false }
   ];
 };
 
@@ -40,23 +18,19 @@ const getPrerequisites = () => {
  * @returns {string} HTML for prerequisites modal
  */
 export function renderPrerequisitesModal() {
-  const isDE = i18n.getCurrentLanguage() === 'de';
   const prerequisites = getPrerequisites();
   
   return `
     <div id="prerequisitesModal" class="modal prerequisites-modal" style="display: flex;">
       <div class="modal-content prerequisites-content">
         <div class="modal-header">
-          <h2>${isDE ? 'Voraussetzungen für Schlaganfall-Triage' : 'Prerequisites for Stroke Triage'}</h2>
+          <h2>${t('prerequisitesTitle')}</h2>
           <button class="modal-close" id="closePrerequisites">&times;</button>
         </div>
         
         <div class="modal-body">
           <p class="prerequisites-intro">
-            ${isDE ? 
-              'Bitte bestätigen Sie, dass alle folgenden Voraussetzungen erfüllt sind:' : 
-              'Please confirm that all of the following prerequisites are met:'
-            }
+            ${t('prerequisitesIntro')}
           </p>
           
           <div class="prerequisites-list">
@@ -67,7 +41,7 @@ export function renderPrerequisitesModal() {
                   <span class="toggle-slider"></span>
                 </label>
                 <span class="prerequisite-label">
-                  ${isDE ? item.labelDE : item.labelEN}
+                  ${t(item.id)}
                 </span>
               </div>
             `).join('')}
@@ -76,20 +50,17 @@ export function renderPrerequisitesModal() {
           <div class="prerequisites-warning" id="prerequisitesWarning" style="display: none;">
             <span class="warning-icon">⚠️</span>
             <span class="warning-text">
-              ${isDE ? 
-                'Alle Voraussetzungen müssen erfüllt sein, um fortzufahren' : 
-                'All prerequisites must be met to continue'
-              }
+              ${t('prerequisitesWarning')}
             </span>
           </div>
         </div>
         
         <div class="modal-footer">
           <button type="button" class="secondary" id="cancelPrerequisites">
-            ${isDE ? 'Abbrechen' : 'Cancel'}
+            ${t('cancel')}
           </button>
           <button type="button" class="primary" id="confirmPrerequisites">
-            ${isDE ? 'Weiter' : 'Continue'}
+            ${t('continue')}
           </button>
         </div>
       </div>

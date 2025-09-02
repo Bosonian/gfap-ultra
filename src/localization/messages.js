@@ -285,6 +285,16 @@ export const messages = {
     directions: 'Directions',
     emergency: 'Emergency',
     certified: 'Certified',
+
+    // Prerequisites Modal
+    prerequisitesTitle: 'Prerequisites for Stroke Triage',
+    prerequisitesIntro: 'Please confirm that all of the following prerequisites are met:',
+    prerequisitesWarning: 'All prerequisites must be met to continue',
+    continue: 'Continue',
+    acute_deficit: 'Acute (severe) neurological deficit present',
+    symptom_onset: 'Symptom onset within 6 hours',
+    no_preexisting: 'No pre-existing severe neurological deficits',
+    no_trauma: 'No traumatic brain injury present',
     
   },
 
@@ -572,6 +582,16 @@ export const messages = {
     directions: 'Wegbeschreibung',
     emergency: 'Notfall',
     certified: 'Zertifiziert',
+
+    // Prerequisites Modal
+    prerequisitesTitle: 'Voraussetzungen für Schlaganfall-Triage',
+    prerequisitesIntro: 'Bitte bestätigen Sie, dass alle folgenden Voraussetzungen erfüllt sind:',
+    prerequisitesWarning: 'Alle Voraussetzungen müssen erfüllt sein, um fortzufahren',
+    continue: 'Weiter',
+    acute_deficit: 'Akutes (schweres) neurologisches Defizit vorhanden',
+    symptom_onset: 'Symptombeginn innerhalb 6h',
+    no_preexisting: 'Keine vorbestehende schwere neurologische Defizite',
+    no_trauma: 'Kein Schädelhirntrauma vorhanden',
     
   }
 };
