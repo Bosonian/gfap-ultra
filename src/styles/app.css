@@ -2908,6 +2908,8 @@ footer {
 
 /* Modal footer specific for prerequisites */
 .prerequisites-modal .modal-footer {
+    display: flex;
+    justify-content: space-between;
     padding: 24px 32px;
     background: linear-gradient(135deg, transparent 0%, rgba(0, 102, 204, 0.03) 100%);
     border-top: 1px solid rgba(0, 102, 204, 0.08);
@@ -2917,10 +2919,13 @@ footer {
 }
 
 .prerequisites-modal .modal-footer button {
+    flex: 1;
     min-width: 120px;
+    max-width: 150px;
     padding: 12px 24px;
     font-weight: 600;
     border-radius: 10px;
+    text-align: center;
 }
 
 /* Shake animation for warning */
