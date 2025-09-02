@@ -2680,51 +2680,105 @@ footer {
     border-color: rgba(255, 152, 0, 0.5);
 }
 
-/* Prerequisites Modal Styles */
+/* Prerequisites Modal Styles - Glassmorphism Theme */
+.prerequisites-modal {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.4);
+}
+
 .prerequisites-modal .modal-content {
-    max-width: 500px;
+    max-width: 600px;
     width: 90%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+                0 0 80px rgba(0, 102, 204, 0.05);
+}
+
+.dark-mode .prerequisites-modal .modal-content {
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 80px rgba(0, 102, 204, 0.08);
 }
 
 .prerequisites-content {
     padding: 0;
 }
 
+.prerequisites-modal .modal-header {
+    padding: 28px 32px;
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(0, 102, 204, 0.1);
+}
+
+.prerequisites-modal .modal-header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.prerequisites-modal .modal-body {
+    padding: 32px;
+}
+
 .prerequisites-intro {
     color: var(--text-secondary);
-    margin-bottom: 24px;
-    font-size: 1rem;
-    line-height: 1.5;
+    margin-bottom: 32px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    text-align: center;
+    padding: 0 16px;
 }
 
 .prerequisites-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-bottom: 24px;
+    gap: 16px;
+    margin-bottom: 28px;
 }
 
 .prerequisite-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 12px;
-    background: var(--input-bg);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    transition: var(--transition-fast);
+    gap: 20px;
+    padding: 18px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 102, 204, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dark-mode .prerequisite-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .prerequisite-item:hover {
-    background: var(--hover-bg);
-    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 102, 204, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 102, 204, 0.1);
+}
+
+.dark-mode .prerequisite-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(0, 102, 204, 0.4);
 }
 
 .prerequisite-label {
     flex: 1;
     color: var(--text-primary);
-    font-size: 0.95rem;
-    line-height: 1.4;
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 500;
+    padding-right: 12px;
 }
 
 /* iPhone-style Toggle Switch */
@@ -2792,11 +2846,13 @@ footer {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    background: rgba(255, 152, 0, 0.1);
-    border: 1px solid var(--warning-color);
-    border-radius: 8px;
-    margin-top: 16px;
+    padding: 14px 18px;
+    background: rgba(255, 152, 0, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 12px;
+    margin-top: 20px;
 }
 
 .warning-icon {
@@ -2806,8 +2862,23 @@ footer {
 
 .warning-text {
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 500;
+}
+
+/* Modal footer specific for prerequisites */
+.prerequisites-modal .modal-footer {
+    padding: 24px 32px;
+    background: linear-gradient(135deg, transparent 0%, rgba(0, 102, 204, 0.03) 100%);
+    border-top: 1px solid rgba(0, 102, 204, 0.08);
+    gap: 12px;
+}
+
+.prerequisites-modal .modal-footer button {
+    min-width: 120px;
+    padding: 12px 24px;
+    font-weight: 600;
+    border-radius: 10px;
 }
 
 /* Shake animation for warning */
@@ -2840,25 +2911,76 @@ footer {
     border-color: var(--primary-color);
 }
 
-/* Mobile responsiveness for prerequisites modal */
-@media (max-width: 480px) {
+/* Tablet responsiveness for prerequisites modal */
+@media (max-width: 768px) {
     .prerequisites-modal .modal-content {
-        width: 95%;
-        max-width: none;
-        margin: 10px;
+        max-width: 520px;
+        width: 92%;
+    }
+    
+    .prerequisites-modal .modal-header {
+        padding: 24px 28px;
+    }
+    
+    .prerequisites-modal .modal-body {
+        padding: 28px;
     }
     
     .prerequisite-item {
-        padding: 10px;
+        padding: 16px 18px;
+        gap: 18px;
+    }
+    
+    .prerequisite-label {
+        font-size: 0.98rem;
+    }
+}
+
+/* Mobile responsiveness for prerequisites modal */
+@media (max-width: 480px) {
+    .prerequisites-modal .modal-content {
+        width: 94%;
+        max-width: none;
+        margin: 12px;
+        border-radius: 20px;
+    }
+    
+    .prerequisites-modal .modal-header {
+        padding: 20px 24px;
+    }
+    
+    .prerequisites-modal .modal-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .prerequisites-modal .modal-body {
+        padding: 24px 20px;
+    }
+    
+    .prerequisites-intro {
+        font-size: 0.95rem;
+        margin-bottom: 24px;
+        padding: 0 8px;
+    }
+    
+    .prerequisites-list {
         gap: 12px;
+    }
+    
+    .prerequisite-item {
+        padding: 14px 16px;
+        gap: 14px;
+        border-radius: 14px;
     }
     
     .prerequisite-label {
         font-size: 0.9rem;
+        line-height: 1.4;
+        padding-right: 8px;
     }
     
     .toggle-switch {
-        width: 48px;
+        width: 46px;
         height: 28px;
     }
     
@@ -2869,6 +2991,26 @@ footer {
     
     .toggle-input:checked + .toggle-slider:before {
         transform: translateX(18px);
+    }
+    
+    .prerequisites-modal .modal-footer {
+        padding: 20px 24px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .prerequisites-modal .modal-footer button {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .prerequisites-warning {
+        padding: 12px 14px;
+        gap: 10px;
+    }
+    
+    .warning-text {
+        font-size: 0.88rem;
     }
 }
 

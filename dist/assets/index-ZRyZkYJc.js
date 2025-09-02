@@ -971,4 +971,4 @@ var fe=Object.defineProperty;var ve=(a,t,e)=>t in a?fe(a,t,{enumerable:!0,config
         </button>
       </div>
     `,t.appendChild(e),document.body.appendChild(t);const i=t.querySelector("#updateNow"),n=t.querySelector("#updateLater");i.addEventListener("click",()=>{window.location.reload()}),n.addEventListener("click",()=>{t.remove(),setTimeout(()=>this.showUpdateNotification(),5*60*1e3)}),t.addEventListener("click",s=>{s.target===t&&n.click()})}destroy(){this.unsubscribe&&this.unsubscribe()}}const Pt=new $t;Pt.init();
-//# sourceMappingURL=index-Dc38sJJY.js.map
+//# sourceMappingURL=index-ZRyZkYJc.js.map
