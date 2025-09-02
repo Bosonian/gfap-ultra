@@ -826,12 +826,14 @@ var ve=Object.defineProperty;var ye=(a,e,t)=>e in a?ve(a,e,{enumerable:!0,config
         </div>
         
         <div class="modal-footer">
-          <button type="button" class="secondary" id="cancelPrerequisites">
-            ${r("cancel")}
-          </button>
-          <button type="button" class="primary" id="confirmPrerequisites">
-            ${r("continue")}
-          </button>
+          <div class="button-group">
+            <button type="button" class="secondary" id="cancelPrerequisites">
+              ${r("cancel")}
+            </button>
+            <button type="button" class="primary" id="confirmPrerequisites">
+              ${r("continue")}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -994,4 +996,4 @@ var ve=Object.defineProperty;var ye=(a,e,t)=>e in a?ve(a,e,{enumerable:!0,config
         </button>
       </div>
     `,e.appendChild(t),document.body.appendChild(e);const i=e.querySelector("#updateNow"),n=e.querySelector("#updateLater");i.addEventListener("click",()=>{window.location.reload()}),n.addEventListener("click",()=>{e.remove(),setTimeout(()=>this.showUpdateNotification(),5*60*1e3)}),e.addEventListener("click",s=>{s.target===e&&n.click()})}destroy(){this.unsubscribe&&this.unsubscribe()}}const Rt=new Pt;Rt.init();
-//# sourceMappingURL=index-B-MTt8to.js.map
+//# sourceMappingURL=index-CKCionNP.js.map

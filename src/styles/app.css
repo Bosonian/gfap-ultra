@@ -2908,24 +2908,27 @@ footer {
 
 /* Modal footer specific for prerequisites */
 .prerequisites-modal .modal-footer {
-    display: flex;
-    justify-content: space-between;
     padding: 24px 32px;
     background: linear-gradient(135deg, transparent 0%, rgba(0, 102, 204, 0.03) 100%);
     border-top: 1px solid rgba(0, 102, 204, 0.08);
-    gap: 12px;
     flex-shrink: 0;
     margin-top: auto;
 }
 
-.prerequisites-modal .modal-footer button {
-    flex: 1;
-    min-width: 120px;
-    max-width: 150px;
+.prerequisites-modal .button-group {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.prerequisites-modal .button-group button {
+    width: 150px;
     padding: 12px 24px;
     font-weight: 600;
     border-radius: 10px;
     text-align: center;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 /* Shake animation for warning */
@@ -2965,10 +2968,30 @@ footer {
         width: 50%;
         max-height: 80vh;
     }
+    
+    .prerequisites-modal .button-group {
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    
+    .prerequisites-modal .button-group button {
+        width: auto;
+        min-width: 120px;
+        padding: 12px 24px;
+    }
+    
+    .prerequisites-modal .button-group .secondary {
+        order: 1;
+    }
+    
+    .prerequisites-modal .button-group .primary {
+        order: 2;
+    }
 }
 
 /* Tablet responsiveness for prerequisites modal */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-width: 481px) {
     .prerequisites-modal {
         padding: 16px;
     }
@@ -2994,6 +3017,18 @@ footer {
     
     .prerequisite-label {
         font-size: 0.98rem;
+    }
+    
+    .prerequisites-modal .button-group {
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    
+    .prerequisites-modal .button-group button {
+        width: 150px;
+        padding: 12px 24px;
+        font-size: 0.95rem;
     }
 }
 
@@ -3061,13 +3096,19 @@ footer {
     
     .prerequisites-modal .modal-footer {
         padding: 20px 24px;
-        flex-direction: column;
-        gap: 10px;
     }
     
-    .prerequisites-modal .modal-footer button {
+    .prerequisites-modal .button-group {
+        flex-direction: column-reverse;
+        gap: 12px;
+        justify-content: stretch;
+    }
+    
+    .prerequisites-modal .button-group button {
         width: 100%;
         min-width: unset;
+        padding: 16px 24px;
+        font-size: 1rem;
     }
     
     .prerequisites-warning {

@@ -56,12 +56,14 @@ export function renderPrerequisitesModal() {
         </div>
         
         <div class="modal-footer">
-          <button type="button" class="secondary" id="cancelPrerequisites">
-            ${t('cancel')}
-          </button>
-          <button type="button" class="primary" id="confirmPrerequisites">
-            ${t('continue')}
-          </button>
+          <div class="button-group">
+            <button type="button" class="secondary" id="cancelPrerequisites">
+              ${t('cancel')}
+            </button>
+            <button type="button" class="primary" id="confirmPrerequisites">
+              ${t('continue')}
+            </button>
+          </div>
         </div>
       </div>
     </div>
