@@ -88,7 +88,7 @@ export function initPrerequisitesModal() {
   console.log('Modal buttons found:', { closeBtn: !!closeBtn, cancelBtn: !!cancelBtn, confirmBtn: !!confirmBtn });
   
   const closeModal = () => {
-    modal.style.display = 'none';
+    modal.remove();
     // Navigate back to welcome screen if cancelled
     navigate('welcome');
   };
@@ -108,7 +108,7 @@ export function initPrerequisitesModal() {
     
     if (allChecked) {
       console.log('Navigating to triage2');
-      modal.style.display = 'none';
+      modal.remove();
       // Proceed to triage2 (stroke module selection)
       navigate('triage2');
     } else {
