@@ -24,16 +24,19 @@ export function announceScreenChange(screen) {
 }
 
 export function setPageTitle(screen) {
+  const appName = 'iGFAP';
   const titles = {
-    'triage1': 'Initial Assessment - Stroke Triage Assistant',
-    'triage2': 'Examination Capability - Stroke Triage Assistant',
-    'coma': 'Coma Module - Stroke Triage Assistant',
-    'limited': 'Limited Data Module - Stroke Triage Assistant',
-    'full': 'Full Stroke Module - Stroke Triage Assistant',
-    'results': 'Assessment Results - Stroke Triage Assistant'
+    triage1: 'Initial Assessment',
+    triage2: 'Examination Capability',
+    coma: 'Coma Module',
+    limited: 'Limited Data Module',
+    full: 'Full Stroke Module',
+    results: 'Assessment Results'
   };
-  
-  document.title = titles[screen] || 'Stroke Triage Assistant';
+
+  const section = titles[screen];
+  // Brand-first to ensure the tab shows iGFAP even when truncated
+  document.title = section ? `${appName} — ${section}` : appName;
 }
 
 export function focusMainHeading() {
