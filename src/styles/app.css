@@ -2913,6 +2913,8 @@ footer {
     border-top: 1px solid rgba(0, 102, 204, 0.08);
     flex-shrink: 0;
     margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .prerequisites-modal .button-group {
@@ -2972,7 +2974,8 @@ footer {
 @media (min-width: 769px) {
     .prerequisites-modal .modal-content {
         max-width: 550px;
-        width: 50%;
+        width: 60%;
+        min-width: 400px;
         max-height: 80vh;
     }
     
