@@ -259,6 +259,9 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
   // Add alternative diagnoses for coma module
   const alternativeDiagnosesHtml = (ich?.module === 'Coma') ? renderComaAlternativeDiagnoses(ich.probability) : '';
   
+  // Add differential diagnoses for stroke modules (limited and full)
+  const strokeDifferentialHtml = (ich?.module !== 'Coma') ? renderStrokeDifferentialDiagnoses(ich.probability) : '';
+  
   return `
     <div class="container">
       ${renderProgressIndicator(3)}
@@ -272,6 +275,9 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
       
       <!-- Alternative Diagnoses for Coma Module -->
       ${alternativeDiagnosesHtml}
+      
+      <!-- Differential Diagnoses for Stroke Modules -->
+      ${strokeDifferentialHtml}
       
       <!-- Research Model Comparison (hidden unless research mode) -->
       ${researchComparisonHtml}
@@ -340,6 +346,9 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   // Determine if we should show LVO notification
   const showLVONotification = ichPercent < 30 && lvoPercent > 50;
   
+  // Add differential diagnoses for stroke modules
+  const strokeDifferentialHtml = renderStrokeDifferentialDiagnoses(ich.probability);
+  
   return `
     <div class="container">
       ${renderProgressIndicator(3)}
@@ -351,6 +360,9 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
         ${renderRiskCard('ich', ich, results)}
         ${showLVONotification ? renderLVONotification() : ''}
       </div>
+      
+      <!-- Differential Diagnoses for Stroke Modules -->
+      ${strokeDifferentialHtml}
       
       <!-- Research Model Comparison (hidden unless research mode) -->
       ${researchComparisonHtml}
@@ -586,6 +598,30 @@ function getPatientInputs() {
  * @param {number} probability - ICH probability (0-1)
  * @returns {string} HTML for alternative diagnoses
  */
+function renderStrokeDifferentialDiagnoses(probability) {
+  const percent = Math.round(probability * 100);
+  
+  if (percent > 25) {
+    return `
+      <div class="alternative-diagnosis-card">
+        <div class="diagnosis-header">
+          <span class="lightning-icon">⚡</span>
+          <h3>${t('differentialDiagnoses')}</h3>
+        </div>
+        <div class="diagnosis-content">
+          <ul class="diagnosis-list">
+            <li>${t('reconfirmTimeWindow')}</li>
+            <li>${t('unclearTimeWindow')}</li>
+            <li>${t('rareDiagnoses')}</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+  
+  return '';
+}
+
 function renderComaAlternativeDiagnoses(probability) {
   const percent = Math.round(probability * 100);
   const isDE = i18n.getCurrentLanguage() === 'de';
