@@ -298,8 +298,8 @@ export const messages = {
 
     // Differential Diagnoses for Stroke Modules
     differentialDiagnoses: 'Differential Diagnoses',
-    reconfirmTimeWindow: 'Please reconfirm time window',
-    unclearTimeWindow: 'With unclear/extended time window, early demarcated brain infarct is also possible',
+    reconfirmTimeWindow: 'Please reconfirm time window!',
+    unclearTimeWindow: 'With unclear/extended time window, early demarcated brain infarction is also possible',
     rareDiagnoses: 'Rare diagnoses such as glioblastoma are also possible',
     
   },
@@ -599,11 +599,11 @@ export const messages = {
     no_preexisting: 'Keine vorbestehende schwere neurologische Defizite',
     no_trauma: 'Kein Schädelhirntrauma vorhanden',
 
-    // Differential Diagnoses for Stroke Modules
+    // Differential Diagnoses for Stroke Modules  
     differentialDiagnoses: 'Differentialdiagnosen',
-    reconfirmTimeWindow: 'Bitte Zeitfenster rekonfirmieren',
+    reconfirmTimeWindow: 'Bitte Zeitfenster rekonfirmieren!',
     unclearTimeWindow: 'Bei unklarem/erweitertem Zeitfenster ist auch ein beginnend demarkierter Hirninfarkt möglich',
-    rareDiagnoses: 'Seltene Diagnosen wie ein Glioblastom ist auch möglich',
+    rareDiagnoses: 'Seltene Diagnosen wie ein Glioblastom sind auch möglich',
     
   }
 };

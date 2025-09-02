@@ -609,8 +609,11 @@ function renderStrokeDifferentialDiagnoses(probability) {
           <h3>${t('differentialDiagnoses')}</h3>
         </div>
         <div class="diagnosis-content">
+          <!-- Time Window Confirmation - Clinical Action -->
+          <h4 class="clinical-action-heading">${t('reconfirmTimeWindow')}</h4>
+          
+          <!-- Actual Differential Diagnoses -->
           <ul class="diagnosis-list">
-            <li>${t('reconfirmTimeWindow')}</li>
             <li>${t('unclearTimeWindow')}</li>
             <li>${t('rareDiagnoses')}</li>
           </ul>
