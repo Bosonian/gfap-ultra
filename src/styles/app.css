@@ -2920,13 +2920,14 @@ footer {
     gap: 12px;
     justify-content: flex-end;
     align-items: center;
+    flex-wrap: nowrap;
 }
 
 .prerequisites-modal .button-group button {
-    width: 150px !important;
+    width: 130px !important;
     height: 44px !important;
     flex-shrink: 0;
-    padding: 12px 24px !important;
+    padding: 12px 20px !important;
     font-weight: 600;
     border-radius: 10px;
     text-align: center;
@@ -3035,9 +3036,9 @@ footer {
     }
     
     .prerequisites-modal .button-group button {
-        width: 150px !important;
+        width: 130px !important;
         height: 44px !important;
-        padding: 12px 24px !important;
+        padding: 12px 20px !important;
         font-size: 0.95rem;
         display: flex;
         align-items: center;
