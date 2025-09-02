@@ -2924,13 +2924,16 @@ footer {
 
 .prerequisites-modal .button-group button {
     width: 150px !important;
+    height: 44px !important;
     flex-shrink: 0;
-    padding: 12px 24px;
+    padding: 12px 24px !important;
     font-weight: 600;
     border-radius: 10px;
     text-align: center;
-    min-height: 44px;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Shake animation for warning */
@@ -2979,8 +2982,12 @@ footer {
     
     .prerequisites-modal .button-group button {
         width: auto !important;
+        height: 44px !important;
         min-width: 120px;
-        padding: 12px 24px;
+        padding: 12px 24px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .prerequisites-modal .button-group .secondary {
@@ -3029,8 +3036,12 @@ footer {
     
     .prerequisites-modal .button-group button {
         width: 150px !important;
-        padding: 12px 24px;
+        height: 44px !important;
+        padding: 12px 24px !important;
         font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
@@ -3108,9 +3119,13 @@ footer {
     
     .prerequisites-modal .button-group button {
         width: 100% !important;
+        height: 48px !important;
         min-width: unset;
-        padding: 16px 24px;
+        padding: 16px 24px !important;
         font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .prerequisites-warning {
