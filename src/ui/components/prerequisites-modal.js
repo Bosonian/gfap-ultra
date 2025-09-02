@@ -130,21 +130,13 @@ export function initPrerequisitesModal() {
 export function showPrerequisitesModal() {
   const existingModal = document.getElementById('prerequisitesModal');
   
-  if (!existingModal) {
-    // Insert modal into DOM
-    const modalHtml = renderPrerequisitesModal();
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    initPrerequisitesModal();
-  } else {
-    // Reset checkboxes
-    const checkboxes = existingModal.querySelectorAll('.toggle-input');
-    checkboxes.forEach(cb => cb.checked = false);
-    
-    // Hide warning
-    const warning = document.getElementById('prerequisitesWarning');
-    if (warning) warning.style.display = 'none';
-    
-    // Show modal
-    existingModal.style.display = 'flex';
+  // Always remove existing modal and create fresh one to handle language changes
+  if (existingModal) {
+    existingModal.remove();
   }
+  
+  // Insert fresh modal into DOM with current language
+  const modalHtml = renderPrerequisitesModal();
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  initPrerequisitesModal();
 }
