@@ -2685,17 +2685,27 @@ footer {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     background: rgba(0, 0, 0, 0.4);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .prerequisites-modal .modal-content {
     max-width: 600px;
     width: 90%;
+    max-height: 85vh;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
                 0 0 80px rgba(0, 102, 204, 0.05);
+    margin: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .dark-mode .prerequisites-modal .modal-content {
@@ -2723,6 +2733,10 @@ footer {
 
 .prerequisites-modal .modal-body {
     padding: 32px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .prerequisites-intro {
@@ -2872,6 +2886,8 @@ footer {
     background: linear-gradient(135deg, transparent 0%, rgba(0, 102, 204, 0.03) 100%);
     border-top: 1px solid rgba(0, 102, 204, 0.08);
     gap: 12px;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 .prerequisites-modal .modal-footer button {
@@ -2911,11 +2927,25 @@ footer {
     border-color: var(--primary-color);
 }
 
+/* Desktop responsiveness for prerequisites modal */
+@media (min-width: 769px) {
+    .prerequisites-modal .modal-content {
+        max-width: 550px;
+        width: 50%;
+        max-height: 80vh;
+    }
+}
+
 /* Tablet responsiveness for prerequisites modal */
 @media (max-width: 768px) {
+    .prerequisites-modal {
+        padding: 16px;
+    }
+    
     .prerequisites-modal .modal-content {
         max-width: 520px;
         width: 92%;
+        max-height: 90vh;
     }
     
     .prerequisites-modal .modal-header {
@@ -2938,11 +2968,16 @@ footer {
 
 /* Mobile responsiveness for prerequisites modal */
 @media (max-width: 480px) {
+    .prerequisites-modal {
+        padding: 12px;
+    }
+    
     .prerequisites-modal .modal-content {
         width: 94%;
         max-width: none;
-        margin: 12px;
+        margin: 0;
         border-radius: 20px;
+        max-height: 92vh;
     }
     
     .prerequisites-modal .modal-header {
