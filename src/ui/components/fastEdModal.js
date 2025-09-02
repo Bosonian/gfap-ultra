@@ -138,8 +138,10 @@ export class FastEdCalculator {
 
           </div>
           <div class="modal-footer">
-            <button class="secondary" data-action="cancel-fast-ed">${t('cancel')}</button>
-            <button class="primary" data-action="apply-fast-ed">${t('applyScore')}</button>
+            <div class="button-group">
+              <button class="secondary" data-action="cancel-fast-ed">${t('cancel')}</button>
+              <button class="primary" data-action="apply-fast-ed">${t('applyScore')}</button>
+            </div>
           </div>
         </div>
       </div>
@@ -172,10 +174,12 @@ export class FastEdCalculator {
     const applyBtn = this.modal.querySelector('[data-action="apply-fast-ed"]');
     applyBtn?.addEventListener('click', () => this.apply());
 
-    // Click outside to close
+    // Disable backdrop click-to-close to prevent accidental dismissal
+    // Users must explicitly Cancel or Apply
     this.modal.addEventListener('click', (e) => {
       if (e.target === this.modal) {
-        this.close();
+        e.preventDefault();
+        e.stopPropagation();
       }
     });
 
