@@ -73,12 +73,19 @@ export function renderPrerequisitesModal() {
  */
 export function initPrerequisitesModal() {
   const modal = document.getElementById('prerequisitesModal');
-  if (!modal) return;
+  if (!modal) {
+    console.error('Prerequisites modal not found');
+    return;
+  }
+  
+  console.log('Initializing prerequisites modal');
   
   // Close button handlers
   const closeBtn = document.getElementById('closePrerequisites');
   const cancelBtn = document.getElementById('cancelPrerequisites');
   const confirmBtn = document.getElementById('confirmPrerequisites');
+  
+  console.log('Modal buttons found:', { closeBtn: !!closeBtn, cancelBtn: !!cancelBtn, confirmBtn: !!confirmBtn });
   
   const closeModal = () => {
     modal.style.display = 'none';
@@ -90,15 +97,22 @@ export function initPrerequisitesModal() {
   cancelBtn?.addEventListener('click', closeModal);
   
   // Confirm button handler
-  confirmBtn?.addEventListener('click', () => {
+  confirmBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Prerequisites confirm button clicked');
     const checkboxes = modal.querySelectorAll('.toggle-input');
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    console.log('All prerequisites checked:', allChecked);
     
     if (allChecked) {
+      console.log('Navigating to triage2');
       modal.style.display = 'none';
       // Proceed to triage2 (stroke module selection)
       navigate('triage2');
     } else {
+      console.log('Showing prerequisites warning');
       // Show warning
       const warning = document.getElementById('prerequisitesWarning');
       if (warning) {
@@ -135,8 +149,14 @@ export function showPrerequisitesModal() {
     existingModal.remove();
   }
   
-  // Insert fresh modal into DOM with current language
-  const modalHtml = renderPrerequisitesModal();
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  // Create modal element directly instead of innerHTML
+  const modalElement = document.createElement('div');
+  modalElement.innerHTML = renderPrerequisitesModal();
+  const modal = modalElement.firstElementChild;
+  
+  // Insert into DOM
+  document.body.appendChild(modal);
+  
+  // Initialize immediately since DOM is ready
   initPrerequisitesModal();
 }
