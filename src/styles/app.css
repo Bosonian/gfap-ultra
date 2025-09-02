@@ -71,6 +71,14 @@ body {
     overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
+/* App Container - Prevent CLS */
+#appContainer {
+    min-height: calc(100vh - 54px - 100px); /* viewport - header - footer */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
 /* Header Styles */
 .app-header {
     display: flex;
@@ -182,6 +190,8 @@ body {
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--border-color);
     animation: fadeIn 0.4s ease;
+    min-height: 400px; /* Prevent height shifts */
+    box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -1937,6 +1947,11 @@ footer {
     .app-header {
         padding: 6px 12px;
         height: 46px; /* Compact mobile header height */
+    }
+    
+    /* Mobile CLS prevention */
+    #appContainer {
+        min-height: calc(100vh - 46px - 80px); /* mobile header + footer */
     }
     
     .app-header h1 {

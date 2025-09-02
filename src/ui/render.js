@@ -16,8 +16,8 @@ export function render(container) {
   const state = store.getState();
   const { currentScreen, results, startTime, navigationHistory } = state;
 
-  // Clear container
-  container.innerHTML = '';
+  // Optimize DOM updates to prevent CLS
+  const tempContainer = document.createElement('div');
   
   // Show/hide back button based on navigation history
   const backButton = document.getElementById('backButton');
@@ -50,7 +50,14 @@ export function render(container) {
       html = renderTriage1();
   }
 
-  container.innerHTML = html;
+  // Use batch DOM update to minimize reflows
+  tempContainer.innerHTML = html;
+  
+  // Single DOM replacement to minimize CLS
+  container.innerHTML = '';
+  while (tempContainer.firstChild) {
+    container.appendChild(tempContainer.firstChild);
+  }
 
   // Restore form data if available
   const form = container.querySelector('form[data-module]');
