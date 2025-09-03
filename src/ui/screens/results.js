@@ -9,11 +9,11 @@ import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
 import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
-import { renderProbabilityRing, initializeProbabilityRings, observeProbabilityRings } from '../components/probability-ring.js';
+import { mountIslands } from '../../react/mountIslands.js';
 import { calculateLegacyICH } from '../../research/legacy-ich-model.js';
 import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-logger.js';
 import { renderModelComparison, renderResearchToggle } from '../../research/comparison-ui.js';
-import { initializeTachometer, cleanupTachometer } from '../components/tachometer.js';
+// React tachometer island is used instead of vanilla implementation
 
 function renderInputSummary() {
   const state = store.getState();
@@ -106,7 +106,7 @@ function renderRiskCard(type, data, results) {
         <div class="circles-container">
           <div class="rings-row">
             <div class="circle-item">
-              ${renderProbabilityRing(percent, level)}
+              <div data-react-ring data-percent="${percent}" data-level="${level}"></div>
               <div class="circle-label">${type === 'ich' ? 'ICH Risk' : 'LVO Risk'}</div>
             </div>
           </div>
@@ -225,16 +225,7 @@ export function renderResults(results, startTime) {
   // Initialize animations after DOM update
   setTimeout(() => {
     initializeVolumeAnimations();
-    initializeProbabilityRings();
-    observeProbabilityRings();
-    
-    // Initialize tachometer if present
-    const tachometerCanvas = document.getElementById('tachometerCanvas');
-    if (tachometerCanvas && lvo && ich) {
-      const ichPercent = Math.round((ich?.probability || 0) * 100);
-      const lvoPercent = Math.round((lvo?.probability || 0) * 100);
-      initializeTachometer(ichPercent, lvoPercent);
-    }
+    mountIslands();
   }, 100);
   
   return resultsHtml;
@@ -826,7 +817,7 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
         </div>
         
         <div class="tachometer-gauge" id="tachometer-canvas-container">
-          <canvas id="tachometerCanvas" width="300" height="200"></canvas>
+          <div data-react-tachometer data-ich="${ichPercent}" data-lvo="${lvoPercent}" data-title="${i18n.getCurrentLanguage() === 'de' ? 'Entscheidungshilfe – LVO/ICH' : 'Decision Support – LVO/ICH'}"></div>
         </div>
 
         <!-- Legend chips for zones -->

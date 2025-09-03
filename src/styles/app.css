@@ -4453,6 +4453,7 @@ footer {
     height: 280px;
     display: block;
 }
+.gauge-canvas { width: 100%; height: 280px; display: block; border-radius: 8px; }
 
 /* Legend chips and metrics under tachometer */
 .tachometer-legend {
@@ -4579,6 +4580,7 @@ footer {
         width: 100%;
         height: 220px;
     }
+    .gauge-canvas { height: 220px; }
 }
 
 /* Mobile tachometer adjustments */
@@ -4588,10 +4590,8 @@ footer {
         margin: 15px 10px;
     }
     
-    #tachometerCanvas {
-        width: 100%;
-        height: 150px;
-    }
+    #tachometerCanvas { width: 100%; height: 150px; }
+    .gauge-canvas { height: 150px; }
     
     .treatment-recommendation {
         flex-direction: column;
