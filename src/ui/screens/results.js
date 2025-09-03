@@ -16,6 +16,16 @@ import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-
 import { renderModelComparison, renderResearchToggle } from '../../research/comparison-ui.js';
 // Premium vanilla JS tachometer implementation
 
+function getModuleDisplayName(module) {
+  const isDE = i18n.getCurrentLanguage() === 'de';
+  const moduleNames = {
+    'Coma': isDE ? 'Koma-Modul' : 'Coma Module',
+    'Limited': isDE ? 'Begrenzte Daten' : 'Limited Data',
+    'Full': isDE ? 'Vollständige Bewertung' : 'Full Assessment'
+  };
+  return moduleNames[module] || module;
+}
+
 function renderInputSummary() {
   const state = store.getState();
   const formData = state.formData;
@@ -99,7 +109,7 @@ function renderRiskCard(type, data, results) {
         <div class="risk-title">
           <h3>${titles[type]}</h3>
           <span class="risk-subtitle">${subtitles[type]}</span>
-          <span class="risk-module">${data.module} Module</span>
+          <span class="risk-module">${getModuleDisplayName(data.module)}</span>
         </div>
       </div>
       
@@ -746,7 +756,7 @@ function renderVolumeCard(ichData) {
         <div class="risk-title">
           <h3>${t('ichVolumeLabel')}</h3>
           <span class="risk-subtitle">${volumeData.displayVolume}</span>
-          <span class="risk-module">Volume Calc</span>
+          <span class="risk-module">${i18n.getCurrentLanguage() === 'de' ? 'Volumen-Berechnung' : 'Volume Calculation'}</span>
         </div>
       </div>
       
@@ -826,7 +836,7 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
         <!-- Legend chips for zones -->
         <div class="tachometer-legend" aria-hidden="true">
           <span class="legend-chip ich">ICH</span>
-          <span class="legend-chip balanced">Balanced</span>
+          <span class="legend-chip uncertain">Uncertain</span>
           <span class="legend-chip lvo">LVO</span>
         </div>
 

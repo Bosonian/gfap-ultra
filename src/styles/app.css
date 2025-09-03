@@ -1060,6 +1060,7 @@ button:disabled {
     font-size: 0.85rem;
     color: var(--text-secondary);
     font-weight: 500;
+    padding-bottom: 8px;
 }
 
 .probability-circle {
@@ -1080,7 +1081,7 @@ button:disabled {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
     font-weight: 700;
     text-align: center;
     color: var(--text-primary);
@@ -4485,7 +4486,7 @@ footer {
     background: rgba(255,255,255,0.04);
 }
 .legend-chip.ich { color: #ff6464; border-color: rgba(255,100,100,0.5); }
-.legend-chip.balanced { color: #ffd700; border-color: rgba(255,215,0,0.5); }
+.legend-chip.uncertain { color: #ffd700; border-color: rgba(255,215,0,0.5); }
 .legend-chip.lvo { color: #00d4ff; border-color: rgba(0,212,255,0.5); }
 
 .metrics-row {
