@@ -348,8 +348,25 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   
   // Get FAST-ED score from form data to determine LVO display
   const state = store.getState();
-  const fastEdScore = state.formData?.full?.fast_ed_score || 0;
-  const showLVORiskCard = fastEdScore > 3 && lvo && !lvo.notPossible;
+  const fastEdScore = parseInt(state.formData?.full?.fast_ed_score) || 0;
+  console.log('🔍 Debug LVO Display:');
+  console.log('  Current Module:', currentModule);
+  console.log('  FAST-ED Score:', fastEdScore);
+  console.log('  FAST-ED Raw:', state.formData?.full?.fast_ed_score);
+  console.log('  LVO Data:', lvo);
+  console.log('  LVO notPossible:', lvo?.notPossible);
+  console.log('  LVO Probability:', lvo?.probability);
+  console.log('  ICH Module:', ich?.module);
+  
+  // Ensure we only show LVO in full module and when LVO data is available
+  const isFullModule = currentModule === 'full' || ich?.module === 'Full';
+  const hasValidLVO = lvo && typeof lvo.probability === 'number' && !lvo.notPossible;
+  const showLVORiskCard = isFullModule && fastEdScore > 3 && hasValidLVO;
+  
+  console.log('  Conditions: isFullModule:', isFullModule);
+  console.log('  Conditions: fastEdScore > 3:', fastEdScore > 3);
+  console.log('  Conditions: hasValidLVO:', hasValidLVO);
+  console.log('  Show LVO Card:', showLVORiskCard);
   
   // Determine layout configuration
   const showVolumeCard = ichPercent >= 50;
