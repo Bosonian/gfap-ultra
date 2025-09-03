@@ -9,6 +9,7 @@ import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
 import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
+import { renderProbabilityRing, initializeProbabilityRings, observeProbabilityRings } from '../components/probability-ring.js';
 import { calculateLegacyICH } from '../../research/legacy-ich-model.js';
 import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-logger.js';
 import { renderModelComparison, renderResearchToggle } from '../../research/comparison-ui.js';
@@ -89,8 +90,9 @@ function renderRiskCard(type, data, results) {
     lvo: i18n.getCurrentLanguage() === 'de' ? 'Großgefäßverschluss' : 'Large Vessel Occlusion' 
   };
   
+  const level = isCritical ? 'critical' : isHigh ? 'high' : 'normal';
   return `
-    <div class="enhanced-risk-card ${type} ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
+    <div class="enhanced-risk-card ${type} ${level}">
       <div class="risk-header">
         <div class="risk-icon">${icons[type]}</div>
         <div class="risk-title">
@@ -104,26 +106,11 @@ function renderRiskCard(type, data, results) {
         <div class="circles-container">
           <div class="rings-row">
             <div class="circle-item">
-              <div class="probability-circle" data-percent="${percent}">
-                <div class="probability-number">${percent}<span>%</span></div>
-                <svg class="probability-ring" viewBox="0 0 120 120" preserveAspectRatio="xMidYMid meet">
-                  <circle cx="60" cy="60" r="54" fill="none" stroke="var(--text-secondary)" stroke-width="8" opacity="0.4"/>
-                  <circle cx="60" cy="60" r="54" fill="none" stroke-width="8" 
-                          stroke-dasharray="${2 * Math.PI * 54}" 
-                          stroke-dashoffset="${2 * Math.PI * 54 * (1 - percent / 100)}"
-                          stroke-linecap="round" 
-                          transform="rotate(-90 60 60)"
-                          class="probability-progress"/>
-                </svg>
-              </div>
+              ${renderProbabilityRing(percent, level)}
               <div class="circle-label">${type === 'ich' ? 'ICH Risk' : 'LVO Risk'}</div>
             </div>
-            
           </div>
-          
-          <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
-            ${riskLevel}
-          </div>
+          <div class="risk-level ${level}">${riskLevel}</div>
         </div>
         
         <div class="risk-assessment">
@@ -238,6 +225,8 @@ export function renderResults(results, startTime) {
   // Initialize animations after DOM update
   setTimeout(() => {
     initializeVolumeAnimations();
+    initializeProbabilityRings();
+    observeProbabilityRings();
     
     // Initialize tachometer if present
     const tachometerCanvas = document.getElementById('tachometerCanvas');
@@ -832,7 +821,7 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
     <div class="tachometer-section">
       <div class="tachometer-card">
         <div class="tachometer-header">
-          <h3>🎯 ${(t('treatmentDecision') || 'Treatment Decision')} · LVO/ICH Balance</h3>
+          <h3>🎯 ${i18n.getCurrentLanguage() === 'de' ? 'Entscheidungshilfe – LVO/ICH' : 'Decision Support – LVO/ICH'}</h3>
           <div class="ratio-display">LVO/ICH Ratio: ${ratio.toFixed(2)}</div>
         </div>
         

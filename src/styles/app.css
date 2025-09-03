@@ -1065,13 +1065,7 @@ button:disabled {
     height: var(--ring-size);
 }
 
-.probability-ring {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: var(--ring-size);
-    height: var(--ring-size);
-}
+.probability-canvas { width: var(--ring-size); height: var(--ring-size); display: block; }
 
 .probability-number {
     position: absolute;

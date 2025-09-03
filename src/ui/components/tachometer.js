@@ -49,35 +49,33 @@ export function initializeTachometer(ichPercent, lvoPercent) {
   let settleFrames = 0;
 
   const drawTachometer = () => {
-    const width = cssWidth;
-    const height = cssHeight;
-    const centerX = width / 2;
-    const centerY = height * 0.72;
-    const radius = Math.min(width, height) * 0.38;
+  const width = cssWidth;
+  const height = cssHeight;
+  const centerX = width / 2;
+  const centerY = height * 0.82; // lower to maximize arc visual area
+  const radius = Math.min(width, height) * 0.48; // larger radius for clarity
 
     // Transparent background: clear only
     ctx.clearRect(0, 0, width, height);
 
-    // Base arc track
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-    ctx.lineWidth = 28;
+    // Base arc track (180°)
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 26;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, Math.PI * 0.75, Math.PI * 2.25, false);
+    ctx.arc(centerX, centerY, radius, Math.PI, Math.PI * 2, false);
     ctx.stroke();
 
     // Colored gradient zones (approximate from design spec)
     const zones = [
-      { start: 0.75, end: 1.0, c1: '#ff0040', c2: '#ff3366', op: '99' }, // ICH red
-      { start: 1.0, end: 1.25, c1: '#ff3366', c2: '#ff9900', op: '88' },
-      { start: 1.25, end: 1.75, c1: '#ff9900', c2: '#ffcc00', op: '88' },
-      { start: 1.75, end: 2.0, c1: '#00aaff', c2: '#0099ff', op: '88' },
-      { start: 2.0, end: 2.25, c1: '#0099ff', c2: '#00ddff', op: '99' }, // LVO cyan
+      { start: Math.PI, end: Math.PI + Math.PI * 0.33, c1: '#ff0040', c2: '#ff3366', op: '99' },
+      { start: Math.PI + Math.PI * 0.33, end: Math.PI + Math.PI * 0.67, c1: '#ff9900', c2: '#ffcc00', op: '88' },
+      { start: Math.PI + Math.PI * 0.67, end: Math.PI * 2, c1: '#00aaff', c2: '#00ddff', op: '99' },
     ];
 
     zones.forEach(z => {
-      const startA = Math.PI * z.start;
-      const endA = Math.PI * z.end;
+      const startA = z.start;
+      const endA = z.end;
       const grad = ctx.createLinearGradient(
         centerX + Math.cos(startA) * radius,
         centerY + Math.sin(startA) * radius,
@@ -87,7 +85,7 @@ export function initializeTachometer(ichPercent, lvoPercent) {
       grad.addColorStop(0, z.c1 + z.op);
       grad.addColorStop(1, z.c2 + z.op);
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 24;
+      ctx.lineWidth = 22;
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, startA, endA, false);
       ctx.stroke();
@@ -97,9 +95,9 @@ export function initializeTachometer(ichPercent, lvoPercent) {
     const marks = [0.5, 0.75, 1.0, 1.5, 2.0];
     marks.forEach(val => {
       const pos = Math.min(1, Math.max(0, (val - 0.5) / 1.5));
-      const angle = Math.PI * (0.75 + pos * 1.5);
+      const angle = Math.PI + pos * Math.PI;
       const inner = radius - 18;
-      const outer = radius - 30;
+      const outer = radius - 32;
 
       ctx.strokeStyle = 'rgba(255,255,255,0.5)';
       ctx.lineWidth = 2;
@@ -108,11 +106,11 @@ export function initializeTachometer(ichPercent, lvoPercent) {
       ctx.lineTo(centerX + Math.cos(angle) * outer, centerY + Math.sin(angle) * outer);
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = 'bold 13px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(val.toFixed(1), centerX + Math.cos(angle) * (radius - 48), centerY + Math.sin(angle) * (radius - 48));
+      ctx.fillText(val.toFixed(1), centerX + Math.cos(angle) * (radius - 46), centerY + Math.sin(angle) * (radius - 46));
     });
 
     // Decision threshold markers at ~0.77 and ~1.3
@@ -122,31 +120,31 @@ export function initializeTachometer(ichPercent, lvoPercent) {
     ];
     thresholds.forEach(th => {
       const pos = Math.min(1, Math.max(0, (th.val - 0.5) / 1.5));
-      const a = Math.PI * (0.75 + pos * 1.5);
-      const inner = radius - 8;
-      const outer = radius + 4;
-      ctx.strokeStyle = 'rgba(255,255,255,0.65)';
-      ctx.lineWidth = 2.5;
+      const a = Math.PI + pos * Math.PI;
+      const inner = radius - 6;
+      const outer = radius + 6;
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(centerX + Math.cos(a) * inner, centerY + Math.sin(a) * inner);
       ctx.lineTo(centerX + Math.cos(a) * outer, centerY + Math.sin(a) * outer);
       ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.65)';
-      ctx.font = '600 10px Inter, system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = '600 12px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(th.label, centerX + Math.cos(a) * (radius + 18), centerY + Math.sin(a) * (radius + 18));
+      ctx.fillText(th.label, centerX + Math.cos(a) * (radius + 22), centerY + Math.sin(a) * (radius + 22));
     });
 
     // Zone edge labels: ICH (left), LVO (right)
-    ctx.font = '700 13px Inter, system-ui, sans-serif';
+    ctx.font = '700 15px Inter, system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ff0040';
-    const ichA = Math.PI * 0.75;
+    const ichA = Math.PI;
     ctx.fillText('ICH', centerX + Math.cos(ichA) * (radius + 36), centerY + Math.sin(ichA) * (radius + 36) - 8);
     ctx.fillStyle = '#00d4ff';
-    const lvoA = Math.PI * 2.25;
+    const lvoA = Math.PI * 2;
     ctx.fillText('LVO', centerX + Math.cos(lvoA) * (radius + 36), centerY + Math.sin(lvoA) * (radius + 36) - 8);
 
     // Smoothly move needle toward target
@@ -158,8 +156,8 @@ export function initializeTachometer(ichPercent, lvoPercent) {
     else if (currentPosition > 0.65) needleColor = '#00d4ff';
 
     // Draw needle shadow/glow
-    const needleAngle = Math.PI * (0.75 + currentPosition * 1.5);
-    const needleLen = radius - 32;
+    const needleAngle = Math.PI + currentPosition * Math.PI;
+    const needleLen = radius - 28;
 
     // Confidence cone (semi-transparent wedge around needle)
     const coneSpan = (1 - confidence / 100) * (Math.PI * 0.12); // max ±~21.6° at 0% conf
@@ -209,9 +207,9 @@ export function initializeTachometer(ichPercent, lvoPercent) {
 
     // Ratio text
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.font = '600 16px ui-monospace, SFMono-Regular, Menlo, monospace';
+    ctx.font = '600 18px ui-monospace, SFMono-Regular, Menlo, monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(ratio.toFixed(2), centerX, centerY - radius * 0.65);
+    ctx.fillText(ratio.toFixed(2), centerX, centerY - radius * 0.7);
 
     // Continue animating until near target; then stop to save CPU
     const delta = Math.abs(currentPosition - targetPosition);
