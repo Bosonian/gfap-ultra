@@ -64,17 +64,21 @@ body.dark-mode {
     --risk-high: #ff6b6b;
 }
 
-/* Ring size scaling by viewport */
-@media (min-width: 768px) {
-    :root { --ring-size: 136px; }
+/* Ring size scaling by viewport - refined responsive scaling */
+@media (min-width: 769px) {
+    :root { --ring-size: 144px; }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
-    :root { --ring-size: 112px; }
+    :root { --ring-size: 116px; }
 }
 
 @media (max-width: 480px) {
-    :root { --ring-size: 96px; }
+    :root { --ring-size: 100px; }
+}
+
+@media (max-width: 360px) {
+    :root { --ring-size: 92px; }
 }
 
 * {
@@ -995,17 +999,20 @@ button:disabled {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: clamp(8px, 2vw, 16px);
     overflow: visible;
     flex: 0 0 auto;
     width: auto;
+    min-width: var(--ring-size);
 }
 
 .circle-label {
-    font-size: 0.9rem;
+    font-size: clamp(0.75rem, 0.8rem + 0.3vw, 0.95rem);
     font-weight: 600;
     color: var(--text-secondary);
     text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
 }
 
 /* Volume circle matching probability circle exactly */
@@ -1063,6 +1070,7 @@ button:disabled {
     overflow: visible;
     width: var(--ring-size);
     height: var(--ring-size);
+    flex-shrink: 0;
 }
 
 .probability-canvas { width: var(--ring-size); height: var(--ring-size); display: block; }
@@ -1072,11 +1080,12 @@ button:disabled {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 2rem;
     font-weight: 700;
     text-align: center;
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .probability-number span {
@@ -1085,17 +1094,7 @@ button:disabled {
     color: var(--text-secondary);
 }
 
-/* Adjust probability font sizes for tablets */
-@media (min-width: 481px) and (max-width: 768px) {
-    .probability-number { font-size: 1.85rem; }
-    .probability-number span { font-size: 1.05rem; }
-}
-
-/* Adjust probability font sizes for small mobiles */
-@media (max-width: 480px) {
-    .probability-number { font-size: 1.6rem; }
-    .probability-number span { font-size: 0.95rem; }
-}
+/* Font sizing now handled by React components for proportional scaling */
 
 .probability-ring {
     transform: rotate(-90deg);
@@ -3459,10 +3458,7 @@ footer {
         height: 80px;
     }
     
-    .risk-results-dual .probability-number {
-        font-size: 14px;
-        line-height: 1;
-    }
+    /* React component handles dynamic font sizing */
     
     .risk-results-dual .circle-label {
         font-size: 12px;
@@ -3502,10 +3498,7 @@ footer {
         height: 70px;
     }
     
-    .risk-results-triple .probability-number {
-        font-size: 12px;
-        line-height: 1;
-    }
+    /* React component handles dynamic font sizing */
     
     .risk-results-triple .circle-label {
         font-size: 11px;
@@ -4394,10 +4387,7 @@ footer {
         height: 60px;
     }
     
-    .risk-results-triple .probability-number {
-        font-size: 10px;
-        line-height: 1;
-    }
+    /* React component handles dynamic font sizing */
     
     .risk-results-triple .circle-label {
         font-size: 9px;
@@ -4456,7 +4446,13 @@ footer {
     height: 280px;
     display: block;
 }
-.gauge-canvas { width: 100%; height: 280px; display: block; border-radius: 8px; }
+.gauge-canvas { 
+    width: 100%; 
+    height: clamp(200px, 40vw, 280px); 
+    display: block; 
+    border-radius: 8px; 
+    min-height: 180px;
+}
 
 /* Legend chips and metrics under tachometer */
 .tachometer-legend {
