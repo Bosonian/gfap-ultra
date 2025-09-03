@@ -1080,6 +1080,7 @@ button:disabled {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
     font-weight: 700;
     text-align: center;
     color: var(--text-primary);
@@ -1089,9 +1090,11 @@ button:disabled {
 }
 
 .probability-number span {
-    font-size: 1.2rem;
+    font-size: clamp(0.8rem, 2.5vw, 1.2rem);
     font-weight: 500;
     color: var(--text-secondary);
+    transform: translateY(-2px);
+    display: inline-block;
 }
 
 /* Font sizing now handled by React components for proportional scaling */
@@ -4446,6 +4449,15 @@ footer {
     height: 280px;
     display: block;
 }
+
+#premium-diagnostic-gauge {
+    border-radius: 8px;
+    width: 100%;
+    height: clamp(200px, 40vw, 280px);
+    display: block;
+    min-height: 180px;
+    background: transparent;
+}
 .gauge-canvas { 
     width: 100%; 
     height: clamp(200px, 40vw, 280px); 
@@ -4591,6 +4603,7 @@ footer {
     
     #tachometerCanvas { width: 100%; height: 150px; }
     .gauge-canvas { height: 150px; }
+    #premium-diagnostic-gauge { height: 150px; }
     
     .treatment-recommendation {
         flex-direction: column;

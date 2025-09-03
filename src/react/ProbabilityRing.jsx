@@ -89,23 +89,8 @@ export default function ProbabilityRing({ percent = 0, level = 'normal' }) {
 
   return (
     <>
-      <div 
-        className="probability-number" 
-        style={{ 
-          fontVariantNumeric: 'tabular-nums',
-          fontSize: `${Math.max(16, (containerRef.current?.offsetWidth || 120) * 0.28)}px`,
-        }}
-      >
-        {Math.round(percent)}
-        <span 
-          style={{
-            fontSize: `${Math.max(10, (containerRef.current?.offsetWidth || 120) * 0.16)}px`,
-            transform: 'translateY(-2px)', // Better baseline alignment
-            display: 'inline-block'
-          }}
-        >
-          %
-        </span>
+      <div className="probability-number">
+        {Math.round(percent)}<span>%</span>
       </div>
       <canvas ref={canvasRef} className="probability-canvas" />
     </>
