@@ -64,6 +64,19 @@ body.dark-mode {
     --risk-high: #ff6b6b;
 }
 
+/* Ring size scaling by viewport */
+@media (min-width: 768px) {
+    :root { --ring-size: 136px; }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    :root { --ring-size: 112px; }
+}
+
+@media (max-width: 480px) {
+    :root { --ring-size: 96px; }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -136,7 +149,7 @@ body {
 }
 
 .app-header h1 {
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 0.95rem + 0.6vw, 1.4rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     margin: 0;
@@ -300,6 +313,7 @@ h2 {
     text-align: center;
     letter-spacing: -0.02em;
     line-height: 1.3;
+    text-wrap: balance;
 }
 
 h3 {
@@ -935,12 +949,12 @@ button:disabled {
 
 .risk-title h3 {
     margin: 0 0 4px 0;
-    font-size: 1.25rem;
+    font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.25rem);
     color: var(--text-primary);
 }
 
 .risk-module {
-    font-size: 0.85rem;
+    font-size: clamp(0.78rem, 0.74rem + 0.3vw, 0.9rem);
     color: var(--text-secondary);
     font-weight: 500;
 }
@@ -1072,6 +1086,18 @@ button:disabled {
     font-size: 1.2rem;
     font-weight: 500;
     color: var(--text-secondary);
+}
+
+/* Adjust probability font sizes for tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+    .probability-number { font-size: 1.85rem; }
+    .probability-number span { font-size: 1.05rem; }
+}
+
+/* Adjust probability font sizes for small mobiles */
+@media (max-width: 480px) {
+    .probability-number { font-size: 1.6rem; }
+    .probability-number span { font-size: 0.95rem; }
 }
 
 .probability-ring {
@@ -4392,16 +4418,16 @@ footer {
 
 /* Tachometer Gauge Styles */
 .tachometer-section {
-    margin: 20px auto;
-    max-width: 800px;
+    margin: 16px auto;
+    max-width: 760px;
 }
 
 .tachometer-card {
-    background: var(--card-background);
-    border-radius: 16px;
-    padding: 20px;
+    background: transparent; /* canvas is transparent; let parent/container show through */
+    border-radius: 12px;
+    padding: 16px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .tachometer-header {
@@ -4424,14 +4450,79 @@ footer {
 .tachometer-gauge {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
+    margin: 12px 0;
 }
 
 #tachometerCanvas {
     border-radius: 8px;
     width: 100%;
-    height: 320px;
+    height: 280px;
     display: block;
+}
+
+/* Legend chips and metrics under tachometer */
+.tachometer-legend {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.legend-chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.04);
+}
+.legend-chip.ich { color: #ff6464; border-color: rgba(255,100,100,0.5); }
+.legend-chip.balanced { color: #ffd700; border-color: rgba(255,215,0,0.5); }
+.legend-chip.lvo { color: #00d4ff; border-color: rgba(0,212,255,0.5); }
+
+.metrics-row {
+    display: flex;
+    gap: 12px;
+    margin: 12px auto 0 auto;
+    max-width: 420px;
+    justify-content: center;
+}
+
+.metric-card {
+    flex: 1;
+    min-width: 110px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+}
+.metric-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+}
+.metric-value {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+}
+.metric-unit {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 480px) {
+    .metrics-row { gap: 8px; max-width: 100%; padding: 0 8px; }
+    .metric-card { padding: 10px; }
+    .metric-value { font-size: 1.1rem; }
 }
 
 .treatment-recommendation {
@@ -4488,15 +4579,23 @@ footer {
     font-weight: 500;
 }
 
+/* Tablet tachometer adjustments */
+@media (min-width: 481px) and (max-width: 768px) {
+    #tachometerCanvas {
+        width: 100%;
+        height: 220px;
+    }
+}
+
 /* Mobile tachometer adjustments */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .tachometer-card {
         padding: 15px;
         margin: 15px 10px;
     }
     
     #tachometerCanvas {
-        width: 250px;
+        width: 100%;
         height: 150px;
     }
     

@@ -832,14 +832,44 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
     <div class="tachometer-section">
       <div class="tachometer-card">
         <div class="tachometer-header">
-          <h3>🎯 ${t('treatmentDecision') || 'Treatment Decision'}</h3>
-          <div class="ratio-display">
-            LVO/ICH Ratio: ${ratio.toFixed(2)}
-          </div>
+          <h3>🎯 ${(t('treatmentDecision') || 'Treatment Decision')} · LVO/ICH Balance</h3>
+          <div class="ratio-display">LVO/ICH Ratio: ${ratio.toFixed(2)}</div>
         </div>
         
         <div class="tachometer-gauge" id="tachometer-canvas-container">
           <canvas id="tachometerCanvas" width="300" height="200"></canvas>
+        </div>
+
+        <!-- Legend chips for zones -->
+        <div class="tachometer-legend" aria-hidden="true">
+          <span class="legend-chip ich">ICH</span>
+          <span class="legend-chip balanced">Balanced</span>
+          <span class="legend-chip lvo">LVO</span>
+        </div>
+
+        <!-- Metrics row: ratio, confidence, absolute difference -->
+        <div class="metrics-row" role="group" aria-label="Tachometer metrics">
+          <div class="metric-card">
+            <div class="metric-label">Ratio</div>
+            <div class="metric-value">${ratio.toFixed(2)}</div>
+            <div class="metric-unit">LVO/ICH</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Confidence</div>
+            <div class="metric-value">${(() => {
+              const diff = Math.abs(lvoPercent - ichPercent);
+              const maxP = Math.max(lvoPercent, ichPercent);
+              let c = diff < 10 ? Math.round(30 + maxP * 0.3) : diff < 20 ? Math.round(50 + maxP * 0.4) : Math.round(70 + maxP * 0.3);
+              c = Math.max(0, Math.min(100, c));
+              return c;
+            })()}%</div>
+            <div class="metric-unit">percent</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Difference</div>
+            <div class="metric-value">${Math.abs(lvoPercent - ichPercent).toFixed(0)}%</div>
+            <div class="metric-unit">|LVO − ICH|</div>
+          </div>
         </div>
         
         <div class="treatment-recommendation ${recommendation.className}">

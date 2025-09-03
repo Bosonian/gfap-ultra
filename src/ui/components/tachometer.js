@@ -29,6 +29,14 @@ export function initializeTachometer(ichPercent, lvoPercent) {
 
   // Derived values
   const ratio = lvoPercent / Math.max(ichPercent, 1);
+  const absDiff = Math.abs(lvoPercent - ichPercent);
+  // Heuristic confidence based on absolute difference and max risk
+  const maxProb = Math.max(lvoPercent, ichPercent);
+  let confidence = 0;
+  if (absDiff < 10) confidence = Math.round(30 + maxProb * 0.3);
+  else if (absDiff < 20) confidence = Math.round(50 + maxProb * 0.4);
+  else confidence = Math.round(70 + maxProb * 0.3);
+  confidence = Math.max(0, Math.min(100, confidence));
 
   // Map ratio 0.5–2.0 to needle position 0–1, clamp extremes
   const targetPosition = (() => {
@@ -38,6 +46,7 @@ export function initializeTachometer(ichPercent, lvoPercent) {
   })();
 
   let currentPosition = 0.5; // start centered
+  let settleFrames = 0;
 
   const drawTachometer = () => {
     const width = cssWidth;
@@ -46,20 +55,8 @@ export function initializeTachometer(ichPercent, lvoPercent) {
     const centerY = height * 0.72;
     const radius = Math.min(width, height) * 0.38;
 
-    // Subtle fade to reduce flicker (gives glow trails)
-    ctx.fillStyle = 'rgba(10,14,39,0.08)';
-    ctx.fillRect(0, 0, width, height);
-
-    // Outer glow backdrop
-    const glowGradient = ctx.createRadialGradient(
-      centerX, centerY, radius - 20,
-      centerX, centerY, radius + 60
-    );
-    glowGradient.addColorStop(0, 'transparent');
-    glowGradient.addColorStop(0.5, 'rgba(255,255,255,0.03)');
-    glowGradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGradient;
-    ctx.fillRect(0, 0, width, height);
+    // Transparent background: clear only
+    ctx.clearRect(0, 0, width, height);
 
     // Base arc track
     ctx.strokeStyle = 'rgba(255,255,255,0.08)';
@@ -118,6 +115,29 @@ export function initializeTachometer(ichPercent, lvoPercent) {
       ctx.fillText(val.toFixed(1), centerX + Math.cos(angle) * (radius - 48), centerY + Math.sin(angle) * (radius - 48));
     });
 
+    // Decision threshold markers at ~0.77 and ~1.3
+    const thresholds = [
+      { val: 0.77, label: 'ICH dom.' },
+      { val: 1.30, label: 'LVO dom.' }
+    ];
+    thresholds.forEach(th => {
+      const pos = Math.min(1, Math.max(0, (th.val - 0.5) / 1.5));
+      const a = Math.PI * (0.75 + pos * 1.5);
+      const inner = radius - 8;
+      const outer = radius + 4;
+      ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(centerX + Math.cos(a) * inner, centerY + Math.sin(a) * inner);
+      ctx.lineTo(centerX + Math.cos(a) * outer, centerY + Math.sin(a) * outer);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.font = '600 10px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(th.label, centerX + Math.cos(a) * (radius + 18), centerY + Math.sin(a) * (radius + 18));
+    });
+
     // Zone edge labels: ICH (left), LVO (right)
     ctx.font = '700 13px Inter, system-ui, sans-serif';
     ctx.textAlign = 'center';
@@ -140,6 +160,18 @@ export function initializeTachometer(ichPercent, lvoPercent) {
     // Draw needle shadow/glow
     const needleAngle = Math.PI * (0.75 + currentPosition * 1.5);
     const needleLen = radius - 32;
+
+    // Confidence cone (semi-transparent wedge around needle)
+    const coneSpan = (1 - confidence / 100) * (Math.PI * 0.12); // max ±~21.6° at 0% conf
+    const coneInner = 10;
+    ctx.save();
+    ctx.fillStyle = needleColor + '33'; // add alpha
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, needleLen, needleAngle - coneSpan, needleAngle + coneSpan, false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
     ctx.shadowColor = needleColor;
     ctx.shadowBlur = 16;
     ctx.strokeStyle = needleColor;
@@ -181,12 +213,20 @@ export function initializeTachometer(ichPercent, lvoPercent) {
     ctx.textAlign = 'center';
     ctx.fillText(ratio.toFixed(2), centerX, centerY - radius * 0.65);
 
-    // Continue animating until near target; keep a few frames for smoothness
-    if (Math.abs(currentPosition - targetPosition) > 0.002) {
+    // Continue animating until near target; then stop to save CPU
+    const delta = Math.abs(currentPosition - targetPosition);
+    if (delta > 0.002) {
+      settleFrames = 0;
       tachometerAnimation = requestAnimationFrame(drawTachometer);
     } else {
       currentPosition = targetPosition;
-      tachometerAnimation = requestAnimationFrame(drawTachometer); // keep subtle glow running
+      settleFrames += 1;
+      if (settleFrames < 4) {
+        tachometerAnimation = requestAnimationFrame(drawTachometer);
+      } else {
+        cancelAnimationFrame(tachometerAnimation);
+        tachometerAnimation = null;
+      }
     }
   };
 
