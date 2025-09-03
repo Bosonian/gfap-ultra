@@ -3387,6 +3387,19 @@ footer {
     min-width: 300px;
 }
 
+.risk-results-triple {
+    display: flex;
+    gap: 15px;
+    max-width: 1200px;
+    margin: 20px auto;
+    flex-wrap: wrap;
+}
+
+.risk-results-triple .enhanced-risk-card {
+    flex: 1;
+    min-width: 250px;
+}
+
 /* Mobile responsive adjustments for dual display - keep side-by-side format */
 @media (max-width: 768px) {
     .risk-results-dual {
@@ -3429,6 +3442,49 @@ footer {
     
     .risk-results-dual .risk-subtitle {
         font-size: 11px;
+    }
+    
+    /* Triple layout mobile adjustments */
+    .risk-results-triple {
+        flex-direction: row;
+        max-width: 100%;
+        gap: 8px;
+        margin: 15px auto;
+    }
+    
+    .risk-results-triple .enhanced-risk-card {
+        min-width: unset;
+        flex: 1;
+        padding: 10px;
+    }
+    
+    /* Even smaller rings for mobile triple display */
+    .risk-results-triple .probability-circle {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .risk-results-triple .probability-ring {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .risk-results-triple .probability-number {
+        font-size: 12px;
+        line-height: 1;
+    }
+    
+    .risk-results-triple .circle-label {
+        font-size: 11px;
+        margin-top: 6px;
+    }
+    
+    .risk-results-triple .risk-title h3 {
+        font-size: 14px;
+    }
+    
+    .risk-results-triple .risk-subtitle {
+        font-size: 10px;
     }
 }
 
@@ -4278,5 +4334,174 @@ footer {
     .primary, .secondary {
         padding: 10px 16px;
         font-size: 0.9rem;
+    }
+    
+    /* Mobile adjustments for triple layout */
+    .risk-results-triple {
+        flex-direction: row;
+        max-width: 100%;
+        gap: 6px;
+        margin: 15px auto;
+    }
+    
+    .risk-results-triple .enhanced-risk-card {
+        min-width: unset;
+        flex: 1;
+        padding: 8px;
+    }
+    
+    /* Even smaller rings for mobile triple display */
+    .risk-results-triple .probability-circle {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .risk-results-triple .probability-ring {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .risk-results-triple .probability-number {
+        font-size: 10px;
+        line-height: 1;
+    }
+    
+    .risk-results-triple .circle-label {
+        font-size: 9px;
+        margin-top: 4px;
+    }
+    
+    .risk-results-triple .risk-title h3 {
+        font-size: 12px;
+    }
+    
+    .risk-results-triple .risk-subtitle {
+        font-size: 9px;
+    }
+}
+
+/* Tachometer Gauge Styles */
+.tachometer-section {
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.tachometer-card {
+    background: var(--card-background);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tachometer-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.tachometer-header h3 {
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.ratio-display {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.tachometer-gauge {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#tachometerCanvas {
+    border-radius: 8px;
+}
+
+.treatment-recommendation {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+
+.treatment-recommendation.critical {
+    background: linear-gradient(135deg, rgba(255, 0, 64, 0.1), rgba(255, 153, 0, 0.1));
+    border: 2px solid var(--critical-color);
+}
+
+.treatment-recommendation.lvo-dominant {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 122, 255, 0.1));
+    border: 2px solid var(--info-color);
+}
+
+.treatment-recommendation.ich-dominant {
+    background: linear-gradient(135deg, rgba(255, 0, 64, 0.1), rgba(220, 20, 60, 0.1));
+    border: 2px solid var(--critical-color);
+}
+
+.treatment-recommendation.moderate {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+    border: 2px solid var(--warning-color);
+}
+
+.recommendation-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.recommendation-text h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.recommendation-text p {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.probability-summary {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Mobile tachometer adjustments */
+@media (max-width: 768px) {
+    .tachometer-card {
+        padding: 15px;
+        margin: 15px 10px;
+    }
+    
+    #tachometerCanvas {
+        width: 250px;
+        height: 150px;
+    }
+    
+    .treatment-recommendation {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .recommendation-icon {
+        font-size: 1.5rem;
+    }
+    
+    .recommendation-text h4 {
+        font-size: 1rem;
+    }
+    
+    .recommendation-text p {
+        font-size: 0.85rem;
     }
 }

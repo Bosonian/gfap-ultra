@@ -12,6 +12,7 @@ import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../compo
 import { calculateLegacyICH } from '../../research/legacy-ich-model.js';
 import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-logger.js';
 import { renderModelComparison, renderResearchToggle } from '../../research/comparison-ui.js';
+import { initializeTachometer, cleanupTachometer } from '../components/tachometer.js';
 
 function renderInputSummary() {
   const state = store.getState();
@@ -234,9 +235,17 @@ export function renderResults(results, startTime) {
     resultsHtml = renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule);
   }
   
-  // Initialize volume animations after DOM update
+  // Initialize animations after DOM update
   setTimeout(() => {
     initializeVolumeAnimations();
+    
+    // Initialize tachometer if present
+    const tachometerCanvas = document.getElementById('tachometerCanvas');
+    if (tachometerCanvas && lvo && ich) {
+      const ichPercent = Math.round((ich?.probability || 0) * 100);
+      const lvoPercent = Math.round((lvo?.probability || 0) * 100);
+      initializeTachometer(ichPercent, lvoPercent);
+    }
   }, 100);
   
   return resultsHtml;
@@ -342,6 +351,20 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   const fastEdScore = state.formData?.full?.fast_ed_score || 0;
   const showLVORiskCard = fastEdScore > 3 && lvo && !lvo.notPossible;
   
+  // Determine layout configuration
+  const showVolumeCard = ichPercent >= 50;
+  const maxProbability = Math.max(ichPercent, lvoPercent);
+  const showTachometer = maxProbability >= 50 && showLVORiskCard;
+  
+  // Calculate number of cards and layout class
+  let cardCount = 1; // Always have ICH
+  if (showLVORiskCard) cardCount++;
+  if (showVolumeCard) cardCount++;
+  
+  const layoutClass = cardCount === 1 ? 'risk-results-single' : 
+                     cardCount === 2 ? 'risk-results-dual' : 
+                     'risk-results-triple';
+  
   // Add differential diagnoses for stroke modules
   const strokeDifferentialHtml = renderStrokeDifferentialDiagnoses(ich.probability);
   
@@ -352,20 +375,14 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       ${criticalAlert}
       
       <!-- Risk Assessment Display -->
-      <div class="${showLVORiskCard ? 'risk-results-dual' : 'risk-results-single'}">
+      <div class="${layoutClass}">
         ${renderRiskCard('ich', ich, results)}
         ${showLVORiskCard ? renderRiskCard('lvo', lvo, results) : ''}
+        ${showVolumeCard ? renderVolumeCard(ich) : ''}
       </div>
       
-      <!-- ICH Volume Display (centered below when applicable) -->
-      ${ichPercent >= 50 ? `
-        <div class="volume-display-section">
-          <div class="circle-item volume-centered">
-            ${renderICHVolumeDisplay(ich)}
-            <div class="circle-label">${t('ichVolumeLabel')}</div>
-          </div>
-        </div>
-      ` : ''}
+      <!-- Treatment Decision Gauge (when high risk) -->
+      ${showTachometer ? renderTachometerGauge(ichPercent, lvoPercent) : ''}
       
       <!-- Differential Diagnoses for Stroke Modules -->
       ${strokeDifferentialHtml}
@@ -704,5 +721,120 @@ function getCurrentModuleName(ich) {
   if (module.includes('full')) return 'full';
   
   return 'unknown';
+}
+
+/**
+ * Render volume as a standalone risk card (for horizontal layout)
+ * @param {object} ichData - ICH data containing volume information
+ * @returns {string} HTML for volume risk card
+ */
+function renderVolumeCard(ichData) {
+  const gfapValue = getCurrentGfapValue();
+  if (!gfapValue || gfapValue <= 0) {
+    return '';
+  }
+  
+  const volumeData = calculateICHVolume(gfapValue);
+  const percent = Math.round((ichData?.probability || 0) * 100);
+  
+  return `
+    <div class="enhanced-risk-card volume-card normal">
+      <div class="risk-header">
+        <div class="risk-icon">🧮</div>
+        <div class="risk-title">
+          <h3>${t('ichVolumeLabel')}</h3>
+          <span class="risk-subtitle">${volumeData.displayVolume}</span>
+          <span class="risk-module">Volume Calc</span>
+        </div>
+      </div>
+      
+      <div class="risk-probability">
+        <div class="circles-container">
+          <div class="rings-row">
+            <div class="circle-item">
+              ${renderICHVolumeDisplay(ichData)}
+              <div class="circle-label">${t('ichVolumeLabel')}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="risk-assessment">
+          <div class="mortality-assessment">
+            ${t('predictedMortality')}: ${volumeData.mortalityRate}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render tachometer gauge for treatment decision when high risk
+ * @param {number} ichPercent - ICH probability percentage
+ * @param {number} lvoPercent - LVO probability percentage
+ * @returns {string} HTML for tachometer gauge
+ */
+function renderTachometerGauge(ichPercent, lvoPercent) {
+  const ratio = lvoPercent / Math.max(ichPercent, 1);
+  
+  // Determine treatment recommendation based on ratio and absolute values
+  let recommendation;
+  if (lvoPercent > 40 && ichPercent > 40) {
+    recommendation = {
+      center: "COMPREHENSIVE CENTER",
+      detail: "Both LVO and ICH risks elevated",
+      className: "critical",
+      icon: "🏥"
+    };
+  } else if (ratio > 1.3 && lvoPercent >= 50) {
+    recommendation = {
+      center: "THROMBECTOMY CENTER", 
+      detail: "LVO dominant - endovascular required",
+      className: "lvo-dominant",
+      icon: "🧠"
+    };
+  } else if (ratio < 0.77 && ichPercent >= 50) {
+    recommendation = {
+      center: "NEUROSURGERY CENTER",
+      detail: "ICH dominant - surgical capability required", 
+      className: "ich-dominant",
+      icon: "🩸"
+    };
+  } else {
+    recommendation = {
+      center: "SPECIALIZED CENTER",
+      detail: "Elevated risk requires specialized care",
+      className: "moderate",
+      icon: "⚡"
+    };
+  }
+  
+  return `
+    <div class="tachometer-section">
+      <div class="tachometer-card">
+        <div class="tachometer-header">
+          <h3>🎯 ${t('treatmentDecision') || 'Treatment Decision'}</h3>
+          <div class="ratio-display">
+            LVO/ICH Ratio: ${ratio.toFixed(2)}
+          </div>
+        </div>
+        
+        <div class="tachometer-gauge" id="tachometer-canvas-container">
+          <canvas id="tachometerCanvas" width="300" height="200"></canvas>
+        </div>
+        
+        <div class="treatment-recommendation ${recommendation.className}">
+          <div class="recommendation-icon">${recommendation.icon}</div>
+          <div class="recommendation-text">
+            <h4>${recommendation.center}</h4>
+            <p>${recommendation.detail}</p>
+          </div>
+          <div class="probability-summary">
+            ICH: ${ichPercent}% | LVO: ${lvoPercent}%
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
