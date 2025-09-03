@@ -351,7 +351,8 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   // Determine layout configuration
   const showVolumeCard = ichPercent >= 50;
   const maxProbability = Math.max(ichPercent, lvoPercent);
-  const showTachometer = maxProbability >= 50 && showLVORiskCard;
+  const showTachometer = isFullModule && ichPercent >= 30 && lvoPercent >= 30;
+  console.log('🎯 Tachometer conditions: isFullModule:', isFullModule, 'ichPercent:', ichPercent, 'lvoPercent:', lvoPercent, 'showTachometer:', showTachometer);
   
   // Calculate number of cards and layout class
   let cardCount = 1; // Always have ICH
