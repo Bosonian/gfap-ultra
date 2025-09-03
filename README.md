@@ -251,7 +251,7 @@ This tool is designed to assist healthcare professionals and should not replace 
 
 ## Version
 
-**v2.0.1** - Modular Professional Edition
+**v2.1.0** - React Enhanced Edition
 
 ## License
 
