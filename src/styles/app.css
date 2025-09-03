@@ -3374,6 +3374,78 @@ footer {
     margin: 20px auto;
 }
 
+.risk-results-dual {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    flex-wrap: wrap;
+}
+
+.risk-results-dual .enhanced-risk-card {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* Mobile responsive adjustments for dual display - keep side-by-side format */
+@media (max-width: 768px) {
+    .risk-results-dual {
+        flex-direction: row;
+        max-width: 100%;
+        gap: 10px;
+        margin: 15px auto;
+    }
+    
+    .risk-results-dual .enhanced-risk-card {
+        min-width: unset;
+        flex: 1;
+        padding: 12px;
+    }
+    
+    /* Smaller rings for mobile dual display */
+    .risk-results-dual .probability-circle {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .risk-results-dual .probability-ring {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .risk-results-dual .probability-number {
+        font-size: 14px;
+        line-height: 1;
+    }
+    
+    .risk-results-dual .circle-label {
+        font-size: 12px;
+        margin-top: 8px;
+    }
+    
+    .risk-results-dual .risk-title h3 {
+        font-size: 16px;
+    }
+    
+    .risk-results-dual .risk-subtitle {
+        font-size: 11px;
+    }
+}
+
+/* ICH Volume Display Section - centered below risk cards */
+.volume-display-section {
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 200px;
+}
+
+.volume-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /* Secondary notification for LVO */
 .secondary-notification {
     margin-top: 15px;

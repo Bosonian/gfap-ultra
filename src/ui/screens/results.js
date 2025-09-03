@@ -115,15 +115,9 @@ function renderRiskCard(type, data, results) {
                           class="probability-progress"/>
                 </svg>
               </div>
-              <div class="circle-label">ICH Risk</div>
+              <div class="circle-label">${type === 'ich' ? 'ICH Risk' : 'LVO Risk'}</div>
             </div>
             
-            ${type === 'ich' && percent >= 50 ? `
-              <div class="circle-item">
-                ${renderICHVolumeDisplay(data)}
-                <div class="circle-label">${t('ichVolumeLabel')}</div>
-              </div>
-            ` : ''}
           </div>
           
           <div class="risk-level ${isCritical ? 'critical' : isHigh ? 'high' : 'normal'}">
@@ -343,8 +337,10 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule)) ? 
     renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
   
-  // Determine if we should show LVO notification
-  const showLVONotification = ichPercent < 30 && lvoPercent > 50;
+  // Get FAST-ED score from form data to determine LVO display
+  const state = store.getState();
+  const fastEdScore = state.formData?.full?.fast_ed_score || 0;
+  const showLVORiskCard = fastEdScore > 3 && lvo && !lvo.notPossible;
   
   // Add differential diagnoses for stroke modules
   const strokeDifferentialHtml = renderStrokeDifferentialDiagnoses(ich.probability);
@@ -355,11 +351,21 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       <h2>${t('resultsTitle')}</h2>
       ${criticalAlert}
       
-      <!-- Primary ICH Risk Display -->
-      <div class="risk-results-single">
+      <!-- Risk Assessment Display -->
+      <div class="${showLVORiskCard ? 'risk-results-dual' : 'risk-results-single'}">
         ${renderRiskCard('ich', ich, results)}
-        ${showLVONotification ? renderLVONotification() : ''}
+        ${showLVORiskCard ? renderRiskCard('lvo', lvo, results) : ''}
       </div>
+      
+      <!-- ICH Volume Display (centered below when applicable) -->
+      ${ichPercent >= 50 ? `
+        <div class="volume-display-section">
+          <div class="circle-item volume-centered">
+            ${renderICHVolumeDisplay(ich)}
+            <div class="circle-label">${t('ichVolumeLabel')}</div>
+          </div>
+        </div>
+      ` : ''}
       
       <!-- Differential Diagnoses for Stroke Modules -->
       ${strokeDifferentialHtml}
@@ -367,10 +373,10 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       <!-- Research Model Comparison (hidden unless research mode) -->
       ${researchComparisonHtml}
       
-      <!-- ICH Drivers Only -->
+      <!-- Risk Factor Drivers -->
       <div class="enhanced-drivers-section">
         <h3>${t('riskFactorsTitle') || 'Risikofaktoren / Risk Factors'}</h3>
-        ${renderICHDriversOnly(ich)}
+        ${showLVORiskCard ? renderDriversSection(ich, lvo) : renderICHDriversOnly(ich)}
       </div>
       
       <!-- Collapsible Additional Information -->
