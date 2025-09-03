@@ -117,20 +117,14 @@ function renderRiskCard(type, data, results) {
         <div class="circles-container">
           <div class="rings-row">
             <div class="circle-item">
-              <div data-react-ring data-percent="${percent}" data-level="${level}"></div>
+              <div class="probability-circle" data-react-ring data-percent="${percent}" data-level="${level}"></div>
               <div class="circle-label">${type === 'ich' ? 'ICH Risk' : 'LVO Risk'}</div>
             </div>
           </div>
           <div class="risk-level ${level}">${riskLevel}</div>
         </div>
         
-        <div class="risk-assessment">
-          ${type === 'ich' && percent >= 50 && getCurrentGfapValue() > 0 ? `
-            <div class="mortality-assessment">
-              ${t('predictedMortality')}: ${calculateICHVolume(getCurrentGfapValue()).mortalityRate}
-            </div>
-          ` : ''}
-        </div>
+        <div class="risk-assessment"></div>
       </div>
     </div>
   `;
