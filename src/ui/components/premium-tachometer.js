@@ -81,11 +81,11 @@ class PremiumDiagnosticGauge {
     
     // Color zones - medical grade precision
     const zones = [
-      { start: 0, end: 0.2, color: 'rgba(255, 68, 68, 0.7)', label: 'ICH' },      // Strong ICH
-      { start: 0.2, end: 0.35, color: 'rgba(255, 68, 68, 0.4)', label: '' },     // ICH lean
-      { start: 0.35, end: 0.65, color: 'rgba(255, 165, 0, 0.4)', label: '' },    // Balanced
-      { start: 0.65, end: 0.8, color: 'rgba(0, 168, 255, 0.4)', label: '' },     // LVO lean
-      { start: 0.8, end: 1.0, color: 'rgba(0, 168, 255, 0.7)', label: 'LVO' }    // Strong LVO
+      { start: 0, end: 0.2, color: 'rgba(0, 168, 255, 0.7)', label: 'LVO' },      // Strong LVO
+      { start: 0.2, end: 0.35, color: 'rgba(0, 168, 255, 0.4)', label: '' },     // LVO lean
+      { start: 0.35, end: 0.65, color: 'rgba(255, 165, 0, 0.4)', label: '' },    // Uncertain
+      { start: 0.65, end: 0.8, color: 'rgba(255, 68, 68, 0.4)', label: '' },     // ICH lean
+      { start: 0.8, end: 1.0, color: 'rgba(255, 68, 68, 0.7)', label: 'ICH' }    // Strong ICH
     ];
     
     zones.forEach(zone => {
@@ -153,24 +153,24 @@ class PremiumDiagnosticGauge {
     // Zone labels - medical clarity
     ctx.font = `500 ${this.isMobile ? 9 : 10}px Inter, -apple-system, sans-serif`;
     
-    // ICH label
-    ctx.fillStyle = '#ff4444';
-    const ichAngle = startAngle + (0.1 * totalAngle);
-    const ichRadius = this.radius - (this.isMobile ? 45 : 50);
-    ctx.fillText(
-      'ICH',
-      this.centerX + Math.cos(ichAngle) * ichRadius,
-      this.centerY + Math.sin(ichAngle) * ichRadius
-    );
-    
-    // LVO label
+    // LVO label (now on left)
     ctx.fillStyle = '#00a8ff';
-    const lvoAngle = startAngle + (0.9 * totalAngle);
+    const lvoAngle = startAngle + (0.1 * totalAngle);
     const lvoRadius = this.radius - (this.isMobile ? 45 : 50);
     ctx.fillText(
       'LVO',
       this.centerX + Math.cos(lvoAngle) * lvoRadius,
       this.centerY + Math.sin(lvoAngle) * lvoRadius
+    );
+    
+    // ICH label (now on right)
+    ctx.fillStyle = '#ff4444';
+    const ichAngle = startAngle + (0.9 * totalAngle);
+    const ichRadius = this.radius - (this.isMobile ? 45 : 50);
+    ctx.fillText(
+      'ICH',
+      this.centerX + Math.cos(ichAngle) * ichRadius,
+      this.centerY + Math.sin(ichAngle) * ichRadius
     );
     
     // Critical thresholds - precision markers
@@ -234,11 +234,11 @@ class PremiumDiagnosticGauge {
     // Needle color based on position - medical significance
     let needleColor;
     if (this.currentNeedle < 0.35) {
-      needleColor = '#ff4444'; // ICH dominant
+      needleColor = '#00a8ff'; // LVO dominant (left side)
     } else if (this.currentNeedle > 0.65) {
-      needleColor = '#00a8ff'; // LVO dominant
+      needleColor = '#ff4444'; // ICH dominant (right side)
     } else {
-      needleColor = '#ffa500'; // Balanced/uncertain
+      needleColor = '#ffa500'; // Uncertain
     }
     
     // Needle shadow for premium feel

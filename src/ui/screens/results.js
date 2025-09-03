@@ -789,38 +789,6 @@ function renderVolumeCard(ichData) {
 function renderTachometerGauge(ichPercent, lvoPercent) {
   const ratio = lvoPercent / Math.max(ichPercent, 1);
   
-  // Determine treatment recommendation based on ratio and absolute values
-  let recommendation;
-  if (lvoPercent > 40 && ichPercent > 40) {
-    recommendation = {
-      center: "COMPREHENSIVE CENTER",
-      detail: "Both LVO and ICH risks elevated",
-      className: "critical",
-      icon: "🏥"
-    };
-  } else if (ratio > 1.3 && lvoPercent >= 50) {
-    recommendation = {
-      center: "THROMBECTOMY CENTER", 
-      detail: "LVO dominant - endovascular required",
-      className: "lvo-dominant",
-      icon: "🧠"
-    };
-  } else if (ratio < 0.77 && ichPercent >= 50) {
-    recommendation = {
-      center: "NEUROSURGERY CENTER",
-      detail: "ICH dominant - surgical capability required", 
-      className: "ich-dominant",
-      icon: "🩸"
-    };
-  } else {
-    recommendation = {
-      center: "SPECIALIZED CENTER",
-      detail: "Elevated risk requires specialized care",
-      className: "moderate",
-      icon: "⚡"
-    };
-  }
-  
   return `
     <div class="tachometer-section">
       <div class="tachometer-card">
@@ -835,9 +803,9 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
 
         <!-- Legend chips for zones -->
         <div class="tachometer-legend" aria-hidden="true">
-          <span class="legend-chip ich">ICH</span>
-          <span class="legend-chip uncertain">Uncertain</span>
           <span class="legend-chip lvo">LVO</span>
+          <span class="legend-chip uncertain">Uncertain</span>
+          <span class="legend-chip ich">ICH</span>
         </div>
 
         <!-- Metrics row: ratio, confidence, absolute difference -->
@@ -865,15 +833,9 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
           </div>
         </div>
         
-        <div class="treatment-recommendation ${recommendation.className}">
-          <div class="recommendation-icon">${recommendation.icon}</div>
-          <div class="recommendation-text">
-            <h4>${recommendation.center}</h4>
-            <p>${recommendation.detail}</p>
-          </div>
-          <div class="probability-summary">
-            ICH: ${ichPercent}% | LVO: ${lvoPercent}%
-          </div>
+        <!-- Hidden probability summary for initialization -->
+        <div class="probability-summary" style="display: none;">
+          ICH: ${ichPercent}% | LVO: ${lvoPercent}%
         </div>
       </div>
     </div>
