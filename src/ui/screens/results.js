@@ -9,7 +9,7 @@ import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
 import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
-import { mountIslands } from '../../react/mountIslands.jsx';
+import { mountIslands } from '../../react/mountIslands';
 // Using React island tachometer instead of the vanilla premium gauge
 import { calculateLegacyICH } from '../../research/legacy-ich-model.js';
 import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-logger.js';
