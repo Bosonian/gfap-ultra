@@ -12,8 +12,15 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
     let raf = null;
     let currentPos = 0.5;
     let settle = 0;
-    const ratio = lvoProb / Math.max(ichProb, 1);
-    const targetPos = ratio < 0.5 ? 0 : ratio > 2.0 ? 1 : (ratio - 0.5) / 1.5;
+    // Robust ratio with epsilon to avoid division spikes
+    const eps = 0.5; // percent points
+    const safeIch = Math.max(ichProb, eps);
+    const rawRatio = lvoProb / safeIch;
+    // Clamp to display bounds
+    const rmin = 0.5, rmax = 2.0;
+    const clampedRatio = Math.max(rmin, Math.min(rmax, rawRatio));
+    // Log-centered mapping around 1.0 so equal risks map to center
+    const targetPos = (Math.log2(clampedRatio) + 1) / 2; // 0 at 0.5, 0.5 at 1.0, 1 at 2.0
     const absDiff = Math.abs(lvoProb - ichProb);
     const maxProb = Math.max(lvoProb, ichProb);
     let confidence = absDiff < 10 ? Math.round(30 + maxProb * 0.3) : absDiff < 20 ? Math.round(50 + maxProb * 0.4) : Math.round(70 + maxProb * 0.3);
@@ -31,24 +38,28 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
 
       const width = cssW;
       const height = cssH;
-      const cx = width / 2;
-      const cy = height * 0.9;
-      // Better radius for small screens - favor larger arc
-      const radius = Math.min(width * 0.52, height * 0.48);
       const isMobile = width < 480;
+      // Responsive stroke widths
+      const baseWidth = isMobile ? 20 : 26;
+      const zoneWidth = isMobile ? 16 : 22;
+      const padding = 10;
+      // Geometry-safe radius and center to avoid clipping or dipping
+      const maxRHorizontal = (width / 2) - padding - baseWidth / 2;
+      const maxRVertical = (height / 2) - padding - baseWidth / 2; // conservative for 180°
+      const radius = Math.max(10, Math.min(maxRHorizontal, maxRVertical));
+      const cx = width / 2;
+      const cy = height - (padding + baseWidth / 2 + radius);
 
       ctx.clearRect(0, 0, width, height);
 
-      // Base 180° arc - responsive thickness
-      const baseWidth = isMobile ? 20 : 26;
-      const zoneWidth = isMobile ? 16 : 22;
       const isDark = document.body.classList.contains('dark-mode');
       
       ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.15)';
       ctx.lineWidth = baseWidth;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.arc(cx, cy, radius, Math.PI, Math.PI * 2, false);
+      // Bottom semicircle from right (0) -> left (π)
+      ctx.arc(cx, cy, radius, 0, Math.PI, false);
       ctx.stroke();
 
       // Zones - enhanced saturation for better visibility
@@ -77,8 +88,9 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       const marks = isMobile ? [0.5, 1.0, 2.0] : [0.5, 0.75, 1.0, 1.5, 2.0];
       const tickFont = isMobile ? 12 : 14;
       marks.forEach(val => {
-        const pos = Math.min(1, Math.max(0, (val - 0.5) / 1.5));
-        const a = Math.PI + pos * Math.PI;
+        // Log-centered tick mapping
+        const pos = (Math.log2(val) + 1) / 2;
+        const a = Math.PI - pos * Math.PI; // bottom semicircle
         const inner = radius - 15;
         const outer = radius - 28;
         ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.75)';
@@ -101,8 +113,8 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ];
       const thresholdFont = isMobile ? 11 : 13;
       thresholds.forEach(th => {
-        const pos = Math.min(1, Math.max(0, (th.val - 0.5) / 1.5));
-        const a = Math.PI + pos * Math.PI;
+        const pos = (Math.log2(th.val) + 1) / 2;
+        const a = Math.PI - pos * Math.PI;
         const inner = radius - 6;
         const outer = radius + 8;
         ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)';
@@ -132,13 +144,14 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       }
       ctx.fillText('ICH', cx + Math.cos(Math.PI) * labelDistance, cy + Math.sin(Math.PI) * labelDistance - 8);
       ctx.fillStyle = isDark ? '#33bbff' : '#00d4ff';
-      ctx.fillText('LVO', cx + Math.cos(Math.PI * 2) * labelDistance, cy + Math.sin(Math.PI * 2) * labelDistance - 8);
+      ctx.fillText('LVO', cx + Math.cos(0) * labelDistance, cy + Math.sin(0) * labelDistance - 8);
       ctx.shadowBlur = 0;
 
       // Animate needle
       currentPos += (targetPos - currentPos) * 0.08;
-      const needleAngle = Math.PI + currentPos * Math.PI;
-      const needleLen = radius - 28;
+      const needleAngle = Math.PI - currentPos * Math.PI; // bottom semicircle mapping
+      const tipMargin = 8;
+      const needleLen = Math.max(0, radius - baseWidth / 2 - tipMargin);
 
       // Confidence cone - tighter on mobile to reduce visual noise
       const coneSpan = (1 - confidence / 100) * (Math.PI * (isMobile ? 0.06 : 0.08));
@@ -217,4 +230,3 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
     </div>
   );
 }
-

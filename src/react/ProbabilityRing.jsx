@@ -37,14 +37,18 @@ export default function ProbabilityRing({ percent = 0, level = 'normal' }) {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Track - better contrast in both themes
+      // Track - better contrast and alignment with theme tokens
       const isDark = document.body.classList.contains('dark-mode');
-      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)';
+      const borderColor = getCSSVar('--border-color') || (isDark ? '#2f3336' : '#dee2e6');
+      ctx.save();
+      ctx.globalAlpha = isDark ? 0.32 : 0.5;
+      ctx.strokeStyle = borderColor;
       ctx.lineWidth = trackWidth;
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.arc(cx, cy, adjustedRadius, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.restore();
 
       // Progress color - enhanced saturation in dark mode
       let stroke = getCSSVar('--primary-color');
@@ -64,10 +68,10 @@ export default function ProbabilityRing({ percent = 0, level = 'normal' }) {
       const startAngle = -Math.PI / 2;
       const endAngle = startAngle + (Math.PI * 2) * (Math.max(0, Math.min(100, percent)) / 100);
 
-      // Subtle depth shadow - more prominent on larger rings
+      // Subtle depth shadow behind progress - slightly stronger in dark mode
       ctx.save();
-      ctx.strokeStyle = isDark ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.15)';
-      ctx.lineWidth = progressWidth + 1;
+      ctx.strokeStyle = isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = progressWidth + 1.5;
       ctx.beginPath();
       ctx.arc(cx, cy, adjustedRadius, startAngle, endAngle, false);
       ctx.stroke();
@@ -80,11 +84,15 @@ export default function ProbabilityRing({ percent = 0, level = 'normal' }) {
       ctx.stroke();
     };
 
-    draw();
+    // Defer first draw to ensure CSS sizing has applied
+    const rafId = requestAnimationFrame(draw);
 
-    const ro = new ResizeObserver(draw);
+    const ro = new ResizeObserver(() => requestAnimationFrame(draw));
     ro.observe(container);
-    return () => ro.disconnect();
+    return () => {
+      cancelAnimationFrame(rafId);
+      ro.disconnect();
+    };
   }, [percent, level]);
 
   return (

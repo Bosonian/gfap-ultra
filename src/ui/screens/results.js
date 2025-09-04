@@ -96,10 +96,6 @@ function renderRiskCard(type, data, results) {
   
   const icons = { ich: '🩸', lvo: '🧠' };
   const titles = { ich: t('ichProbability'), lvo: t('lvoProbability') };
-  const subtitles = { 
-    ich: 'ICH', 
-    lvo: i18n.getCurrentLanguage() === 'de' ? 'Großgefäßverschluss' : 'Large Vessel Occlusion' 
-  };
   
   const level = isCritical ? 'critical' : isHigh ? 'high' : 'normal';
   return `
@@ -108,8 +104,6 @@ function renderRiskCard(type, data, results) {
         <div class="risk-icon">${icons[type]}</div>
         <div class="risk-title">
           <h3>${titles[type]}</h3>
-          <span class="risk-subtitle">${subtitles[type]}</span>
-          <span class="risk-module">${getModuleDisplayName(data.module)}</span>
         </div>
       </div>
       
@@ -357,8 +351,14 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   // Determine layout configuration
   const showVolumeCard = ichPercent >= 50;
   const maxProbability = Math.max(ichPercent, lvoPercent);
-  const showTachometer = isFullModule && ichPercent >= 30 && lvoPercent >= 30;
-  console.log('🎯 Tachometer conditions: isFullModule:', isFullModule, 'ichPercent:', ichPercent, 'lvoPercent:', lvoPercent, 'showTachometer:', showTachometer);
+  // Robust ratio for gating (avoid divide-by-zero)
+  const eps = 0.5;
+  const ratio = lvoPercent / Math.max(ichPercent, eps);
+  const inRatioBand = ratio >= 0.6 && ratio <= 1.7;
+  // Strong-signal gate: both ICH and LVO at least 50%, and ratio in an informative band
+  const showTachometer = isFullModule && ichPercent >= 50 && lvoPercent >= 50 && inRatioBand;
+  const showDominanceBanner = isFullModule && ichPercent >= 50 && lvoPercent >= 50 && !inRatioBand;
+  console.log('🎯 Tachometer conditions:', { isFullModule, ichPercent, lvoPercent, ratio: ratio.toFixed(2), inRatioBand, showTachometer, showDominanceBanner });
   
   // Calculate number of cards and layout class
   let cardCount = 1; // Always have ICH
@@ -387,8 +387,9 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
         ${showVolumeCard ? renderVolumeCard(ich) : ''}
       </div>
       
-      <!-- Treatment Decision Gauge (when high risk) -->
+      <!-- Treatment Decision Gauge (when strong signal) -->
       ${showTachometer ? renderTachometerGauge(ichPercent, lvoPercent) : ''}
+      ${!showTachometer && showDominanceBanner ? renderDominanceBanner(ichPercent, lvoPercent, ratio) : ''}
       
       <!-- Differential Diagnoses for Stroke Modules -->
       ${strokeDifferentialHtml}
@@ -450,6 +451,33 @@ function renderLVONotification() {
       <p class="lvo-possible">
         ⚡ ${t('lvoMayBePossible') || 'Großgefäßverschluss möglich / Large vessel occlusion possible'}
       </p>
+    </div>
+  `;
+}
+
+function renderDominanceBanner(ichPercent, lvoPercent, ratio) {
+  const dominant = ratio > 1 ? 'LVO' : 'ICH';
+  const icon = dominant === 'LVO' ? '🧠' : '🩸';
+  const dominantText = i18n.getCurrentLanguage() === 'de'
+    ? (dominant === 'LVO' ? 'LVO-dominant' : 'ICH-dominant')
+    : (dominant === 'LVO' ? 'LVO dominant' : 'ICH dominant');
+  const subtitle = i18n.getCurrentLanguage() === 'de'
+    ? `Verhältnis LVO/ICH: ${ratio.toFixed(2)}`
+    : `LVO/ICH ratio: ${ratio.toFixed(2)}`;
+  return `
+    <div class="tachometer-section">
+      <div class="tachometer-card">
+        <div class="treatment-recommendation ${dominant === 'LVO' ? 'lvo-dominant' : 'ich-dominant'}">
+          <div class="recommendation-icon">${icon}</div>
+          <div class="recommendation-text">
+            <h4>${dominantText}</h4>
+            <p>${subtitle}</p>
+          </div>
+          <div class="probability-summary">
+            ICH: ${ichPercent}% | LVO: ${lvoPercent}%
+          </div>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -749,8 +777,6 @@ function renderVolumeCard(ichData) {
         <div class="risk-icon">🧮</div>
         <div class="risk-title">
           <h3>${t('ichVolumeLabel')}</h3>
-          <span class="risk-subtitle">${volumeData.displayVolume}</span>
-          <span class="risk-module">${i18n.getCurrentLanguage() === 'de' ? 'Volumen-Berechnung' : 'Volume Calculation'}</span>
         </div>
       </div>
       
@@ -797,9 +823,9 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
 
         <!-- Legend chips for zones -->
         <div class="tachometer-legend" aria-hidden="true">
-          <span class="legend-chip lvo">LVO</span>
-          <span class="legend-chip uncertain">Uncertain</span>
           <span class="legend-chip ich">ICH</span>
+          <span class="legend-chip uncertain">${i18n.getCurrentLanguage() === 'de' ? 'Unsicher' : 'Uncertain'}</span>
+          <span class="legend-chip lvo">LVO</span>
         </div>
 
         <!-- Metrics row: ratio, confidence, absolute difference -->
