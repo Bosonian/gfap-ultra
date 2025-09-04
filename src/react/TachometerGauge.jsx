@@ -65,30 +65,41 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.arc(cx, cy, radius, 0, Math.PI, false);
       ctx.stroke();
 
-      // Zones on bottom semicircle: blue (LVO) on right, warm middle, red (ICH) on left
-      const zones = [
-        // Right segment (0 -> π/3): LVO (blue)
-        { start: 0, end: Math.PI / 3, c1: '#0099ff', c2: '#00ddff', op: isDark ? 'dd' : 'dd' },
-        // Middle segment (π/3 -> 2π/3): warm blend
-        { start: Math.PI / 3, end: (2 * Math.PI) / 3, c1: '#ff7a00', c2: '#ffcc00', op: isDark ? 'cc' : 'cc' },
-        // Left segment (2π/3 -> π): ICH (red)
-        { start: (2 * Math.PI) / 3, end: Math.PI, c1: '#ff0040', c2: '#ff3366', op: isDark ? 'dd' : 'dd' },
-      ];
-      zones.forEach(z => {
-        const grad = ctx.createLinearGradient(
-          cx + Math.cos(z.start) * radius,
-          cy + Math.sin(z.start) * radius,
-          cx + Math.cos(z.end) * radius,
-          cy + Math.sin(z.end) * radius
-        );
-        grad.addColorStop(0, z.c1 + z.op);
-        grad.addColorStop(1, z.c2 + z.op);
-        ctx.strokeStyle = grad;
+      // Smooth color transition across entire semicircle
+      // Create angular gradient: LVO (blue) right → warm center → ICH (red) left
+      const segments = 60; // Fine granularity for smooth transition
+      const angleStep = Math.PI / segments;
+      
+      for (let i = 0; i < segments; i++) {
+        const progress = i / (segments - 1); // 0 to 1
+        const startAngle = i * angleStep;
+        const endAngle = (i + 1) * angleStep;
+        
+        // Color interpolation across the spectrum
+        let r, g, b;
+        if (progress <= 0.5) {
+          // LVO (blue) to warm center (orange/yellow)
+          const t = progress * 2; // 0 to 1
+          r = Math.round(0 * (1 - t) + 255 * t);     // 0 → 255
+          g = Math.round(153 * (1 - t) + 180 * t);   // 153 → 180
+          b = Math.round(255 * (1 - t) + 0 * t);     // 255 → 0
+        } else {
+          // Warm center to ICH (red)
+          const t = (progress - 0.5) * 2; // 0 to 1
+          r = Math.round(255 * (1 - t) + 255 * t);   // 255 → 255
+          g = Math.round(180 * (1 - t) + 64 * t);    // 180 → 64
+          b = Math.round(0 * (1 - t) + 64 * t);      // 0 → 64
+        }
+        
+        const alpha = isDark ? 'dd' : 'dd';
+        const color = `rgba(${r}, ${g}, ${b}, 0.85)`;
+        
+        ctx.strokeStyle = color;
         ctx.lineWidth = zoneWidth;
         ctx.beginPath();
-        ctx.arc(cx, cy, radius, z.start, z.end, false);
+        ctx.arc(cx, cy, radius, startAngle, endAngle, false);
         ctx.stroke();
-      });
+      }
 
       // (Sub-band removed per new design)
 
