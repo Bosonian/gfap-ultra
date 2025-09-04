@@ -106,29 +106,29 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.arc(cx, cy, radius, 0, Math.PI, false);
       ctx.stroke();
 
-      // Smooth gradient transition: red → yellow → blue
+      // Smooth gradient transition: blue (LVO right) → yellow → red (ICH left)
       const segments = 60; // Fine granularity for smooth transition
       const angleStep = Math.PI / segments;
       
       for (let i = 0; i < segments; i++) {
-        const progress = i / (segments - 1); // 0 to 1 from left (ICH) to right (LVO)
+        const progress = i / (segments - 1); // 0 to 1 from right (LVO) to left (ICH)
         const startAngle = i * angleStep;
         const endAngle = Math.min((i + 1) * angleStep, Math.PI);
         
-        // Smooth color interpolation: red → yellow → blue
+        // Smooth color interpolation: blue (right) → yellow → red (left)
         let r, g, b;
         if (progress <= 0.5) {
-          // Red to yellow (first half)
+          // Blue to yellow (first half - right side)
           const t = progress * 2; // 0 to 1
-          r = Math.round(255 * (1 - t * 0.05)); // Keep red high: 255 → 242
-          g = Math.round(0 + 220 * t);   // Increase green: 0 → 220
-          b = Math.round(0);              // No blue in red-yellow range
+          r = Math.round(0 + 242 * t);    // Increase red: 0 → 242
+          g = Math.round(154 + 66 * t);   // Increase green: 154 → 220
+          b = Math.round(255 * (1 - t));  // Decrease blue: 255 → 0
         } else {
-          // Yellow to blue (second half)
+          // Yellow to red (second half - left side)
           const t = (progress - 0.5) * 2; // 0 to 1
-          r = Math.round(242 * (1 - t));  // Decrease red: 242 → 0
-          g = Math.round(220 * (1 - t * 0.3)); // Decrease green: 220 → 154
-          b = Math.round(0 + 255 * t);    // Increase blue: 0 → 255
+          r = Math.round(242 + 13 * t);   // Increase red slightly: 242 → 255
+          g = Math.round(220 * (1 - t));  // Decrease green: 220 → 0
+          b = Math.round(0);              // No blue
         }
         
         const color = `rgba(${r}, ${g}, ${b}, 0.85)`;
