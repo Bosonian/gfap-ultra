@@ -106,11 +106,11 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.arc(cx, cy, radius, 0, Math.PI, false);
       ctx.stroke();
 
-      // Sophisticated color zones - clinical precision
+      // Sophisticated color zones - red → yellow → blue transition
       const zones = [
-        { start: 0, end: 0.25, color: theme.ich }, // ICH dominant
-        { start: 0.25, end: 0.75, color: theme.neutral }, // Equipoise
-        { start: 0.75, end: 1, color: theme.lvo } // LVO dominant
+        { start: 0, end: 0.33, color: theme.ich }, // ICH dominant (red)
+        { start: 0.33, end: 0.67, color: isDark ? '#fbbf24' : '#f59e0b' }, // Center zone (yellow/amber)
+        { start: 0.67, end: 1, color: theme.lvo } // LVO dominant (blue)
       ];
       
       zones.forEach(zone => {
