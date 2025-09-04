@@ -41,7 +41,7 @@ export default function ProbabilityRing({ percent = 0, level = 'normal' }) {
       const isDark = document.body.classList.contains('dark-mode');
       const borderColor = getCSSVar('--border-color') || (isDark ? '#2f3336' : '#dee2e6');
       ctx.save();
-      ctx.globalAlpha = isDark ? 0.32 : 0.5;
+      ctx.globalAlpha = isDark ? 0.32 : 0.6;
       ctx.strokeStyle = borderColor;
       ctx.lineWidth = trackWidth;
       ctx.lineCap = 'round';

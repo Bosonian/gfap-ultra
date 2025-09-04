@@ -409,8 +409,8 @@ export const messages = {
     // Results
     resultsTitle: 'Bewertungsergebnisse',
     bleedingRiskAssessment: 'Blutungsrisiko-Bewertung',
-    ichProbability: 'ICB-Wahrscheinlichkeit',
-    lvoProbability: 'LVO-Wahrscheinlichkeit',
+    ichProbability: 'ICB-Risiko',
+    lvoProbability: 'LVO-Risiko',
     lvoMayBePossible: 'Großgefäßverschluss möglich - weitere Abklärung empfohlen',
     riskFactorsTitle: 'Hauptrisikofaktoren',
     increasingRisk: 'Risikoerhöhend',
