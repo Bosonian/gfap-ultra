@@ -84,6 +84,62 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         ctx.stroke();
       });
 
+      // Dynamic sub-band drawn beneath ticks/needle: from endpoint to near the needle
+      const bandPos = currentPos + (targetPos - currentPos) * 0.08; // anticipate the next needle pos
+      const bandAngle = Math.PI - bandPos * Math.PI; // 0..π range
+      const bandWidth = Math.max(10, zoneWidth - 4);
+      const bandLabelFont = isMobile ? 11 : 13;
+      ctx.lineWidth = bandWidth;
+      if (Math.abs(bandPos - 0.5) > 0.02) { // no band if very close to balanced
+        if (bandPos < 0.5) {
+          // ICH side
+          const c1 = '#ff0040', c2 = '#ff3366';
+          const grad = ctx.createLinearGradient(
+            cx + Math.cos(Math.PI) * radius,
+            cy + Math.sin(Math.PI) * radius,
+            cx + Math.cos(bandAngle) * radius,
+            cy + Math.sin(bandAngle) * radius
+          );
+          grad.addColorStop(0, c1);
+          grad.addColorStop(1, c2);
+          ctx.strokeStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, Math.PI, bandAngle, true);
+          ctx.stroke();
+          // Label
+          const mid = (Math.PI + bandAngle) / 2;
+          ctx.fillStyle = '#ff3366';
+          ctx.font = `700 ${bandLabelFont}px Inter, system-ui, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const labelR = radius + (isMobile ? 18 : 24);
+          ctx.fillText('ICH', cx + Math.cos(mid) * labelR, cy + Math.sin(mid) * labelR);
+        } else {
+          // LVO side
+          const c1 = '#0099ff', c2 = '#00ddff';
+          const grad = ctx.createLinearGradient(
+            cx + Math.cos(0) * radius,
+            cy + Math.sin(0) * radius,
+            cx + Math.cos(bandAngle) * radius,
+            cy + Math.sin(bandAngle) * radius
+          );
+          grad.addColorStop(0, c1);
+          grad.addColorStop(1, c2);
+          ctx.strokeStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, 0, bandAngle, false);
+          ctx.stroke();
+          // Label
+          const mid = (0 + bandAngle) / 2;
+          ctx.fillStyle = '#00bbff';
+          ctx.font = `700 ${bandLabelFont}px Inter, system-ui, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const labelR = radius + (isMobile ? 18 : 24);
+          ctx.fillText('LVO', cx + Math.cos(mid) * labelR, cy + Math.sin(mid) * labelR);
+        }
+      }
+
       // Ticks - fewer on mobile, responsive sizing
       const marks = isMobile ? [0.5, 1.0, 2.0] : [0.5, 0.75, 1.0, 1.5, 2.0];
       const tickFont = isMobile ? 12 : 14;

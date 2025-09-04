@@ -853,6 +853,10 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
           </div>
         </div>
         
+        <div class="probability-summary">
+          ICH: ${ichPercent}% | LVO: ${lvoPercent}%
+        </div>
+        
         <!-- Hidden probability summary for initialization -->
         <div class="probability-summary" style="display: none;">
           ICH: ${ichPercent}% | LVO: ${lvoPercent}%
