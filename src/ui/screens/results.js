@@ -363,9 +363,8 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   
   // Calculate number of cards and layout class
   let cardCount = 1; // Always have ICH
-  // Maintain symmetry: in full module, show an LVO placeholder when not shown
-  const showLVOPlaceholder = isFullModule && !showLVORiskCard;
-  if (showLVORiskCard || showLVOPlaceholder) cardCount++;
+  // No placeholder needed - only show LVO card when FAST-ED > 3
+  if (showLVORiskCard) cardCount++;
   if (showVolumeCard) cardCount++;
   
   const layoutClass = cardCount === 1 ? 'risk-results-single' : 
@@ -384,7 +383,7 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       <!-- Risk Assessment Display -->
       <div class="${layoutClass}">
         ${renderRiskCard('ich', ich, results)}
-        ${showLVORiskCard ? renderRiskCard('lvo', lvo, results) : (showLVOPlaceholder ? renderLVONotPossible() : '')}
+        ${showLVORiskCard ? renderRiskCard('lvo', lvo, results) : ''}
         ${showVolumeCard ? renderVolumeCard(ich) : ''}
       </div>
       
