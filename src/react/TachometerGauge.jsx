@@ -267,7 +267,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         ctx.shadowColor = 'rgba(0,0,0,0.6)';
         ctx.shadowBlur = 2;
       }
-      ctx.fillText(ratio.toFixed(2), cx, cy - radius * 0.72);
+      ctx.fillText(clampedRatio.toFixed(2), cx, cy - radius * 0.72);
       ctx.shadowBlur = 0;
 
       const delta = Math.abs(currentPos - targetPos);
