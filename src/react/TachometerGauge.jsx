@@ -106,28 +106,39 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.arc(cx, cy, radius, 0, Math.PI, false);
       ctx.stroke();
 
-      // Sophisticated color zones - red → yellow → blue transition
-      const zones = [
-        { start: 0, end: 0.33, color: theme.ich }, // ICH dominant (red)
-        { start: 0.33, end: 0.67, color: isDark ? '#fbbf24' : '#f59e0b' }, // Center zone (yellow/amber)
-        { start: 0.67, end: 1, color: theme.lvo } // LVO dominant (blue)
-      ];
+      // Smooth gradient transition: red → yellow → blue
+      const segments = 60; // Fine granularity for smooth transition
+      const angleStep = Math.PI / segments;
       
-      zones.forEach(zone => {
-        const startAngle = zone.start * Math.PI;
-        const endAngle = zone.end * Math.PI;
+      for (let i = 0; i < segments; i++) {
+        const progress = i / (segments - 1); // 0 to 1 from left (ICH) to right (LVO)
+        const startAngle = i * angleStep;
+        const endAngle = Math.min((i + 1) * angleStep, Math.PI);
         
-        // Subtle gradient within each zone
-        const zoneGradient = ctx.createRadialGradient(cx, cy, radius - 15, cx, cy, radius + 5);
-        zoneGradient.addColorStop(0, zone.color + 'cc');
-        zoneGradient.addColorStop(1, zone.color + '99');
+        // Smooth color interpolation: red → yellow → blue
+        let r, g, b;
+        if (progress <= 0.5) {
+          // Red to yellow (first half)
+          const t = progress * 2; // 0 to 1
+          r = Math.round(255 * (1 - t * 0.05)); // Keep red high: 255 → 242
+          g = Math.round(0 + 220 * t);   // Increase green: 0 → 220
+          b = Math.round(0);              // No blue in red-yellow range
+        } else {
+          // Yellow to blue (second half)
+          const t = (progress - 0.5) * 2; // 0 to 1
+          r = Math.round(242 * (1 - t));  // Decrease red: 242 → 0
+          g = Math.round(220 * (1 - t * 0.3)); // Decrease green: 220 → 154
+          b = Math.round(0 + 255 * t);    // Increase blue: 0 → 255
+        }
         
-        ctx.strokeStyle = zoneGradient;
+        const color = `rgba(${r}, ${g}, ${b}, 0.85)`;
+        
+        ctx.strokeStyle = color;
         ctx.lineWidth = baseWidth - 4; // Thinner zones
         ctx.beginPath();
         ctx.arc(cx, cy, radius, startAngle, endAngle, false);
         ctx.stroke();
-      });
+      }
 
       // Precision tick system - automotive style
       const majorTicks = [0.5, 0.75, 1.0, 1.5, 2.0];
@@ -200,8 +211,8 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       const labelFont = isMobile ? 15 : 17;
       const labelDistance = isMobile ? radius + 35 : radius + 42;
       
-      // ICH label
-      ctx.fillStyle = theme.ich;
+      // ICH label - pure red
+      ctx.fillStyle = isDark ? '#ff4444' : '#ff0000';
       ctx.font = `700 ${labelFont}px "SF Pro Display", system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -212,8 +223,8 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       }
       ctx.fillText('ICH', cx + Math.cos(Math.PI) * labelDistance, cy + Math.sin(Math.PI) * labelDistance - 10);
       
-      // LVO label
-      ctx.fillStyle = theme.lvo;
+      // LVO label - pure blue
+      ctx.fillStyle = isDark ? '#4499ff' : '#0099ff';
       ctx.fillText('LVO', cx + Math.cos(0) * labelDistance, cy + Math.sin(0) * labelDistance - 10);
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
