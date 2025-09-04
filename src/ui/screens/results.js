@@ -357,6 +357,8 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   // Strong-signal gate: both ICH and LVO at least 50%, and ratio in an informative band
   const showTachometer = isFullModule && ichPercent >= 50 && lvoPercent >= 50 && inRatioBand;
   const showDominanceBanner = isFullModule && ichPercent >= 50 && lvoPercent >= 50 && !inRatioBand;
+  // DEBUG: Temporary relaxed conditions for testing
+  const debugShowTachometer = isFullModule && ichPercent >= 30 && lvoPercent >= 30;
   console.log('🎯 Tachometer conditions:', { isFullModule, ichPercent, lvoPercent, ratio: ratio.toFixed(2), inRatioBand, showTachometer, showDominanceBanner });
   
   // Calculate number of cards and layout class
@@ -387,8 +389,8 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       </div>
       
       <!-- Treatment Decision Gauge (when strong signal) -->
-      ${showTachometer ? renderTachometerGauge(ichPercent, lvoPercent) : ''}
-      ${!showTachometer && showDominanceBanner ? renderDominanceBanner(ichPercent, lvoPercent, ratio) : ''}
+      ${debugShowTachometer ? renderTachometerGauge(ichPercent, lvoPercent) : ''}
+      ${!debugShowTachometer && showDominanceBanner ? renderDominanceBanner(ichPercent, lvoPercent, ratio) : ''}
       
       <!-- Differential Diagnoses for Stroke Modules -->
       ${strokeDifferentialHtml}
