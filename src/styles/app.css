@@ -4588,11 +4588,8 @@ footer {
 
 /* Tablet tachometer adjustments */
 @media (min-width: 481px) and (max-width: 768px) {
-    #tachometerCanvas {
-        width: 100%;
-        height: 220px;
-    }
-    .gauge-canvas { height: 220px; }
+    #tachometerCanvas { width: 100%; height: 200px; }
+    .gauge-canvas { height: 200px; }
 }
 
 /* Mobile tachometer adjustments */

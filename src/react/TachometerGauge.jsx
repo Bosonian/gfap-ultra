@@ -39,13 +39,16 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       const width = cssW;
       const height = cssH;
       const isMobile = width < 480;
+      const isTablet = width >= 480 && width < 1024;
       // Responsive stroke widths
-      const baseWidth = isMobile ? 20 : 26;
-      const zoneWidth = isMobile ? 16 : 22;
+      const baseWidth = isMobile ? 18 : isTablet ? 20 : 26;
+      const zoneWidth = isMobile ? 14 : isTablet ? 16 : 22;
       const padding = 10;
       // Geometry-safe radius and center to avoid clipping or dipping
       const maxRHorizontal = (width / 2) - padding - baseWidth / 2;
-      const maxRVertical = (height / 2) - padding - baseWidth / 2; // conservative for 180°
+      // Tighter vertical radius on tablet to avoid a bloated look
+      const maxRVerticalBase = (height / 2) - padding - baseWidth / 2;
+      const maxRVertical = isTablet ? Math.min(maxRVerticalBase, height * 0.42) : maxRVerticalBase;
       const radius = Math.max(10, Math.min(maxRHorizontal, maxRVertical));
       const cx = width / 2;
       const cy = height - (padding + baseWidth / 2 + radius);
@@ -62,11 +65,14 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.arc(cx, cy, radius, 0, Math.PI, false);
       ctx.stroke();
 
-      // Zones - enhanced saturation for better visibility
+      // Zones on bottom semicircle: blue (LVO) on right, warm middle, red (ICH) on left
       const zones = [
-        { start: Math.PI, end: Math.PI + Math.PI * 0.33, c1: '#ff0040', c2: '#ff3366', op: isDark ? 'dd' : '99' },
-        { start: Math.PI + Math.PI * 0.33, end: Math.PI + Math.PI * 0.67, c1: '#ff9900', c2: '#ffcc00', op: isDark ? 'bb' : '88' },
-        { start: Math.PI + Math.PI * 0.67, end: Math.PI * 2, c1: '#00aaff', c2: '#00ddff', op: isDark ? 'dd' : '99' },
+        // Right segment (0 -> π/3): LVO (blue)
+        { start: 0, end: Math.PI / 3, c1: '#0099ff', c2: '#00ddff', op: isDark ? 'dd' : 'dd' },
+        // Middle segment (π/3 -> 2π/3): warm blend
+        { start: Math.PI / 3, end: (2 * Math.PI) / 3, c1: '#ff7a00', c2: '#ffcc00', op: isDark ? 'cc' : 'cc' },
+        // Left segment (2π/3 -> π): ICH (red)
+        { start: (2 * Math.PI) / 3, end: Math.PI, c1: '#ff0040', c2: '#ff3366', op: isDark ? 'dd' : 'dd' },
       ];
       zones.forEach(z => {
         const grad = ctx.createLinearGradient(
@@ -83,6 +89,61 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         ctx.arc(cx, cy, radius, z.start, z.end, false);
         ctx.stroke();
       });
+
+      // Dynamic sub-band: draw on an inner radius so it stands out
+      const bandPos = currentPos; // use current needle pos for visual stability
+      const bandAngle = Math.PI - bandPos * Math.PI; // 0..π
+      const bandWidth = Math.max(8, zoneWidth - 4);
+      const rBand = radius - baseWidth / 2 - 2; // slight inset inside zone
+      const bandLabelFont = isMobile ? 11 : 13;
+      ctx.lineWidth = bandWidth;
+      if (Math.abs(bandPos - 0.5) > 0.005) { // skip only if truly centered
+        if (bandPos < 0.5) {
+          // ICH side: from left endpoint (π) to needle angle
+          const grad = ctx.createLinearGradient(
+            cx + Math.cos(Math.PI) * rBand,
+            cy + Math.sin(Math.PI) * rBand,
+            cx + Math.cos(bandAngle) * rBand,
+            cy + Math.sin(bandAngle) * rBand
+          );
+          grad.addColorStop(0, '#ff0040');
+          grad.addColorStop(1, '#ff3366');
+          ctx.strokeStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, rBand, bandAngle, Math.PI, false);
+          ctx.stroke();
+          // Label near mid of band
+          const mid = (bandAngle + Math.PI) / 2;
+          ctx.fillStyle = '#ff3366';
+          ctx.font = `700 ${bandLabelFont}px Inter, system-ui, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const labelR = radius + (isMobile ? 18 : 24);
+          ctx.fillText('ICH', cx + Math.cos(mid) * labelR, cy + Math.sin(mid) * labelR);
+        } else {
+          // LVO side: from right endpoint (0) to needle angle
+          const grad = ctx.createLinearGradient(
+            cx + Math.cos(0) * rBand,
+            cy + Math.sin(0) * rBand,
+            cx + Math.cos(bandAngle) * rBand,
+            cy + Math.sin(bandAngle) * rBand
+          );
+          grad.addColorStop(0, '#0099ff');
+          grad.addColorStop(1, '#00ddff');
+          ctx.strokeStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, rBand, 0, bandAngle, false);
+          ctx.stroke();
+          // Label near mid of band
+          const mid = bandAngle / 2;
+          ctx.fillStyle = '#00bbff';
+          ctx.font = `700 ${bandLabelFont}px Inter, system-ui, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const labelR = radius + (isMobile ? 18 : 24);
+          ctx.fillText('LVO', cx + Math.cos(mid) * labelR, cy + Math.sin(mid) * labelR);
+        }
+      }
 
       // Dynamic sub-band drawn beneath ticks/needle: from endpoint to near the needle
       const bandPos = currentPos + (targetPos - currentPos) * 0.08; // anticipate the next needle pos
