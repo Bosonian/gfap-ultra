@@ -42,6 +42,18 @@
 
     /* Visualization tokens */
     --ring-size: 120px;
+
+    /* Tachometer tokens (day mode) */
+    --tach-track: rgba(0, 0, 0, 0.15);
+    --tach-ich-1: #ff0040;
+    --tach-ich-2: #ff3366;
+    --tach-mid-1: #ff7a00;
+    --tach-mid-2: #ffcc00;
+    --tach-lvo-1: #0099ff;
+    --tach-lvo-2: #00ddff;
+    --tach-needle: #ffd700;
+    --tach-label-ich: #ff0040;
+    --tach-label-lvo: #00d4ff;
 }
 
 body.dark-mode {
@@ -62,6 +74,18 @@ body.dark-mode {
     --risk-low: #51cf66;
     --risk-medium: #ffb74d;
     --risk-high: #ff6b6b;
+
+    /* Tachometer tokens (night mode) */
+    --tach-track: rgba(255, 255, 255, 0.18);
+    --tach-ich-1: #ff3366;
+    --tach-ich-2: #ff6688;
+    --tach-mid-1: #ff9a2a;
+    --tach-mid-2: #ffdc5c;
+    --tach-lvo-1: #33bbff;
+    --tach-lvo-2: #66ddff;
+    --tach-needle: #ffe066;
+    --tach-label-ich: #ff6688;
+    --tach-label-lvo: #66ddff;
 }
 
 /* Ring size scaling by viewport - refined responsive scaling */

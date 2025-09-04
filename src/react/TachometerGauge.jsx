@@ -197,7 +197,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       // Labels ICH/LVO - responsive sizing and enhanced contrast
       const labelFont = isMobile ? 14 : 16;
       const labelDistance = isMobile ? radius + 32 : radius + 38;
-      ctx.fillStyle = isDark ? '#ff3366' : '#ff0040';
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--tach-label-ich').trim() || (isDark ? '#ff3366' : '#ff0040');
       ctx.font = `700 ${labelFont}px Inter, system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -206,7 +206,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         ctx.shadowBlur = 2;
       }
       ctx.fillText('ICH', cx + Math.cos(Math.PI) * labelDistance, cy + Math.sin(Math.PI) * labelDistance - 8);
-      ctx.fillStyle = isDark ? '#33bbff' : '#00d4ff';
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--tach-label-lvo').trim() || (isDark ? '#66ddff' : '#00d4ff');
       ctx.fillText('LVO', cx + Math.cos(0) * labelDistance, cy + Math.sin(0) * labelDistance - 8);
       ctx.shadowBlur = 0;
 
@@ -228,9 +228,9 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.restore();
 
       // Needle
-      let needleColor = '#ffd700';
-      if (currentPos < 0.35) needleColor = '#ff0040';
-      else if (currentPos > 0.65) needleColor = '#00d4ff';
+      let needleColor = getComputedStyle(document.documentElement).getPropertyValue('--tach-needle').trim() || '#ffd700';
+      if (currentPos < 0.35) needleColor = getComputedStyle(document.documentElement).getPropertyValue('--tach-ich-1').trim() || '#ff0040';
+      else if (currentPos > 0.65) needleColor = getComputedStyle(document.documentElement).getPropertyValue('--tach-lvo-1').trim() || '#00d4ff';
       ctx.shadowColor = needleColor;
       ctx.shadowBlur = 16;
       ctx.strokeStyle = needleColor;
