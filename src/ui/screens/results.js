@@ -10,7 +10,7 @@ import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../
 import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
 import { mountIslands } from '../../react/mountIslands.jsx';
-import { PremiumDiagnosticGauge } from '../components/premium-tachometer.js';
+// Using React island tachometer instead of the vanilla premium gauge
 import { calculateLegacyICH } from '../../research/legacy-ich-model.js';
 import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-logger.js';
 import { renderModelComparison, renderResearchToggle } from '../../research/comparison-ui.js';
@@ -225,7 +225,6 @@ export function renderResults(results, startTime) {
   setTimeout(() => {
     initializeVolumeAnimations();
     mountIslands();
-    initializePremiumTachometer();
   }, 100);
   
   return resultsHtml;
@@ -818,7 +817,7 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
         </div>
         
         <div class="tachometer-gauge" id="tachometer-canvas-container">
-          <canvas id="premium-diagnostic-gauge" width="400" height="400"></canvas>
+          <div data-react-tachometer data-ich="${ichPercent}" data-lvo="${lvoPercent}" data-title="${i18n.getCurrentLanguage() === 'de' ? 'Entscheidungshilfe – LVO/ICH' : 'Decision Support – LVO/ICH'}"></div>
         </div>
 
         <!-- Legend chips for zones -->
@@ -866,47 +865,4 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
   `;
 }
 
-// Global reference for the current premium tachometer instance
-let currentPremiumGauge = null;
-
-/**
- * Initialize premium tachometer gauge if canvas exists
- */
-function initializePremiumTachometer() {
-  const canvas = document.getElementById('premium-diagnostic-gauge');
-  if (!canvas) return;
-
-  // Clean up existing gauge
-  if (currentPremiumGauge) {
-    currentPremiumGauge.destroy();
-    currentPremiumGauge = null;
-  }
-
-  // Extract ICH and LVO values from the DOM context
-  const tachometerSection = document.querySelector('.tachometer-section');
-  if (!tachometerSection) return;
-
-  // Get values from the probability summary
-  const probSummary = tachometerSection.querySelector('.probability-summary');
-  if (!probSummary) return;
-
-  const text = probSummary.textContent;
-  const ichMatch = text.match(/ICH: (\d+)%/);
-  const lvoMatch = text.match(/LVO: (\d+)%/);
-  
-  if (!ichMatch || !lvoMatch) return;
-
-  const ichPercent = parseInt(ichMatch[1]);
-  const lvoPercent = parseInt(lvoMatch[1]);
-
-  // Create new gauge instance
-  currentPremiumGauge = new PremiumDiagnosticGauge('premium-diagnostic-gauge', {
-    lvoProb: lvoPercent,
-    ichProb: ichPercent
-  });
-
-  // Update with the values
-  currentPremiumGauge.updateValues(lvoPercent, ichPercent);
-
-  console.log('🎯 Premium tachometer initialized:', { ichPercent, lvoPercent });
-}
+// Premium (vanilla) tachometer disabled in favor of React island gauge

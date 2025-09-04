@@ -79,13 +79,13 @@ class PremiumDiagnosticGauge {
     ctx.arc(this.centerX, this.centerY, this.radius, startAngle, endAngle);
     ctx.stroke();
     
-    // Color zones - medical grade precision
+    // Color zones - flipped for intuition: ICH (red) on left, LVO (blue) on right
     const zones = [
-      { start: 0, end: 0.2, color: 'rgba(0, 168, 255, 0.7)', label: 'LVO' },      // Strong LVO
-      { start: 0.2, end: 0.35, color: 'rgba(0, 168, 255, 0.4)', label: '' },     // LVO lean
-      { start: 0.35, end: 0.65, color: 'rgba(255, 165, 0, 0.4)', label: '' },    // Uncertain
-      { start: 0.65, end: 0.8, color: 'rgba(255, 68, 68, 0.4)', label: '' },     // ICH lean
-      { start: 0.8, end: 1.0, color: 'rgba(255, 68, 68, 0.7)', label: 'ICH' }    // Strong ICH
+      { start: 0, end: 0.2, color: 'rgba(255, 68, 68, 0.7)', label: 'ICH' },      // Strong ICH (left/start)
+      { start: 0.2, end: 0.35, color: 'rgba(255, 68, 68, 0.4)', label: '' },      // ICH lean
+      { start: 0.35, end: 0.65, color: 'rgba(255, 165, 0, 0.4)', label: '' },     // Uncertain
+      { start: 0.65, end: 0.8, color: 'rgba(0, 168, 255, 0.4)', label: '' },      // LVO lean
+      { start: 0.8, end: 1.0, color: 'rgba(0, 168, 255, 0.7)', label: 'LVO' }     // Strong LVO (right/end)
     ];
     
     zones.forEach(zone => {
@@ -150,27 +150,26 @@ class PremiumDiagnosticGauge {
       );
     });
     
-    // Zone labels - medical clarity
+    // Zone labels - ICH left, LVO right
     ctx.font = `500 ${this.isMobile ? 9 : 10}px Inter, -apple-system, sans-serif`;
-    
-    // LVO label (now on left)
-    ctx.fillStyle = '#00a8ff';
-    const lvoAngle = startAngle + (0.1 * totalAngle);
-    const lvoRadius = this.radius - (this.isMobile ? 45 : 50);
-    ctx.fillText(
-      'LVO',
-      this.centerX + Math.cos(lvoAngle) * lvoRadius,
-      this.centerY + Math.sin(lvoAngle) * lvoRadius
-    );
-    
-    // ICH label (now on right)
+    // ICH label (left/start)
     ctx.fillStyle = '#ff4444';
-    const ichAngle = startAngle + (0.9 * totalAngle);
+    const ichAngle = startAngle + (0.1 * totalAngle);
     const ichRadius = this.radius - (this.isMobile ? 45 : 50);
     ctx.fillText(
       'ICH',
       this.centerX + Math.cos(ichAngle) * ichRadius,
       this.centerY + Math.sin(ichAngle) * ichRadius
+    );
+
+    // LVO label (right/end)
+    ctx.fillStyle = '#00a8ff';
+    const lvoAngle = startAngle + (0.9 * totalAngle);
+    const lvoRadius = this.radius - (this.isMobile ? 45 : 50);
+    ctx.fillText(
+      'LVO',
+      this.centerX + Math.cos(lvoAngle) * lvoRadius,
+      this.centerY + Math.sin(lvoAngle) * lvoRadius
     );
     
     // Critical thresholds - precision markers
