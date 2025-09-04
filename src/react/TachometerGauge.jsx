@@ -90,62 +90,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         ctx.stroke();
       });
 
-      // Dynamic sub-band: draw on an inner radius so it stands out
-      const bandPos = currentPos; // use current needle pos for visual stability
-      const bandAngle = Math.PI - bandPos * Math.PI; // 0..π
-      const bandWidth = Math.max(8, zoneWidth - 4);
-      const rBand = radius - baseWidth / 2 - 2; // slight inset inside zone
-      const bandLabelFont = isMobile ? 11 : 13;
-      ctx.lineWidth = bandWidth;
-      if (Math.abs(bandPos - 0.5) > 0.005) { // skip only if truly centered
-        if (bandPos < 0.5) {
-          // ICH side: from left endpoint (π) to needle angle
-          const grad = ctx.createLinearGradient(
-            cx + Math.cos(Math.PI) * rBand,
-            cy + Math.sin(Math.PI) * rBand,
-            cx + Math.cos(bandAngle) * rBand,
-            cy + Math.sin(bandAngle) * rBand
-          );
-          grad.addColorStop(0, '#ff0040');
-          grad.addColorStop(1, '#ff3366');
-          ctx.strokeStyle = grad;
-          ctx.beginPath();
-          ctx.arc(cx, cy, rBand, bandAngle, Math.PI, false);
-          ctx.stroke();
-          // Label near mid of band
-          const mid = (bandAngle + Math.PI) / 2;
-          ctx.fillStyle = '#ff3366';
-          ctx.font = `700 ${bandLabelFont}px Inter, system-ui, sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          const labelR = radius + (isMobile ? 18 : 24);
-          ctx.fillText('ICH', cx + Math.cos(mid) * labelR, cy + Math.sin(mid) * labelR);
-        } else {
-          // LVO side: from right endpoint (0) to needle angle
-          const grad = ctx.createLinearGradient(
-            cx + Math.cos(0) * rBand,
-            cy + Math.sin(0) * rBand,
-            cx + Math.cos(bandAngle) * rBand,
-            cy + Math.sin(bandAngle) * rBand
-          );
-          grad.addColorStop(0, '#0099ff');
-          grad.addColorStop(1, '#00ddff');
-          ctx.strokeStyle = grad;
-          ctx.beginPath();
-          ctx.arc(cx, cy, rBand, 0, bandAngle, false);
-          ctx.stroke();
-          // Label near mid of band
-          const mid = bandAngle / 2;
-          ctx.fillStyle = '#00bbff';
-          ctx.font = `700 ${bandLabelFont}px Inter, system-ui, sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          const labelR = radius + (isMobile ? 18 : 24);
-          ctx.fillText('LVO', cx + Math.cos(mid) * labelR, cy + Math.sin(mid) * labelR);
-        }
-      }
-
-      // (Removed duplicate sub-band block)
+      // (Sub-band removed per new design)
 
       // Ticks - fewer on mobile, responsive sizing
       const marks = isMobile ? [0.5, 1.0, 2.0] : [0.5, 0.75, 1.0, 1.5, 2.0];
@@ -232,7 +177,11 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       if (currentPos < 0.35) needleColor = getComputedStyle(document.documentElement).getPropertyValue('--tach-ich-1').trim() || '#ff0040';
       else if (currentPos > 0.65) needleColor = getComputedStyle(document.documentElement).getPropertyValue('--tach-lvo-1').trim() || '#00d4ff';
       ctx.shadowColor = needleColor;
-      ctx.shadowBlur = 16;
+      // Elegant pulsing glow on needle tip
+      const now = performance.now();
+      const pulse = 0.5 + 0.5 * Math.sin(now * 0.004);
+      const pulseBlur = 10 + pulse * 8;
+      ctx.shadowBlur = pulseBlur;
       ctx.strokeStyle = needleColor;
       ctx.lineWidth = 4;
       ctx.lineCap = 'round';
@@ -241,9 +190,21 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.lineTo(cx + Math.cos(needleAngle) * needleLen, cy + Math.sin(needleAngle) * needleLen);
       ctx.stroke();
       ctx.shadowBlur = 0;
+      const tx = cx + Math.cos(needleAngle) * needleLen;
+      const ty = cy + Math.sin(needleAngle) * needleLen;
+      const tipRadius = 4 + pulse * 1.5;
+      // Halo
+      ctx.save();
+      ctx.globalAlpha = 0.25 + pulse * 0.15;
       ctx.fillStyle = needleColor;
       ctx.beginPath();
-      ctx.arc(cx + Math.cos(needleAngle) * needleLen, cy + Math.sin(needleAngle) * needleLen, 5, 0, Math.PI * 2);
+      ctx.arc(tx, ty, tipRadius * 2.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      // Solid tip
+      ctx.fillStyle = needleColor;
+      ctx.beginPath();
+      ctx.arc(tx, ty, tipRadius, 0, Math.PI * 2);
       ctx.fill();
 
       // Center hub
@@ -270,17 +231,8 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.fillText(clampedRatio.toFixed(2), cx, cy - radius * 0.72);
       ctx.shadowBlur = 0;
 
-      const delta = Math.abs(currentPos - targetPos);
-      if (delta > 0.002) {
-        settle = 0;
-        raf = requestAnimationFrame(draw);
-      } else if (settle < 4) {
-        settle += 1;
-        raf = requestAnimationFrame(draw);
-      } else {
-        cancelAnimationFrame(raf);
-        raf = null;
-      }
+      // Keep gentle pulse running even when settled
+      raf = requestAnimationFrame(draw);
     };
 
     draw();
