@@ -22,7 +22,7 @@ export const messages = {
     // Triage 1
     triage1Title: 'Patient Assessment',
     triage1Question: 'Is the patient comatose?',
-    triage1Help: 'Glasgow Coma Scale < 8',
+    triage1Help: 'Glasgow Coma Scale < 9',
     triage1Yes: 'YES - Comatose',
     triage1No: 'NO - Conscious',
 
@@ -92,7 +92,7 @@ export const messages = {
     
     // Alert messages
     criticalPatient: 'Critical Patient',
-    comaAlert: 'Patient is comatose (GCS < 8). Rapid assessment required.',
+    comaAlert: 'Patient is comatose (GCS < 9). Rapid assessment required.',
     vigilanceReduction: 'Vigilance Reduction (Decreased alertness)',
     
     // Additional symptom labels
@@ -146,7 +146,7 @@ export const messages = {
     // Help Modal
     helpTitle: 'Quick Reference Guide',
     gcsTitle: 'Glasgow Coma Scale (GCS)',
-    gcsLow: 'GCS < 8: Comatose patient - use Coma Module',
+    gcsLow: 'GCS < 9: Comatose patient - use Coma Module',
     gcsMod: 'GCS 8-12: Moderate impairment',
     gcsHigh: 'GCS 13-15: Mild impairment',
     fastEdTitle: 'FAST-ED Score Components',
@@ -325,7 +325,7 @@ export const messages = {
     // Triage 1
     triage1Title: 'Patientenbeurteilung',
     triage1Question: 'Ist der Patient komatös?',
-    triage1Help: 'Glasgow Coma Scale < 8',
+    triage1Help: 'Glasgow Coma Scale < 9',
     triage1Yes: 'JA - Komatös',
     triage1No: 'NEIN - Bei Bewusstsein',
 
@@ -395,7 +395,7 @@ export const messages = {
     
     // Alert messages
     criticalPatient: 'Kritischer Patient',
-    comaAlert: 'Patient ist komatös (GCS < 8). Schnelle Beurteilung erforderlich.',
+    comaAlert: 'Patient ist komatös (GCS < 9). Schnelle Beurteilung erforderlich.',
     vigilanceReduction: 'Vigilanzminderung (Verminderte Wachheit)',
     
     // Additional symptom labels
@@ -449,7 +449,7 @@ export const messages = {
     // Help Modal
     helpTitle: 'Kurzreferenzleitfaden',
     gcsTitle: 'Glasgow Coma Scale (GCS)',
-    gcsLow: 'GCS < 8: Komatöser Patient - Koma-Modul verwenden',
+    gcsLow: 'GCS < 9: Komatöser Patient - Koma-Modul verwenden',
     gcsMod: 'GCS 8-12: Mäßige Beeinträchtigung',
     gcsHigh: 'GCS 13-15: Leichte Beeinträchtigung',
     fastEdTitle: 'FAST-ED-Score-Komponenten',
