@@ -254,6 +254,11 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
       <div class="risk-results-single">
         ${renderRiskCard('ich', ich, results)}
       </div>
+
+      <!-- ICH Volume Card (Coma/Limited) -->
+      <div class="risk-results-single">
+        ${renderVolumeCard(ich)}
+      </div>
       
       <!-- Alternative Diagnoses for Coma Module -->
       ${alternativeDiagnosesHtml}

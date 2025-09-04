@@ -41,8 +41,8 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       const isMobile = width < 480;
       const isTablet = width >= 480 && width < 1024;
       
-      // Premium automotive proportions
-      const baseWidth = isMobile ? 24 : isTablet ? 28 : 32;
+      // Refined thin proportions
+      const baseWidth = isMobile ? 12 : isTablet ? 14 : 16;
       const padding = 15;
       const maxRHorizontal = (width / 2) - padding - baseWidth / 2;
       const maxRVerticalBase = (height / 2) - padding - baseWidth / 2;
@@ -85,7 +85,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       
       const theme = isDark ? colors.night : colors.day;
 
-      // Outer bezel - brushed aluminum effect
+      // Outer bezel - thin brushed aluminum effect
       const bezelGradient = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
       bezelGradient.addColorStop(0, theme.bezel);
       bezelGradient.addColorStop(0.3, theme.bezelShadow);
@@ -93,13 +93,13 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       bezelGradient.addColorStop(1, theme.bezelShadow);
       
       ctx.strokeStyle = bezelGradient;
-      ctx.lineWidth = baseWidth + 8;
+      ctx.lineWidth = baseWidth + 4; // Thinner bezel
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.arc(cx, cy, radius + 4, 0, Math.PI, false);
+      ctx.arc(cx, cy, radius + 2, 0, Math.PI, false);
       ctx.stroke();
 
-      // Inner track - premium matte finish
+      // Inner track - thin premium matte finish
       ctx.strokeStyle = theme.track;
       ctx.lineWidth = baseWidth;
       ctx.beginPath();
@@ -123,7 +123,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         zoneGradient.addColorStop(1, zone.color + '99');
         
         ctx.strokeStyle = zoneGradient;
-        ctx.lineWidth = baseWidth - 6;
+        ctx.lineWidth = baseWidth - 4; // Thinner zones
         ctx.beginPath();
         ctx.arc(cx, cy, radius, startAngle, endAngle, false);
         ctx.stroke();
@@ -141,7 +141,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         const outer = radius - 24;
         
         ctx.strokeStyle = theme.tickMajor;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 1.5; // Thinner major ticks
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner);
@@ -165,7 +165,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
         const outer = radius - 16;
         
         ctx.strokeStyle = theme.tickMinor;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 0.8; // Thinner minor ticks
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner);
@@ -250,7 +250,7 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       gradient.addColorStop(1, needleColor + 'bb');
       
       ctx.strokeStyle = gradient;
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 2.5; // Thinner needle
       ctx.lineCap = 'round';
       ctx.shadowColor = isDark ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.3)';
       ctx.shadowBlur = 4;
@@ -262,22 +262,42 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
 
-      // Precision needle tip - automotive style
+      // Enhanced pulsing needle tip
       const tx = cx + Math.cos(needleAngle) * needleLen;
       const ty = cy + Math.sin(needleAngle) * needleLen;
+      const pulse = 0.6 + 0.4 * Math.sin(now * 0.006); // Slower, more elegant pulse
+      const tipRadius = 3 + pulse * 2; // Smaller base tip
       
-      // Tip highlight
+      // Outer pulsing halo
+      ctx.save();
+      ctx.globalAlpha = 0.15 + pulse * 0.25;
+      ctx.fillStyle = needleColor;
+      ctx.beginPath();
+      ctx.arc(tx, ty, tipRadius * 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      
+      // Mid pulsing glow
+      ctx.save();
+      ctx.globalAlpha = 0.4 + pulse * 0.3;
+      ctx.fillStyle = needleColor;
+      ctx.beginPath();
+      ctx.arc(tx, ty, tipRadius * 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      
+      // Solid tip core
       ctx.fillStyle = needleColor;
       ctx.shadowColor = needleColor;
-      ctx.shadowBlur = 6;
+      ctx.shadowBlur = 4 + pulse * 6;
       ctx.beginPath();
-      ctx.arc(tx, ty, 6, 0, Math.PI * 2);
+      ctx.arc(tx, ty, tipRadius, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Premium center hub - automotive grade
-      const hubOuter = 20;
-      const hubInner = 12;
+      // Refined center hub - thinner automotive grade
+      const hubOuter = 14; // Smaller hub
+      const hubInner = 8;
       
       // Outer ring - brushed metal
       const hubGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, hubOuter);
@@ -300,9 +320,9 @@ export default function TachometerGauge({ lvoProb = 0, ichProb = 0, title = 'Dec
       ctx.arc(cx, cy, hubInner, 0, Math.PI * 2);
       ctx.fill();
       
-      // Precision rim
+      // Precision rim - thinner
       ctx.strokeStyle = needleColor;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1; // Thinner rim
       ctx.beginPath();
       ctx.arc(cx, cy, hubOuter - 1, 0, Math.PI * 2);
       ctx.stroke();
