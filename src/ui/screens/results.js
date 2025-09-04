@@ -9,7 +9,7 @@ import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
 import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
-import { mountIslands } from '../../react/mountIslands';
+// Dynamic import for React islands to avoid module resolution issues
 // Using React island tachometer instead of the vanilla premium gauge
 import { calculateLegacyICH } from '../../research/legacy-ich-model.js';
 import { safeLogResearchData, isResearchModeEnabled } from '../../research/data-logger.js';
@@ -222,9 +222,14 @@ export function renderResults(results, startTime) {
   }
   
   // Initialize animations after DOM update
-  setTimeout(() => {
+  setTimeout(async () => {
     initializeVolumeAnimations();
-    mountIslands();
+    try {
+      const { mountIslands } = await import('../../react/mountIslands.jsx');
+      mountIslands();
+    } catch (err) {
+      console.warn('React islands not available:', err);
+    }
   }, 100);
   
   return resultsHtml;
@@ -232,6 +237,7 @@ export function renderResults(results, startTime) {
 
 function renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule) {
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
+  const ichPercentLocal = Math.round((ich?.probability || 0) * 100);
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
   const researchToggleHtml = isResearchModeEnabled(currentModule) ? renderResearchToggle() : '';
@@ -255,10 +261,12 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
         ${renderRiskCard('ich', ich, results)}
       </div>
 
-      <!-- ICH Volume Card (Coma/Limited) -->
+      ${ich?.module === 'Coma' && ichPercentLocal >= 50 ? `
+      <!-- ICH Volume Card (Coma only) -->
       <div class="risk-results-single">
         ${renderVolumeCard(ich)}
       </div>
+      ` : ''}
       
       <!-- Alternative Diagnoses for Coma Module -->
       ${alternativeDiagnosesHtml}
