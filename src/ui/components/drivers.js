@@ -85,17 +85,22 @@ export function renderDriversPanel(drivers, title, type) {
       </h4>
   `;
 
+  // Calculate relative importance for legacy panel
+  const totalPositiveWeightLegacy = driversViewModel.positive.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+  const totalNegativeWeightLegacy = driversViewModel.negative.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+
   // Show positive drivers (increase risk)
   if (driversViewModel.positive.length > 0) {
     driversViewModel.positive.forEach(driver => {
-      const percentage = Math.abs(driver.weight * 100);
-      const width = Math.min(percentage * 2, 100); // Scale for visualization
+      const relativeImportance = totalPositiveWeightLegacy > 0 ? 
+        (Math.abs(driver.weight) / totalPositiveWeightLegacy) * 100 : 0;
+      const width = Math.min(relativeImportance * 2, 100); // Scale for visualization
       html += `
         <div class="driver-item">
           <span class="driver-label">${driver.label}</span>
           <div class="driver-bar-container">
             <div class="driver-bar positive" style="width: ${width}%">
-              <span class="driver-value">+${percentage.toFixed(0)}%</span>
+              <span class="driver-value">+${relativeImportance.toFixed(0)}%</span>
             </div>
           </div>
         </div>
@@ -106,14 +111,15 @@ export function renderDriversPanel(drivers, title, type) {
   // Show negative drivers (decrease risk)
   if (driversViewModel.negative.length > 0) {
     driversViewModel.negative.forEach(driver => {
-      const percentage = Math.abs(driver.weight * 100);
-      const width = Math.min(percentage * 2, 100); // Scale for visualization
+      const relativeImportance = totalNegativeWeightLegacy > 0 ? 
+        (Math.abs(driver.weight) / totalNegativeWeightLegacy) * 100 : 0;
+      const width = Math.min(relativeImportance * 2, 100); // Scale for visualization
       html += `
         <div class="driver-item">
           <span class="driver-label">${driver.label}</span>
           <div class="driver-bar-container">
             <div class="driver-bar negative" style="width: ${width}%">
-              <span class="driver-value">-${percentage.toFixed(0)}%</span>
+              <span class="driver-value">-${relativeImportance.toFixed(0)}%</span>
             </div>
           </div>
         </div>
@@ -202,8 +208,18 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     .slice(0, 3); // Top 3 negative drivers
 
   console.log(`🎯 ${title} Final displayed drivers:`);
-  console.log('  Top positive:', positiveDrivers.map(d => `${d.label}: +${(Math.abs(d.weight) * 100).toFixed(1)}%`));
-  console.log('  Top negative:', negativeDrivers.map(d => `${d.label}: -${(Math.abs(d.weight) * 100).toFixed(1)}%`));
+  // Calculate correct relative importance for debug
+  const totalPosWeight = positiveDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+  const totalNegWeight = negativeDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+  
+  console.log('  Top positive:', positiveDrivers.map(d => {
+    const relImp = totalPosWeight > 0 ? (Math.abs(d.weight) / totalPosWeight * 100).toFixed(1) : '0';
+    return `${d.label}: +${relImp}% (weight: ${d.weight.toFixed(3)})`;
+  }));
+  console.log('  Top negative:', negativeDrivers.map(d => {
+    const relImp = totalNegWeight > 0 ? (Math.abs(d.weight) / totalNegWeight * 100).toFixed(1) : '0';
+    return `${d.label}: -${relImp}% (weight: ${d.weight.toFixed(3)})`;
+  }));
 
   const maxWeight = Math.max(
     ...positiveDrivers.map(d => Math.abs(d.weight)),
@@ -230,10 +246,15 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
           <div class="compact-drivers">
   `;
 
+  // Calculate relative importance percentages
+  const totalPositiveWeight = positiveDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+  
   // Render positive drivers
   if (positiveDrivers.length > 0) {
     positiveDrivers.forEach((driver) => {
-      const percentage = Math.abs(driver.weight * 100);
+      // Calculate relative importance as percentage of total positive contribution
+      const relativeImportance = totalPositiveWeight > 0 ? 
+        (Math.abs(driver.weight) / totalPositiveWeight) * 100 : 0;
       const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
       const cleanLabel = formatDriverName(driver.label);
       
@@ -241,7 +262,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
         <div class="compact-driver-item">
           <div class="compact-driver-label">${cleanLabel}</div>
           <div class="compact-driver-bar positive" style="width: ${barWidth}%">
-            <span class="compact-driver-value">+${percentage.toFixed(0)}%</span>
+            <span class="compact-driver-value">+${relativeImportance.toFixed(0)}%</span>
           </div>
         </div>
       `;
@@ -262,10 +283,15 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
           <div class="compact-drivers">
   `;
 
+  // Calculate relative importance percentages for negative drivers
+  const totalNegativeWeight = negativeDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+  
   // Render negative drivers
   if (negativeDrivers.length > 0) {
     negativeDrivers.forEach((driver) => {
-      const percentage = Math.abs(driver.weight * 100);
+      // Calculate relative importance as percentage of total negative contribution
+      const relativeImportance = totalNegativeWeight > 0 ? 
+        (Math.abs(driver.weight) / totalNegativeWeight) * 100 : 0;
       const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
       const cleanLabel = formatDriverName(driver.label);
       
@@ -273,7 +299,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
         <div class="compact-driver-item">
           <div class="compact-driver-label">${cleanLabel}</div>
           <div class="compact-driver-bar negative" style="width: ${barWidth}%">
-            <span class="compact-driver-value">-${percentage.toFixed(0)}%</span>
+            <span class="compact-driver-value">-${relativeImportance.toFixed(0)}%</span>
           </div>
         </div>
       `;
