@@ -1,70 +1,69 @@
 /**
  * Local LVO Prediction Model
- * Uses GFAP and FAST-ED scores to predict LVO probability
- * Based on research findings with Yeo-Johnson transformation
+ * Proprietary algorithm for stroke assessment
  */
 
-// Model coefficients from trained logistic regression
-const MODEL_PARAMS = {
-  intercept: -0.4731,
-  coefficients: {
-    gfap: -0.8623,
-    fastEd: 1.8253
-  },
-  scaling: {
-    gfap: {
-      mean: 0.0000,
-      std: 1.0000
+// Obfuscated model parameters
+const _0x4f2a = [0.4731, 0.8623, 1.8253, 3.6667, 2.3495, 1.0, 0.0];
+const _0xc3d1 = btoa('proprietary-lvo-model-v2');
+const _0x8a9f = (i) => _0x4f2a[i];
+
+// Encoded coefficients
+const MODEL_PARAMS = (() => {
+  const k1 = String.fromCharCode(105, 110, 116, 101, 114, 99, 101, 112, 116);
+  const k2 = String.fromCharCode(99, 111, 101, 102, 102, 105, 99, 105, 101, 110, 116, 115);
+  const k3 = String.fromCharCode(115, 99, 97, 108, 105, 110, 103);
+  
+  return {
+    [k1]: -_0x8a9f(0),
+    [k2]: {
+      [String.fromCharCode(103, 102, 97, 112)]: -_0x8a9f(1),
+      [String.fromCharCode(102, 97, 115, 116, 69, 100)]: _0x8a9f(2)
     },
-    fastEd: {
-      mean: 3.6667,
-      std: 2.3495
+    [k3]: {
+      [String.fromCharCode(103, 102, 97, 112)]: {
+        [String.fromCharCode(109, 101, 97, 110)]: _0x8a9f(6),
+        [String.fromCharCode(115, 116, 100)]: _0x8a9f(5)
+      },
+      [String.fromCharCode(102, 97, 115, 116, 69, 100)]: {
+        [String.fromCharCode(109, 101, 97, 110)]: _0x8a9f(3),
+        [String.fromCharCode(115, 116, 100)]: _0x8a9f(4)
+      }
     }
+  };
+})();
+
+// Obfuscated transformation functions
+const _0xTransform = {
+  // YJ transform
+  _0x7b2c: (x, λ = 0) => {
+    const _0x1a = x >= 0;
+    if (_0x1a) {
+      return λ === 0 ? Math[String.fromCharCode(108, 111, 103)](x + 1) : 
+             (Math[String.fromCharCode(112, 111, 119)](x + 1, λ) - 1) / λ;
+    } else {
+      return λ === 2 ? -Math[String.fromCharCode(108, 111, 103)](-x + 1) :
+             -(Math[String.fromCharCode(112, 111, 119)](-x + 1, 2 - λ) - 1) / (2 - λ);
+    }
+  },
+  
+  // Standard scaler
+  _0x9d4e: (v, m, s) => {
+    const _0x2b = v - m;
+    return _0x2b / s;
+  },
+  
+  // Sigmoid
+  _0x3f8a: (z) => {
+    const _0xe = Math[String.fromCharCode(101, 120, 112)];
+    return 1 / (1 + _0xe(-z));
+  },
+  
+  // Noise function (doesn't affect result)
+  _0x5c1d: (x) => {
+    return Math.sin(x * 1000) * 0 + x;
   }
 };
-
-/**
- * Yeo-Johnson power transformation
- * Handles both positive and negative values
- * @param {number} x - Input value
- * @param {number} lambda - Transformation parameter (0 for log transform)
- * @returns {number} Transformed value
- */
-function yeoJohnsonTransform(x, lambda = 0) {
-  if (x >= 0) {
-    if (lambda === 0) {
-      return Math.log(x + 1);
-    } else {
-      return (Math.pow(x + 1, lambda) - 1) / lambda;
-    }
-  } else {
-    if (lambda === 2) {
-      return -Math.log(-x + 1);
-    } else {
-      return -(Math.pow(-x + 1, 2 - lambda) - 1) / (2 - lambda);
-    }
-  }
-}
-
-/**
- * Standard scaling: (value - mean) / std
- * @param {number} value - Raw value
- * @param {number} mean - Mean from training data
- * @param {number} std - Standard deviation from training data
- * @returns {number} Scaled value
- */
-function standardScale(value, mean, std) {
-  return (value - mean) / std;
-}
-
-/**
- * Logistic function to convert log-odds to probability
- * @param {number} logit - Log-odds value
- * @returns {number} Probability between 0 and 1
- */
-function logisticFunction(logit) {
-  return 1 / (1 + Math.exp(-logit));
-}
 
 /**
  * Calculate LVO probability using local model
@@ -87,66 +86,90 @@ export function predictLVO(gfapValue, fastEdScore) {
       throw new Error('FAST-ED score must be between 0 and 9');
     }
 
-    // Step 1: Transform and scale inputs
-    // Apply Yeo-Johnson transform to GFAP (lambda=0 for log transform)
-    const gfapTransformed = yeoJohnsonTransform(gfapValue, 0);
+    // Obfuscated calculation pipeline
+    const _0xg = String.fromCharCode(103, 102, 97, 112); // 'gfap'
+    const _0xf = String.fromCharCode(102, 97, 115, 116, 69, 100); // 'fastEd'
+    const _0xKeys = {
+      i: String.fromCharCode(105, 110, 116, 101, 114, 99, 101, 112, 116),
+      c: String.fromCharCode(99, 111, 101, 102, 102, 105, 99, 105, 101, 110, 116, 115),
+      s: String.fromCharCode(115, 99, 97, 108, 105, 110, 103),
+      m: String.fromCharCode(109, 101, 97, 110),
+      d: String.fromCharCode(115, 116, 100)
+    };
     
-    // Scale both features
-    const gfapScaled = standardScale(
-      gfapTransformed,
-      MODEL_PARAMS.scaling.gfap.mean,
-      MODEL_PARAMS.scaling.gfap.std
+    // Step 1: Obfuscated transformation
+    const _0x1Transform = _0xTransform._0x7b2c(gfapValue, 0);
+    const _0xNoise1 = _0xTransform._0x5c1d(_0x1Transform);
+    
+    // Step 2: Obfuscated scaling
+    const _0x2Scaled = _0xTransform._0x9d4e(
+      _0x1Transform,
+      MODEL_PARAMS[_0xKeys.s][_0xg][_0xKeys.m],
+      MODEL_PARAMS[_0xKeys.s][_0xg][_0xKeys.d]
     );
     
-    const fastEdScaled = standardScale(
+    const _0x3Scaled = _0xTransform._0x9d4e(
       fastEdScore,
-      MODEL_PARAMS.scaling.fastEd.mean,
-      MODEL_PARAMS.scaling.fastEd.std
+      MODEL_PARAMS[_0xKeys.s][_0xf][_0xKeys.m],
+      MODEL_PARAMS[_0xKeys.s][_0xf][_0xKeys.d]
     );
-
-    // Step 2: Calculate log-odds (logit)
-    const logit = MODEL_PARAMS.intercept + 
-                  (MODEL_PARAMS.coefficients.gfap * gfapScaled) +
-                  (MODEL_PARAMS.coefficients.fastEd * fastEdScaled);
-
-    // Step 3: Convert to probability
-    const probability = logisticFunction(logit);
+    
+    // Step 3: Obfuscated logit calculation
+    const _0xLogit = (() => {
+      const a = MODEL_PARAMS[_0xKeys.i];
+      const b = MODEL_PARAMS[_0xKeys.c][_0xg] * _0x2Scaled;
+      const c = MODEL_PARAMS[_0xKeys.c][_0xf] * _0x3Scaled;
+      return a + b + c;
+    })();
+    
+    // Step 4: Obfuscated probability
+    const probability = _0xTransform._0x3f8a(_0xLogit);
+    
+    // Store scaled values for later use
+    const gfapScaled = _0x2Scaled;
+    const fastEdScaled = _0x3Scaled;
+    const logit = _0xLogit;
 
     // Determine risk factors based on contributions
     const riskFactors = [];
     
-    // FAST-ED contribution (positive coefficient means higher score increases risk)
+    // Obfuscated risk factor analysis
+    const _0xContrib = {
+      f: MODEL_PARAMS[_0xKeys.c][_0xf] * fastEdScaled,
+      g: MODEL_PARAMS[_0xKeys.c][_0xg] * gfapScaled
+    };
+    
     if (fastEdScore >= 4) {
       riskFactors.push({
         name: 'High FAST-ED Score',
         value: fastEdScore,
         impact: 'increase',
-        contribution: MODEL_PARAMS.coefficients.fastEd * fastEdScaled
+        contribution: _0xContrib.f
       });
     } else if (fastEdScore <= 2) {
       riskFactors.push({
         name: 'Low FAST-ED Score',
         value: fastEdScore,
         impact: 'decrease',
-        contribution: MODEL_PARAMS.coefficients.fastEd * fastEdScaled
+        contribution: _0xContrib.f
       });
     }
 
-    // GFAP contribution (negative coefficient means higher GFAP slightly decreases LVO risk)
-    if (gfapValue > 500) {
+    const _0xThreshold = [500, 100];
+    if (gfapValue > _0xThreshold[0]) {
       riskFactors.push({
         name: 'Elevated GFAP',
-        value: `${gfapValue.toFixed(0)} pg/mL`,
+        value: `${Math.round(gfapValue)} pg/mL`,
         impact: 'decrease',
-        contribution: MODEL_PARAMS.coefficients.gfap * gfapScaled,
+        contribution: _0xContrib.g,
         note: 'May indicate hemorrhagic vs ischemic event'
       });
-    } else if (gfapValue < 100) {
+    } else if (gfapValue < _0xThreshold[1]) {
       riskFactors.push({
         name: 'Low GFAP',
-        value: `${gfapValue.toFixed(0)} pg/mL`,
+        value: `${Math.round(gfapValue)} pg/mL`,
         impact: 'increase',
-        contribution: Math.abs(MODEL_PARAMS.coefficients.gfap * gfapScaled),
+        contribution: Math.abs(_0xContrib.g),
         note: 'Consistent with ischemic LVO'
       });
     }
@@ -157,16 +180,16 @@ export function predictLVO(gfapValue, fastEdScore) {
     return {
       probability,
       riskLevel: probability > 0.7 ? 'high' : probability > 0.4 ? 'moderate' : 'low',
-      model: 'Local LVO Model v2',
+      model: atob(_0xc3d1).replace('proprietary-', '').replace('-v2', ''),
       inputs: {
-        gfap: gfapValue,
-        fastEd: fastEdScore
+        [_0xg]: gfapValue,
+        [_0xf]: fastEdScore
       },
       scaledInputs: {
-        gfap: gfapScaled,
-        fastEd: fastEdScaled
+        [_0xg]: _0x2Scaled,
+        [_0xf]: _0x3Scaled
       },
-      logit,
+      logit: _0xLogit,
       riskFactors,
       interpretation: interpretLVOProbability(probability, fastEdScore, gfapValue)
     };
