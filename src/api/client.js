@@ -1,5 +1,6 @@
 import { API_URLS, APP_CONFIG } from '../config.js';
 import { extractDriversFromResponse, extractProbabilityFromResponse, extractConfidenceFromResponse } from './drivers.js';
+import { predictLVO, canUseLocalModel } from '../logic/lvo-local-model.js';
 
 // Warm up Google Cloud Functions on app load
 export async function warmUpFunctions() {
@@ -225,63 +226,47 @@ export async function predictFullStroke(payload) {
   console.log('  💊 Anticoag NOAK:', normalizedPayload.anticoagulated_noak);
   console.log('  💊 Antiplatelets:', normalizedPayload.antiplatelets);
   
+  // Use local LVO model for prediction (more accurate, faster, works offline)
+  let lvoResult = null;
+  
+  if (canUseLocalModel(normalizedPayload)) {
+    console.log('🚀 Using local LVO model (GFAP + FAST-ED)');
+    const localLVO = predictLVO(normalizedPayload.gfap_value, normalizedPayload.fast_ed_score);
+    
+    if (localLVO.probability !== null) {
+      // Convert local model format to match expected API format
+      lvoResult = {
+        probability: localLVO.probability,
+        drivers: localLVO.riskFactors.map(factor => ({
+          feature: factor.name,
+          value: factor.value,
+          contribution: factor.contribution,
+          impact: factor.impact
+        })),
+        confidence: localLVO.riskLevel === 'high' ? 0.9 : localLVO.riskLevel === 'moderate' ? 0.7 : 0.5,
+        module: 'Full Stroke (Local LVO)',
+        interpretation: localLVO.interpretation
+      };
+      
+      console.log('✅ Local LVO prediction:', {
+        probability: lvoResult.probability,
+        riskLevel: localLVO.riskLevel,
+        inputs: localLVO.inputs
+      });
+    }
+  }
+  
   try {
+    // Still use API for ICH prediction (requires all parameters)
     const response = await fetchJSON(API_URLS.FULL_STROKE, normalizedPayload);
     
-    // Debug log the API response
-    console.log('📥 Full Stroke API Response:', response);
-    console.log('🔑 Available keys in response:', Object.keys(response));
+    console.log('📥 Full Stroke API Response (ICH only):', response);
     
-    // Test backend data mapping accuracy
-    console.log('=== BACKEND MAPPING VERIFICATION ===');
-    
-    // Check if backend returns any feature names that match our inputs
-    const responseStr = JSON.stringify(response).toLowerCase();
-    console.log('🔍 Backend Feature Name Analysis:');
-    console.log('  Contains "fast":', responseStr.includes('fast'));
-    console.log('  Contains "ed":', responseStr.includes('ed'));
-    console.log('  Contains "fast_ed":', responseStr.includes('fast_ed'));
-    console.log('  Contains "systolic":', responseStr.includes('systolic'));
-    console.log('  Contains "diastolic":', responseStr.includes('diastolic'));
-    console.log('  Contains "gfap":', responseStr.includes('gfap'));
-    console.log('  Contains "age":', responseStr.includes('age'));
-    console.log('  Contains "headache":', responseStr.includes('headache'));
-    
-    // Debug driver extraction
-    console.log('🧠 ICH driver sources:');
-    console.log('  response.ich_prediction?.drivers:', response.ich_prediction?.drivers);
-    console.log('  response.ich_drivers:', response.ich_drivers);
-    console.log('  response.ich?.drivers:', response.ich?.drivers);
-    console.log('  response.drivers?.ich:', response.drivers?.ich);
-    
-    console.log('🩸 LVO driver sources:');
-    console.log('  response.lvo_prediction?.drivers:', response.lvo_prediction?.drivers);
-    console.log('  response.lvo_drivers:', response.lvo_drivers);
-    console.log('  response.lvo?.drivers:', response.lvo?.drivers);
-    console.log('  response.drivers?.lvo:', response.drivers?.lvo);
-    
-    // Try to identify probability values
-    Object.keys(response).forEach(key => {
-      const value = response[key];
-      if (typeof value === 'number' && value >= 0 && value <= 1) {
-        console.log(`Potential probability field: ${key} = ${value}`);
-      }
-    });
-    
-    // Clean extraction with proper API mapping
+    // Extract ICH results from API
     const ichProbability = extractProbabilityFromResponse(response, 'ICH');
-    const lvoProbability = extractProbabilityFromResponse(response, 'LVO');
-    
     const ichDrivers = extractDriversFromResponse(response, 'ICH');
-    const lvoDrivers = extractDriversFromResponse(response, 'LVO');
-    
     const ichConfidence = extractConfidenceFromResponse(response, 'ICH');
-    const lvoConfidence = extractConfidenceFromResponse(response, 'LVO');
     
-    console.log('✅ Clean extraction results:');
-    console.log('  ICH:', { probability: ichProbability, hasDrivers: !!ichDrivers });
-    console.log('  LVO:', { probability: lvoProbability, hasDrivers: !!lvoDrivers });
-
     const ichResult = {
       probability: ichProbability,
       drivers: ichDrivers,
@@ -289,12 +274,24 @@ export async function predictFullStroke(payload) {
       module: 'Full Stroke'
     };
     
-    const lvoResult = {
-      probability: lvoProbability,
-      drivers: lvoDrivers,
-      confidence: lvoConfidence,
-      module: 'Full Stroke'
-    };
+    // If local LVO failed, fall back to API
+    if (!lvoResult) {
+      console.log('⚠️ Falling back to API for LVO prediction');
+      const lvoProbability = extractProbabilityFromResponse(response, 'LVO');
+      const lvoDrivers = extractDriversFromResponse(response, 'LVO');
+      const lvoConfidence = extractConfidenceFromResponse(response, 'LVO');
+      
+      lvoResult = {
+        probability: lvoProbability,
+        drivers: lvoDrivers,
+        confidence: lvoConfidence,
+        module: 'Full Stroke (API)'
+      };
+    }
+    
+    console.log('✅ Combined results:');
+    console.log('  ICH (API):', { probability: ichProbability, hasDrivers: !!ichDrivers });
+    console.log('  LVO (Local):', { probability: lvoResult.probability, hasDrivers: !!lvoResult.drivers });
     
     return {
       ich: ichResult,
