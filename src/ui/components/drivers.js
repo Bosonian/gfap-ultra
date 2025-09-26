@@ -3,17 +3,7 @@ import { formatDriverName } from '../../utils/label-formatter.js';
 
 export function renderDriversSection(ich, lvo) {
   console.log('=== DRIVER RENDERING SECTION ===');
-  console.log('🧠 ICH result received:', { 
-    probability: ich?.probability, 
-    hasDrivers: !!ich?.drivers,
-    module: ich?.module 
-  });
-  console.log('🩸 LVO result received:', { 
-    probability: lvo?.probability, 
-    hasDrivers: !!lvo?.drivers,
-    module: lvo?.module,
-    notPossible: lvo?.notPossible 
-  });
+  
   
   if (!ich?.drivers && !lvo?.drivers) {
     console.log('❌ No drivers available for rendering');
@@ -155,9 +145,7 @@ export function renderDriversPanel(drivers, title, type) {
 }
 
 export function renderEnhancedDriversPanel(drivers, title, type, probability) {
-  console.log(`--- ${title} Driver Panel Debug ---`);
-  console.log('Raw drivers input:', drivers);
-  console.log('Title:', title, 'Type:', type, 'Probability:', probability);
+  
   
   if (!drivers || Object.keys(drivers).length === 0) {
     console.log(`No drivers data for ${title}`);
@@ -179,7 +167,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
 
   // Drivers are already in the correct format from our new extraction
   const driversViewModel = drivers;
-  console.log(`${title} drivers ready for display:`, driversViewModel);
+  
   
   if (driversViewModel.kind === 'unavailable') {
     return `
@@ -207,19 +195,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
     .slice(0, 3); // Top 3 negative drivers
 
-  console.log(`🎯 ${title} Final displayed drivers:`);
-  // Calculate correct relative importance for debug
-  const totalPosWeight = positiveDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
-  const totalNegWeight = negativeDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
   
-  console.log('  Top positive:', positiveDrivers.map(d => {
-    const relImp = totalPosWeight > 0 ? (Math.abs(d.weight) / totalPosWeight * 100).toFixed(1) : '0';
-    return `${d.label}: +${relImp}% (weight: ${d.weight.toFixed(3)})`;
-  }));
-  console.log('  Top negative:', negativeDrivers.map(d => {
-    const relImp = totalNegWeight > 0 ? (Math.abs(d.weight) / totalNegWeight * 100).toFixed(1) : '0';
-    return `${d.label}: -${relImp}% (weight: ${d.weight.toFixed(3)})`;
-  }));
 
   const maxWeight = Math.max(
     ...positiveDrivers.map(d => Math.abs(d.weight)),

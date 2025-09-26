@@ -193,14 +193,7 @@ export function renderResults(results, startTime) {
   const legacyResults = currentModule !== 'coma' ? calculateLegacyFromResults(results) : null;
   
   // Debug logging for research mode
-  console.log('🔬 Research Debug - Always Active:', {
-    module: currentModule,
-    researchEnabled: isResearchModeEnabled(currentModule),
-    mainResults: ich,
-    legacyResults: legacyResults,
-    patientInputs: getPatientInputs(),
-    legacyCalculationAttempted: currentModule !== 'coma'
-  });
+  
   
   // Log research data if research mode is enabled (background, non-breaking)
   if (legacyResults && isResearchModeEnabled(currentModule)) {
@@ -341,14 +334,7 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   // Get FAST-ED score from form data to determine LVO display
   const state = store.getState();
   const fastEdScore = parseInt(state.formData?.full?.fast_ed_score) || 0;
-  console.log('🔍 Debug LVO Display:');
-  console.log('  Current Module:', currentModule);
-  console.log('  FAST-ED Score:', fastEdScore);
-  console.log('  FAST-ED Raw:', state.formData?.full?.fast_ed_score);
-  console.log('  LVO Data:', lvo);
-  console.log('  LVO notPossible:', lvo?.notPossible);
-  console.log('  LVO Probability:', lvo?.probability);
-  console.log('  ICH Module:', ich?.module);
+  
   
   // Ensure we only show LVO in full module and when LVO data is available
   const isFullModule = currentModule === 'full' || ich?.module === 'Full';
@@ -372,7 +358,7 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   const showDominanceBanner = isFullModule && ichPercent >= 50 && lvoPercent >= 50 && !inRatioBand;
   // DEBUG: Temporary relaxed conditions for testing
   const debugShowTachometer = isFullModule && ichPercent >= 30 && lvoPercent >= 30;
-  console.log('🎯 Tachometer conditions:', { isFullModule, ichPercent, lvoPercent, ratio: ratio.toFixed(2), inRatioBand, showTachometer, showDominanceBanner });
+  
   
   // Calculate number of cards and layout class
   let cardCount = 1; // Always have ICH
@@ -612,7 +598,7 @@ function renderBibliography(ichData) {
 function calculateLegacyFromResults(results) {
   try {
     const patientInputs = getPatientInputs();
-    console.log('🔍 Legacy calculation inputs:', patientInputs);
+    
     
     if (!patientInputs.age || !patientInputs.gfap) {
       console.warn('🔍 Missing required inputs for legacy model:', { 
@@ -623,7 +609,7 @@ function calculateLegacyFromResults(results) {
     }
     
     const legacyResult = calculateLegacyICH(patientInputs);
-    console.log('🔍 Legacy calculation result:', legacyResult);
+    
     
     return legacyResult;
   } catch (error) {
@@ -640,7 +626,7 @@ function getPatientInputs() {
   const state = store.getState();
   const formData = state.formData;
   
-  console.log('🔍 Debug formData structure:', formData);
+  
   
   // Extract age and GFAP from any module
   let age = null;
@@ -648,7 +634,7 @@ function getPatientInputs() {
   
   for (const module of ['coma', 'limited', 'full']) {
     if (formData[module]) {
-      console.log(`🔍 ${module} module data:`, formData[module]);
+      
       age = age || formData[module].age_years;
       gfap = gfap || formData[module].gfap_value;
     }
@@ -659,7 +645,7 @@ function getPatientInputs() {
     gfap: parseFloat(gfap) || null
   };
   
-  console.log('🔍 Extracted patient inputs:', result);
+  
   return result;
 }
 

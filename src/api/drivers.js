@@ -5,16 +5,16 @@
  */
 export function extractDriversFromResponse(response, predictionType) {
   console.log(`=== EXTRACTING ${predictionType.toUpperCase()} DRIVERS ===`);
-  console.log('Full response:', response);
+  
   
   let rawDrivers = null;
   
   if (predictionType === 'ICH') {
     rawDrivers = response.ich_prediction?.drivers || null;
-    console.log('🧠 ICH raw drivers extracted:', rawDrivers);
+    
   } else if (predictionType === 'LVO') {
     rawDrivers = response.lvo_prediction?.drivers || null;
-    console.log('🩸 LVO raw drivers extracted:', rawDrivers);
+    
   }
   
   if (!rawDrivers) {
@@ -25,7 +25,7 @@ export function extractDriversFromResponse(response, predictionType) {
   // Convert flat dictionary to structured format
   const formattedDrivers = formatDriversFromDictionary(rawDrivers, predictionType);
   
-  console.log(`✅ ${predictionType} drivers formatted:`, formattedDrivers);
+  
   
   // Check for FAST-ED specifically
   const allFeatures = [...formattedDrivers.positive, ...formattedDrivers.negative];
@@ -49,7 +49,7 @@ export function extractDriversFromResponse(response, predictionType) {
  * Convert backend flat dictionary to structured positive/negative arrays
  */
 function formatDriversFromDictionary(drivers, predictionType) {
-  console.log(`🔄 Formatting ${predictionType} drivers from dictionary:`, drivers);
+  
   
   const positive = [];
   const negative = [];
@@ -69,8 +69,7 @@ function formatDriversFromDictionary(drivers, predictionType) {
   positive.sort((a, b) => b.weight - a.weight);
   negative.sort((a, b) => b.weight - a.weight);
   
-  console.log(`📈 ${predictionType} positive drivers:`, positive.slice(0, 5));
-  console.log(`📉 ${predictionType} negative drivers:`, negative.slice(0, 5));
+  
   
   return {
     kind: 'flat_dictionary',
@@ -91,11 +90,11 @@ export function extractProbabilityFromResponse(response, predictionType) {
   
   if (predictionType === 'ICH') {
     probability = response.ich_prediction?.probability || 0;
-    console.log('🧠 ICH probability extracted:', probability);
+    
     
   } else if (predictionType === 'LVO') {
     probability = response.lvo_prediction?.probability || 0;
-    console.log('🩸 LVO probability extracted:', probability);
+    
   }
   
   return probability;

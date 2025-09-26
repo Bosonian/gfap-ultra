@@ -49,10 +49,16 @@ export function showValidationErrors(container, validationErrors) {
         group.classList.add('error');
         // Remove existing error messages
         group.querySelectorAll('.error-message').forEach(el => el.remove());
-        // Add new error message
+        // Add new error message safely without innerHTML
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
-        errorDiv.innerHTML = `<span class="error-icon">⚠️</span> ${errors[0]}`;
+
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'error-icon';
+        iconSpan.textContent = '⚠️';
+
+        errorDiv.appendChild(iconSpan);
+        errorDiv.appendChild(document.createTextNode(' ' + errors[0]));
         group.appendChild(errorDiv);
       }
     }

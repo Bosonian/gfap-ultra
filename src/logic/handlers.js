@@ -41,20 +41,20 @@ export function reset() {
 }
 
 export function goBack() {
-  console.log('goBack() called');
+  
   const success = store.goBack();
-  console.log('goBack() success:', success);
+  
   if (success) {
     store.logEvent('navigate_back');
     window.scrollTo(0, 0);
   } else {
-    console.log('No history available, going home instead');
+    
     goHome();
   }
 }
 
 export function goHome() {
-  console.log('goHome() called');
+  
   store.logEvent('navigate_home');
   store.goHome();
   window.scrollTo(0, 0);
@@ -113,7 +113,7 @@ export async function handleSubmit(e, container) {
     }
   });
   
-  console.log('Collected form inputs:', inputs);
+  
 
   // Store form data
   store.setFormData(module, inputs);
@@ -186,7 +186,20 @@ function showError(container, message) {
 
   const alert = document.createElement('div');
   alert.className = 'critical-alert';
-  alert.innerHTML = `<h4><span class="alert-icon">⚠️</span> Error</h4><p>${message}</p>`;
+
+  // Create safe DOM structure without innerHTML to prevent XSS
+  const h4 = document.createElement('h4');
+  const iconSpan = document.createElement('span');
+  iconSpan.className = 'alert-icon';
+  iconSpan.textContent = '⚠️';
+  h4.appendChild(iconSpan);
+  h4.appendChild(document.createTextNode(' Error'));
+
+  const p = document.createElement('p');
+  p.textContent = message; // Safe text content only
+
+  alert.appendChild(h4);
+  alert.appendChild(p);
   
   const containerDiv = container.querySelector('.container');
   if (containerDiv) {

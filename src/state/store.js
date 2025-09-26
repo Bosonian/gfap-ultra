@@ -19,11 +19,18 @@ class Store {
   initialize() {
     this.state.sessionId = this.generateSessionId();
     this.state.startTime = Date.now();
-    console.log('Store initialized with session:', this.state.sessionId);
+    
   }
   
   generateSessionId() {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // Use cryptographically secure random values
+    const timestamp = Date.now();
+    const randomBytes = new Uint8Array(8);
+    crypto.getRandomValues(randomBytes);
+    const randomHex = Array.from(randomBytes)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    return `session_${timestamp}_${randomHex}`;
   }
   
   // Subscribe to state changes
@@ -50,7 +57,7 @@ class Store {
   
   // Navigate to a new screen
   navigate(screen) {
-    console.log(`Navigating from ${this.state.currentScreen} to ${screen}`);
+    
     const history = [...this.state.screenHistory];
     
     // Add current screen to history if not already there
@@ -67,18 +74,17 @@ class Store {
   // Navigate back to previous screen
   goBack() {
     const history = [...this.state.screenHistory];
-    console.log('goBack() - current history:', history);
-    console.log('goBack() - current screen:', this.state.currentScreen);
+    
     if (history.length > 0) {
       const previousScreen = history.pop();
-      console.log('goBack() - navigating to:', previousScreen);
+      
       this.setState({ 
         currentScreen: previousScreen, 
         screenHistory: history 
       });
       return true;
     }
-    console.log('goBack() - no history available');
+    
     return false;
   }
   
@@ -134,7 +140,7 @@ class Store {
       screenHistory: []
     };
     this.setState(newState);
-    console.log('Store reset with new session:', newState.sessionId);
+    
   }
   
   // Log events for audit trail
@@ -145,7 +151,7 @@ class Store {
       event: eventName,
       data: data
     };
-    console.log('Event:', event);
+    
     // In production, send to analytics service
     // this.sendToAnalytics(event);
   }

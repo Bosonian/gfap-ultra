@@ -110,10 +110,10 @@ export function addCompactVolumeToSummary(summarySection) {
  * @param {number} newGfapValue - New GFAP value
  */
 export function updateAllVolumeDisplays(newGfapValue) {
-  console.log(`🩸 Updating volume displays for GFAP: ${newGfapValue} pg/ml`);
+  
   
   const volumeResult = calculateICHVolume(newGfapValue);
-  console.log(`📊 Calculated volume: ${volumeResult.displayVolume}, mortality: ${volumeResult.mortalityRate}`);
+  
   
   // Update compact displays
   const compactDisplays = document.querySelectorAll('.compact-volume-display');

@@ -120,14 +120,12 @@ async function fetchJSON(url, payload) {
 export async function predictComaIch(payload) {
   const normalizedPayload = normalizeBooleans(payload);
   
-  // Debug log the payload being sent
-  console.log('Coma ICH API Payload:', normalizedPayload);
+  // Production: Patient data logging removed for privacy
   
   try {
     const response = await fetchJSON(API_URLS.COMA_ICH, normalizedPayload);
     
-    // Debug log the API response
-    console.log('Coma ICH API Response:', response);
+    // Production: Response logging removed for privacy
     
     // Normalize response format for consistency
     return {
@@ -159,14 +157,12 @@ export async function predictLimitedIch(payload) {
   
   const normalizedPayload = normalizeBooleans(fullPayload);
   
-  // Debug log the payload being sent
-  console.log('Limited Data ICH API Payload:', normalizedPayload);
+  // Production: Patient data logging removed for privacy
   
   try {
     const response = await fetchJSON(API_URLS.LDM_ICH, normalizedPayload);
     
-    // Debug log the API response
-    console.log('Limited Data ICH API Response:', response);
+    // Production: Response logging removed for privacy
     
     // Normalize response format for consistency
     return {
@@ -206,25 +202,7 @@ export async function predictFullStroke(payload) {
   
   const normalizedPayload = normalizeBooleans(fullPayload);
   
-  // Debug log the payload being sent
-  console.log('=== BACKEND DATA MAPPING TEST ===');
-  console.log('📤 Full Stroke API Payload:', normalizedPayload);
-  
-  // Test all key clinical variables
-  console.log('🧪 Clinical Variables Being Sent:');
-  console.log('  📊 FAST-ED Score:', normalizedPayload.fast_ed_score);
-  console.log('  🩸 Systolic BP:', normalizedPayload.systolic_bp);
-  console.log('  🩸 Diastolic BP:', normalizedPayload.diastolic_bp);
-  console.log('  🧬 GFAP Value:', normalizedPayload.gfap_value);
-  console.log('  👤 Age:', normalizedPayload.age_years);
-  console.log('  🤕 Headache:', normalizedPayload.headache);
-  console.log('  😵 Vigilanz:', normalizedPayload.vigilanzminderung);
-  console.log('  💪 Arm Parese:', normalizedPayload.armparese);
-  console.log('  🦵 Leg Parese:', normalizedPayload.beinparese);
-  console.log('  👁️ Eye Deviation:', normalizedPayload.eye_deviation);
-  console.log('  💓 Atrial Fib:', normalizedPayload.atrial_fibrillation);
-  console.log('  💊 Anticoag NOAK:', normalizedPayload.anticoagulated_noak);
-  console.log('  💊 Antiplatelets:', normalizedPayload.antiplatelets);
+  // Production: Patient data logging removed for privacy
   
   // Use local LVO model for prediction (more accurate, faster, works offline)
   let lvoResult = null;
@@ -248,11 +226,7 @@ export async function predictFullStroke(payload) {
         interpretation: localLVO.interpretation
       };
       
-      console.log('✅ Local LVO prediction:', {
-        probability: lvoResult.probability,
-        riskLevel: localLVO.riskLevel,
-        inputs: localLVO.inputs
-      });
+      // Production: Prediction logging removed for privacy
     }
   }
   
@@ -260,7 +234,7 @@ export async function predictFullStroke(payload) {
     // Still use API for ICH prediction (requires all parameters)
     const response = await fetchJSON(API_URLS.FULL_STROKE, normalizedPayload);
     
-    console.log('📥 Full Stroke API Response (ICH only):', response);
+    // Production: Response logging removed for privacy
     
     // Extract ICH results from API
     const ichProbability = extractProbabilityFromResponse(response, 'ICH');
@@ -289,9 +263,7 @@ export async function predictFullStroke(payload) {
       };
     }
     
-    console.log('✅ Combined results:');
-    console.log('  ICH (API):', { probability: ichProbability, hasDrivers: !!ichDrivers });
-    console.log('  LVO (Local):', { probability: lvoResult.probability, hasDrivers: !!lvoResult.drivers });
+    // Production: Results logging removed for privacy
     
     return {
       ich: ichResult,

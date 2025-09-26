@@ -4,6 +4,7 @@ import { APP_CONFIG } from './config.js';
 import { i18n, t } from './localization/i18n.js';
 import { warmUpFunctions } from './api/client.js';
 import { setResearchMode, isResearchModeEnabled } from './research/data-logger.js';
+import { authManager } from './auth/authentication.js';
 
 class App {
   constructor() {
@@ -22,6 +23,11 @@ class App {
     if (!this.container) {
       console.error('App container not found');
       return;
+    }
+
+    // Check authentication before proceeding
+    if (!authManager.isValidSession()) {
+      store.navigate('login');
     }
 
     // Subscribe to store changes
@@ -67,7 +73,7 @@ class App {
     // Initial render
     render(this.container);
 
-    console.log('iGFAP Stroke Triage Assistant initialized');
+    
   }
 
   setupGlobalEventListeners() {
@@ -270,7 +276,7 @@ class App {
       researchModeToggle.style.display = shouldShow ? 'flex' : 'none';
       researchModeToggle.style.opacity = shouldShow ? '1' : '0.5';
       
-      console.log(`🔬 Research button visibility: ${shouldShow ? 'VISIBLE' : 'HIDDEN'} (module: ${currentModule})`);
+      
     }
   }
 
@@ -305,7 +311,7 @@ class App {
         'rgba(255, 255, 255, 0.1)' : 'rgba(0, 102, 204, 0.2)';
     }
     
-    console.log(`🔬 Research panel ${isVisible ? 'HIDDEN' : 'SHOWN'}`);
+    
     
     // DO NOT trigger any navigation or state changes
     return false;
@@ -399,16 +405,16 @@ class App {
         scope: '/0825/'
       });
 
-      console.log('Service Worker registered successfully:', registration);
+      
 
       // Handle service worker updates
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
-        console.log('New service worker found');
+        
 
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            console.log('New service worker installed, update available');
+            
             // Could show update notification here
             this.showUpdateNotification();
           }
@@ -417,7 +423,7 @@ class App {
 
       // Listen for service worker messages
       navigator.serviceWorker.addEventListener('message', (event) => {
-        console.log('Message from service worker:', event.data);
+        
       });
 
     } catch (error) {

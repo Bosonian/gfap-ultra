@@ -5,12 +5,14 @@ import { renderComa } from './screens/coma.js';
 import { renderLimited } from './screens/limited.js';
 import { renderFull } from './screens/full.js';
 import { renderResults } from './screens/results.js';
+import { renderLoginScreen, initializeLoginScreen } from './screens/login.js';
 import { handleTriage1, handleTriage2, handleSubmit, reset, goBack, goHome } from '../logic/handlers.js';
 import { clearValidationErrors } from '../logic/validate.js';
 import { announceScreenChange, setPageTitle, focusMainHeading } from './a11y.js';
 import { initializeStrokeCenterMap } from './components/stroke-center-map.js';
 import { fastEdCalculator } from './components/fastEdModal.js';
 import { initializeResearchMode } from '../research/comparison-ui.js';
+import { authManager } from '../auth/authentication.js';
 
 export function render(container) {
   const state = store.getState();
@@ -28,7 +30,15 @@ export function render(container) {
   // Render the appropriate screen
   let html = '';
   switch (currentScreen) {
+    case 'login':
+      html = renderLoginScreen();
+      break;
     case 'triage1':
+      // Verify authentication for all clinical screens
+      if (!authManager.isValidSession()) {
+        store.navigate('login');
+        return;
+      }
       html = renderTriage1();
       break;
     case 'triage2':
@@ -68,6 +78,13 @@ export function render(container) {
 
   // Attach event listeners
   attachEvents(container);
+
+  // Initialize login screen if needed
+  if (currentScreen === 'login') {
+    setTimeout(() => {
+      initializeLoginScreen();
+    }, 100);
+  }
 
   // Initialize stroke center map if on results screen
   if (currentScreen === 'results' && results) {
