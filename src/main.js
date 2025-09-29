@@ -12,6 +12,7 @@ import { createApp } from './core/app-controller.js';
 import { store } from './state/store.js';
 import { render } from './ui/render.js';
 import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from './utils/error-handler.js';
+import { initializeAPIWarmup } from './core/api-warmup.js';
 
 /**
  * Application instance
@@ -26,6 +27,17 @@ async function initializeApplication() {
     async () => {
       // Create and initialize the main application
       app = await createApp();
+
+      // Start API warmup in background to prevent cold starts
+      setTimeout(() => {
+        initializeAPIWarmup({ background: true, criticalOnly: false })
+          .then(result => {
+            console.info('[Main] API warmup started:', result.status || 'completed');
+          })
+          .catch(error => {
+            console.warn('[Main] API warmup failed:', error.message);
+          });
+      }, 2000); // Start warmup 2 seconds after app initialization
 
       // Log successful initialization
       const status = app.getStatus();

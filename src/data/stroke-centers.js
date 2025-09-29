@@ -497,7 +497,20 @@ export async function calculateTravelTime(fromLat, fromLng, toLat, toLng, profil
     }
     throw new Error('No route found');
   } catch (error) {
-    //('Travel time calculation failed, using distance estimate:', error);
+    // Enhanced CORS-aware fallback to distance-based time estimation
+    let source = 'estimated';
+
+    // Detect CORS errors specifically
+    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      console.info('[TravelTime] OpenRouteService blocked by CORS, using distance estimation');
+      source = 'cors-fallback';
+    } else if (error.message.includes('signal')) {
+      console.info('[TravelTime] OpenRouteService timeout, using distance estimation');
+      source = 'timeout-fallback';
+    } else {
+      console.info('[TravelTime] OpenRouteService error, using distance estimation:', error.message);
+      source = 'error-fallback';
+    }
 
     // Fallback to distance-based time estimation
     const distance = calculateDistance(fromLat, fromLng, toLat, toLng);
@@ -506,7 +519,7 @@ export async function calculateTravelTime(fromLat, fromLng, toLat, toLng, profil
     return {
       duration: estimatedTime,
       distance: Math.round(distance),
-      source: 'estimated',
+      source: source,
     };
   }
 }

@@ -373,7 +373,7 @@ def predict_lvo(request) -> Tuple[Dict[str, Any], int, Dict[str, str]]:
     """
     # CORS headers
     cors_headers = {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': 'https://igfap.eu',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Max-Age': '3600',
