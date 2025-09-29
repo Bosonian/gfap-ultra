@@ -19,7 +19,7 @@ class I18n {
     // Detect browser language
     const browserLang = navigator.language || navigator.userLanguage;
     const langCode = browserLang.substring(0, 2).toLowerCase();
-    
+
     // Default to German if browser language is German, otherwise English
     return langCode === 'de' ? 'de' : 'en';
   }
@@ -34,12 +34,12 @@ class I18n {
     if (this.supportedLanguages.includes(language)) {
       this.currentLanguage = language;
       localStorage.setItem('language', language);
-      
+
       // Dispatch custom event for language change
-      window.dispatchEvent(new CustomEvent('languageChanged', { 
-        detail: { language } 
+      window.dispatchEvent(new CustomEvent('languageChanged', {
+        detail: { language },
       }));
-      
+
       return true;
     }
     return false;
@@ -66,8 +66,8 @@ class I18n {
   getLanguageDisplayName(lang = null) {
     const language = lang || this.currentLanguage;
     const displayNames = {
-      'en': 'English',
-      'de': 'Deutsch'
+      en: 'English',
+      de: 'Deutsch',
     };
     return displayNames[language] || language;
   }
@@ -77,11 +77,11 @@ class I18n {
     const locale = this.currentLanguage === 'de' ? 'de-DE' : 'en-US';
     return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
-      month: '2-digit', 
+      month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     }).format(date);
   }
 
@@ -91,7 +91,7 @@ class I18n {
     return new Intl.DateTimeFormat(locale, {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     }).format(date);
   }
 }

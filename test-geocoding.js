@@ -2,7 +2,12 @@
 async function testGeocoding(locationString) {
   try {
     const encodedLocation = encodeURIComponent(locationString + ', Deutschland');
-    const url = `https://api.openrouteservice.org/geocoding/v1/search?api_key=5b3ce3597851110001cf624868c4c27b63ae476c9c26c8bffbc35688&text=${encodedLocation}&boundary.country=DE&size=1`;
+    // SECURITY: API key moved to environment variables
+    const apiKey = process.env.OPENROUTE_API_KEY || 'YOUR_API_KEY_HERE';
+    if (apiKey === 'YOUR_API_KEY_HERE') {
+      throw new Error('OpenRoute API key not configured. Set OPENROUTE_API_KEY environment variable.');
+    }
+    const url = `https://api.openrouteservice.org/geocoding/v1/search?api_key=${apiKey}&text=${encodedLocation}&boundary.country=DE&size=1`;
     
     console.log(`Testing geocoding for: ${locationString}`);
     console.log(`URL: ${url}`);

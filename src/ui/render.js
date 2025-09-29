@@ -1,4 +1,11 @@
 import { store } from '../state/store.js';
+import {
+  handleTriage1, handleTriage2, handleSubmit, reset, goBack, goHome,
+} from '../logic/handlers.js';
+import { clearValidationErrors, clearAllValidation } from '../logic/validate.js';
+import { initializeResearchMode } from '../research/comparison-ui.js';
+import { authManager } from '../auth/authentication.js';
+
 import { renderTriage1 } from './screens/triage1.js';
 import { renderTriage2 } from './screens/triage2.js';
 import { renderComa } from './screens/coma.js';
@@ -6,25 +13,26 @@ import { renderLimited } from './screens/limited.js';
 import { renderFull } from './screens/full.js';
 import { renderResults } from './screens/results.js';
 import { renderLoginScreen, initializeLoginScreen } from './screens/login.js';
-import { handleTriage1, handleTriage2, handleSubmit, reset, goBack, goHome } from '../logic/handlers.js';
-import { clearValidationErrors } from '../logic/validate.js';
 import { announceScreenChange, setPageTitle, focusMainHeading } from './a11y.js';
 import { initializeStrokeCenterMap } from './components/stroke-center-map.js';
 import { fastEdCalculator } from './components/fastEdModal.js';
-import { initializeResearchMode } from '../research/comparison-ui.js';
-import { authManager } from '../auth/authentication.js';
+import { safeSetInnerHTML } from '../security/html-sanitizer.js';
 
 export function render(container) {
   const state = store.getState();
-  const { currentScreen, results, startTime, navigationHistory } = state;
+  const {
+    currentScreen, results, startTime, screenHistory,
+  } = state;
+
+  console.log('[Render] Rendering screen:', currentScreen, 'Has results:', !!results);
 
   // Optimize DOM updates to prevent CLS
   const tempContainer = document.createElement('div');
-  
+
   // Show/hide back button based on navigation history
   const backButton = document.getElementById('backButton');
   if (backButton) {
-    backButton.style.display = navigationHistory && navigationHistory.length > 0 ? 'flex' : 'none';
+    backButton.style.display = screenHistory && screenHistory.length > 0 ? 'flex' : 'none';
   }
 
   // Render the appropriate screen
@@ -60,11 +68,19 @@ export function render(container) {
       html = renderTriage1();
   }
 
-  // Use batch DOM update to minimize reflows
-  tempContainer.innerHTML = html;
-  
+  // Use secure DOM update to minimize reflows and prevent XSS
+  try {
+    safeSetInnerHTML(tempContainer, html);
+  } catch (error) {
+    // Fallback to text content on sanitization error
+    tempContainer.textContent = 'Error loading content. Please refresh.';
+  }
+
   // Single DOM replacement to minimize CLS
-  container.innerHTML = '';
+  // Clear container safely without using innerHTML
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
   while (tempContainer.firstChild) {
     container.appendChild(tempContainer.firstChild);
   }
@@ -72,7 +88,7 @@ export function render(container) {
   // Restore form data if available
   const form = container.querySelector('form[data-module]');
   if (form) {
-    const module = form.dataset.module;
+    const { module } = form.dataset;
     restoreFormData(form, module);
   }
 
@@ -89,13 +105,18 @@ export function render(container) {
   // Initialize stroke center map if on results screen
   if (currentScreen === 'results' && results) {
     setTimeout(() => {
-      initializeStrokeCenterMap(results);
+      try {
+        console.log('[Render] Initializing stroke center map with results:', results);
+        initializeStrokeCenterMap(results);
+      } catch (error) {
+        console.error('[Render] Stroke center map initialization failed:', error);
+      }
     }, 100);
   }
 
-  // Initialize research mode components (non-breaking)
+  // Initialize research mode components
   setTimeout(() => {
-    initializeResearchMode();
+    try { initializeResearchMode(); } catch {}
   }, 150);
 
   // Accessibility updates
@@ -106,7 +127,9 @@ export function render(container) {
 
 function restoreFormData(form, module) {
   const formData = store.getFormData(module);
-  if (!formData || Object.keys(formData).length === 0) return;
+  if (!formData || Object.keys(formData).length === 0) {
+    return;
+  }
 
   Object.entries(formData).forEach(([key, value]) => {
     const input = form.elements[key];
@@ -121,19 +144,24 @@ function restoreFormData(form, module) {
 }
 
 function attachEvents(container) {
-  // Clear any existing validation errors when inputs change
-  container.querySelectorAll('input[type="number"]').forEach(input => {
-    input.addEventListener('blur', () => {
-      clearValidationErrors(container);
+  // Clear validation errors when user starts typing in a field
+  container.querySelectorAll('input[type="number"]').forEach((input) => {
+    input.addEventListener('input', () => {
+      // Only clear errors for the specific field being edited
+      const group = input.closest('.input-group');
+      if (group && group.classList.contains('error')) {
+        group.classList.remove('error');
+        group.querySelectorAll('.error-message').forEach((el) => el.remove());
+      }
     });
   });
 
   // Triage button handlers
-  container.querySelectorAll('[data-action]').forEach(button => {
+  container.querySelectorAll('[data-action]').forEach((button) => {
     button.addEventListener('click', (e) => {
       const { action, value } = e.currentTarget.dataset;
       const boolVal = value === 'true';
-      
+
       switch (action) {
         case 'triage1':
           handleTriage1(boolVal);
@@ -155,7 +183,7 @@ function attachEvents(container) {
   });
 
   // Form submission handlers
-  container.querySelectorAll('form[data-module]').forEach(form => {
+  container.querySelectorAll('form[data-module]').forEach((form) => {
     form.addEventListener('submit', (e) => {
       handleSubmit(e, container);
     });
@@ -173,29 +201,28 @@ function attachEvents(container) {
     fastEdInput.addEventListener('click', (e) => {
       e.preventDefault();
       const currentValue = parseInt(fastEdInput.value) || 0;
-      
+
       fastEdCalculator.show(currentValue, (result) => {
         // Update FAST-ED score
         fastEdInput.value = result.total;
-        
+
         // Update hidden arm weakness field
         const armPareseField = container.querySelector('#armparese_hidden');
         if (armPareseField) {
           armPareseField.value = result.armWeaknessBoolean ? 'true' : 'false';
         }
-        
+
         // Update eye deviation hidden field if exists
         const eyeDeviationField = container.querySelector('#eye_deviation_hidden');
         if (eyeDeviationField) {
           eyeDeviationField.value = result.eyeDeviationBoolean ? 'true' : 'false';
         }
-        
+
         // Trigger change event to save form data
         fastEdInput.dispatchEvent(new Event('change', { bubbles: true }));
       });
     });
-    
-    // Prevent manual typing
+    // Prevent manual typing (baseline behavior)
     fastEdInput.addEventListener('keydown', (e) => {
       e.preventDefault();
     });
@@ -203,15 +230,15 @@ function attachEvents(container) {
 
   // Collapsible info toggles handler
   const infoToggles = container.querySelectorAll('.info-toggle');
-  infoToggles.forEach(toggle => {
+  infoToggles.forEach((toggle) => {
     toggle.addEventListener('click', (e) => {
       const targetId = toggle.dataset.target;
       const targetContent = container.querySelector(`#${targetId}`);
       const arrow = toggle.querySelector('.toggle-arrow');
-      
+
       if (targetContent) {
         const isVisible = targetContent.style.display !== 'none';
-        
+
         if (isVisible) {
           // Hide content
           targetContent.style.display = 'none';

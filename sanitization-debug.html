@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanitization Debug</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        pre { background: #f1f1f1; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Sanitization Debug Tool</h1>
+
+    <div id="results"></div>
+
+    <div class="test-section">
+        <h2>🧪 Live Tests</h2>
+        <button onclick="testComaScreen()">Test Coma Screen</button>
+        <button onclick="testPrerequisitesModal()">Test Prerequisites Modal</button>
+        <button onclick="testButtonHTML()">Test Button HTML</button>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        window.testComaScreen = async function() {
+            try {
+                addResult('🔄 Testing Coma Screen Sanitization...', 'info');
+
+                const { renderComa } = await import('./src/ui/screens/coma.js');
+                const { safeSetInnerHTML } = await import('./src/security/html-sanitizer.js');
+
+                const comaHtml = renderComa();
+                addResult(`📊 Coma HTML length: ${comaHtml.length}`, 'info');
+
+                // Show the HTML being generated
+                const preview = document.createElement('div');
+                preview.innerHTML = '<h4>Generated Coma HTML:</h4><pre>' +
+                    comaHtml.substring(0, 800).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '...</pre>';
+                results.appendChild(preview);
+
+                // Test sanitization
+                const testContainer = document.createElement('div');
+                try {
+                    safeSetInnerHTML(testContainer, comaHtml);
+                    addResult('✅ Coma screen passed sanitization!', 'success');
+
+                    const forms = testContainer.querySelectorAll('form');
+                    const inputs = testContainer.querySelectorAll('input');
+                    const buttons = testContainer.querySelectorAll('button');
+
+                    addResult(`📊 Forms preserved: ${forms.length}`, 'info');
+                    addResult(`📊 Inputs preserved: ${inputs.length}`, 'info');
+                    addResult(`📊 Buttons preserved: ${buttons.length}`, 'info');
+
+                } catch (sanitizeError) {
+                    addResult(`❌ Coma sanitization failed: ${sanitizeError.message}`, 'error');
+                    console.error('Coma sanitization error:', sanitizeError);
+                }
+
+            } catch (error) {
+                addResult(`❌ Coma test error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testPrerequisitesModal = async function() {
+            try {
+                addResult('🔄 Testing Prerequisites Modal Sanitization...', 'info');
+
+                const { renderPrerequisitesModal } = await import('./src/ui/components/prerequisites-modal.js');
+                const { safeSetInnerHTML } = await import('./src/security/html-sanitizer.js');
+
+                const modalHtml = renderPrerequisitesModal();
+                addResult(`📊 Modal HTML length: ${modalHtml.length}`, 'info');
+
+                // Test sanitization
+                const testContainer = document.createElement('div');
+                try {
+                    safeSetInnerHTML(testContainer, modalHtml);
+                    addResult('✅ Prerequisites modal passed sanitization!', 'success');
+
+                    const buttons = testContainer.querySelectorAll('button');
+                    const inputs = testContainer.querySelectorAll('input');
+                    const labels = testContainer.querySelectorAll('label');
+
+                    addResult(`📊 Buttons preserved: ${buttons.length}`, 'info');
+                    addResult(`📊 Inputs preserved: ${inputs.length}`, 'info');
+                    addResult(`📊 Labels preserved: ${labels.length}`, 'info');
+
+                } catch (sanitizeError) {
+                    addResult(`❌ Modal sanitization failed: ${sanitizeError.message}`, 'error');
+                    console.error('Modal sanitization error:', sanitizeError);
+                }
+
+            } catch (error) {
+                addResult(`❌ Modal test error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testButtonHTML = async function() {
+            try {
+                addResult('🔄 Testing Button HTML Sanitization...', 'info');
+
+                const { safeSetInnerHTML } = await import('./src/security/html-sanitizer.js');
+
+                const buttonHtml = `
+                    <div class="triage-buttons">
+                        <button class="yes-btn" data-action="triage1" data-value="true">YES - Comatose</button>
+                        <button class="no-btn" data-action="triage1" data-value="false">NO - Conscious</button>
+                    </div>
+                `;
+
+                const testContainer = document.createElement('div');
+                try {
+                    safeSetInnerHTML(testContainer, buttonHtml);
+                    addResult('✅ Button HTML passed sanitization!', 'success');
+
+                    const buttons = testContainer.querySelectorAll('button[data-action="triage1"]');
+                    addResult(`📊 Triage buttons preserved: ${buttons.length}`, 'info');
+
+                } catch (sanitizeError) {
+                    addResult(`❌ Button sanitization failed: ${sanitizeError.message}`, 'error');
+                    console.error('Button sanitization error:', sanitizeError);
+                }
+
+            } catch (error) {
+                addResult(`❌ Button test error: ${error.message}`, 'error');
+            }
+        };
+
+        // Auto-run all tests
+        async function runAllTests() {
+            addResult('🚀 Running comprehensive sanitization tests...', 'info');
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await testButtonHTML();
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await testComaScreen();
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await testPrerequisitesModal();
+
+            addResult('🎯 All tests completed!', 'success');
+        }
+
+        runAllTests();
+    </script>
+</body>
+</html>

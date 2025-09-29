@@ -1,17 +1,16 @@
 import { t, i18n } from '../../localization/i18n.js';
 import { navigate } from '../../logic/handlers.js';
+import { safeSetInnerHTML } from '../../security/html-sanitizer.js';
 
 /**
  * Prerequisites checklist items
  */
-const getPrerequisites = () => {
-  return [
-    { id: 'acute_deficit', checked: false },
-    { id: 'symptom_onset', checked: false },
-    { id: 'no_preexisting', checked: false },
-    { id: 'no_trauma', checked: false }
-  ];
-};
+const getPrerequisites = () => [
+  { id: 'acute_deficit', checked: false },
+  { id: 'symptom_onset', checked: false },
+  { id: 'no_preexisting', checked: false },
+  { id: 'no_trauma', checked: false },
+];
 
 /**
  * Render prerequisites modal
@@ -19,7 +18,7 @@ const getPrerequisites = () => {
  */
 export function renderPrerequisitesModal() {
   const prerequisites = getPrerequisites();
-  
+
   return `
     <div id="prerequisitesModal" class="modal prerequisites-modal" style="display: flex;">
       <div class="modal-content prerequisites-content">
@@ -34,7 +33,7 @@ export function renderPrerequisitesModal() {
           </p>
           
           <div class="prerequisites-list">
-            ${prerequisites.map(item => `
+            ${prerequisites.map((item) => `
               <div class="prerequisite-item" data-id="${item.id}">
                 <label class="toggle-switch">
                   <input type="checkbox" id="${item.id}" class="toggle-input">
@@ -76,45 +75,45 @@ export function renderPrerequisitesModal() {
 export function initPrerequisitesModal() {
   const modal = document.getElementById('prerequisitesModal');
   if (!modal) {
-    console.error('Prerequisites modal not found');
+    //('Prerequisites modal not found');
     return;
   }
-  
-  console.log('Initializing prerequisites modal');
-  
+
+  //('Initializing prerequisites modal');
+
   // Close button handlers
   const closeBtn = document.getElementById('closePrerequisites');
   const cancelBtn = document.getElementById('cancelPrerequisites');
   const confirmBtn = document.getElementById('confirmPrerequisites');
-  
-  console.log('Modal buttons found:', { closeBtn: !!closeBtn, cancelBtn: !!cancelBtn, confirmBtn: !!confirmBtn });
-  
+
+  //('Modal buttons found:', { closeBtn: !!closeBtn, cancelBtn: !!cancelBtn, confirmBtn: !!confirmBtn });
+
   const closeModal = () => {
     modal.remove();
     // Navigate back to welcome screen if cancelled
     navigate('welcome');
   };
-  
+
   closeBtn?.addEventListener('click', closeModal);
   cancelBtn?.addEventListener('click', closeModal);
-  
+
   // Confirm button handler
   confirmBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    console.log('Prerequisites confirm button clicked');
+
+    //('Prerequisites confirm button clicked');
     const checkboxes = modal.querySelectorAll('.toggle-input');
-    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-    console.log('All prerequisites checked:', allChecked);
-    
+    const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
+    //('All prerequisites checked:', allChecked);
+
     if (allChecked) {
-      console.log('Navigating to triage2');
+      //('Navigating to triage2');
       modal.remove();
       // Proceed to triage2 (stroke module selection)
       navigate('triage2');
     } else {
-      console.log('Showing prerequisites warning');
+      //('Showing prerequisites warning');
       // Show warning
       const warning = document.getElementById('prerequisitesWarning');
       if (warning) {
@@ -125,14 +124,14 @@ export function initPrerequisitesModal() {
       }
     }
   });
-  
+
   // Toggle change handler to hide warning when all checked
   const checkboxes = modal.querySelectorAll('.toggle-input');
-  checkboxes.forEach(checkbox => {
+  checkboxes.forEach((checkbox) => {
     checkbox.addEventListener('change', () => {
-      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
       const warning = document.getElementById('prerequisitesWarning');
-      
+
       if (allChecked && warning) {
         warning.style.display = 'none';
       }
@@ -145,20 +144,35 @@ export function initPrerequisitesModal() {
  */
 export function showPrerequisitesModal() {
   const existingModal = document.getElementById('prerequisitesModal');
-  
+
   // Always remove existing modal and create fresh one to handle language changes
   if (existingModal) {
     existingModal.remove();
   }
-  
-  // Create modal element directly instead of innerHTML
+
+  // Create modal element safely
   const modalElement = document.createElement('div');
-  modalElement.innerHTML = renderPrerequisitesModal();
-  const modal = modalElement.firstElementChild;
-  
-  // Insert into DOM
-  document.body.appendChild(modal);
-  
+  try {
+    safeSetInnerHTML(modalElement, renderPrerequisitesModal());
+    const modal = modalElement.firstElementChild;
+
+    if (!modal) {
+      throw new Error('Failed to create modal element');
+    }
+
+    // Insert into DOM
+    document.body.appendChild(modal);
+  } catch (error) {
+    console.error('Prerequisites modal sanitization failed:', error);
+    // Fallback: create basic modal
+    const fallbackModal = document.createElement('div');
+    fallbackModal.className = 'modal prerequisites-modal';
+    fallbackModal.style.display = 'flex';
+    fallbackModal.textContent = 'Prerequisites modal could not be displayed securely. Please refresh the page.';
+    document.body.appendChild(fallbackModal);
+    return;
+  }
+
   // Initialize immediately since DOM is ready
   initPrerequisitesModal();
 }

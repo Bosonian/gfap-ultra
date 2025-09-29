@@ -3,9 +3,10 @@
  * Hidden by default, activated only for research purposes
  */
 
+import { t } from '../localization/i18n.js';
+
 import { LegacyICHModel } from './legacy-ich-model.js';
 import { ResearchDataLogger, isResearchModeEnabled } from './data-logger.js';
-import { t } from '../localization/i18n.js';
 
 /**
  * Render research toggle button (no longer used - header button handles this)
@@ -25,7 +26,7 @@ export function renderResearchToggle() {
 export function renderModelComparison(mainResults, legacyResults, inputs) {
   // Show debug info if legacy results are invalid
   if (!legacyResults?.isValid) {
-    console.log('🔬 Legacy model results invalid:', legacyResults);
+    //('🔬 Legacy model results invalid:', legacyResults);
     return `
       <div class="research-panel" id="researchPanel" style="display: none;">
         <div class="research-header">
@@ -41,7 +42,7 @@ export function renderModelComparison(mainResults, legacyResults, inputs) {
   }
 
   const comparison = LegacyICHModel.compareModels(mainResults, legacyResults);
-  
+
   return `
     <div class="research-panel" id="researchPanel" style="display: none;">
       <div class="research-header">
@@ -83,27 +84,27 @@ function renderProbabilityBars(mainResults, legacyResults) {
   // Convert main model probability to percentage if it's in decimal form (0-1)
   let mainProb = mainResults.probability || 0;
   if (mainProb <= 1) {
-    mainProb = mainProb * 100; // Convert 0.65 to 65%
+    mainProb *= 100; // Convert 0.65 to 65%
   }
-  
+
   // Legacy model already returns percentage (0-100)
   const legacyProb = legacyResults.probability || 0;
-  
+
   return `
     <div class="probability-comparison">
       <div class="bar-group">
         <label class="bar-label">Main Model (Complex) - ${mainResults.module || 'Unknown'}</label>
         <div class="probability-bar">
-          <div class="bar-fill main-model" style="width: ${Math.min(mainProb, 100)}%">
+          <div class="bar-fill main-model" style="width: ${Math.max(10, Math.min(mainProb, 100))}%">
             <span class="bar-value">${mainProb.toFixed(1)}%</span>
           </div>
         </div>
       </div>
-      
+
       <div class="bar-group">
         <label class="bar-label">Legacy Model (Age + GFAP Only)</label>
         <div class="probability-bar">
-          <div class="bar-fill legacy-model" style="width: ${Math.min(legacyProb, 100)}%">
+          <div class="bar-fill legacy-model" style="width: ${Math.max(10, Math.min(legacyProb, 100))}%">
             <span class="bar-value">${legacyProb.toFixed(1)}%</span>
           </div>
         </div>
@@ -124,7 +125,7 @@ function renderDifferenceAnalysis(comparison) {
 
   const { differences, agreement } = comparison;
   const isMainHigher = differences.absolute > 0;
-  
+
   return `
     <div class="difference-analysis">
       <div class="difference-metric">
@@ -183,7 +184,7 @@ function renderCalculationDetails(legacyResults, inputs) {
  */
 function renderModelMetrics() {
   const metadata = LegacyICHModel.getModelMetadata();
-  
+
   return `
     <div class="model-metrics">
       <h5>Performance Comparison</h5>
@@ -252,14 +253,13 @@ export function initializeResearchMode() {
     clearButton.addEventListener('click', () => {
       if (confirm('Clear all research data? This cannot be undone.')) {
         ResearchDataLogger.clearData();
-        
+
         // Update display
         const summary = ResearchDataLogger.getDataSummary();
-        console.log(`Data cleared. Total entries: ${summary.totalEntries}`);
+        //(`Data cleared. Total entries: ${summary.totalEntries}`);
       }
     });
   }
 
-  console.log('🔬 Research mode initialized');
+  //('🔬 Research mode initialized');
 }
-

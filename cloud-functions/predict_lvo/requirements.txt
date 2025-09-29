@@ -1,0 +1,5 @@
+# Zero-dependency LVO prediction cloud function
+functions-framework==3.*
+
+# Note: All mathematical operations implemented using Python standard library only.
+# No external dependencies (numpy, scipy, sklearn) required for faster cold starts.

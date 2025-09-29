@@ -1,15 +1,15 @@
 import { t } from '../../localization/i18n.js';
 import { formatDriverName } from '../../utils/label-formatter.js';
+import { normalizeDrivers } from '../../logic/shap.js';
 
 export function renderDriversSection(ich, lvo) {
-  console.log('=== DRIVER RENDERING SECTION ===');
-  
-  
+  //('=== DRIVER RENDERING SECTION ===');
+
   if (!ich?.drivers && !lvo?.drivers) {
-    console.log('❌ No drivers available for rendering');
+    //('❌ No drivers available for rendering');
     return '';
   }
-  
+
   let html = `
     <div class="drivers-section">
       <div class="drivers-header">
@@ -18,17 +18,20 @@ export function renderDriversSection(ich, lvo) {
       </div>
       <div class="enhanced-drivers-grid">
   `;
-  
+
+  console.log('[Drivers] ICH has drivers:', !!ich?.drivers, ich?.drivers);
+  console.log('[Drivers] LVO has drivers:', !!lvo?.drivers, 'notPossible:', lvo?.notPossible, lvo?.drivers);
+
   if (ich?.drivers) {
     console.log('🧠 Rendering ICH drivers panel');
     html += renderEnhancedDriversPanel(ich.drivers, 'ICH', 'ich', ich.probability);
   }
-  
+
   if (lvo?.drivers && !lvo.notPossible) {
     console.log('🩸 Rendering LVO drivers panel');
     html += renderEnhancedDriversPanel(lvo.drivers, 'LVO', 'lvo', lvo.probability);
   }
-  
+
   html += `
       </div>
     </div>
@@ -52,7 +55,7 @@ export function renderDriversPanel(drivers, title, type) {
   }
 
   const driversViewModel = normalizeDrivers(drivers);
-  
+
   if (driversViewModel.kind === 'unavailable') {
     return `
       <div class="drivers-panel">
@@ -81,9 +84,9 @@ export function renderDriversPanel(drivers, title, type) {
 
   // Show positive drivers (increase risk)
   if (driversViewModel.positive.length > 0) {
-    driversViewModel.positive.forEach(driver => {
-      const relativeImportance = totalPositiveWeightLegacy > 0 ? 
-        (Math.abs(driver.weight) / totalPositiveWeightLegacy) * 100 : 0;
+    driversViewModel.positive.forEach((driver) => {
+      const relativeImportance = totalPositiveWeightLegacy > 0
+        ? (Math.abs(driver.weight) / totalPositiveWeightLegacy) * 100 : 0;
       const width = Math.min(relativeImportance * 2, 100); // Scale for visualization
       html += `
         <div class="driver-item">
@@ -100,9 +103,9 @@ export function renderDriversPanel(drivers, title, type) {
 
   // Show negative drivers (decrease risk)
   if (driversViewModel.negative.length > 0) {
-    driversViewModel.negative.forEach(driver => {
-      const relativeImportance = totalNegativeWeightLegacy > 0 ? 
-        (Math.abs(driver.weight) / totalNegativeWeightLegacy) * 100 : 0;
+    driversViewModel.negative.forEach((driver) => {
+      const relativeImportance = totalNegativeWeightLegacy > 0
+        ? (Math.abs(driver.weight) / totalNegativeWeightLegacy) * 100 : 0;
       const width = Math.min(relativeImportance * 2, 100); // Scale for visualization
       html += `
         <div class="driver-item">
@@ -123,7 +126,7 @@ export function renderDriversPanel(drivers, title, type) {
       <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color);">
         <small style="color: var(--text-secondary);">
     `;
-    
+
     if (driversViewModel.meta.base_value !== undefined) {
       html += `Base value: ${driversViewModel.meta.base_value.toFixed(2)} `;
     }
@@ -133,22 +136,20 @@ export function renderDriversPanel(drivers, title, type) {
     if (driversViewModel.meta.logit_total !== undefined) {
       html += `Logit total: ${driversViewModel.meta.logit_total.toFixed(2)}`;
     }
-    
+
     html += `
         </small>
       </div>
     `;
   }
 
-  html += `</div>`;
+  html += '</div>';
   return html;
 }
 
 export function renderEnhancedDriversPanel(drivers, title, type, probability) {
-  
-  
   if (!drivers || Object.keys(drivers).length === 0) {
-    console.log(`No drivers data for ${title}`);
+    //(`No drivers data for ${title}`);
     return `
       <div class="enhanced-drivers-panel ${type}">
         <div class="panel-header">
@@ -167,8 +168,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
 
   // Drivers are already in the correct format from our new extraction
   const driversViewModel = drivers;
-  
-  
+
   if (driversViewModel.kind === 'unavailable') {
     return `
       <div class="enhanced-drivers-panel ${type}">
@@ -187,21 +187,25 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   }
 
   // Sort drivers by absolute impact and limit to top 6 most important
-  const positiveDrivers = driversViewModel.positive
+  const positiveDrivers = (driversViewModel.positive || [])
     .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
     .slice(0, 3); // Top 3 positive drivers
-  
-  const negativeDrivers = driversViewModel.negative
+
+  const negativeDrivers = (driversViewModel.negative || [])
     .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight))
     .slice(0, 3); // Top 3 negative drivers
 
-  
-
   const maxWeight = Math.max(
-    ...positiveDrivers.map(d => Math.abs(d.weight)),
-    ...negativeDrivers.map(d => Math.abs(d.weight)),
-    0.01 // Prevent division by zero
+    ...positiveDrivers.map((d) => Math.abs(d.weight)),
+    ...negativeDrivers.map((d) => Math.abs(d.weight)),
+    0.01, // Prevent division by zero
   );
+
+  console.log(`[Drivers] ${type} maxWeight:`, maxWeight);
+  console.log(`[Drivers] ${type} positive:`, positiveDrivers.map(d => `${d.label}: ${d.weight}`));
+  console.log(`[Drivers] ${type} negative:`, negativeDrivers.map(d => `${d.label}: ${d.weight}`));
+  console.log(`[Drivers] ${type} positive weights:`, positiveDrivers.map(d => Math.abs(d.weight)));
+  console.log(`[Drivers] ${type} negative weights:`, negativeDrivers.map(d => Math.abs(d.weight)));
 
   let html = `
     <div class="enhanced-drivers-panel ${type}">
@@ -224,16 +228,20 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
 
   // Calculate relative importance percentages
   const totalPositiveWeight = positiveDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
-  
+
   // Render positive drivers
   if (positiveDrivers.length > 0) {
-    positiveDrivers.forEach((driver) => {
+    positiveDrivers.forEach((driver, index) => {
       // Calculate relative importance as percentage of total positive contribution
-      const relativeImportance = totalPositiveWeight > 0 ? 
-        (Math.abs(driver.weight) / totalPositiveWeight) * 100 : 0;
+      const relativeImportance = totalPositiveWeight > 0
+        ? (Math.abs(driver.weight) / totalPositiveWeight) * 100 : 0;
+
+      // Use baseline implementation: ratio to maxWeight (TRUE working method)
       const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
+      console.log(`[Drivers] ${type} positive driver "${driver.label}": weight=${Math.abs(driver.weight)}, relativeImportance=${relativeImportance.toFixed(1)}%, barWidth=${barWidth}%`);
+
       const cleanLabel = formatDriverName(driver.label);
-      
+
       html += `
         <div class="compact-driver-item">
           <div class="compact-driver-label">${cleanLabel}</div>
@@ -261,16 +269,20 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
 
   // Calculate relative importance percentages for negative drivers
   const totalNegativeWeight = negativeDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
-  
+
   // Render negative drivers
   if (negativeDrivers.length > 0) {
-    negativeDrivers.forEach((driver) => {
+    negativeDrivers.forEach((driver, index) => {
       // Calculate relative importance as percentage of total negative contribution
-      const relativeImportance = totalNegativeWeight > 0 ? 
-        (Math.abs(driver.weight) / totalNegativeWeight) * 100 : 0;
+      const relativeImportance = totalNegativeWeight > 0
+        ? (Math.abs(driver.weight) / totalNegativeWeight) * 100 : 0;
+
+      // Use baseline implementation: ratio to maxWeight (TRUE working method)
       const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
+      console.log(`[Drivers] ${type} negative driver "${driver.label}": weight=${Math.abs(driver.weight)}, relativeImportance=${relativeImportance.toFixed(1)}%, barWidth=${barWidth}%`);
+
       const cleanLabel = formatDriverName(driver.label);
-      
+
       html += `
         <div class="compact-driver-item">
           <div class="compact-driver-label">${cleanLabel}</div>
@@ -290,6 +302,6 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
       </div>
     </div>
   `;
-  
+
   return html;
 }

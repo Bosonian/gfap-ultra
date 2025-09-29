@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Fix Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .highlight { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        iframe { border: 2px solid #007bff; border-radius: 8px; width: 100%; height: 600px; margin: 20px 0; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔧 API Fix Test - Coma Prediction</h1>
+
+    <div class="highlight">
+        <h3>🎯 Fix Applied:</h3>
+        <ul>
+            <li>✅ Reverted coma screen to original simple form (gfap_value only)</li>
+            <li>✅ Simplified API validation to match working GitHub deployment</li>
+            <li>✅ Removed overly strict type checking that broke the workflow</li>
+        </ul>
+        <h3>🧪 Expected Result:</h3>
+        <p>Coma module should now accept gfap_value and make successful API calls without "invalid patient data" errors.</p>
+    </div>
+
+    <div id="results"></div>
+
+    <div style="margin: 20px 0;">
+        <button onclick="testComaAPI()">🧪 Test Coma API Directly</button>
+        <button onclick="testFormSubmission()">📝 Test Form Submission</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <div style="border: 2px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <h2>📺 Test in Application</h2>
+        <p><strong>Manual Test:</strong></p>
+        <ol>
+            <li>Click "YES - Comatose" in the app below</li>
+            <li>Enter a GFAP value (e.g., 100)</li>
+            <li>Click "Analyze ICH Risk"</li>
+            <li>Should see results instead of "invalid patient data" error</li>
+        </ol>
+        <iframe src="/0925/" title="Test Application"></iframe>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        window.clearResults = function() {
+            results.innerHTML = '';
+        };
+
+        window.testComaAPI = async function() {
+            try {
+                addResult('🔄 Testing Coma API directly...', 'info');
+
+                const { predictComaIch } = await import('./src/api/client.js');
+                addResult('✅ Coma API function imported', 'success');
+
+                // Test with the data structure the form would send
+                const testData = {
+                    gfap_value: 100.5
+                };
+
+                addResult(`📊 Testing with data: ${JSON.stringify(testData)}`, 'info');
+
+                try {
+                    const result = await predictComaIch(testData);
+                    addResult('🎉 Coma API call SUCCESSFUL!', 'success');
+                    addResult(`📊 Result: probability=${result.probability}, module=${result.module}`, 'success');
+                } catch (apiError) {
+                    addResult(`❌ API call failed: ${apiError.message}`, 'error');
+                    console.error('API error details:', apiError);
+                }
+
+            } catch (error) {
+                addResult(`❌ Test error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testFormSubmission = async function() {
+            try {
+                addResult('🔄 Testing form submission flow...', 'info');
+
+                // Import the modules
+                const { handleSubmit } = await import('./src/logic/handlers.js');
+                const { renderComa } = await import('./src/ui/screens/coma.js');
+                const { safeSetInnerHTML } = await import('./src/security/html-sanitizer.js');
+
+                addResult('✅ Handler modules imported', 'success');
+
+                // Create a mock form
+                const testContainer = document.createElement('div');
+                const comaHtml = renderComa();
+                safeSetInnerHTML(testContainer, comaHtml);
+
+                const form = testContainer.querySelector('form[data-module="coma"]');
+                if (!form) {
+                    addResult('❌ Could not create coma form', 'error');
+                    return;
+                }
+
+                // Fill in the GFAP value
+                const gfapInput = form.querySelector('#gfap_value');
+                if (gfapInput) {
+                    gfapInput.value = '150.7';
+                    addResult('📝 Filled GFAP value: 150.7', 'info');
+                } else {
+                    addResult('❌ GFAP input not found', 'error');
+                    return;
+                }
+
+                addResult('✅ Form submission test setup complete', 'success');
+                addResult('ℹ️ Note: Actual submission requires DOM attachment and event handling', 'info');
+
+            } catch (error) {
+                addResult(`❌ Form test error: ${error.message}`, 'error');
+            }
+        };
+
+        // Auto-run API test on load
+        setTimeout(testComaAPI, 1000);
+    </script>
+</body>
+</html>

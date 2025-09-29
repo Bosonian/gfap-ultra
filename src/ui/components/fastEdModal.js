@@ -7,7 +7,7 @@ export class FastEdCalculator {
       arm_weakness: 0,
       speech_changes: 0,
       eye_deviation: 0,
-      denial_neglect: 0
+      denial_neglect: 0,
     };
     this.onApply = null;
     this.modal = null;
@@ -25,7 +25,7 @@ export class FastEdCalculator {
   render() {
     const total = this.getTotal();
     const riskLevel = this.getRiskLevel();
-    
+
     return `
       <div id="fastEdModal" class="modal" role="dialog" aria-labelledby="fastEdModalTitle" aria-hidden="true" style="display: none !important;">
         <div class="modal-content fast-ed-modal">
@@ -150,7 +150,9 @@ export class FastEdCalculator {
 
   setupEventListeners() {
     this.modal = document.getElementById('fastEdModal');
-    if (!this.modal) return;
+    if (!this.modal) {
+      return;
+    }
 
     // Radio button changes
     this.modal.addEventListener('change', (e) => {
@@ -194,11 +196,11 @@ export class FastEdCalculator {
   updateDisplay() {
     const totalElement = this.modal?.querySelector('.total-score');
     const riskElement = this.modal?.querySelector('.risk-indicator');
-    
+
     if (totalElement) {
       totalElement.textContent = `${this.getTotal()}/9`;
     }
-    
+
     if (riskElement) {
       const riskLevel = this.getRiskLevel();
       riskElement.className = `risk-indicator ${riskLevel}`;
@@ -208,12 +210,12 @@ export class FastEdCalculator {
 
   show(currentScore = 0, onApplyCallback = null) {
     this.onApply = onApplyCallback;
-    
+
     // If we have a current score, try to reverse engineer it (basic approximation)
     if (currentScore > 0 && currentScore <= 9) {
       this.approximateFromTotal(currentScore);
     }
-    
+
     // Inject modal HTML if not already present
     if (!document.getElementById('fastEdModal')) {
       document.body.insertAdjacentHTML('beforeend', this.render());
@@ -223,13 +225,13 @@ export class FastEdCalculator {
       document.body.insertAdjacentHTML('beforeend', this.render());
       this.modal = document.getElementById('fastEdModal');
     }
-    
+
     this.setupEventListeners();
-    
+
     this.modal.setAttribute('aria-hidden', 'false');
     this.modal.style.display = 'flex';
     this.modal.classList.add('show');
-    
+
     // Focus first radio button
     const firstRadio = this.modal.querySelector('input[type="radio"]');
     firstRadio?.focus();
@@ -247,16 +249,16 @@ export class FastEdCalculator {
     const total = this.getTotal();
     const armWeaknessBoolean = this.scores.arm_weakness > 0;
     const eyeDeviationBoolean = this.scores.eye_deviation > 0;
-    
+
     if (this.onApply) {
       this.onApply({
         total,
         components: { ...this.scores },
         armWeaknessBoolean,
-        eyeDeviationBoolean
+        eyeDeviationBoolean,
       });
     }
-    
+
     this.close();
   }
 
@@ -268,15 +270,17 @@ export class FastEdCalculator {
       arm_weakness: 0,
       speech_changes: 0,
       eye_deviation: 0,
-      denial_neglect: 0
+      denial_neglect: 0,
     };
-    
+
     let remaining = total;
     const components = Object.keys(this.scores);
-    
+
     for (const component of components) {
-      if (remaining <= 0) break;
-      
+      if (remaining <= 0) {
+        break;
+      }
+
       const maxForComponent = (component === 'facial_palsy') ? 1 : 2;
       const assignToThis = Math.min(remaining, maxForComponent);
       this.scores[component] = assignToThis;

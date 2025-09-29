@@ -1,0 +1,767 @@
+/**
+ * Enterprise Base Prediction Client
+ * Eliminates code duplication and provides consistent API patterns
+ *
+ * Features:
+ * - DRY principle enforcement
+ * - Consistent error handling
+ * - Configurable mock responses
+ * - Standardized response normalization
+ * - Type-safe payload processing
+ * - Medical compliance logging hooks
+ *
+ * @author iGFAP Project Team
+ * @contact Deepak Bos <bosdeepak@gmail.com>
+ */
+
+import { API_URLS, APP_CONFIG, DEV_CONFIG } from '../config.js';
+// import { medicalPerformanceMonitor, PerformanceMetricType } from '../performance/medical-performance-monitor.js';
+// import {
+//   MedicalCacheFactory,
+//   CachePriority,
+//   MedicalCacheTTL
+// } from '../performance/medical-cache.js';
+
+/**
+ * Enhanced API Error with medical context
+ */
+export class MedicalAPIError extends Error {
+  constructor(message, status, url, context = {}) {
+    super(message);
+    this.name = 'MedicalAPIError';
+    this.status = status;
+    this.url = url;
+    this.context = context;
+    this.timestamp = new Date().toISOString();
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status: this.status,
+      url: this.url,
+      context: this.context,
+      timestamp: this.timestamp
+    };
+  }
+}
+
+/**
+ * Prediction endpoint configuration
+ */
+const PREDICTION_CONFIGS = {
+  coma_ich: {
+    url: API_URLS.COMA_ICH,
+    mockKey: 'coma_ich',
+    defaultConfidence: 0.75,
+    module: 'Coma',
+    requiredFields: ['age_years', 'gcs', 'gfap_value'],
+    logContext: 'COMA_ICH_PREDICTION'
+  },
+  limited_ich: {
+    url: API_URLS.LDM_ICH,
+    mockKey: 'limited_ich',
+    defaultConfidence: 0.65,
+    module: 'Limited Data',
+    requiredFields: ['age_years', 'systolic_bp', 'diastolic_bp', 'gfap_value'],
+    logContext: 'LIMITED_ICH_PREDICTION'
+  },
+  full_stroke: {
+    url: API_URLS.FULL_STROKE,
+    mockKey: 'full_stroke',
+    defaultConfidence: 0.85,
+    module: 'Full Stroke',
+    requiredFields: [
+      'age_years', 'systolic_bp', 'diastolic_bp', 'gfap_value', 'fast_ed_score'
+    ],
+    logContext: 'FULL_STROKE_PREDICTION'
+  },
+  lvo: {
+    url: API_URLS.LVO_PREDICTION,
+    mockKey: 'lvo_prediction',
+    defaultConfidence: 0.80,
+    module: 'LVO',
+    requiredFields: ['gfap_value', 'fast_ed_score'],
+    logContext: 'LVO_PREDICTION'
+  }
+};
+
+/**
+ * Base prediction client with enterprise patterns
+ */
+export class BasePredictionClient {
+  constructor() {
+    this.requestId = 0;
+    this.activeRequests = new Map();
+
+    // Initialize medical performance monitoring
+    this.initializePerformanceMonitoring();
+
+    // Initialize caching system
+    this.initializeCaching();
+  }
+
+  /**
+   * Initialize medical-grade performance monitoring
+   */
+  initializePerformanceMonitoring() {
+    if (!medicalPerformanceMonitor.isMonitoring) {
+      medicalPerformanceMonitor.start();
+    }
+  }
+
+  /**
+   * Initialize caching system with medical-grade configurations
+   */
+  initializeCaching() {
+    this.apiCache = MedicalCacheFactory.getApiCache();
+    this.predictionCache = MedicalCacheFactory.getPredictionCache();
+    this.validationCache = MedicalCacheFactory.getValidationCache();
+
+    // Enable offline mode detection
+    this.isOnline = navigator.onLine;
+    this.setupOfflineHandlers();
+  }
+
+  /**
+   * Setup online/offline event handlers
+   */
+  setupOfflineHandlers() {
+    window.addEventListener('online', () => {
+      this.isOnline = true;
+      this.handleOnlineReconnection();
+    });
+
+    window.addEventListener('offline', () => {
+      this.isOnline = false;
+    });
+  }
+
+  /**
+   * Handle reconnection after offline mode
+   */
+  handleOnlineReconnection() {
+    // Clear expired cache entries and sync any pending requests
+    this.apiCache.cleanup();
+    this.predictionCache.cleanup();
+  }
+
+  /**
+   * Normalize boolean values for API compatibility
+   * @param {Object} payload - Raw payload
+   * @returns {Object} Normalized payload
+   */
+  normalizeBooleans(payload) {
+    const normalized = { ...payload };
+
+    Object.keys(normalized).forEach((key) => {
+      const value = normalized[key];
+      if (typeof value === 'boolean' || value === 'on' || value === 'true' || value === 'false') {
+        normalized[key] = value === true || value === 'on' || value === 'true' ? 1 : 0;
+      }
+    });
+
+    return normalized;
+  }
+
+  /**
+   * Safe float parsing with medical context
+   * @param {*} value - Value to parse
+   * @param {number} defaultValue - Default fallback
+   * @returns {number} Parsed float value
+   */
+  safeParseFloat(value, defaultValue = 0) {
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+  }
+
+  /**
+   * Check if mock API should be used
+   * @returns {boolean} True if mock API should be used
+   */
+  useMockApi() {
+    const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+    const mockEnabled = localStorage.getItem('use_mock_api') !== 'false';
+    return isLocalPreview && mockEnabled;
+  }
+
+  /**
+   * Generate mock response for development
+   * @param {string} endpointType - Type of prediction endpoint
+   * @param {Object} config - Endpoint configuration
+   * @returns {Object} Mock response
+   */
+  generateMockResponse(endpointType, config) {
+    const mockData = DEV_CONFIG.mockApiResponses[config.mockKey];
+    if (!mockData) {
+      throw new MedicalAPIError(
+        `No mock data configured for ${endpointType}`,
+        500,
+        config.url,
+        { endpointType, mockKey: config.mockKey }
+      );
+    }
+
+    const rawProbability = this.safeParseFloat(mockData.probability ?? mockData.ich_probability, 0);
+    const probability = rawProbability > 1 ? rawProbability / 100 : rawProbability;
+
+    return {
+      probability,
+      drivers: mockData.drivers || null,
+      confidence: this.safeParseFloat(mockData.confidence, config.defaultConfidence),
+      module: config.module,
+      mockResponse: true,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Validate payload against endpoint requirements
+   * @param {Object} payload - Payload to validate
+   * @param {Object} config - Endpoint configuration
+   * @throws {MedicalAPIError} If validation fails
+   */
+  validatePayload(payload, config) {
+    // Start performance monitoring for validation
+    const validationMetricId = medicalPerformanceMonitor.startMeasurement(
+      PerformanceMetricType.VALIDATION,
+      `${config.logContext}_validation`,
+      { endpoint: config.url, fieldsCount: Object.keys(payload).length }
+    );
+
+    try {
+      const missingFields = config.requiredFields.filter(field =>
+        payload[field] === undefined || payload[field] === null || payload[field] === ''
+      );
+
+      if (missingFields.length > 0) {
+        throw new MedicalAPIError(
+          `Missing required fields: ${missingFields.join(', ')}`,
+          400,
+          config.url,
+          {
+            missingFields,
+            providedFields: Object.keys(payload),
+            requiredFields: config.requiredFields
+          }
+        );
+      }
+
+      // Medical value range validation
+      this.validateMedicalRanges(payload);
+
+    } finally {
+      // End validation performance measurement
+      medicalPerformanceMonitor.endMeasurement(validationMetricId, {
+        success: true,
+        validatedFields: config.requiredFields.length
+      });
+    }
+  }
+
+  /**
+   * Validate medical parameter ranges
+   * @param {Object} payload - Payload to validate
+   * @throws {MedicalAPIError} If values are out of medical range
+   */
+  validateMedicalRanges(payload) {
+    const validations = [
+      { field: 'age_years', min: 0, max: 120, name: 'Age' },
+      { field: 'systolic_bp', min: 50, max: 300, name: 'Systolic BP' },
+      { field: 'diastolic_bp', min: 30, max: 200, name: 'Diastolic BP' },
+      { field: 'gfap_value', min: 29, max: 10001, name: 'GFAP' },
+      { field: 'fast_ed_score', min: 0, max: 9, name: 'FAST-ED Score' },
+      { field: 'gcs', min: 3, max: 15, name: 'GCS Score' }
+    ];
+
+    const invalidValues = [];
+
+    validations.forEach(({ field, min, max, name }) => {
+      if (payload[field] !== undefined) {
+        const value = this.safeParseFloat(payload[field]);
+        if (value < min || value > max) {
+          invalidValues.push(`${name}: ${value} (valid range: ${min}-${max})`);
+        }
+      }
+    });
+
+    if (invalidValues.length > 0) {
+      throw new MedicalAPIError(
+        `Medical parameter validation failed: ${invalidValues.join(', ')}`,
+        400,
+        'validation',
+        { invalidValues, payload }
+      );
+    }
+  }
+
+  /**
+   * Execute HTTP request with enterprise error handling and performance monitoring
+   * @param {string} url - API endpoint URL
+   * @param {Object} payload - Request payload
+   * @param {number} customTimeout - Custom timeout in ms
+   * @param {string} endpointType - Type of endpoint for performance tracking
+   * @returns {Promise<Object>} API response
+   */
+  async fetchJSON(url, payload, customTimeout, endpointType = 'api_call') {
+    const requestId = ++this.requestId;
+    const timeout = customTimeout || APP_CONFIG.apiTimeout || 10000;
+
+    // Start performance monitoring for API call
+    const apiMetricId = medicalPerformanceMonitor.startMeasurement(
+      PerformanceMetricType.API_CALL,
+      `${endpointType}_request`,
+      {
+        url: url,
+        requestId: requestId,
+        payloadSize: JSON.stringify(payload).length,
+        timeout: timeout,
+        critical: endpointType.includes('coma') || endpointType.includes('full_stroke')
+      }
+    );
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    // Track active request
+    this.activeRequests.set(requestId, { url, startTime: Date.now(), controller });
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Request-ID': requestId.toString(),
+          'X-Client-Version': '2.1.0'
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+        mode: 'cors'
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        let errorMessage = `HTTP ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch {
+          errorMessage = `${errorMessage}: ${response.statusText}`;
+        }
+
+        // End performance measurement with error context
+        medicalPerformanceMonitor.endMeasurement(apiMetricId, {
+          success: false,
+          httpStatus: response.status,
+          errorMessage: errorMessage
+        });
+
+        throw new MedicalAPIError(errorMessage, response.status, url, {
+          requestId,
+          responseHeaders: Object.fromEntries(response.headers.entries())
+        });
+      }
+
+      const data = await response.json();
+
+      // End performance measurement with success context
+      medicalPerformanceMonitor.endMeasurement(apiMetricId, {
+        success: true,
+        httpStatus: response.status,
+        responseSize: JSON.stringify(data).length,
+        contentType: response.headers.get('content-type')
+      });
+
+      return data;
+
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error.name === 'AbortError') {
+        // End performance measurement with timeout context
+        medicalPerformanceMonitor.endMeasurement(apiMetricId, {
+          success: false,
+          timeout: true,
+          requestTimeout: timeout
+        });
+
+        throw new MedicalAPIError(
+          'Request timeout - please try again',
+          408,
+          url,
+          { requestId, timeout }
+        );
+      }
+
+      if (error instanceof MedicalAPIError) {
+        // Error already handled above
+        throw error;
+      }
+
+      // End performance measurement with network error context
+      medicalPerformanceMonitor.endMeasurement(apiMetricId, {
+        success: false,
+        networkError: true,
+        errorType: error.name,
+        errorMessage: error.message
+      });
+
+      throw new MedicalAPIError(
+        `Network error: ${error.message}`,
+        0,
+        url,
+        { requestId, originalError: error.message }
+      );
+
+    } finally {
+      this.activeRequests.delete(requestId);
+    }
+  }
+
+  /**
+   * Normalize API response format
+   * @param {Object} response - Raw API response
+   * @param {Object} config - Endpoint configuration
+   * @returns {Object} Normalized response
+   */
+  normalizeResponse(response, config) {
+    return {
+      probability: this.safeParseFloat(
+        response.probability || response.ich_probability || response.lvo_probability,
+        0
+      ),
+      drivers: response.drivers || response.risk_factors || null,
+      confidence: this.safeParseFloat(response.confidence, config.defaultConfidence),
+      module: config.module,
+      interpretation: response.interpretation || null,
+      riskLevel: response.risk_level || null,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Generate cache key for request
+   * @param {string} endpointType - Type of prediction endpoint
+   * @param {Object} payload - Request payload
+   * @returns {string} Cache key
+   */
+  generateCacheKey(endpointType, payload) {
+    // Create a deterministic key based on endpoint and payload
+    const payloadString = JSON.stringify(payload, Object.keys(payload).sort());
+    const hash = payloadString.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    return `${endpointType}_${Math.abs(hash)}`;
+  }
+
+  /**
+   * Check cache for existing prediction result
+   * @param {string} endpointType - Type of prediction endpoint
+   * @param {Object} payload - Request payload
+   * @returns {Object|null} Cached result or null
+   */
+  getCachedPrediction(endpointType, payload) {
+    const cacheKey = this.generateCacheKey(endpointType, payload);
+    return this.predictionCache.get(cacheKey);
+  }
+
+  /**
+   * Store prediction result in cache
+   * @param {string} endpointType - Type of prediction endpoint
+   * @param {Object} payload - Request payload
+   * @param {Object} result - Prediction result
+   */
+  cachePredictionResult(endpointType, payload, result) {
+    const cacheKey = this.generateCacheKey(endpointType, payload);
+    const priority = endpointType.includes('coma') ? CachePriority.HIGH : CachePriority.NORMAL;
+    const ttl = MedicalCacheTTL.PREDICTION_RESULTS;
+
+    this.predictionCache.set(cacheKey, result, ttl, priority, {
+      endpointType,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  /**
+   * Enhanced prediction method with caching and offline support
+   * @param {string} endpointType - Type of prediction (coma_ich, limited_ich, etc.)
+   * @param {Object} payload - Request payload
+   * @param {Object} options - Additional options
+   * @returns {Promise<Object>} Prediction result
+   */
+  async predict(endpointType, payload, options = {}) {
+    const config = PREDICTION_CONFIGS[endpointType];
+    if (!config) {
+      throw new MedicalAPIError(
+        `Unknown prediction endpoint: ${endpointType}`,
+        400,
+        'configuration',
+        { endpointType, availableEndpoints: Object.keys(PREDICTION_CONFIGS) }
+      );
+    }
+
+    // Handle mock API for development
+    if (this.useMockApi()) {
+      return this.generateMockResponse(endpointType, config);
+    }
+
+    // Validate payload
+    this.validatePayload(payload, config);
+
+    // Normalize boolean values
+    const normalizedPayload = this.normalizeBooleans(payload);
+
+    // Prepare payload with endpoint-specific logic
+    const processedPayload = this.preprocessPayload(normalizedPayload, endpointType);
+
+    // Check cache first (unless bypassed)
+    if (!options.bypassCache) {
+      const cachedResult = this.getCachedPrediction(endpointType, processedPayload);
+      if (cachedResult) {
+        return {
+          ...cachedResult,
+          fromCache: true,
+          timestamp: new Date().toISOString()
+        };
+      }
+    }
+
+    // Handle offline mode
+    if (!this.isOnline && !options.forceOnline) {
+      // Try to return cached result even if expired
+      const expiredCachedResult = this.getCachedPrediction(endpointType, processedPayload);
+      if (expiredCachedResult) {
+        return {
+          ...expiredCachedResult,
+          fromCache: true,
+          offlineMode: true,
+          warning: 'Result from cache due to offline mode',
+          timestamp: new Date().toISOString()
+        };
+      }
+
+      // No cached result available in offline mode
+      throw new MedicalAPIError(
+        'Offline mode: No cached result available for this prediction',
+        503,
+        'offline',
+        { endpointType, isOnline: this.isOnline }
+      );
+    }
+
+    // Start performance monitoring for prediction
+    const predictionMetricId = medicalPerformanceMonitor.startMeasurement(
+      PerformanceMetricType.PREDICTION,
+      `${endpointType}_prediction`,
+      {
+        endpoint: endpointType,
+        payloadFields: Object.keys(processedPayload).length,
+        module: config.module,
+        cached: false
+      }
+    );
+
+    try {
+      // Execute API request
+      const response = await this.fetchJSON(
+        config.url,
+        processedPayload,
+        options.timeout,
+        endpointType
+      );
+
+      // Normalize response
+      const normalizedResponse = this.normalizeResponse(response, config);
+
+      // Cache the result
+      this.cachePredictionResult(endpointType, processedPayload, normalizedResponse);
+
+      // End prediction performance measurement
+      medicalPerformanceMonitor.endMeasurement(predictionMetricId, {
+        success: true,
+        responseFields: response ? Object.keys(response).length : 0,
+        probability: normalizedResponse.probability,
+        cached: false
+      });
+
+      return normalizedResponse;
+
+    } catch (error) {
+      // End prediction performance measurement with error
+      medicalPerformanceMonitor.endMeasurement(predictionMetricId, {
+        success: false,
+        errorType: error.name,
+        errorStatus: error.status,
+        cached: false
+      });
+
+      // Enhanced error logging for medical compliance
+      console.error(`${config.logContext} failed:`, {
+        error: error.toJSON ? error.toJSON() : error.message,
+        endpoint: endpointType,
+        url: config.url,
+        timestamp: new Date().toISOString()
+      });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint-specific payload preprocessing
+   * @param {Object} payload - Normalized payload
+   * @param {string} endpointType - Type of endpoint
+   * @returns {Object} Processed payload
+   */
+  preprocessPayload(payload, endpointType) {
+    switch (endpointType) {
+      case 'limited_ich':
+        // Ensure Limited Data API has all required fields with defaults
+        return {
+          age_years: payload.age_years,
+          systolic_bp: payload.systolic_bp,
+          diastolic_bp: payload.diastolic_bp,
+          gfap_value: payload.gfap_value,
+          vigilanzminderung: payload.vigilanzminderung || 0
+        };
+
+      case 'full_stroke':
+        // Full stroke requires all 13 clinical variables
+        return {
+          age_years: payload.age_years,
+          systolic_bp: payload.systolic_bp,
+          diastolic_bp: payload.diastolic_bp,
+          gfap_value: payload.gfap_value,
+          fast_ed_score: payload.fast_ed_score,
+          headache: payload.headache || 0,
+          vigilanzminderung: payload.vigilanzminderung || 0,
+          armparese: payload.armparese || 0,
+          beinparese: payload.beinparese || 0,
+          eye_deviation: payload.eye_deviation || 0,
+          atrial_fibrillation: payload.atrial_fibrillation || 0,
+          anticoagulated_noak: payload.anticoagulated_noak || 0,
+          antiplatelets: payload.antiplatelets || 0
+        };
+
+      case 'lvo':
+        // LVO prediction requires only GFAP and FAST-ED
+        return {
+          gfap_value: parseFloat(payload.gfap_value),
+          fast_ed_score: parseInt(payload.fast_ed_score)
+        };
+
+      default:
+        // Coma and other endpoints use payload as-is
+        return payload;
+    }
+  }
+
+  /**
+   * Get active request statistics for monitoring
+   * @returns {Object} Request statistics
+   */
+  getRequestStats() {
+    return {
+      activeRequests: this.activeRequests.size,
+      totalRequests: this.requestId,
+      activeRequestDetails: Array.from(this.activeRequests.entries()).map(([id, req]) => ({
+        id,
+        url: req.url,
+        duration: Date.now() - req.startTime
+      }))
+    };
+  }
+
+  /**
+   * Get comprehensive performance report including cache statistics
+   * @returns {Object} Performance report including medical metrics and caching
+   */
+  getPerformanceReport() {
+    const report = medicalPerformanceMonitor.generatePerformanceReport();
+    const requestStats = this.getRequestStats();
+
+    return {
+      ...report,
+      apiClientStats: {
+        ...requestStats,
+        memoryUsage: medicalPerformanceMonitor.getMemoryUsage(),
+        isMonitoring: medicalPerformanceMonitor.isMonitoring,
+        isOnline: this.isOnline
+      },
+      medicalApiPerformance: {
+        validationStats: medicalPerformanceMonitor.getTypeStatistics('validation'),
+        predictionStats: medicalPerformanceMonitor.getTypeStatistics('prediction'),
+        apiCallStats: medicalPerformanceMonitor.getTypeStatistics('api_call')
+      },
+      cachePerformance: {
+        apiCache: this.apiCache.getStats(),
+        predictionCache: this.predictionCache.getStats(),
+        validationCache: this.validationCache.getStats()
+      }
+    };
+  }
+
+  /**
+   * Clear all caches (for privacy compliance)
+   */
+  clearAllCaches() {
+    this.apiCache.clear();
+    this.predictionCache.clear();
+    this.validationCache.clear();
+  }
+
+  /**
+   * Get cache entry information for debugging
+   * @param {string} endpointType - Type of prediction endpoint
+   * @param {Object} payload - Request payload
+   * @returns {Object|null} Cache entry info
+   */
+  getCacheEntryInfo(endpointType, payload) {
+    const cacheKey = this.generateCacheKey(endpointType, payload);
+    return this.predictionCache.getEntryInfo(cacheKey);
+  }
+
+  /**
+   * Get performance configuration for medical compliance
+   * @returns {Object} Performance configuration
+   */
+  getPerformanceConfig() {
+    return {
+      performanceMonitor: medicalPerformanceMonitor.getConfig(),
+      medicalThresholds: {
+        criticalApiResponse: 3000,
+        validationResponse: 100,
+        predictionResponse: 5000,
+        memoryLeakThreshold: 50 * 1024 * 1024
+      },
+      clientConfig: {
+        apiTimeout: APP_CONFIG.apiTimeout || 10000,
+        maxRetention: 1000,
+        reportingInterval: 30000
+      }
+    };
+  }
+
+  /**
+   * Cancel all active requests
+   */
+  cancelAllRequests() {
+    this.activeRequests.forEach(({ controller }) => {
+      controller.abort();
+    });
+    this.activeRequests.clear();
+  }
+}
+
+// Export singleton instance
+export const basePredictionClient = new BasePredictionClient();
+
+// Export convenience functions that match original API
+export const normalizeBooleans = (payload) => basePredictionClient.normalizeBooleans(payload);
+export const safeParseFloat = (value, defaultValue) => basePredictionClient.safeParseFloat(value, defaultValue);
+
+export default basePredictionClient;

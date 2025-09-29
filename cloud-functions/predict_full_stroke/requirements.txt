@@ -1,0 +1,24 @@
+# Requirements for FULL_STROKE Cloud Function
+# Python 3.11+
+
+# Core dependencies
+functions-framework==3.*
+flask-cors==4.0.0
+
+# Data processing
+numpy==1.26.4
+pandas==2.1.4
+
+# Machine learning
+scikit-learn==1.7.1
+xgboost==2.0.3
+joblib==1.4.2
+
+# Model interpretation
+shap==0.45.0
+
+# Development dependencies (optional)
+# pytest==7.4.3
+# pytest-cov==4.1.0
+# ruff==0.1.0
+# bandit==1.7.5

@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Medical Software Pre-commit Quality Gates
+echo "🏥 Running medical software quality checks..."
+
+# Run linting for code quality
+echo "🔍 Checking code quality with ESLint..."
+npm run lint
+
+# Check code formatting
+echo "✨ Checking code formatting..."
+npm run format:check
+
+# Run tests to ensure medical logic integrity
+echo "🧪 Running medical validation tests..."
+npm run test:ci
+
+# Check for code duplication (medical safety concern)
+echo "🔄 Checking for code duplication..."
+npm run analyze:duplication
+
+echo "✅ All quality gates passed - ready for commit!"

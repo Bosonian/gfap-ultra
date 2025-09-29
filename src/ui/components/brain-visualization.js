@@ -3,7 +3,9 @@
  * Creates an SVG-based brain hemorrhage visualization
  */
 
-import { calculateHemorrhageSizePercent, getVolumeColor, calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
+import {
+  calculateHemorrhageSizePercent, getVolumeColor, calculateICHVolume, formatVolumeDisplay,
+} from '../../logic/ich-volume-calculator.js';
 
 /**
  * Render brain visualization with hemorrhage overlay
@@ -15,25 +17,25 @@ export function renderBrainVisualization(volume, size = 'compact') {
   const dimensions = size === 'compact' ? { width: 120, height: 120 } : { width: 200, height: 200 };
   const centerX = dimensions.width / 2;
   const centerY = dimensions.height / 2;
-  
+
   // Calculate hemorrhage appearance
   const hemorrhagePercent = calculateHemorrhageSizePercent(volume);
   const hemorrhageColor = getVolumeColor(volume);
-  
+
   // Scale hemorrhage radius based on volume (basal ganglia region, slightly off-center)
   const maxRadius = dimensions.width * 0.25; // Maximum 25% of brain width
   const hemorrhageRadius = (hemorrhagePercent / 70) * maxRadius; // 70% is max brain area
-  
+
   // Position hemorrhage in basal ganglia region (slightly right of center)
   const hemorrhageX = centerX + (dimensions.width * 0.1); // 10% right of center
   const hemorrhageY = centerY + (dimensions.height * 0.05); // 5% below center
-  
+
   // 30ml reference circle (for detailed view)
   const referenceRadius = (40 / 70) * maxRadius; // 40% brain area = 30ml threshold
-  
+
   // Animation for hemorrhage (subtle pulsing)
   const animationId = `hemorrhage-pulse-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   return `
     <div class="brain-visualization ${size}">
       <svg 
@@ -127,19 +129,19 @@ export function renderBrainVisualization(volume, size = 'compact') {
 function renderBrainOutlineWithHemorrhage(dimensions, volume) {
   // For performance, we'll use the SVG as a background image and overlay the hemorrhage
   // This avoids loading the 530KB SVG content directly into the DOM
-  
+
   const centerX = dimensions.width / 2;
   const centerY = dimensions.height / 2;
-  
+
   // Calculate hemorrhage position (basal ganglia region - slightly right and posterior)
-  const hemorrhageX = centerX + (dimensions.width * 0.08); // 8% right of center  
+  const hemorrhageX = centerX + (dimensions.width * 0.08); // 8% right of center
   const hemorrhageY = centerY + (dimensions.height * 0.03); // 3% below center
-  
+
   const hemorrhagePercent = calculateHemorrhageSizePercent(volume);
   const hemorrhageColor = getVolumeColor(volume);
   const maxRadius = dimensions.width * 0.25;
   const hemorrhageRadius = (hemorrhagePercent / 70) * maxRadius;
-  
+
   return `
     <!-- 3D Brain image as background -->
     <image 
@@ -198,7 +200,7 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
 function renderTemporaryBrainOutline(dimensions) {
   const centerX = dimensions.width / 2;
   const centerY = dimensions.height / 2;
-  
+
   return `
     <!-- Simplified brain outline -->
     <ellipse 
@@ -234,7 +236,7 @@ function renderTemporaryBrainOutline(dimensions) {
 export function renderCompactBrainIcon(volume, size = 24) {
   const hemorrhageColor = getVolumeColor(volume);
   const hemorrhageSize = volume > 0 ? Math.max(2, (volume / 50) * size * 0.3) : 0;
-  
+
   return `
     <svg 
       width="${size}" 
@@ -245,10 +247,10 @@ export function renderCompactBrainIcon(volume, size = 24) {
     >
       <!-- Simple brain outline -->
       <ellipse 
-        cx="${size/2}" 
-        cy="${size/2}" 
-        rx="${size*0.4}" 
-        ry="${size*0.35}" 
+        cx="${size / 2}" 
+        cy="${size / 2}" 
+        rx="${size * 0.4}" 
+        ry="${size * 0.35}" 
         fill="#f1f5f9" 
         stroke="#64748b" 
         stroke-width="1"
@@ -257,8 +259,8 @@ export function renderCompactBrainIcon(volume, size = 24) {
       <!-- Hemorrhage indicator -->
       ${volume > 0 ? `
         <circle 
-          cx="${size/2 + size*0.1}" 
-          cy="${size/2}" 
+          cx="${size / 2 + size * 0.1}" 
+          cy="${size / 2}" 
           r="${hemorrhageSize}"
           fill="${hemorrhageColor}"
           opacity="0.9"
@@ -282,10 +284,10 @@ export function renderCircularBrainDisplay(volume) {
       </div>
     `;
   }
-  
+
   const formattedVolume = formatVolumeDisplay(volume);
   const canvasId = `volume-canvas-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   return `
     <div class="volume-circle" data-volume="${volume}">
       <div class="volume-number">${formattedVolume}</div>
@@ -301,14 +303,14 @@ export function renderCircularBrainDisplay(volume) {
  */
 export function initializeVolumeAnimations() {
   const canvases = document.querySelectorAll('.volume-canvas');
-  
-  canvases.forEach(canvas => {
+
+  canvases.forEach((canvas) => {
     // Set canvas internal size to match CSS size
     const cssWidth = canvas.offsetWidth || 120;
     const cssHeight = canvas.offsetHeight || 120;
     canvas.width = cssWidth;
     canvas.height = cssHeight;
-    
+
     const volume = parseFloat(canvas.dataset.volume) || 0;
     if (volume > 0) {
       drawVolumeFluid(canvas, volume);
@@ -328,71 +330,73 @@ function drawVolumeFluid(canvas, volume) {
   const radius = canvas.width * 0.45; // 45% of canvas width for the circle
   let animationFrame = 0;
   let isAnimating = true;
-  
+
   // Check dark mode once
-  const isDarkMode = document.body.classList.contains('dark-mode') || 
-                    window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
+  const isDarkMode = document.body.classList.contains('dark-mode')
+                    || window.matchMedia('(prefers-color-scheme: dark)').matches;
+
   function draw() {
-    if (!isAnimating) return;
-    
+    if (!isAnimating) {
+      return;
+    }
+
     // Clear canvas completely
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Don't draw background - let CSS handle it
     // Just draw the fluid and border
     drawFluidLayer();
   }
-  
+
   function drawFluidLayer() {
     // Calculate fill level based on volume
     const maxVolume = 80; // ml (practical maximum for visualization)
     const fillPercentage = Math.min(volume / maxVolume, 0.9);
     const fillHeight = fillPercentage * (radius * 1.8);
     const baseLevel = centerY + radius - 4 - fillHeight;
-    
+
     // Draw fluid fill with waves
     if (volume > 0) {
       ctx.save();
-      
+
       // Clip to circle
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius - 4, 0, Math.PI * 2);
       ctx.clip();
-      
+
       // Draw base fluid rectangle
       ctx.fillStyle = '#dc2626';
       ctx.globalAlpha = 0.7;
       ctx.fillRect(0, baseLevel + 5, canvas.width, canvas.height);
-      
+
       // Draw animated wave surface
       ctx.globalAlpha = 0.9;
       ctx.fillStyle = '#dc2626';
       ctx.beginPath();
-      
+
       // Create wave path
-      let startX = centerX - radius + 4;
+      const startX = centerX - radius + 4;
       ctx.moveTo(startX, baseLevel);
-      
+
       for (let x = startX; x <= centerX + radius - 4; x += 2) {
         const waveOffset1 = Math.sin((x * 0.05) + animationFrame * 0.08) * 3;
         const waveOffset2 = Math.sin((x * 0.08) + animationFrame * 0.12 + 1) * 2;
         const y = baseLevel + waveOffset1 + waveOffset2;
         ctx.lineTo(x, y);
       }
-      
+
       // Complete wave fill
       ctx.lineTo(centerX + radius - 4, canvas.height);
       ctx.lineTo(startX, canvas.height);
       ctx.closePath();
       ctx.fill();
-      
+
       ctx.restore();
     }
-    
+
     // Draw background border circle (like ICH risk ring)
-    const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim() || 
-                       (isDarkMode ? '#8899a6' : '#6c757d');
+    const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim()
+                       || (isDarkMode ? '#8899a6' : '#6c757d');
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 8;
     ctx.globalAlpha = 0.4;
@@ -400,33 +404,33 @@ function drawVolumeFluid(canvas, volume) {
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
-    
+
     // Draw volume progress ring (like ICH risk circle)
     const volumePercent = Math.min(volume / 100, 1); // Max 100ml = 100%
     const circumference = 2 * Math.PI * radius;
     const progressOffset = circumference * (1 - volumePercent);
-    
+
     // Progress ring (dark mode aware)
-    const progressColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color').trim() || 
-                         '#dc2626';
+    const progressColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color').trim()
+                         || '#dc2626';
     ctx.strokeStyle = progressColor;
     ctx.lineWidth = 8;
     ctx.setLineDash([]);
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, -Math.PI/2, -Math.PI/2 + (volumePercent * 2 * Math.PI));
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + (volumePercent * 2 * Math.PI));
     ctx.stroke();
-    
+
     // Continue animation
     animationFrame += 1;
     if (volume > 0) {
       requestAnimationFrame(draw);
     }
   }
-  
+
   // Start animation
   draw();
-  
+
   // Stop animation when canvas is removed from DOM
   const observer = new MutationObserver(() => {
     if (!document.contains(canvas)) {

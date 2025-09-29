@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Stroke Module Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        h1 { color: #0066cc; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 10px 5px; font-size: 14px; border-radius: 5px; cursor: pointer; }
+        .primary { background: #0066cc; color: white; border: none; }
+        .secondary { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
+        .result { margin: 15px 0; padding: 15px; background: #f9f9f9; border-radius: 5px; }
+        .error { background: #fee; color: #c00; }
+        .success { background: #efe; color: #080; }
+        .info { background: #eef; color: #008; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .loading { color: #666; font-style: italic; }
+        input[type="number"] { width: 100px; padding: 5px; margin: 5px; }
+        label { display: inline-block; margin: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Full Stroke Module API Test</h1>
+
+        <div class="test-section">
+            <h2>Test Configuration</h2>
+            <div>
+                <label>
+                    <input type="radio" name="api-mode" value="production" checked> Production API
+                </label>
+                <label>
+                    <input type="radio" name="api-mode" value="mock"> Mock Data
+                </label>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 1: Direct API Call</h2>
+            <p>This test calls the Full Stroke API endpoint directly with sample data.</p>
+            <button class="primary" onclick="testDirectAPI()">Run Direct API Test</button>
+            <div id="direct-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Using App's predictFullStroke</h2>
+            <p>This test uses the application's predictFullStroke function.</p>
+            <button class="primary" onclick="testAppFunction()">Run App Function Test</button>
+            <div id="app-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Custom Input</h2>
+            <p>Test with custom patient data:</p>
+            <div>
+                <label>Age: <input type="number" id="age" value="65" min="18" max="120"></label>
+                <label>Systolic BP: <input type="number" id="systolic" value="160" min="60" max="300"></label>
+                <label>Diastolic BP: <input type="number" id="diastolic" value="90" min="30" max="200"></label>
+                <label>GFAP: <input type="number" id="gfap" value="850" min="29" max="10001"></label>
+                <label>FAST-ED: <input type="number" id="fasted" value="5" min="0" max="9"></label>
+            </div>
+            <div style="margin-top: 10px;">
+                <label><input type="checkbox" id="headache"> Headache</label>
+                <label><input type="checkbox" id="vigilanzminderung" checked> Vigilanzminderung</label>
+                <label><input type="checkbox" id="armparese" checked> Arm Weakness</label>
+                <label><input type="checkbox" id="beinparese"> Leg Weakness</label>
+                <label><input type="checkbox" id="eye_deviation" checked> Eye Deviation</label>
+                <label><input type="checkbox" id="atrial_fibrillation"> Atrial Fibrillation</label>
+            </div>
+            <button class="primary" onclick="testCustomInput()">Run Custom Test</button>
+            <div id="custom-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Console Output</h2>
+            <button class="secondary" onclick="clearConsole()">Clear Console</button>
+            <pre id="console-output"></pre>
+        </div>
+    </div>
+
+    <script type="module">
+        import { predictFullStroke } from './src/api/client.js';
+
+        // Make function available globally for buttons
+        window.predictFullStroke = predictFullStroke;
+
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+
+        function logToPage(type, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => {
+                if (typeof arg === 'object') {
+                    return JSON.stringify(arg, null, 2);
+                }
+                return String(arg);
+            }).join(' ');
+
+            consoleOutput.textContent += `[${timestamp}] ${type}: ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        console.log = (...args) => {
+            originalLog(...args);
+            logToPage('LOG', ...args);
+        };
+
+        console.error = (...args) => {
+            originalError(...args);
+            logToPage('ERROR', ...args);
+        };
+
+        // Test functions
+        window.testDirectAPI = async function() {
+            const resultDiv = document.getElementById('direct-result');
+            resultDiv.innerHTML = '<div class="loading">Testing direct API call...</div>';
+
+            const apiMode = document.querySelector('input[name="api-mode"]:checked').value;
+            const endpoint = apiMode === 'production'
+                ? 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke'
+                : '/api/cloud-functions/predict_full_stroke';
+
+            const testData = {
+                age_years: 65,
+                systolic_bp: 160,
+                diastolic_bp: 90,
+                gfap_value: 850,
+                fast_ed_score: 5,
+                headache: 0,
+                vigilanzminderung: 1,
+                armparese: 1,
+                beinparese: 0,
+                eye_deviation: 1,
+                atrial_fibrillation: 0,
+                anticoagulated_noak: 0,
+                antiplatelets: 0
+            };
+
+            console.log('Calling endpoint:', endpoint);
+            console.log('Request data:', testData);
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(testData),
+                    mode: 'cors'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${JSON.stringify(data)}`);
+                }
+
+                console.log('Response received:', data);
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ API call successful!</div>
+                    <h3>Response:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('Direct API test failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">❌ API call failed!</div>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        };
+
+        window.testAppFunction = async function() {
+            const resultDiv = document.getElementById('app-result');
+            resultDiv.innerHTML = '<div class="loading">Testing app function...</div>';
+
+            const testData = {
+                age_years: 65,
+                systolic_bp: 160,
+                diastolic_bp: 90,
+                gfap_value: 850,
+                fast_ed_score: 5,
+                headache: false,
+                vigilanzminderung: true,
+                armparese: true,
+                beinparese: false,
+                eye_deviation: true,
+                atrial_fibrillation: false,
+                anticoagulated_noak: false,
+                antiplatelets: false
+            };
+
+            console.log('Calling predictFullStroke with:', testData);
+
+            try {
+                const result = await predictFullStroke(testData);
+                console.log('Function result:', result);
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Function call successful!</div>
+                    <h3>ICH Prediction:</h3>
+                    <p>Probability: ${(result.ich.probability * 100).toFixed(1)}%</p>
+                    <p>Confidence: ${result.ich.confidence}</p>
+                    <p>Drivers: ${JSON.stringify(result.ich.drivers)}</p>
+                    <h3>LVO Prediction:</h3>
+                    <p>Probability: ${(result.lvo.probability * 100).toFixed(1)}%</p>
+                    <p>Confidence: ${result.lvo.confidence}</p>
+                    <p>Drivers: ${JSON.stringify(result.lvo.drivers)}</p>
+                `;
+            } catch (error) {
+                console.error('App function test failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Function call failed!</div>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        };
+
+        window.testCustomInput = async function() {
+            const resultDiv = document.getElementById('custom-result');
+            resultDiv.innerHTML = '<div class="loading">Testing with custom input...</div>';
+
+            const testData = {
+                age_years: parseInt(document.getElementById('age').value),
+                systolic_bp: parseInt(document.getElementById('systolic').value),
+                diastolic_bp: parseInt(document.getElementById('diastolic').value),
+                gfap_value: parseFloat(document.getElementById('gfap').value),
+                fast_ed_score: parseInt(document.getElementById('fasted').value),
+                headache: document.getElementById('headache').checked,
+                vigilanzminderung: document.getElementById('vigilanzminderung').checked,
+                armparese: document.getElementById('armparese').checked,
+                beinparese: document.getElementById('beinparese').checked,
+                eye_deviation: document.getElementById('eye_deviation').checked,
+                atrial_fibrillation: document.getElementById('atrial_fibrillation').checked,
+                anticoagulated_noak: false,
+                antiplatelets: false
+            };
+
+            console.log('Testing with custom data:', testData);
+
+            try {
+                const result = await predictFullStroke(testData);
+                console.log('Custom test result:', result);
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Custom test successful!</div>
+                    <h3>ICH Risk: ${(result.ich.probability * 100).toFixed(1)}%</h3>
+                    <h3>LVO Risk: ${(result.lvo.probability * 100).toFixed(1)}%</h3>
+                    <details>
+                        <summary>Full Response</summary>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                console.error('Custom test failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Custom test failed!</div>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        };
+
+        window.clearConsole = function() {
+            consoleOutput.textContent = '';
+        };
+
+        // Initial message
+        console.log('Full Stroke Module Test Page loaded');
+        console.log('Ready to test API calls');
+    </script>
+</body>
+</html>

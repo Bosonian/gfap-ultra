@@ -10,7 +10,7 @@ export function normalizeDrivers(drivers) {
       units: null,
       positive: [],
       negative: [],
-      meta: {}
+      meta: {},
     };
   }
 
@@ -39,12 +39,11 @@ export function normalizeDrivers(drivers) {
     units: null,
     positive: [],
     negative: [],
-    meta: {}
+    meta: {},
   };
 }
 
 function normalizeShapValues(drivers) {
-  
   const shapData = drivers.shap_values || drivers;
   const features = [];
 
@@ -54,12 +53,12 @@ function normalizeShapValues(drivers) {
       if (typeof item === 'object' && item.feature && item.value !== undefined) {
         features.push({
           label: item.feature,
-          weight: item.value
+          weight: item.value,
         });
       } else if (typeof item === 'number') {
         features.push({
           label: `Feature ${index}`,
-          weight: item
+          weight: item,
         });
       }
     });
@@ -69,7 +68,7 @@ function normalizeShapValues(drivers) {
       if (typeof value === 'number') {
         features.push({
           label: feature,
-          weight: value
+          weight: value,
         });
       }
     });
@@ -77,37 +76,37 @@ function normalizeShapValues(drivers) {
 
   // Sort by absolute weight value
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
-  
-  
-  
+
   // Specific check for FAST-ED related features
-  const fastEdFeatures = features.filter(f => 
-    f.label.toLowerCase().includes('fast') || 
-    f.label.toLowerCase().includes('ed') ||
-    f.label.includes('fast_ed')
-  );
+  const fastEdFeatures = features.filter((f) => f.label.toLowerCase().includes('fast')
+    || f.label.toLowerCase().includes('ed')
+    || f.label.includes('fast_ed'));
   if (fastEdFeatures.length > 0) {
-    
+
   } else {
-    console.log('⚠️  No FAST-ED features found in drivers!');
+    // No FAST-ED features found in drivers
   }
 
-  const positive = features.filter(f => f.weight > 0);
-  const negative = features.filter(f => f.weight < 0);
-  
-  
+  const positive = features.filter((f) => f.weight > 0);
+  const negative = features.filter((f) => f.weight < 0);
 
   const meta = {};
-  if (drivers.base_value !== undefined) meta.base_value = drivers.base_value;
-  if (drivers.contrib_sum !== undefined) meta.contrib_sum = drivers.contrib_sum;
-  if (drivers.logit_total !== undefined) meta.logit_total = drivers.logit_total;
+  if (drivers.base_value !== undefined) {
+    meta.base_value = drivers.base_value;
+  }
+  if (drivers.contrib_sum !== undefined) {
+    meta.contrib_sum = drivers.contrib_sum;
+  }
+  if (drivers.logit_total !== undefined) {
+    meta.logit_total = drivers.logit_total;
+  }
 
   return {
     kind: 'shap_values',
     units: 'logit',
     positive,
     negative,
-    meta
+    meta,
   };
 }
 
@@ -120,7 +119,7 @@ function normalizeLogisticContributions(drivers) {
       if (typeof value === 'number' && !['intercept', 'contrib_sum', 'logit_total'].includes(feature)) {
         features.push({
           label: feature,
-          weight: value
+          weight: value,
         });
       }
     });
@@ -129,21 +128,29 @@ function normalizeLogisticContributions(drivers) {
   // Sort by absolute weight value
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
 
-  const positive = features.filter(f => f.weight > 0);
-  const negative = features.filter(f => f.weight < 0);
+  const positive = features.filter((f) => f.weight > 0);
+  const negative = features.filter((f) => f.weight < 0);
 
   const meta = {};
-  if (logitData.intercept !== undefined) meta.base_value = logitData.intercept;
-  if (logitData.contrib_sum !== undefined) meta.contrib_sum = logitData.contrib_sum;
-  if (logitData.logit_total !== undefined) meta.logit_total = logitData.logit_total;
-  if (drivers.contrib_sum !== undefined) meta.contrib_sum = drivers.contrib_sum;
+  if (logitData.intercept !== undefined) {
+    meta.base_value = logitData.intercept;
+  }
+  if (logitData.contrib_sum !== undefined) {
+    meta.contrib_sum = logitData.contrib_sum;
+  }
+  if (logitData.logit_total !== undefined) {
+    meta.logit_total = logitData.logit_total;
+  }
+  if (drivers.contrib_sum !== undefined) {
+    meta.contrib_sum = drivers.contrib_sum;
+  }
 
   return {
     kind: 'logistic_contributions',
     units: 'logit',
     positive,
     negative,
-    meta
+    meta,
   };
 }
 
@@ -154,7 +161,7 @@ function normalizeRawDrivers(drivers) {
     if (typeof value === 'number') {
       features.push({
         label: feature,
-        weight: value
+        weight: value,
       });
     }
   });
@@ -162,18 +169,18 @@ function normalizeRawDrivers(drivers) {
   // Sort by absolute weight value
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
 
-  const positive = features.filter(f => f.weight > 0);
-  const negative = features.filter(f => f.weight < 0);
+  const positive = features.filter((f) => f.weight > 0);
+  const negative = features.filter((f) => f.weight < 0);
 
   return {
     kind: 'raw_weights',
     units: null,
     positive,
     negative,
-    meta: {}
+    meta: {},
   };
 }
 
 function isRawDriversObject(obj) {
-  return Object.values(obj).every(value => typeof value === 'number');
+  return Object.values(obj).every((value) => typeof value === 'number');
 }

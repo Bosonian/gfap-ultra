@@ -13,7 +13,7 @@
     <!-- Cache-bust: v2.1.1 -->
     
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="./manifest.json" />
+    <link rel="manifest" href="/0925/assets/manifest-CgZQOV_e.json" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -22,11 +22,11 @@
     <meta name="msapplication-tap-highlight" content="no" />
     
     <!-- Favicon and Icons -->
-    <link rel="icon" href="./favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="./icons/icon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
-    <link rel="mask-icon" href="./icons/icon-192x192.png" color="#0066CC" />
+    <link rel="icon" href="/0925/assets/favicon-DPOKeJP6.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/0925/assets/icon-32x32-BZn9ZIFo.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/0925/assets/icon-16x16-BUOTCe54.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/0925/assets/apple-touch-icon-IbqiIBz1.png" />
+    <link rel="mask-icon" href="/0925/assets/icon-192x192-88fexMmU.png" color="#0066CC" />
     
     
     <!-- Critical CSS for CLS prevention -->
@@ -75,8 +75,15 @@
             }
         }
     </style>
-  <script type="module" crossorigin src="/0825/assets/index-XLcuBX9X.js"></script>
-  <link rel="stylesheet" crossorigin href="/0825/assets/index-DbnZbWPC.css">
+  <script type="module" crossorigin src="/0925/assets/index-BBmQgakm.js"></script>
+  <link rel="modulepreload" crossorigin href="/0925/assets/prediction-models-BW8hqZ1g.js">
+  <link rel="modulepreload" crossorigin href="/0925/assets/enterprise-features-DrM-1IqS.js">
+  <link rel="modulepreload" crossorigin href="/0925/assets/research-tools-D6-gi7wf.js">
+  <link rel="modulepreload" crossorigin href="/0925/assets/ui-components-BWyzIDxj.js">
+  <link rel="modulepreload" crossorigin href="/0925/assets/vendor-x0kWEXnY.js">
+  <link rel="modulepreload" crossorigin href="/0925/assets/index-BBmQgakm.js">
+  <link rel="modulepreload" crossorigin href="/0925/assets/medical-core-BFYLkP1b.js">
+  <link rel="stylesheet" crossorigin href="/0925/assets/index-W03zdC12.css">
 </head>
 <body>
 <header class="app-header" role="banner">
@@ -89,6 +96,7 @@
         <small class="app-subtitle">Stroke Triage Assistant</small>
     </div>
     <div class="header-controls">
+        <button id="apiModeToggle" aria-label="Toggle API mode" title="API Mode">🧪</button>
         <button id="researchModeToggle" aria-label="Toggle research mode" title="Research Mode">📊</button>
         <button id="languageToggle" aria-label="Toggle language" title="Language" data-lang="en">🇬🇧</button>
         <button id="helpButton" aria-label="Help and Instructions" title="Help">❓</button>

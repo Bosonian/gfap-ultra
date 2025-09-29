@@ -18,7 +18,9 @@ export function initializeProbabilityRings(root = document) {
   const canvases = root.querySelectorAll('.probability-canvas');
   canvases.forEach((canvas) => {
     const container = canvas.closest('.probability-circle');
-    if (!container) return;
+    if (!container) {
+      return;
+    }
     const percent = parseFloat(container.dataset.prob) || 0;
     const level = container.dataset.level || 'normal';
 
@@ -48,8 +50,12 @@ export function initializeProbabilityRings(root = document) {
 
     // Progress color by level
     let stroke = getCSSVar('--primary-color');
-    if (level === 'high') stroke = getCSSVar('--warning-color') || '#ff9800';
-    if (level === 'critical') stroke = getCSSVar('--danger-color') || '#DC143C';
+    if (level === 'high') {
+      stroke = getCSSVar('--warning-color') || '#ff9800';
+    }
+    if (level === 'critical') {
+      stroke = getCSSVar('--danger-color') || '#DC143C';
+    }
 
     // Progress arc (start at -90deg)
     const startAngle = -Math.PI / 2;
@@ -65,9 +71,12 @@ export function initializeProbabilityRings(root = document) {
 // Optional: re-render on resize for crispness
 let resizeObserver;
 export function observeProbabilityRings(root = document) {
-  if (typeof ResizeObserver === 'undefined') return;
-  if (resizeObserver) resizeObserver.disconnect();
+  if (typeof ResizeObserver === 'undefined') {
+    return;
+  }
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
   resizeObserver = new ResizeObserver(() => initializeProbabilityRings(root));
-  root.querySelectorAll('.probability-circle').forEach(el => resizeObserver.observe(el));
+  root.querySelectorAll('.probability-circle').forEach((el) => resizeObserver.observe(el));
 }
-

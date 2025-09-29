@@ -72,11 +72,14 @@ export function renderLoginScreen() {
 
 export function initializeLoginScreen() {
   const loginForm = document.getElementById('loginForm');
+
+  if (!loginForm) {
+    return;
+  }
+
   const passwordInput = document.getElementById('researchPassword');
   const loginError = document.getElementById('loginError');
   const loginButton = loginForm.querySelector('.login-button');
-
-  if (!loginForm) return;
 
   // Focus password input on load
   passwordInput.focus();
@@ -96,31 +99,34 @@ export function initializeLoginScreen() {
     hideLoginError();
 
     try {
-      const hashedInput = await authManager.hashPassword(password);
-      const isAuthenticated = await authManager.authenticate(hashedInput);
+      const authResult = await authManager.authenticate(password);
 
-      if (isAuthenticated) {
+      if (authResult.success) {
         // Log successful authentication
         store.logEvent('auth_success', {
           timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent.substring(0, 100) // Limited info
+          userAgent: navigator.userAgent.substring(0, 100), // Limited info
         });
 
         // Navigate to main application
         store.navigate('triage1');
       } else {
-        showLoginError('Invalid access code. Please contact Deepak Bos for research access.');
+        // Handle authentication failure
+        let errorMessage = authResult.message;
+
+        showLoginError(errorMessage);
         passwordInput.value = '';
         passwordInput.focus();
 
         // Log failed attempt (no sensitive data)
         store.logEvent('auth_failed', {
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          errorCode: authResult.errorCode,
         });
       }
     } catch (error) {
       showLoginError('Authentication system error. Please try again.');
-      console.error('Authentication error:', error);
+      // Remove // for production
     } finally {
       setLoginLoading(false);
     }

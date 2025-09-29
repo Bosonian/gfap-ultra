@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triage1 Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .triage-buttons { margin: 20px 0; }
+        .triage-buttons button {
+            margin: 10px;
+            padding: 15px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .yes-btn { background: #28a745; color: white; }
+        .no-btn { background: #dc3545; color: white; }
+        iframe { border: 2px solid #007bff; border-radius: 8px; width: 100%; height: 600px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Triage1 Screen Test</h1>
+
+    <div class="container">
+        <div id="results"></div>
+
+        <h2>📺 Main Application</h2>
+        <iframe src="/0925/" title="Current iGFAP Application"></iframe>
+
+        <h2>🔬 Isolated Triage1 Test</h2>
+        <div id="triage1Container"></div>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+        const triage1Container = document.getElementById('triage1Container');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        async function testTriage1() {
+            try {
+                addResult('🔄 Testing triage1 screen rendering...', 'info');
+
+                // Test importing triage1 module
+                const { renderTriage1 } = await import('./src/ui/screens/triage1.js');
+                addResult('✅ Triage1 module imported successfully', 'success');
+
+                // Test rendering triage1
+                const html = renderTriage1();
+                triage1Container.innerHTML = html;
+                addResult('✅ Triage1 HTML rendered successfully', 'success');
+
+                // Check if buttons are present
+                const buttons = triage1Container.querySelectorAll('[data-action="triage1"]');
+                addResult(`📊 Found ${buttons.length} triage1 buttons`, buttons.length === 2 ? 'success' : 'error');
+
+                // Test button data attributes
+                buttons.forEach((button, index) => {
+                    const action = button.dataset.action;
+                    const value = button.dataset.value;
+                    addResult(`Button ${index + 1}: action="${action}", value="${value}"`, 'info');
+                });
+
+                // Test event handlers
+                addResult('🔄 Testing event handlers...', 'info');
+
+                const { handleTriage1 } = await import('./src/logic/handlers.js');
+                addResult('✅ Handler imported successfully', 'success');
+
+                // Test store
+                const { store } = await import('./src/state/store.js');
+                const state = store.getState();
+                addResult(`📊 Current screen: ${state.currentScreen}`, 'info');
+
+                addResult('🎯 Triage1 test complete!', 'success');
+
+            } catch (error) {
+                addResult(`❌ Error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        testTriage1();
+    </script>
+</body>
+</html>

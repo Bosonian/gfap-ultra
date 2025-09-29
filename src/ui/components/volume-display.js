@@ -4,8 +4,10 @@
  */
 
 import { calculateICHVolume, formatVolumeDisplay, VOLUME_THRESHOLDS } from '../../logic/ich-volume-calculator.js';
-import { renderBrainVisualization, renderCompactBrainIcon } from './brain-visualization.js';
 import { t } from '../../localization/i18n.js';
+import { safeSetInnerHTML } from '../../security/html-sanitizer.js';
+
+import { renderBrainVisualization, renderCompactBrainIcon } from './brain-visualization.js';
 
 /**
  * Render compact volume display for integration into risk cards
@@ -23,9 +25,9 @@ export function renderCompactVolumeDisplay(gfapValue) {
       </div>
     `;
   }
-  
+
   const volumeResult = calculateICHVolume(gfapValue);
-  
+
   if (!volumeResult.isValid) {
     return `
       <div class="compact-volume-display error">
@@ -36,10 +38,10 @@ export function renderCompactVolumeDisplay(gfapValue) {
       </div>
     `;
   }
-  
-  const riskLevel = volumeResult.riskLevel;
+
+  const { riskLevel } = volumeResult;
   const thresholdInfo = VOLUME_THRESHOLDS[riskLevel];
-  
+
   return `
     <div class="compact-volume-display ${riskLevel}">
       <div class="volume-metric">
@@ -87,11 +89,11 @@ export function renderDetailedVolumeCard(gfapValue, expanded = false) {
       </div>
     `;
   }
-  
+
   const volumeResult = calculateICHVolume(gfapValue);
-  const riskLevel = volumeResult.riskLevel;
+  const { riskLevel } = volumeResult;
   const thresholdInfo = VOLUME_THRESHOLDS[riskLevel];
-  
+
   return `
     <div class="volume-detail-card ${expanded ? 'expanded' : 'collapsed'} ${riskLevel}">
       <div class="volume-header" onclick="toggleVolumeDetails()">
@@ -188,10 +190,10 @@ export function renderVolumeIndicator(gfapValue) {
   if (!gfapValue || gfapValue <= 0) {
     return '';
   }
-  
+
   const volumeResult = calculateICHVolume(gfapValue);
   const thresholdInfo = VOLUME_THRESHOLDS[volumeResult.riskLevel];
-  
+
   return `
     <div class="volume-indicator">
       <div class="volume-row">
@@ -214,11 +216,11 @@ export function renderVolumeIndicator(gfapValue) {
  * Toggle volume details visibility
  * Called from onclick events
  */
-window.toggleVolumeDetails = function() {
+window.toggleVolumeDetails = function () {
   const card = document.querySelector('.volume-detail-card');
   if (card) {
     const isExpanded = card.classList.contains('expanded');
-    
+
     if (isExpanded) {
       card.classList.remove('expanded');
       card.classList.add('collapsed');
@@ -226,18 +228,29 @@ window.toggleVolumeDetails = function() {
       card.classList.remove('collapsed');
       card.classList.add('expanded');
     }
-    
+
     // Update expand icon
     const icon = card.querySelector('.expand-icon');
     if (icon) {
       icon.textContent = isExpanded ? '▼' : '▲';
     }
-    
+
     // Re-render content with new state
     const gfapValue = parseFloat(document.querySelector('[name="gfap_value"]')?.value || 0);
     if (gfapValue > 0) {
-      const newContent = renderDetailedVolumeCard(gfapValue, !isExpanded);
-      card.outerHTML = newContent;
+      try {
+        const newContent = renderDetailedVolumeCard(gfapValue, !isExpanded);
+        const tempElement = document.createElement('div');
+        safeSetInnerHTML(tempElement, newContent);
+        if (tempElement.firstElementChild) {
+          card.parentNode.replaceChild(tempElement.firstElementChild, card);
+        }
+      } catch (error) {
+        console.error('Volume card toggle sanitization failed:', error);
+        // Fallback: just toggle classes without re-rendering
+        card.classList.toggle('expanded');
+        card.classList.toggle('collapsed');
+      }
     }
   }
 };
@@ -249,26 +262,53 @@ window.toggleVolumeDetails = function() {
 export function updateVolumeDisplays(newGfapValue) {
   // Update compact displays
   const compactDisplays = document.querySelectorAll('.compact-volume-display');
-  compactDisplays.forEach(display => {
-    const newContent = renderCompactVolumeDisplay(newGfapValue);
-    display.outerHTML = newContent;
+  compactDisplays.forEach((display) => {
+    try {
+      const newContent = renderCompactVolumeDisplay(newGfapValue);
+      const tempElement = document.createElement('div');
+      safeSetInnerHTML(tempElement, newContent);
+      if (tempElement.firstElementChild) {
+        display.parentNode.replaceChild(tempElement.firstElementChild, display);
+      }
+    } catch (error) {
+      console.error('Compact display update sanitization failed:', error);
+      display.textContent = `Volume: ${newGfapValue} GFAP`;
+    }
   });
-  
+
   // Update volume indicators
   const indicators = document.querySelectorAll('.volume-indicator');
-  indicators.forEach(indicator => {
+  indicators.forEach((indicator) => {
     const newContent = renderVolumeIndicator(newGfapValue);
     if (newContent) {
-      indicator.outerHTML = newContent;
+      try {
+        const tempElement = document.createElement('div');
+        safeSetInnerHTML(tempElement, newContent);
+        if (tempElement.firstElementChild) {
+          indicator.parentNode.replaceChild(tempElement.firstElementChild, indicator);
+        }
+      } catch (error) {
+        console.error('Volume indicator update sanitization failed:', error);
+        indicator.textContent = `Volume indicator: ${newGfapValue} GFAP`;
+      }
     } else {
       indicator.style.display = 'none';
     }
   });
-  
+
   // Update detailed cards if expanded
   const detailCards = document.querySelectorAll('.volume-detail-card.expanded');
-  detailCards.forEach(card => {
-    const newContent = renderDetailedVolumeCard(newGfapValue, true);
-    card.outerHTML = newContent;
+  detailCards.forEach((card) => {
+    try {
+      const newContent = renderDetailedVolumeCard(newGfapValue, true);
+      const tempElement = document.createElement('div');
+      safeSetInnerHTML(tempElement, newContent);
+      if (tempElement.firstElementChild) {
+        card.parentNode.replaceChild(tempElement.firstElementChild, card);
+      }
+    } catch (error) {
+      console.error('Detail card update sanitization failed:', error);
+      card.textContent = `ICH Volume Analysis: ${newGfapValue} GFAP`;
+    }
   });
 }

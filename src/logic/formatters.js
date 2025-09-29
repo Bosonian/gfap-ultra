@@ -3,14 +3,13 @@ import { CRITICAL_THRESHOLDS } from '../config.js';
 export function getRiskLevel(probabilityPercent, type) {
   const p = Number(probabilityPercent);
   const thresholds = CRITICAL_THRESHOLDS[type];
-  
+
   if (p >= thresholds.high) {
     return '🔴 HIGH RISK';
-  } else if (p >= thresholds.medium) {
+  } if (p >= thresholds.medium) {
     return '🟡 MEDIUM RISK';
-  } else {
-    return '🟢 LOW RISK';
   }
+  return '🟢 LOW RISK';
 }
 
 export function formatTime(milliseconds) {

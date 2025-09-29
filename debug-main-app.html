@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Main App Flow</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .debug { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug Main App Flow</h1>
+    <div id="debug-info"></div>
+
+    <script type="module">
+        const debugInfo = document.getElementById('debug-info');
+
+        function addDebugInfo(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `debug ${type}`;
+            div.innerHTML = message;
+            debugInfo.appendChild(div);
+            console.log(message);
+        }
+
+        async function debugMainApp() {
+            try {
+                addDebugInfo('🔍 Starting main app debug analysis...', 'info');
+
+                // Check store state
+                const { store } = await import('./src/state/store.js');
+                const state = store.getState();
+                addDebugInfo(`📊 Store State: currentScreen = "${state.currentScreen}"`, 'info');
+
+                // Check authentication
+                const { simpleAuthManager } = await import('./src/auth/simple-auth.js');
+                const isValid = simpleAuthManager.isValidSession();
+                addDebugInfo(`🔐 Authentication: isValidSession = ${isValid}`, isValid ? 'success' : 'info');
+
+                // Check what the render function would render
+                const { render } = await import('./src/ui/render.js');
+                addDebugInfo('🎨 Render function loaded successfully', 'success');
+
+                // Create a test container to see what would be rendered
+                const testContainer = document.createElement('div');
+                testContainer.id = 'testContainer';
+
+                try {
+                    render(testContainer);
+                    addDebugInfo(`✅ Render executed successfully. Content length: ${testContainer.innerHTML.length} chars`, 'success');
+
+                    // Show a preview of what's rendered
+                    if (testContainer.innerHTML.includes('password')) {
+                        addDebugInfo('🔐 Login screen is being rendered (contains "password")', 'success');
+                    } else if (testContainer.innerHTML.includes('triage')) {
+                        addDebugInfo('📋 Triage screen is being rendered (contains "triage")', 'success');
+                    } else {
+                        addDebugInfo('❓ Unknown screen content rendered', 'info');
+                    }
+
+                    // Show first 200 chars of rendered content
+                    const preview = testContainer.innerHTML.substring(0, 200).replace(/</g, '&lt;');
+                    addDebugInfo(`📝 Rendered content preview: <code>${preview}...</code>`, 'info');
+
+                } catch (renderError) {
+                    addDebugInfo(`❌ Render error: ${renderError.message}`, 'error');
+                }
+
+                // Check if main app is properly initialized
+                if (typeof window.iGFAPApp !== 'undefined') {
+                    const appStatus = window.iGFAPApp.getStatus();
+                    addDebugInfo(`🚀 Main app status: ${JSON.stringify(appStatus)}`, 'success');
+                } else {
+                    addDebugInfo('⚠️ Main app not found on window.iGFAPApp', 'info');
+                }
+
+                addDebugInfo('🎯 Debug analysis complete!', 'success');
+
+            } catch (error) {
+                addDebugInfo(`❌ Debug error: ${error.message}`, 'error');
+                console.error('Full debug error:', error);
+            }
+        }
+
+        debugMainApp();
+    </script>
+</body>
+</html>

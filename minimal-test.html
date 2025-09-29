@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal App Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Minimal iGFAP App Test</h1>
+    <div id="status" class="info">Initializing...</div>
+    <div id="appContainer" style="border: 1px solid #ccc; min-height: 200px; padding: 20px; margin: 20px 0;">
+        <!-- App content will load here -->
+    </div>
+
+    <script type="module">
+        const status = document.getElementById('status');
+        const container = document.getElementById('appContainer');
+
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = type;
+            console.log(message);
+        }
+
+        async function testApp() {
+            try {
+                updateStatus('🔧 Testing app initialization...');
+
+                // Import and create the app exactly like main.js does
+                updateStatus('📦 Importing app controller...');
+                const { createApp } = await import('./src/core/app-controller.js');
+                updateStatus('✅ App controller imported successfully');
+
+                updateStatus('🚀 Creating application instance...');
+                const app = await createApp();
+                updateStatus('✅ Application created successfully!', 'success');
+
+                // Test app status
+                const appStatus = app.getStatus();
+                updateStatus(`✅ App Status: ${JSON.stringify(appStatus, null, 2)}`, 'success');
+
+                container.innerHTML = '<h3>✅ App initialized successfully!</h3><pre>' + JSON.stringify(appStatus, null, 2) + '</pre>';
+
+            } catch (error) {
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+                container.innerHTML = `<h3>❌ Initialization failed</h3><p><strong>Error:</strong> ${error.message}</p><pre>${error.stack}</pre>`;
+
+                console.error('Full error:', error);
+            }
+        }
+
+        // Start the test when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', testApp);
+        } else {
+            testApp();
+        }
+    </script>
+</body>
+</html>

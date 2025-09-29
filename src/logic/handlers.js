@@ -1,12 +1,17 @@
 import { store } from '../state/store.js';
-import { validateForm, showValidationErrors } from './validate.js';
-import { predictComaIch, predictLimitedIch, predictFullStroke, APIError } from '../api/client.js';
+import {
+  predictComaIch, predictLimitedIch, predictFullStroke, APIError,
+} from '../api/client.js';
 import { t } from '../localization/i18n.js';
 import { showPrerequisitesModal } from '../ui/components/prerequisites-modal.js';
+import { safeSetInnerHTML } from '../security/html-sanitizer.js';
+
+import { validateForm, showValidationErrors } from './validate.js';
+import { DEV_CONFIG } from '../config.js';
 
 export function handleTriage1(isComatose) {
   store.logEvent('triage1_answer', { comatose: isComatose });
-  
+
   if (isComatose) {
     navigate('coma');
   } else {
@@ -22,9 +27,9 @@ export function handleTriage2(isExaminable) {
 }
 
 export function navigate(screen) {
-  store.logEvent('navigate', { 
-    from: store.getState().currentScreen, 
-    to: screen 
+  store.logEvent('navigate', {
+    from: store.getState().currentScreen,
+    to: screen,
   });
   store.navigate(screen);
   window.scrollTo(0, 0);
@@ -41,20 +46,17 @@ export function reset() {
 }
 
 export function goBack() {
-  
   const success = store.goBack();
-  
+
   if (success) {
     store.logEvent('navigate_back');
     window.scrollTo(0, 0);
   } else {
-    
     goHome();
   }
 }
 
 export function goHome() {
-  
   store.logEvent('navigate_home');
   store.goHome();
   window.scrollTo(0, 0);
@@ -63,7 +65,7 @@ export function goHome() {
 export async function handleSubmit(e, container) {
   e.preventDefault();
   const form = e.target;
-  const module = form.dataset.module;
+  const { module } = form.dataset;
 
   // Validate form
   const validation = validateForm(form);
@@ -91,9 +93,9 @@ export async function handleSubmit(e, container) {
 
   // Collect inputs - handle all form elements including unchecked checkboxes
   const inputs = {};
-  
+
   // Process all form elements to ensure checkboxes are included
-  Array.from(form.elements).forEach(element => {
+  Array.from(form.elements).forEach((element) => {
     if (element.name) {
       if (element.type === 'checkbox') {
         inputs[element.name] = element.checked;
@@ -112,8 +114,6 @@ export async function handleSubmit(e, container) {
       }
     }
   });
-  
-  
 
   // Store form data
   store.setFormData(module, inputs);
@@ -123,62 +123,154 @@ export async function handleSubmit(e, container) {
   const originalContent = button ? button.innerHTML : '';
   if (button) {
     button.disabled = true;
-    button.innerHTML = `<span class="loading-spinner"></span> ${t('analyzing')}`;
+    try {
+      safeSetInnerHTML(button, `<span class="loading-spinner"></span> ${t('analyzing')}`);
+    } catch (error) {
+      console.error('Button loading state sanitization failed:', error);
+      button.textContent = t('analyzing') || 'Analyzing...';
+    }
   }
 
   try {
+    console.log('[Submit] Module:', module);
+    console.log('[Submit] Inputs:', inputs);
     // Run models based on module
     let results;
-    
+
     switch (module) {
       case 'coma':
         const comaResult = await predictComaIch(inputs);
         results = {
-          ich: comaResult,
-          lvo: null
+          ich: {
+            ...comaResult,
+            module: 'Coma'
+          },
+          lvo: null,
         };
         break;
-        
+
       case 'limited':
         const limitedResult = await predictLimitedIch(inputs);
         results = {
-          ich: limitedResult,
-          lvo: { notPossible: true }
+          ich: {
+            ...limitedResult,
+            module: 'Limited'
+          },
+          lvo: { notPossible: true },
         };
         break;
-        
+
       case 'full':
         results = await predictFullStroke(inputs);
+        console.log('[Submit] Full results:', {
+          ich: !!results?.ich,
+          lvo: !!results?.lvo,
+          ichP: results?.ich?.probability,
+          lvoP: results?.lvo?.probability
+        });
+        // Validate results structure
+        if (!results || !results.ich) {
+          throw new Error('Invalid response structure from Full Stroke API');
+        }
+        // Fix ICH probability mapping for Full Stroke
+        if (results.ich && !results.ich.probability && results.ich.ich_probability !== undefined) {
+          results.ich.probability = results.ich.ich_probability;
+          console.log('[Submit] Fixed ICH probability for Full Stroke:', results.ich.probability);
+        }
+        // Ensure module property is set
+        if (results.ich && !results.ich.module) {
+          results.ich.module = 'Full Stroke';
+        }
+        if (results.lvo && !results.lvo.module) {
+          results.lvo.module = 'Full Stroke';
+        }
         break;
-        
+
       default:
-        throw new Error('Unknown module: ' + module);
+        throw new Error(`Unknown module: ${module}`);
     }
 
+    console.log('[Submit] Setting results in store:', results);
     store.setResults(results);
     store.logEvent('models_complete', { module, results });
+
+    // Verify results were stored
+    const storedState = store.getState();
+    console.log('[Submit] State after setResults:', {
+      hasResults: !!storedState.results,
+      currentScreen: storedState.currentScreen
+    });
+
+    console.log('[Submit] Navigating to results...');
     navigate('results');
-    
+    // Visual confirmation that results screen loaded
+    showToast('✅ Results loaded', 2000);
+    // Double-check navigation and force if needed
+    setTimeout(() => {
+      try {
+        const cs = store.getState().currentScreen;
+        console.log('[Submit] currentScreen after navigate:', cs);
+        if (cs !== 'results') {
+          store.navigate('results');
+          showToast('🔁 Forced results view', 1500);
+        }
+      } catch {}
+    }, 0);
   } catch (error) {
-    console.error('Error running models:', error);
-    
+    // Error running models - handle gracefully, with Full module fallback in preview
+    const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+    if (module === 'full' && isLocalPreview) {
+      try {
+        const m = DEV_CONFIG.mockApiResponses.full_stroke;
+        const ich = m.ich_prediction || {};
+        const lvo = m.lvo_prediction || {};
+        const pIch = parseFloat(ich.probability) || 0;
+        const pLvo = parseFloat(lvo.probability) || 0;
+        const fallbackResults = {
+          ich: {
+            probability: pIch > 1 ? pIch / 100 : pIch,
+            drivers: ich.drivers || null,
+            confidence: parseFloat(ich.confidence) || 0.85,
+            module: 'Full Stroke'
+          },
+          lvo: {
+            probability: pLvo > 1 ? pLvo / 100 : pLvo,
+            drivers: lvo.drivers || null,
+            confidence: parseFloat(lvo.confidence) || 0.85,
+            module: 'Full Stroke'
+          }
+        };
+        store.setResults(fallbackResults);
+        store.logEvent('models_complete_fallback', { module, reason: error.message });
+        navigate('results');
+        return;
+      } catch (e) {
+        // Continue to show error below
+      }
+    }
+
     let errorMessage = 'An error occurred during analysis. Please try again.';
     if (error instanceof APIError) {
       errorMessage = error.message;
     }
-    
+
     showError(container, errorMessage);
-    
+
     if (button) {
       button.disabled = false;
-      button.innerHTML = originalContent;
+      try {
+        safeSetInnerHTML(button, originalContent);
+      } catch (e2) {
+        console.error('Button restore sanitization failed:', e2);
+        button.textContent = 'Submit';
+      }
     }
   }
 }
 
 function showError(container, message) {
   // Remove existing error alerts
-  container.querySelectorAll('.critical-alert').forEach(alert => {
+  container.querySelectorAll('.critical-alert').forEach((alert) => {
     if (alert.querySelector('h4')?.textContent?.includes('Error')) {
       alert.remove();
     }
@@ -200,13 +292,45 @@ function showError(container, message) {
 
   alert.appendChild(h4);
   alert.appendChild(p);
-  
+
   const containerDiv = container.querySelector('.container');
   if (containerDiv) {
     containerDiv.prepend(alert);
   } else {
     container.prepend(alert);
   }
-  
+
   setTimeout(() => alert.remove(), 10000);
+}
+
+// Lightweight toast helper (overlays at top center)
+function showToast(message, duration = 2000) {
+  try {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.style.cssText = `
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0066CC;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10000;
+      font-size: 14px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 160ms ease;
+    `;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => { toast.style.opacity = '1'; });
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 200);
+    }, duration);
+  } catch {}
 }

@@ -7,7 +7,7 @@ import { CRITICAL_THRESHOLDS } from '../../config.js';
 import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
-import { calculateICHVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
+import { calculateICHVolume, estimateVolumeFromGFAP, estimateMortalityFromVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
 // Dynamic import for React islands to avoid module resolution issues
 // Using React island tachometer instead of the vanilla premium gauge
@@ -19,39 +19,41 @@ import { renderModelComparison, renderResearchToggle } from '../../research/comp
 function getModuleDisplayName(module) {
   const isDE = i18n.getCurrentLanguage() === 'de';
   const moduleNames = {
-    'Coma': isDE ? 'Koma-Modul' : 'Coma Module',
-    'Limited': isDE ? 'Begrenzte Daten' : 'Limited Data',
-    'Full': isDE ? 'Vollständige Bewertung' : 'Full Assessment'
+    Coma: isDE ? 'Koma-Modul' : 'Coma Module',
+    Limited: isDE ? 'Begrenzte Daten' : 'Limited Data',
+    Full: isDE ? 'Vollständige Bewertung' : 'Full Assessment',
   };
   return moduleNames[module] || module;
 }
 
 function renderInputSummary() {
   const state = store.getState();
-  const formData = state.formData;
-  
+  const { formData } = state;
+
   if (!formData || Object.keys(formData).length === 0) {
     return '';
   }
-  
+
   let summaryHtml = '';
-  
+
   // Iterate through each module's form data
   Object.entries(formData).forEach(([module, data]) => {
     if (data && Object.keys(data).length > 0) {
       const moduleTitle = t(`${module}ModuleTitle`) || module.charAt(0).toUpperCase() + module.slice(1);
       let itemsHtml = '';
-      
+
       Object.entries(data).forEach(([key, value]) => {
         // Skip empty values
-        if (value === '' || value === null || value === undefined) return;
-        
+        if (value === '' || value === null || value === undefined) {
+          return;
+        }
+
         // Use consistent medical terminology from input forms
-        let label = formatSummaryLabel(key);
-        
+        const label = formatSummaryLabel(key);
+
         // Format value with appropriate units
-        let displayValue = formatDisplayValue(value, key);
-        
+        const displayValue = formatDisplayValue(value, key);
+
         itemsHtml += `
           <div class="summary-item">
             <span class="summary-label">${label}:</span>
@@ -59,7 +61,7 @@ function renderInputSummary() {
           </div>
         `;
       });
-      
+
       if (itemsHtml) {
         summaryHtml += `
           <div class="summary-module">
@@ -72,9 +74,11 @@ function renderInputSummary() {
       }
     }
   });
-  
-  if (!summaryHtml) return '';
-  
+
+  if (!summaryHtml) {
+    return '';
+  }
+
   return `
     <div class="input-summary">
       <h3>📋 ${t('inputSummaryTitle')}</h3>
@@ -87,16 +91,21 @@ function renderInputSummary() {
 }
 
 function renderRiskCard(type, data, results) {
-  if (!data) return '';
-  
+  if (!data) {
+    console.log(`[RiskCard] No data for ${type}`);
+    return '';
+  }
+
   const percent = Math.round((data.probability || 0) * 100);
+  console.log(`[RiskCard] ${type} - probability: ${data.probability}, percent: ${percent}%`);
+
   const riskLevel = getRiskLevel(percent, type);
   const isCritical = percent > 70; // Very high risk threshold
   const isHigh = percent > CRITICAL_THRESHOLDS[type].high;
-  
+
   const icons = { ich: '🩸', lvo: '🧠' };
   const titles = { ich: t('ichProbability'), lvo: t('lvoProbability') };
-  
+
   const level = isCritical ? 'critical' : isHigh ? 'high' : 'normal';
   return `
     <div class="enhanced-risk-card ${type} ${level}">
@@ -111,7 +120,22 @@ function renderRiskCard(type, data, results) {
         <div class="circles-container">
           <div class="rings-row">
             <div class="circle-item">
-              <div class="probability-circle" data-react-ring data-percent="${percent}" data-level="${level}"></div>
+              <div class="probability-circle" data-react-ring data-percent="${percent}" data-level="${level}">
+                <svg viewBox="0 0 120 120" class="probability-svg">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
+                  <circle cx="60" cy="60" r="50" fill="none"
+                    stroke="${level === 'critical' ? '#ff4444' : level === 'high' ? '#ff8800' : '#0066cc'}"
+                    stroke-width="8"
+                    stroke-dasharray="${Math.PI * 100}"
+                    stroke-dashoffset="${Math.PI * 100 * (1 - percent / 100)}"
+                    stroke-linecap="round"
+                    transform="rotate(-90 60 60)"/>
+                  <text x="60" y="60" text-anchor="middle" dominant-baseline="middle"
+                    class="probability-text" fill="white" font-size="20" font-weight="bold">
+                    ${percent}%
+                  </text>
+                </svg>
+              </div>
               <div class="circle-label">${type === 'ich' ? 'ICH Risk' : 'LVO Risk'}</div>
             </div>
           </div>
@@ -132,16 +156,16 @@ function renderRiskCard(type, data, results) {
 function renderICHVolumeDisplay(data) {
   // Get GFAP value from the data
   const gfapValue = data.gfap_value || getCurrentGfapValue();
-  
+
   if (!gfapValue || gfapValue <= 0) {
     return '';
   }
-  
-  const volumeResult = calculateICHVolume(gfapValue);
-  
+
+  // Use synchronous estimate for immediate UI rendering
+  const estVolume = estimateVolumeFromGFAP(gfapValue);
   return `
     <div class="volume-display-container">
-      ${renderCircularBrainDisplay(volumeResult.volume)}
+      ${renderCircularBrainDisplay(estVolume)}
     </div>
   `;
 }
@@ -152,15 +176,15 @@ function renderICHVolumeDisplay(data) {
  */
 function getCurrentGfapValue() {
   const state = store.getState();
-  const formData = state.formData;
-  
+  const { formData } = state;
+
   // Check all modules for GFAP value
   for (const module of ['coma', 'limited', 'full']) {
     if (formData[module]?.gfap_value) {
       return parseFloat(formData[module].gfap_value);
     }
   }
-  
+
   return 0;
 }
 
@@ -184,28 +208,49 @@ function renderLVONotPossible() {
 }
 
 export function renderResults(results, startTime) {
-  const { ich, lvo } = results;
-  
+  try {
+    // Add error handling for missing results
+    if (!results) {
+      console.error('renderResults: No results data provided');
+      return `
+        <div class="container">
+          <div class="error-message">
+            <h2>No Results Available</h2>
+            <p>Please complete an assessment first.</p>
+            <button class="primary" onclick="window.location.reload()">Start Over</button>
+          </div>
+        </div>
+      `;
+    }
+
+    const { ich, lvo } = results;
+
   // Determine current module
   const currentModule = getCurrentModuleName(ich);
-  
+
   // Calculate legacy model for research comparison (only for stroke modules)
   const legacyResults = currentModule !== 'coma' ? calculateLegacyFromResults(results) : null;
-  
+
   // Debug logging for research mode
-  
-  
+
   // Log research data if research mode is enabled (background, non-breaking)
   if (legacyResults && isResearchModeEnabled(currentModule)) {
     safeLogResearchData(ich, legacyResults, getPatientInputs());
   }
-  
+
   // Detect which module was used based on the data
   const isLimitedOrComa = ich?.module === 'Limited' || ich?.module === 'Coma' || lvo?.notPossible === true;
-  const isFullModule = ich?.module === 'Full';
-  
+  const isFullModule = ich?.module === 'Full Stroke' || ich?.module?.includes('Full');
+
   let resultsHtml;
-  
+
+  // Debug logging
+  console.log('[Results] ICH data:', ich);
+  console.log('[Results] LVO data:', lvo);
+  console.log('[Results] ICH module:', ich?.module);
+  console.log('[Results] isLimitedOrComa:', isLimitedOrComa);
+  console.log('[Results] isFullModule:', isFullModule);
+
   // For limited/coma modules - only show ICH
   if (isLimitedOrComa) {
     resultsHtml = renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule);
@@ -213,19 +258,32 @@ export function renderResults(results, startTime) {
     // For full module - show ICH prominently with conditional LVO text
     resultsHtml = renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule);
   }
-  
+
   // Initialize animations after DOM update
   setTimeout(async () => {
+    console.log('[Results] Initializing volume animations...');
     initializeVolumeAnimations();
     try {
       const { mountIslands } = await import('../../react/mountIslands.jsx');
       mountIslands();
     } catch (err) {
-      console.warn('React islands not available:', err);
+      //('React islands not available:', err);
     }
   }, 100);
-  
+
   return resultsHtml;
+  } catch (error) {
+    console.error('Error in renderResults:', error);
+    return `
+      <div class="container">
+        <div class="error-message">
+          <h2>Error Displaying Results</h2>
+          <p>There was an error displaying the results. Error: ${error.message}</p>
+          <button class="primary" onclick="window.location.reload()">Start Over</button>
+        </div>
+      </div>
+    `;
+  }
 }
 
 function renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule) {
@@ -234,15 +292,15 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
   const researchToggleHtml = isResearchModeEnabled(currentModule) ? renderResearchToggle() : '';
-  const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule)) ? 
-    renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
-  
+  const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule))
+    ? renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
+
   // Add alternative diagnoses for coma module
   const alternativeDiagnosesHtml = (ich?.module === 'Coma') ? renderComaAlternativeDiagnoses(ich.probability) : '';
-  
+
   // Add differential diagnoses for stroke modules (limited and full)
   const strokeDifferentialHtml = (ich?.module !== 'Coma') ? renderStrokeDifferentialDiagnoses(ich.probability) : '';
-  
+
   return `
     <div class="container">
       ${renderProgressIndicator(3)}
@@ -323,29 +381,31 @@ function renderICHFocusedResults(ich, results, startTime, legacyResults, current
 function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule) {
   const ichPercent = Math.round((ich?.probability || 0) * 100);
   const lvoPercent = Math.round((lvo?.probability || 0) * 100);
-  
+
+  console.log('[FullModuleResults] ICH probability:', ich?.probability, '-> %:', ichPercent);
+  console.log('[FullModuleResults] LVO probability:', lvo?.probability, '-> %:', lvoPercent);
+
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : '';
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
   const researchToggleHtml = isResearchModeEnabled(currentModule) ? renderResearchToggle() : '';
-  const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule)) ? 
-    renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
-  
+  const researchComparisonHtml = (legacyResults && isResearchModeEnabled(currentModule))
+    ? renderModelComparison(ich, legacyResults, getPatientInputs()) : '';
+
   // Get FAST-ED score from form data to determine LVO display
   const state = store.getState();
   const fastEdScore = parseInt(state.formData?.full?.fast_ed_score) || 0;
-  
-  
+
   // Ensure we only show LVO in full module and when LVO data is available
   const isFullModule = currentModule === 'full' || ich?.module === 'Full';
   const hasValidLVO = lvo && typeof lvo.probability === 'number' && !lvo.notPossible;
   const showLVORiskCard = isFullModule && fastEdScore > 3 && hasValidLVO;
-  
-  console.log('  Conditions: isFullModule:', isFullModule);
-  console.log('  Conditions: fastEdScore > 3:', fastEdScore > 3);
-  console.log('  Conditions: hasValidLVO:', hasValidLVO);
-  console.log('  Show LVO Card:', showLVORiskCard);
-  
+
+  //('  Conditions: isFullModule:', isFullModule);
+  //('  Conditions: fastEdScore > 3:', fastEdScore > 3);
+  //('  Conditions: hasValidLVO:', hasValidLVO);
+  //('  Show LVO Card:', showLVORiskCard);
+
   // Determine layout configuration
   const showVolumeCard = ichPercent >= 50;
   const maxProbability = Math.max(ichPercent, lvoPercent);
@@ -358,21 +418,24 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   const showDominanceBanner = isFullModule && ichPercent >= 50 && lvoPercent >= 50 && !inRatioBand;
   // DEBUG: Temporary relaxed conditions for testing
   const debugShowTachometer = isFullModule && ichPercent >= 30 && lvoPercent >= 30;
-  
-  
+
   // Calculate number of cards and layout class
   let cardCount = 1; // Always have ICH
   // No placeholder needed - only show LVO card when FAST-ED > 3
-  if (showLVORiskCard) cardCount++;
-  if (showVolumeCard) cardCount++;
-  
-  const layoutClass = cardCount === 1 ? 'risk-results-single' : 
-                     cardCount === 2 ? 'risk-results-dual' : 
-                     'risk-results-triple';
-  
+  if (showLVORiskCard) {
+    cardCount++;
+  }
+  if (showVolumeCard) {
+    cardCount++;
+  }
+
+  const layoutClass = cardCount === 1 ? 'risk-results-single'
+    : cardCount === 2 ? 'risk-results-dual'
+      : 'risk-results-triple';
+
   // Add differential diagnoses for stroke modules
   const strokeDifferentialHtml = renderStrokeDifferentialDiagnoses(ich.probability);
-  
+
   return `
     <div class="container">
       ${renderProgressIndicator(3)}
@@ -485,19 +548,19 @@ function renderICHDriversOnly(ich) {
   if (!ich || !ich.drivers) {
     return '<p class="no-drivers">No driver data available</p>';
   }
-  
+
   // Drivers are already formatted from API with positive/negative arrays
   const driversData = ich.drivers;
-  
+
   // Check if drivers have the correct structure
   if (!driversData.positive && !driversData.negative) {
     // Fallback for unexpected format
     return '<p class="no-drivers">Driver format error</p>';
   }
-  
+
   const positiveDrivers = driversData.positive || [];
   const negativeDrivers = driversData.negative || [];
-  
+
   return `
     <div class="drivers-split-view">
       <div class="drivers-column positive-column">
@@ -506,10 +569,10 @@ function renderICHDriversOnly(ich) {
           <span class="column-title">${t('increasingRisk') || 'Risikoerhöhend / Increasing Risk'}</span>
         </div>
         <div class="compact-drivers">
-          ${positiveDrivers.length > 0 ? 
-            positiveDrivers.slice(0, 5).map(d => renderCompactDriver(d, 'positive')).join('') :
-            `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
-          }
+          ${positiveDrivers.length > 0
+    ? positiveDrivers.slice(0, 5).map((d) => renderCompactDriver(d, 'positive')).join('')
+    : `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
+}
         </div>
       </div>
       
@@ -519,10 +582,10 @@ function renderICHDriversOnly(ich) {
           <span class="column-title">${t('decreasingRisk') || 'Risikomindernd / Decreasing Risk'}</span>
         </div>
         <div class="compact-drivers">
-          ${negativeDrivers.length > 0 ?
-            negativeDrivers.slice(0, 5).map(d => renderCompactDriver(d, 'negative')).join('') :
-            `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
-          }
+          ${negativeDrivers.length > 0
+    ? negativeDrivers.slice(0, 5).map((d) => renderCompactDriver(d, 'negative')).join('')
+    : `<p class="no-factors">${t('noFactors') || 'Keine Faktoren / No factors'}</p>`
+}
         </div>
       </div>
     </div>
@@ -533,7 +596,7 @@ function renderCompactDriver(driver, type) {
   // Driver object has 'label' and 'weight' properties
   const percentage = Math.abs(driver.weight * 100);
   const width = Math.min(percentage * 2, 100); // Scale for display
-  
+
   return `
     <div class="compact-driver-item">
       <div class="compact-driver-label">${formatDriverName(driver.label)}</div>
@@ -554,17 +617,17 @@ function renderBibliography(ichData) {
   if (!ichData || !ichData.probability) {
     return '';
   }
-  
+
   const ichPercent = Math.round((ichData.probability || 0) * 100);
   if (ichPercent < 50) {
     return '';
   }
-  
+
   const gfapValue = getCurrentGfapValue();
   if (!gfapValue || gfapValue <= 0) {
     return '';
   }
-  
+
   return `
     <div class="bibliography-section">
       <h4>${t('references')}</h4>
@@ -598,22 +661,20 @@ function renderBibliography(ichData) {
 function calculateLegacyFromResults(results) {
   try {
     const patientInputs = getPatientInputs();
-    
-    
+
     if (!patientInputs.age || !patientInputs.gfap) {
-      console.warn('🔍 Missing required inputs for legacy model:', { 
-        age: patientInputs.age, 
-        gfap: patientInputs.gfap 
-      });
+      //console.log('🔍 Missing required inputs for legacy model:', {
+      //  age: patientInputs.age,
+      //  gfap: patientInputs.gfap,
+      //});
       return null;
     }
-    
+
     const legacyResult = calculateLegacyICH(patientInputs);
-    
-    
+
     return legacyResult;
   } catch (error) {
-    console.warn('Legacy model calculation failed (non-critical):', error);
+    //console.log('Legacy model calculation failed (non-critical):', error);
     return null;
   }
 }
@@ -624,28 +685,24 @@ function calculateLegacyFromResults(results) {
  */
 function getPatientInputs() {
   const state = store.getState();
-  const formData = state.formData;
-  
-  
-  
+  const { formData } = state;
+
   // Extract age and GFAP from any module
   let age = null;
   let gfap = null;
-  
+
   for (const module of ['coma', 'limited', 'full']) {
     if (formData[module]) {
-      
       age = age || formData[module].age_years;
       gfap = gfap || formData[module].gfap_value;
     }
   }
-  
+
   const result = {
     age: parseInt(age) || null,
-    gfap: parseFloat(gfap) || null
+    gfap: parseFloat(gfap) || null,
   };
-  
-  
+
   return result;
 }
 
@@ -656,7 +713,7 @@ function getPatientInputs() {
  */
 function renderStrokeDifferentialDiagnoses(probability) {
   const percent = Math.round(probability * 100);
-  
+
   if (percent > 25) {
     return `
       <div class="alternative-diagnosis-card">
@@ -677,14 +734,14 @@ function renderStrokeDifferentialDiagnoses(probability) {
       </div>
     `;
   }
-  
+
   return '';
 }
 
 function renderComaAlternativeDiagnoses(probability) {
   const percent = Math.round(probability * 100);
   const isDE = i18n.getCurrentLanguage() === 'de';
-  
+
   if (percent > 25) {
     // High probability - show SAB, SDH, EDH
     return `
@@ -696,24 +753,24 @@ function renderComaAlternativeDiagnoses(probability) {
         <div class="diagnosis-content">
           <ul class="diagnosis-list">
             <li>
-              ${isDE ? 
-                'Alternative Diagnosen sind SAB, SDH, EDH (Subarachnoidalblutung, Subduralhämatom, Epiduralhämatom)' : 
-                'Alternative diagnoses include SAH, SDH, EDH (Subarachnoid Hemorrhage, Subdural Hematoma, Epidural Hematoma)'
-              }
+              ${isDE
+    ? 'Alternative Diagnosen sind SAB, SDH, EDH (Subarachnoidalblutung, Subduralhämatom, Epiduralhämatom)'
+    : 'Alternative diagnoses include SAH, SDH, EDH (Subarachnoid Hemorrhage, Subdural Hematoma, Epidural Hematoma)'
+}
             </li>
             <li>
-              ${isDE ? 
-                'Bei unklarem Zeitfenster seit Symptombeginn oder im erweiterten Zeitfenster kommen auch ein demarkierter Infarkt oder hypoxischer Hirnschaden in Frage' : 
-                'In cases of unclear time window since symptom onset or extended time window, demarcated infarction or hypoxic brain injury should also be considered'
-              }
+              ${isDE
+    ? 'Bei unklarem Zeitfenster seit Symptombeginn oder im erweiterten Zeitfenster kommen auch ein demarkierter Infarkt oder hypoxischer Hirnschaden in Frage'
+    : 'In cases of unclear time window since symptom onset or extended time window, demarcated infarction or hypoxic brain injury should also be considered'
+}
             </li>
           </ul>
         </div>
       </div>
     `;
-  } else {
-    // Low probability - other causes of altered consciousness
-    return `
+  }
+  // Low probability - other causes of altered consciousness
+  return `
       <div class="alternative-diagnosis-card">
         <div class="diagnosis-header">
           <span class="lightning-icon">⚡</span>
@@ -722,22 +779,21 @@ function renderComaAlternativeDiagnoses(probability) {
         <div class="diagnosis-content">
           <ul class="diagnosis-list">
             <li>
-              ${isDE ? 
-                'Alternative Diagnose von Vigilanzminderung wahrscheinlich' : 
-                'Alternative diagnosis for reduced consciousness likely'
-              }
+              ${isDE
+    ? 'Alternative Diagnose von Vigilanzminderung wahrscheinlich'
+    : 'Alternative diagnosis for reduced consciousness likely'
+}
             </li>
             <li>
-              ${isDE ? 
-                'Ein Verschluss der Arteria Basilaris ist nicht ausgeschlossen' : 
-                'Basilar artery occlusion cannot be excluded'
-              }
+              ${isDE
+    ? 'Ein Verschluss der Arteria Basilaris ist nicht ausgeschlossen'
+    : 'Basilar artery occlusion cannot be excluded'
+}
             </li>
           </ul>
         </div>
       </div>
     `;
-  }
 }
 
 /**
@@ -746,13 +802,21 @@ function renderComaAlternativeDiagnoses(probability) {
  * @returns {string} - Module name ('coma', 'limited', 'full')
  */
 function getCurrentModuleName(ich) {
-  if (!ich?.module) return 'unknown';
-  
+  if (!ich?.module) {
+    return 'unknown';
+  }
+
   const module = ich.module.toLowerCase();
-  if (module.includes('coma')) return 'coma';
-  if (module.includes('limited')) return 'limited';
-  if (module.includes('full')) return 'full';
-  
+  if (module.includes('coma')) {
+    return 'coma';
+  }
+  if (module.includes('limited')) {
+    return 'limited';
+  }
+  if (module.includes('full')) {
+    return 'full';
+  }
+
   return 'unknown';
 }
 
@@ -766,10 +830,12 @@ function renderVolumeCard(ichData) {
   if (!gfapValue || gfapValue <= 0) {
     return '';
   }
-  
-  const volumeData = calculateICHVolume(gfapValue);
+
+  // Use fast estimate for immediate UI and mortality band
+  const estVolume = estimateVolumeFromGFAP(gfapValue);
+  const mortality = estimateMortalityFromVolume(estVolume);
   const percent = Math.round((ichData?.probability || 0) * 100);
-  
+
   return `
     <div class="enhanced-risk-card volume-card normal">
       <div class="risk-header">
@@ -791,11 +857,11 @@ function renderVolumeCard(ichData) {
         
         <div class="risk-assessment">
           <div class="mortality-assessment">
-            ${t('predictedMortality')}: ${volumeData.mortalityRate}
+            ${t('predictedMortality')}: ${mortality}
           </div>
-        </div>
       </div>
     </div>
+  </div>
   `;
 }
 
@@ -807,7 +873,7 @@ function renderVolumeCard(ichData) {
  */
 function renderTachometerGauge(ichPercent, lvoPercent) {
   const ratio = lvoPercent / Math.max(ichPercent, 1);
-  
+
   return `
     <div class="tachometer-section">
       <div class="tachometer-card">
@@ -837,12 +903,12 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
           <div class="metric-card">
             <div class="metric-label">Confidence</div>
             <div class="metric-value">${(() => {
-              const diff = Math.abs(lvoPercent - ichPercent);
-              const maxP = Math.max(lvoPercent, ichPercent);
-              let c = diff < 10 ? Math.round(30 + maxP * 0.3) : diff < 20 ? Math.round(50 + maxP * 0.4) : Math.round(70 + maxP * 0.3);
-              c = Math.max(0, Math.min(100, c));
-              return c;
-            })()}%</div>
+    const diff = Math.abs(lvoPercent - ichPercent);
+    const maxP = Math.max(lvoPercent, ichPercent);
+    let c = diff < 10 ? Math.round(30 + maxP * 0.3) : diff < 20 ? Math.round(50 + maxP * 0.4) : Math.round(70 + maxP * 0.3);
+    c = Math.max(0, Math.min(100, c));
+    return c;
+  })()}%</div>
             <div class="metric-unit">percent</div>
           </div>
           <div class="metric-card">

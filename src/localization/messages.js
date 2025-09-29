@@ -11,9 +11,9 @@ export const messages = {
 
     // Progress
     step1: 'Initial Assessment',
-    step2: 'Data Collection', 
+    step2: 'Data Collection',
     step3: 'Results',
-    
+
     // Module titles
     comaModuleTitle: 'Coma Module',
     limitedDataModuleTitle: 'Limited Data Module',
@@ -38,7 +38,7 @@ export const messages = {
     ageHelp: 'Patient age in years',
     systolicLabel: 'Systolic BP (mmHg)',
     systolicHelp: 'Systolic blood pressure',
-    diastolicLabel: 'Diastolic BP (mmHg)', 
+    diastolicLabel: 'Diastolic BP (mmHg)',
     diastolicHelp: 'Diastolic blood pressure',
     gfapLabel: 'GFAP Value (pg/mL)',
     gfapHelp: 'GFAP biomarker level',
@@ -49,7 +49,7 @@ export const messages = {
     headacheLabel: 'Headache',
     vigilanzLabel: 'Reduced consciousness',
     armPareseLabel: 'Arm weakness',
-    beinPareseLabel: 'Leg weakness', 
+    beinPareseLabel: 'Leg weakness',
     eyeDeviationLabel: 'Eye deviation',
     atrialFibLabel: 'Atrial fibrillation',
     anticoagLabel: 'Anticoagulated (NOAK)',
@@ -63,20 +63,20 @@ export const messages = {
     startOver: 'Start Over',
     goBack: 'Go Back',
     goHome: 'Go Home',
-    
+
     // Form sections
     basicInformation: 'Basic Information',
     biomarkersScores: 'Biomarkers & Scores',
     clinicalSymptoms: 'Clinical Symptoms',
     medicalHistory: 'Medical History',
-    
+
     // Form labels with units
     ageYearsLabel: 'Age (years)',
     systolicBpLabel: 'Systolic BP (mmHg)',
     diastolicBpLabel: 'Diastolic BP (mmHg)',
     gfapValueLabel: 'GFAP Value (pg/mL)',
     fastEdScoreLabel: 'FAST-ED Score',
-    
+
     // Help text
     ageYearsHelp: "Patient's age in years",
     systolicBpHelp: 'Normal: 90-140 mmHg',
@@ -85,16 +85,16 @@ export const messages = {
     gfapTooltipLong: 'Glial Fibrillary Acidic Protein - Brain injury biomarker',
     gfapRange: 'Range: {min} - {max} pg/mL',
     fastEdTooltip: '0-9 scale for LVO screening',
-    
+
     // Module buttons
     analyzeIchRisk: 'Analyze ICH Risk',
     analyzeStrokeRisk: 'Analyze Stroke Risk',
-    
+
     // Alert messages
     criticalPatient: 'Critical Patient',
     comaAlert: 'Patient is comatose (GCS < 9). Rapid assessment required.',
     vigilanceReduction: 'Vigilance Reduction (Decreased alertness)',
-    
+
     // Additional symptom labels
     armParesis: 'Arm Paresis',
     legParesis: 'Leg Paresis',
@@ -115,7 +115,7 @@ export const messages = {
     noFactors: 'No factors',
     riskLevel: 'Risk Level',
     lowRisk: 'Low Risk',
-    mediumRisk: 'Medium Risk', 
+    mediumRisk: 'Medium Risk',
     highRisk: 'High Risk',
 
     // Risk levels
@@ -171,7 +171,7 @@ export const messages = {
     armWeaknessNormal: 'Normal (0)',
     armWeaknessMild: 'Mild weakness or drift (1)',
     armWeaknessSevere: 'Severe weakness or falls immediately (2)',
-    speechChangesTitle: 'Speech Abnormalities', 
+    speechChangesTitle: 'Speech Abnormalities',
     speechChangesNormal: 'Normal (0)',
     speechChangesMild: 'Mild dysarthria or aphasia (1)',
     speechChangesSevere: 'Severe dysarthria or aphasia (2)',
@@ -189,7 +189,7 @@ export const messages = {
     riskLevelHigh: 'HIGH (Score ≥4 - Consider LVO)',
     applyScore: 'Apply Score',
     cancel: 'Cancel',
-    
+
     // Results Screen Enhancements
     riskAnalysis: 'Risk Analysis',
     riskAnalysisSubtitle: 'Clinical factors in this assessment',
@@ -216,19 +216,19 @@ export const messages = {
     disclaimerText: 'This tool is for clinical decision support only. Always use clinical judgment and follow local protocols. Not a replacement for physician assessment.',
     importantNote: 'Important',
     importantText: 'These results are for clinical decision support only. Always use clinical judgment and follow institutional protocols.',
-    
+
     // ICH Volume and Mortality
     predictedMortality: 'Predicted 30-day mortality',
     ichVolumeLabel: 'ICH Volume',
     references: 'References',
-    
+
     // Input Summary
     inputSummaryTitle: 'Input Summary',
     inputSummarySubtitle: 'Values used for this analysis',
 
     // Footer
     privacyLink: 'Privacy Policy',
-    disclaimerLink: 'Medical Disclaimer', 
+    disclaimerLink: 'Medical Disclaimer',
     versionLink: 'Version 2.1.0 - Research Preview',
 
     // Privacy and disclaimers
@@ -269,7 +269,7 @@ export const messages = {
     calculatingTravelTimes: 'Calculating travel times',
     minutes: 'min',
     poweredByOrs: 'Travel times powered by OpenRoute Service',
-    
+
     // Center Types and Services
     comprehensiveCenter: 'Comprehensive Stroke Center',
     primaryCenter: 'Primary Stroke Center',
@@ -279,7 +279,7 @@ export const messages = {
     icu: 'Intensive Care',
     telemedicine: 'Telemedicine',
     stroke_unit: 'Stroke Unit',
-    
+
     // Actions
     call: 'Call',
     directions: 'Directions',
@@ -301,7 +301,7 @@ export const messages = {
     reconfirmTimeWindow: 'Please reconfirm time window!',
     unclearTimeWindow: 'With unclear/extended time window, early demarcated brain infarction is also possible',
     rareDiagnoses: 'Rare diagnoses such as glioblastoma are also possible',
-    
+
   },
 
   de: {
@@ -316,7 +316,7 @@ export const messages = {
     step1: 'Erstbeurteilung',
     step2: 'Datenerhebung',
     step3: 'Ergebnisse',
-    
+
     // Module titles
     comaModuleTitle: 'Koma-Modul',
     limitedDataModuleTitle: 'Begrenzte Daten Modul',
@@ -366,20 +366,20 @@ export const messages = {
     startOver: 'Von vorn beginnen',
     goBack: 'Zurück',
     goHome: 'Zur Startseite',
-    
+
     // Form sections
     basicInformation: 'Grundinformationen',
     biomarkersScores: 'Biomarker & Scores',
     clinicalSymptoms: 'Klinische Symptome',
     medicalHistory: 'Anamnese',
-    
+
     // Form labels with units
     ageYearsLabel: 'Alter (Jahre)',
     systolicBpLabel: 'Systolischer RR (mmHg)',
     diastolicBpLabel: 'Diastolischer RR (mmHg)',
     gfapValueLabel: 'GFAP-Wert (pg/mL)',
     fastEdScoreLabel: 'FAST-ED-Score',
-    
+
     // Help text
     ageYearsHelp: 'Patientenalter in Jahren',
     systolicBpHelp: 'Normal: 90-140 mmHg',
@@ -388,16 +388,16 @@ export const messages = {
     gfapTooltipLong: 'Glial Fibrillary Acidic Protein - Hirnverletzungs-Biomarker',
     gfapRange: 'Bereich: {min} - {max} pg/mL',
     fastEdTooltip: '0-9 Skala für LVO-Screening',
-    
+
     // Module buttons
     analyzeIchRisk: 'ICB-Risiko analysieren',
     analyzeStrokeRisk: 'Schlaganfall-Risiko analysieren',
-    
+
     // Alert messages
     criticalPatient: 'Kritischer Patient',
     comaAlert: 'Patient ist komatös (GCS < 9). Schnelle Beurteilung erforderlich.',
     vigilanceReduction: 'Vigilanzminderung (Verminderte Wachheit)',
-    
+
     // Additional symptom labels
     armParesis: 'Armparese',
     legParesis: 'Beinparese',
@@ -492,7 +492,7 @@ export const messages = {
     riskLevelHigh: 'HOCH (Score ≥4 - LVO erwägen)',
     applyScore: 'Score Anwenden',
     cancel: 'Abbrechen',
-    
+
     // Results Screen Enhancements
     riskAnalysis: 'Risikoanalyse',
     riskAnalysisSubtitle: 'Klinische Faktoren in dieser Bewertung',
@@ -519,12 +519,12 @@ export const messages = {
     disclaimerText: 'Dieses Tool dient nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie lokale Protokolle. Kein Ersatz für ärztliche Beurteilung.',
     importantNote: 'Wichtig',
     importantText: 'Diese Ergebnisse dienen nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie institutionelle Protokolle.',
-    
+
     // ICH Volume and Mortality
     predictedMortality: 'Vorhergesagte 30-Tage-Mortalität',
     ichVolumeLabel: 'ICB-Volumen',
     references: 'Referenzen',
-    
+
     // Input Summary
     inputSummaryTitle: 'Eingabezusammenfassung',
     inputSummarySubtitle: 'Für diese Analyse verwendete Werte',
@@ -572,7 +572,7 @@ export const messages = {
     calculatingTravelTimes: 'Fahrzeiten werden berechnet',
     minutes: 'Min',
     poweredByOrs: 'Fahrzeiten bereitgestellt von OpenRoute Service',
-    
+
     // Center Types and Services
     comprehensiveCenter: 'Überregionales Schlaganfall-Zentrum',
     primaryCenter: 'Regionales Schlaganfall-Zentrum',
@@ -582,7 +582,7 @@ export const messages = {
     icu: 'Intensivstation',
     telemedicine: 'Telemedizin',
     stroke_unit: 'Stroke Unit',
-    
+
     // Actions
     call: 'Anrufen',
     directions: 'Wegbeschreibung',
@@ -599,11 +599,11 @@ export const messages = {
     no_preexisting: 'Keine vorbestehende schwere neurologische Defizite',
     no_trauma: 'Kein Schädelhirntrauma vorhanden',
 
-    // Differential Diagnoses for Stroke Modules  
+    // Differential Diagnoses for Stroke Modules
     differentialDiagnoses: 'Differentialdiagnosen',
     reconfirmTimeWindow: 'Bitte Zeitfenster rekonfirmieren!',
     unclearTimeWindow: 'Bei unklarem/erweitertem Zeitfenster ist auch ein beginnend demarkierter Hirninfarkt möglich',
     rareDiagnoses: 'Seltene Diagnosen wie ein Glioblastom sind auch möglich',
-    
-  }
+
+  },
 };

@@ -1100,6 +1100,19 @@ button:disabled {
 
 .probability-canvas { width: var(--ring-size); height: var(--ring-size); display: block; }
 
+.probability-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transition: all 0.3s ease;
+}
+
+.probability-text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
 .probability-number {
     position: absolute;
     top: 50%;
@@ -1290,7 +1303,6 @@ button:disabled {
     height: 18px;
     border-radius: 9px;
     position: relative;
-    min-width: 40px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -2566,6 +2578,228 @@ footer {
     gap: 5px;
 }
 .error-icon { font-size: 1rem; }
+
+/* Warning States */
+.warning-message {
+    color: var(--warning-color);
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #fff8e1;
+    padding: 8px;
+    border-radius: 4px;
+    border-left: 3px solid var(--warning-color);
+}
+.warning-icon { font-size: 1rem; }
+
+/* Offline/Online Notifications */
+.network-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out;
+}
+
+.network-notification.online {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.network-notification.offline {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notification-icon {
+    font-size: 1.2rem;
+}
+
+/* Update Notification */
+.update-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    background: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--primary-color);
+    max-width: 400px;
+    animation: slideUp 0.3s ease-out;
+}
+
+.update-notification .notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.update-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+
+.update-button:hover {
+    background: var(--primary-hover);
+}
+
+.dismiss-button {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.dismiss-button:hover {
+    background: var(--background-color);
+}
+
+/* PWA Install Banner */
+.install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: var(--primary-color);
+    color: white;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.3s ease-out;
+}
+
+.install-banner .banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+.install-banner .banner-text h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+}
+
+.install-banner .banner-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.install-banner .banner-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.install-banner .install-button {
+    background: white;
+    color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.install-banner .install-button:hover {
+    background: #f8f9fa;
+}
+
+.install-banner .dismiss-button {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.install-banner .dismiss-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobile responsiveness for offline features */
+@media (max-width: 480px) {
+    .network-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        text-align: center;
+    }
+
+    .update-notification {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+    }
+
+    .install-banner .banner-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+
+    .install-banner .banner-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
 
 /* Stroke Center Map Styles */
 .stroke-center-section {

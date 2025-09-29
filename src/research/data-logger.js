@@ -8,6 +8,7 @@ import { LegacyICHModel } from './legacy-ich-model.js';
 
 export class ResearchDataLogger {
   static STORAGE_KEY = 'igfap_research_data';
+
   static MAX_ENTRIES = 1000; // Prevent unlimited storage growth
 
   /**
@@ -20,26 +21,26 @@ export class ResearchDataLogger {
         id: this.generateEntryId(),
         timestamp: new Date().toISOString(),
         sessionId: this.getSessionId(),
-        ...comparisonData
+        ...comparisonData,
       };
 
       const stored = this.getStoredData();
       stored.entries.push(entry);
-      
+
       // Limit storage size
       if (stored.entries.length > this.MAX_ENTRIES) {
         stored.entries = stored.entries.slice(-this.MAX_ENTRIES);
       }
-      
+
       stored.lastUpdated = new Date().toISOString();
       stored.totalComparisons = stored.entries.length;
-      
+
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(stored));
-      
-      console.log(`📊 Research data logged (${stored.totalComparisons} comparisons)`);
+
+      //(`📊 Research data logged (${stored.totalComparisons} comparisons)`);
       return true;
     } catch (error) {
-      console.warn('Research data logging failed (non-critical):', error);
+      //('Research data logging failed (non-critical):', error);
       return false;
     }
   }
@@ -54,18 +55,18 @@ export class ResearchDataLogger {
       if (!stored) {
         return this.createEmptyDataset();
       }
-      
+
       const data = JSON.parse(stored);
-      
+
       // Validate structure
       if (!data.entries || !Array.isArray(data.entries)) {
-        console.warn('Invalid research data structure, resetting');
+        //('Invalid research data structure, resetting');
         return this.createEmptyDataset();
       }
-      
+
       return data;
     } catch (error) {
-      console.warn('Failed to load research data, creating new:', error);
+      //('Failed to load research data, creating new:', error);
       return this.createEmptyDataset();
     }
   }
@@ -84,8 +85,8 @@ export class ResearchDataLogger {
       metadata: {
         app: 'iGFAP Stroke Triage',
         purpose: 'Model comparison research',
-        dataRetention: 'Local storage only'
-      }
+        dataRetention: 'Local storage only',
+      },
     };
   }
 
@@ -95,7 +96,7 @@ export class ResearchDataLogger {
    */
   static exportAsCSV() {
     const data = this.getStoredData();
-    
+
     if (!data.entries || data.entries.length === 0) {
       return 'No research data available for export';
     }
@@ -103,7 +104,7 @@ export class ResearchDataLogger {
     // CSV headers
     const headers = [
       'timestamp',
-      'session_id', 
+      'session_id',
       'age',
       'gfap_value',
       'main_model_probability',
@@ -113,26 +114,24 @@ export class ResearchDataLogger {
       'absolute_difference',
       'relative_difference',
       'agreement_level',
-      'higher_risk_model'
+      'higher_risk_model',
     ];
 
     // Convert entries to CSV rows
-    const rows = data.entries.map(entry => {
-      return [
-        entry.timestamp,
-        entry.sessionId,
-        entry.inputs?.age || '',
-        entry.inputs?.gfap || '',
-        entry.main?.probability || '',
-        entry.main?.module || '',
-        entry.legacy?.probability || '',
-        entry.legacy?.confidence || '',
-        entry.comparison?.differences?.absolute || '',
-        entry.comparison?.differences?.relative || '',
-        entry.comparison?.agreement?.level || '',
-        entry.comparison?.agreement?.higherRiskModel || ''
-      ].join(',');
-    });
+    const rows = data.entries.map((entry) => [
+      entry.timestamp,
+      entry.sessionId,
+      entry.inputs?.age || '',
+      entry.inputs?.gfap || '',
+      entry.main?.probability || '',
+      entry.main?.module || '',
+      entry.legacy?.probability || '',
+      entry.legacy?.confidence || '',
+      entry.comparison?.differences?.absolute || '',
+      entry.comparison?.differences?.relative || '',
+      entry.comparison?.agreement?.level || '',
+      entry.comparison?.agreement?.higherRiskModel || '',
+    ].join(','));
 
     // Combine headers and rows
     const csv = [headers.join(','), ...rows].join('\n');
@@ -156,11 +155,11 @@ export class ResearchDataLogger {
     try {
       const data = format === 'csv' ? this.exportAsCSV() : this.exportAsJSON();
       const filename = `igfap-research-${Date.now()}.${format}`;
-      
-      const blob = new Blob([data], { 
-        type: format === 'csv' ? 'text/csv' : 'application/json' 
+
+      const blob = new Blob([data], {
+        type: format === 'csv' ? 'text/csv' : 'application/json',
       });
-      
+
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -169,11 +168,11 @@ export class ResearchDataLogger {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
-      console.log(`📥 Downloaded research data: ${filename}`);
+
+      //(`📥 Downloaded research data: ${filename}`);
       return true;
     } catch (error) {
-      console.error('Failed to download research data:', error);
+      //('Failed to download research data:', error);
       return false;
     }
   }
@@ -184,10 +183,10 @@ export class ResearchDataLogger {
   static clearData() {
     try {
       localStorage.removeItem(this.STORAGE_KEY);
-      console.log('🗑️ Research data cleared');
+      //('🗑️ Research data cleared');
       return true;
     } catch (error) {
-      console.warn('Failed to clear research data:', error);
+      //('Failed to clear research data:', error);
       return false;
     }
   }
@@ -198,31 +197,31 @@ export class ResearchDataLogger {
    */
   static getDataSummary() {
     const data = this.getStoredData();
-    
+
     if (!data.entries || data.entries.length === 0) {
       return {
         totalEntries: 0,
         dateRange: null,
-        avgDifference: null
+        avgDifference: null,
       };
     }
 
-    const entries = data.entries;
+    const { entries } = data;
     const differences = entries
-      .map(e => e.comparison?.differences?.absolute)
-      .filter(d => d !== undefined && d !== null);
-    
-    const avgDifference = differences.length > 0 ? 
-      differences.reduce((sum, d) => sum + Math.abs(d), 0) / differences.length : 0;
+      .map((e) => e.comparison?.differences?.absolute)
+      .filter((d) => d !== undefined && d !== null);
+
+    const avgDifference = differences.length > 0
+      ? differences.reduce((sum, d) => sum + Math.abs(d), 0) / differences.length : 0;
 
     return {
       totalEntries: entries.length,
       dateRange: {
         first: entries[0]?.timestamp,
-        last: entries[entries.length - 1]?.timestamp
+        last: entries[entries.length - 1]?.timestamp,
       },
       avgAbsoluteDifference: Math.round(avgDifference * 10) / 10,
-      storageSize: JSON.stringify(data).length
+      storageSize: JSON.stringify(data).length,
     };
   }
 
@@ -234,7 +233,7 @@ export class ResearchDataLogger {
   static getSessionId() {
     let sessionId = sessionStorage.getItem('research_session_id');
     if (!sessionId) {
-      sessionId = 'session_' + Date.now().toString(36);
+      sessionId = `session_${Date.now().toString(36)}`;
       sessionStorage.setItem('research_session_id', sessionId);
     }
     return sessionId;
@@ -258,22 +257,22 @@ export function safeLogResearchData(mainResults, legacyResults, inputs) {
       inputs: {
         age: inputs.age_years || inputs.age,
         gfap: inputs.gfap_value || inputs.gfap,
-        module: mainResults.module || 'unknown'
+        module: mainResults.module || 'unknown',
       },
       main: {
         probability: mainResults.probability,
         module: mainResults.module,
-        confidence: mainResults.confidence
+        confidence: mainResults.confidence,
       },
       legacy: legacyResults,
-      comparison: legacyResults ? 
-        LegacyICHModel.compareModels(mainResults, legacyResults) : null
+      comparison: legacyResults
+        ? LegacyICHModel.compareModels(mainResults, legacyResults) : null,
     };
 
     ResearchDataLogger.logComparison(comparisonData);
   } catch (error) {
     // Silently fail - never break main app functionality
-    console.warn('Research logging failed (non-critical):', error);
+    //('Research logging failed (non-critical):', error);
   }
 }
 
@@ -287,18 +286,18 @@ export function isResearchModeEnabled(module = null) {
   if (module === 'coma') {
     return false;
   }
-  
+
   // Always enable for stroke modules (limited/full)
   if (module === 'limited' || module === 'full') {
     return true;
   }
-  
+
   // Fallback: check if any stroke module data exists
   if (typeof window !== 'undefined') {
     try {
       const store = window.store || require('../state/store.js')?.store;
       if (store) {
-        const formData = store.getState().formData;
+        const { formData } = store.getState();
         const hasStrokeData = formData.limited || formData.full;
         return hasStrokeData; // Enable if stroke module data exists
       }
@@ -306,7 +305,7 @@ export function isResearchModeEnabled(module = null) {
       // Silently fail - research mode just won't work
     }
   }
-  
+
   return false;
 }
 
@@ -318,12 +317,12 @@ export function setResearchMode(enabled) {
   try {
     if (enabled) {
       localStorage.setItem('research_mode', 'true');
-      console.log('🔬 Research mode enabled');
+      //('🔬 Research mode enabled');
     } else {
       localStorage.removeItem('research_mode');
-      console.log('🔬 Research mode disabled');
+      //('🔬 Research mode disabled');
     }
-    
+
     // Trigger page refresh to apply changes
     if (window.location.search.includes('research=')) {
       // Remove research param from URL if disabling
@@ -333,10 +332,10 @@ export function setResearchMode(enabled) {
         window.history.replaceState({}, '', url);
       }
     }
-    
+
     return true;
   } catch (error) {
-    console.warn('Failed to toggle research mode:', error);
+    //('Failed to toggle research mode:', error);
     return false;
   }
 }

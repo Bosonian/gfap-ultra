@@ -2,10 +2,10 @@ export function renderProgressIndicator(currentStep) {
   const steps = [
     { id: 1, label: 'Triage' },
     { id: 2, label: 'Assessment' },
-    { id: 3, label: 'Results' }
+    { id: 3, label: 'Results' },
   ];
-  
-  let html = `<div class="progress-indicator">`;
+
+  let html = '<div class="progress-indicator">';
   steps.forEach((step, index) => {
     const isActive = step.id === currentStep;
     const isCompleted = step.id < currentStep;
@@ -18,6 +18,6 @@ export function renderProgressIndicator(currentStep) {
       html += `<div class="progress-line ${isCompleted ? 'completed' : ''}"></div>`;
     }
   });
-  html += `</div>`;
+  html += '</div>';
   return html;
 }

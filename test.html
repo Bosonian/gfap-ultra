@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>Test Page</h1>
+    <div id="test"></div>
+    <script type="module">
+        console.log('Testing module loading...');
+
+        // Test basic import
+        import('./src/main.js')
+            .then(() => console.log('main.js loaded successfully'))
+            .catch(err => {
+                console.error('Error loading main.js:', err);
+                document.getElementById('test').innerHTML = `<pre>Error: ${err.message}\n${err.stack}</pre>`;
+            });
+    </script>
+</body>
+</html>

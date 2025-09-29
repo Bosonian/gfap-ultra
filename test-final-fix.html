@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Fix Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .test-btn { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        iframe { border: 2px solid #007bff; border-radius: 8px; width: 100%; height: 600px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Final Fix Test</h1>
+
+    <div id="results"></div>
+
+    <div style="margin: 20px 0;">
+        <button class="test-btn" onclick="testFlow()">🧪 Test Complete Flow</button>
+        <button class="test-btn" onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <div style="border: 2px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <h2>📺 Test Application Below</h2>
+        <p><strong>Test Steps:</strong></p>
+        <ol>
+            <li>Verify you see "Is the patient comatose?" with buttons</li>
+            <li>Click "YES - Comatose" → should show coma form (not error)</li>
+            <li>Go back and click "NO - Conscious" → should show prerequisites modal</li>
+        </ol>
+        <iframe src="/0925/" title="Test Application"></iframe>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        window.clearResults = function() {
+            results.innerHTML = '';
+        };
+
+        window.testFlow = async function() {
+            try {
+                addResult('🚀 Running final comprehensive test...', 'info');
+
+                // Import everything we need
+                const { store } = await import('./src/state/store.js');
+                const { renderComa } = await import('./src/ui/screens/coma.js');
+                const { renderPrerequisitesModal } = await import('./src/ui/components/prerequisites-modal.js');
+                const { renderTriage1 } = await import('./src/ui/screens/triage1.js');
+                const { safeSetInnerHTML } = await import('./src/security/html-sanitizer.js');
+                const { handleTriage1 } = await import('./src/logic/handlers.js');
+
+                addResult('✅ All modules imported successfully', 'success');
+
+                // Test 1: Triage1 buttons
+                addResult('<strong>Test 1: Triage1 Buttons</strong>', 'info');
+                const triage1Html = renderTriage1();
+                const triage1Container = document.createElement('div');
+
+                try {
+                    safeSetInnerHTML(triage1Container, triage1Html);
+                    const triageButtons = triage1Container.querySelectorAll('[data-action="triage1"]');
+                    addResult(`✅ Triage1 buttons: ${triageButtons.length}/2`, triageButtons.length === 2 ? 'success' : 'error');
+                } catch (triage1Error) {
+                    addResult(`❌ Triage1 error: ${triage1Error.message}`, 'error');
+                }
+
+                // Test 2: Coma screen
+                addResult('<strong>Test 2: Coma Screen</strong>', 'info');
+                const comaHtml = renderComa();
+                const comaContainer = document.createElement('div');
+
+                try {
+                    safeSetInnerHTML(comaContainer, comaHtml);
+                    const comaForm = comaContainer.querySelector('form[data-module="coma"]');
+                    const comaInputs = comaContainer.querySelectorAll('input');
+                    const comaButtons = comaContainer.querySelectorAll('button');
+
+                    addResult(`✅ Coma form found: ${comaForm ? 'Yes' : 'No'}`, comaForm ? 'success' : 'error');
+                    addResult(`✅ Coma inputs: ${comaInputs.length}`, comaInputs.length > 0 ? 'success' : 'error');
+                    addResult(`✅ Coma buttons: ${comaButtons.length}`, comaButtons.length >= 2 ? 'success' : 'error');
+
+                    if (comaForm && comaInputs.length > 0 && comaButtons.length >= 2) {
+                        addResult('🎉 Coma screen sanitization: SUCCESSFUL', 'success');
+                    }
+                } catch (comaError) {
+                    addResult(`❌ Coma error: ${comaError.message}`, 'error');
+                    console.error('Coma sanitization failed:', comaError);
+                }
+
+                // Test 3: Prerequisites modal
+                addResult('<strong>Test 3: Prerequisites Modal</strong>', 'info');
+                const modalHtml = renderPrerequisitesModal();
+                const modalContainer = document.createElement('div');
+
+                try {
+                    safeSetInnerHTML(modalContainer, modalHtml);
+                    const modalButtons = modalContainer.querySelectorAll('button');
+                    const modalInputs = modalContainer.querySelectorAll('input[type="checkbox"]');
+                    const modalLabels = modalContainer.querySelectorAll('label');
+
+                    addResult(`✅ Modal buttons: ${modalButtons.length}`, modalButtons.length >= 3 ? 'success' : 'error');
+                    addResult(`✅ Modal checkboxes: ${modalInputs.length}`, modalInputs.length >= 4 ? 'success' : 'error');
+                    addResult(`✅ Modal labels: ${modalLabels.length}`, modalLabels.length >= 4 ? 'success' : 'error');
+
+                    if (modalButtons.length >= 3 && modalInputs.length >= 4) {
+                        addResult('🎉 Prerequisites modal sanitization: SUCCESSFUL', 'success');
+                    }
+                } catch (modalError) {
+                    addResult(`❌ Modal error: ${modalError.message}`, 'error');
+                    console.error('Modal sanitization failed:', modalError);
+                }
+
+                // Test 4: Flow simulation
+                addResult('<strong>Test 4: Flow Simulation</strong>', 'info');
+
+                try {
+                    // Test comatose path
+                    store.navigate('triage1');
+                    handleTriage1(true);
+                    const comaState = store.getState();
+                    addResult(`✅ Comatose path → ${comaState.currentScreen}`, comaState.currentScreen === 'coma' ? 'success' : 'error');
+
+                    // Test conscious path (modal)
+                    store.navigate('triage1');
+                    handleTriage1(false);
+
+                    setTimeout(() => {
+                        const modal = document.getElementById('prerequisitesModal');
+                        addResult(`✅ Prerequisites modal created: ${modal ? 'Yes' : 'No'}`, modal ? 'success' : 'error');
+                    }, 100);
+
+                } catch (flowError) {
+                    addResult(`❌ Flow error: ${flowError.message}`, 'error');
+                }
+
+                addResult('<strong>🏆 FINAL STATUS</strong>', 'info');
+                addResult('If all tests above show success, the application should be fully functional!', 'success');
+
+            } catch (error) {
+                addResult(`❌ Test suite error: ${error.message}`, 'error');
+                console.error('Final test failed:', error);
+            }
+        };
+
+        // Auto-run test on load
+        setTimeout(testFlow, 1000);
+    </script>
+</body>
+</html>

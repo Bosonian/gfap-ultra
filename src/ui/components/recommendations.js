@@ -2,12 +2,12 @@ import { formatTime } from '../../logic/formatters.js';
 
 export function renderRecommendations(ich, lvo, startTime) {
   const recommendations = generateRecommendations(ich, lvo);
-  
+
   return `
     <div class="result-card info">
       <h3>📋 Clinical Recommendations</h3>
       <ul style="text-align: left; margin: 10px 0;">
-        ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+        ${recommendations.map((rec) => `<li>${rec}</li>`).join('')}
       </ul>
       <p style="margin-top: 15px;">
         <strong>Time since assessment started:</strong> ${formatTime(Date.now() - startTime)}
@@ -18,7 +18,7 @@ export function renderRecommendations(ich, lvo, startTime) {
 
 function generateRecommendations(ich, lvo) {
   const recommendations = [];
-  
+
   if (ich) {
     const ichPercent = ich.probability * 100;
     if (ichPercent > 80) {
@@ -36,7 +36,7 @@ function generateRecommendations(ich, lvo) {
       recommendations.push('✓ Low ICH risk - proceed with standard evaluation');
     }
   }
-  
+
   if (lvo && !lvo.notPossible) {
     const lvoPercent = lvo.probability * 100;
     if (lvoPercent > 70) {
@@ -49,10 +49,10 @@ function generateRecommendations(ich, lvo) {
       recommendations.push('📊 Moderate LVO risk - standard stroke evaluation');
     }
   }
-  
+
   // Time-based recommendations
   recommendations.push('⏱️ Document symptom onset time accurately');
   recommendations.push('📞 Notify receiving facility early for resource preparation');
-  
+
   return recommendations;
 }

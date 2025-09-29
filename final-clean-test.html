@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Clean Application Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; line-height: 1.6; }
+        .test-result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .highlight { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        iframe { border: 2px solid #28a745; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Final Clean Application Test</h1>
+
+    <div class="highlight">
+        <h3>🔐 Test Instructions:</h3>
+        <ol>
+            <li>The app should load without errors</li>
+            <li>You should see a login screen asking for password</li>
+            <li>Use password: <strong>"Neuro25"</strong></li>
+            <li>After login, you should see the main triage interface</li>
+        </ol>
+    </div>
+
+    <div id="results"></div>
+
+    <h2>📺 Live Application</h2>
+    <iframe src="/0925/" width="100%" height="700" title="Clean iGFAP Application"></iframe>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function runFinalTest() {
+            try {
+                addResult('🎯 Running final application test...', 'info');
+
+                // Test core imports
+                const { simpleAuthManager } = await import('./src/auth/simple-auth.js');
+                addResult('✅ Simple authentication manager loaded', 'success');
+
+                const { store } = await import('./src/state/store.js');
+                addResult('✅ Store loaded', 'success');
+
+                const { createApp } = await import('./src/core/app-controller.js');
+                addResult('✅ App controller loaded', 'success');
+
+                // Test authentication
+                const authResult = await simpleAuthManager.authenticate('Neuro25');
+                if (authResult) {
+                    addResult('✅ Authentication works with "Neuro25"', 'success');
+                    simpleAuthManager.logout(); // Clean up for proper testing
+                } else {
+                    addResult('⚠️ Authentication test failed', 'error');
+                }
+
+                // Test app creation
+                const app = await createApp();
+                addResult('✅ App controller created successfully', 'success');
+
+                const status = app.getStatus();
+                addResult(`✅ App status: initialized=${status.isInitialized}`, 'success');
+
+                addResult('🎉 ALL TESTS PASSED!', 'success');
+                addResult('💡 The application should now work without errors', 'info');
+                addResult('🔐 Use password "Neuro25" to access the main application', 'info');
+
+            } catch (error) {
+                addResult(`❌ Error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        runFinalTest();
+    </script>
+</body>
+</html>

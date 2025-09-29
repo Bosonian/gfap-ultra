@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Test - Fixed Store Subscription</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .highlight { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        iframe { border: 2px solid #28a745; border-radius: 8px; width: 100%; height: 600px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Flow Test - Store Subscription Fix</h1>
+
+    <div class="highlight">
+        <h3>🔧 Fix Applied:</h3>
+        <p>Moved store subscription setup BEFORE initial render to ensure navigation works correctly when render function calls store.navigate('login').</p>
+
+        <h3>📋 Expected Flow:</h3>
+        <ol>
+            <li>App starts with currentScreen: 'triage1'</li>
+            <li>Render function checks authentication</li>
+            <li>Since not authenticated, calls store.navigate('login')</li>
+            <li>Store subscription triggers re-render with login screen</li>
+            <li>User sees login form asking for password</li>
+        </ol>
+    </div>
+
+    <div id="results"></div>
+
+    <h2>📺 Main Application (Should Show Login Screen)</h2>
+    <iframe src="/0925/" title="Fixed iGFAP Application"></iframe>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        async function testFlow() {
+            try {
+                addResult('🔄 Testing fixed authentication flow...', 'info');
+
+                // Test the core modules
+                const { simpleAuthManager } = await import('./src/auth/simple-auth.js');
+                const { store } = await import('./src/state/store.js');
+
+                // Check initial state
+                const initialState = store.getState();
+                addResult(`📊 Initial state: currentScreen = "${initialState.currentScreen}"`, 'info');
+
+                // Check if user is authenticated initially
+                const isAuth = simpleAuthManager.isValidSession();
+                addResult(`🔐 Initial authentication: ${isAuth}`, isAuth ? 'success' : 'info');
+
+                if (!isAuth) {
+                    addResult('✅ User not authenticated - login screen should show', 'success');
+                    addResult('💡 The iframe above should display a login form', 'info');
+                    addResult('🔑 Use password "Neuro25" to test login', 'info');
+                } else {
+                    addResult('⚠️ User already authenticated - may show main interface', 'info');
+                }
+
+                addResult('🎯 Test complete! Check the iframe above for actual behavior.', 'success');
+
+            } catch (error) {
+                addResult(`❌ Error: ${error.message}`, 'error');
+                console.error('Flow test error:', error);
+            }
+        }
+
+        testFlow();
+    </script>
+</body>
+</html>

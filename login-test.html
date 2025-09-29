@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Screen Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; line-height: 1.6; }
+        .test-result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Login Screen Test</h1>
+    <div id="results"></div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function testLogin() {
+            try {
+                addResult('🔧 Testing login screen functionality...', 'info');
+
+                // Import required modules
+                const { store } = await import('./src/state/store.js');
+                const { authManager } = await import('./src/auth/authentication.js');
+                const { render } = await import('./src/ui/render.js');
+
+                // Check initial state
+                const state = store.getState();
+                addResult(`✅ Initial screen: ${state.currentScreen}`, 'success');
+
+                // Check if we have a valid session
+                const isValid = authManager.isValidSession();
+                addResult(`📋 Session valid: ${isValid}`, isValid ? 'success' : 'info');
+
+                // Test navigation to login
+                store.navigate('login');
+                const newState = store.getState();
+                addResult(`✅ After navigate('login'): ${newState.currentScreen}`, 'success');
+
+                // Create a test container and render
+                const testContainer = document.createElement('div');
+                testContainer.id = 'test-container';
+                testContainer.style.cssText = 'border: 1px solid #ccc; padding: 20px; margin: 20px 0; min-height: 200px;';
+
+                render(testContainer);
+
+                document.body.appendChild(testContainer);
+                addResult('✅ Login screen rendered successfully!', 'success');
+
+                // Check if login form elements are present
+                const loginForm = testContainer.querySelector('form');
+                const passwordInput = testContainer.querySelector('input[type="password"]');
+                const submitButton = testContainer.querySelector('button[type="submit"]');
+
+                if (loginForm) {
+                    addResult('✅ Login form found', 'success');
+                } else {
+                    addResult('⚠️ Login form not found', 'error');
+                }
+
+                if (passwordInput) {
+                    addResult('✅ Password input found', 'success');
+                } else {
+                    addResult('⚠️ Password input not found', 'error');
+                }
+
+                if (submitButton) {
+                    addResult('✅ Submit button found', 'success');
+                } else {
+                    addResult('⚠️ Submit button not found', 'error');
+                }
+
+                addResult('🎉 Login screen test completed!', 'success');
+
+            } catch (error) {
+                addResult(`❌ Error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        testLogin();
+    </script>
+</body>
+</html>

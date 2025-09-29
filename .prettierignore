@@ -1,0 +1,30 @@
+# Prettier ignore file for iGFAP Stroke Triage Assistant
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Dependencies
+node_modules/
+
+# Generated files
+coverage/
+.nyc_output/
+
+# Service worker
+sw.js
+
+# Documentation
+*.md
+
+# Config files that need specific formatting
+package.json
+package-lock.json
+
+# External libraries
+src/lib/
+
+# Test snapshots
+**/__snapshots__/

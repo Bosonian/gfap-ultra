@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Fix Verification</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .highlight { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .test-container { border: 2px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        iframe { border: 2px solid #007bff; border-radius: 8px; width: 100%; height: 600px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>✅ Button Fix Verification</h1>
+
+    <div class="highlight">
+        <h3>🔧 Fix Applied:</h3>
+        <p><strong>Problem:</strong> HTML sanitizer was stripping out button elements</p>
+        <p><strong>Solution:</strong> Added 'button', 'input', 'form' etc. to ALLOWED_TAGS and their attributes</p>
+        <p><strong>Expected Result:</strong> Triage1 buttons should now be visible and clickable</p>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="test-container">
+        <h2>🧪 Sanitizer Test</h2>
+        <div id="sanitizerTest"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>📺 Main Application</h2>
+        <iframe src="/0925/" title="Fixed iGFAP Application"></iframe>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+        const sanitizerTest = document.getElementById('sanitizerTest');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        async function testButtonFix() {
+            try {
+                addResult('🔄 Testing button fix...', 'info');
+
+                // Test 1: HTML Sanitizer
+                addResult('<strong>Test 1: HTML Sanitizer Button Support</strong>', 'info');
+
+                const { safeSetInnerHTML } = await import('./src/security/html-sanitizer.js');
+                addResult('✅ HTML sanitizer imported', 'success');
+
+                // Test HTML with buttons
+                const testHtml = `
+                    <div class="triage-buttons">
+                        <button class="yes-btn" data-action="triage1" data-value="true">YES - Comatose</button>
+                        <button class="no-btn" data-action="triage1" data-value="false">NO - Conscious</button>
+                    </div>
+                `;
+
+                const testContainer = document.createElement('div');
+                safeSetInnerHTML(testContainer, testHtml);
+
+                const buttons = testContainer.querySelectorAll('button');
+                addResult(`📊 Buttons after sanitization: ${buttons.length}`, buttons.length === 2 ? 'success' : 'error');
+
+                if (buttons.length === 2) {
+                    buttons.forEach((btn, index) => {
+                        const action = btn.getAttribute('data-action');
+                        const value = btn.getAttribute('data-value');
+                        addResult(`Button ${index + 1}: action="${action}", value="${value}"`, 'success');
+                    });
+
+                    // Show the sanitized HTML in the test container
+                    sanitizerTest.appendChild(testContainer);
+                    addResult('✅ Buttons preserved through sanitization!', 'success');
+                } else {
+                    addResult('❌ Buttons still being stripped!', 'error');
+                }
+
+                // Test 2: Triage1 Screen
+                addResult('<strong>Test 2: Triage1 Screen Generation</strong>', 'info');
+
+                const { renderTriage1 } = await import('./src/ui/screens/triage1.js');
+                const triage1Html = renderTriage1();
+
+                const buttonMatches = triage1Html.match(/data-action="triage1"/g);
+                const buttonCount = buttonMatches ? buttonMatches.length : 0;
+                addResult(`📊 Buttons in triage1 HTML: ${buttonCount}`, buttonCount === 2 ? 'success' : 'error');
+
+                // Test 3: Complete render process
+                addResult('<strong>Test 3: Complete Render Process</strong>', 'info');
+
+                const { render } = await import('./src/ui/render.js');
+                const { store } = await import('./src/state/store.js');
+
+                // Navigate to triage1
+                store.navigate('triage1');
+
+                const mockContainer = document.createElement('div');
+                render(mockContainer);
+
+                const renderedButtons = mockContainer.querySelectorAll('[data-action="triage1"]');
+                addResult(`📊 Buttons in rendered DOM: ${renderedButtons.length}`, renderedButtons.length === 2 ? 'success' : 'error');
+
+                if (renderedButtons.length === 2) {
+                    addResult('🎉 SUCCESS: Buttons are now rendering correctly!', 'success');
+                    addResult('<strong>The triage1 screen should now show clickable Yes/No buttons</strong>', 'success');
+                } else {
+                    addResult('⚠️ Still having issues with button rendering', 'error');
+                }
+
+                addResult('🎯 Button fix verification complete!', 'success');
+
+            } catch (error) {
+                addResult(`❌ Test error: ${error.message}`, 'error');
+                console.error('Test error:', error);
+            }
+        }
+
+        // Run the test
+        testButtonFix();
+    </script>
+</body>
+</html>

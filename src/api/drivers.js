@@ -4,44 +4,31 @@
  * Extract and format drivers from new backend flat dictionary format
  */
 export function extractDriversFromResponse(response, predictionType) {
-  console.log(`=== EXTRACTING ${predictionType.toUpperCase()} DRIVERS ===`);
-  
-  
+
   let rawDrivers = null;
-  
+
   if (predictionType === 'ICH') {
     rawDrivers = response.ich_prediction?.drivers || null;
-    
   } else if (predictionType === 'LVO') {
     rawDrivers = response.lvo_prediction?.drivers || null;
-    
   }
-  
+
   if (!rawDrivers) {
-    console.log(`❌ No ${predictionType} drivers found`);
     return null;
   }
-  
+
   // Convert flat dictionary to structured format
   const formattedDrivers = formatDriversFromDictionary(rawDrivers, predictionType);
-  
-  
-  
+
   // Check for FAST-ED specifically
   const allFeatures = [...formattedDrivers.positive, ...formattedDrivers.negative];
-  const fastEdFeature = allFeatures.find(f => 
-    f.label && (
-      f.label.toLowerCase().includes('fast') || 
-      f.label.includes('fast_ed')
-    )
-  );
-  
-  if (fastEdFeature) {
-    console.log(`🎯 FAST-ED found in ${predictionType}:`, `${fastEdFeature.label}: ${fastEdFeature.weight > 0 ? '+' : ''}${fastEdFeature.weight.toFixed(4)}`);
-  } else {
-    console.log(`⚠️  FAST-ED NOT found in ${predictionType} drivers`);
-  }
-  
+  const fastEdFeature = allFeatures.find((f) => f.label && (
+    f.label.toLowerCase().includes('fast')
+      || f.label.includes('fast_ed')
+  ));
+
+  // FAST-ED feature detection for validation
+
   return formattedDrivers;
 }
 
@@ -49,11 +36,9 @@ export function extractDriversFromResponse(response, predictionType) {
  * Convert backend flat dictionary to structured positive/negative arrays
  */
 function formatDriversFromDictionary(drivers, predictionType) {
-  
-  
   const positive = [];
   const negative = [];
-  
+
   Object.entries(drivers).forEach(([label, weight]) => {
     if (typeof weight === 'number') {
       if (weight > 0) {
@@ -64,19 +49,17 @@ function formatDriversFromDictionary(drivers, predictionType) {
       // Skip zero weights
     }
   });
-  
+
   // Sort by weight (descending)
   positive.sort((a, b) => b.weight - a.weight);
   negative.sort((a, b) => b.weight - a.weight);
-  
-  
-  
+
   return {
     kind: 'flat_dictionary',
     units: 'logit',
     positive,
     negative,
-    meta: {}
+    meta: {},
   };
 }
 
@@ -84,19 +67,15 @@ function formatDriversFromDictionary(drivers, predictionType) {
  * Clean probability extraction with source tracking
  */
 export function extractProbabilityFromResponse(response, predictionType) {
-  console.log(`=== EXTRACTING ${predictionType.toUpperCase()} PROBABILITY ===`);
-  
+
   let probability = 0;
-  
+
   if (predictionType === 'ICH') {
     probability = response.ich_prediction?.probability || 0;
-    
-    
   } else if (predictionType === 'LVO') {
     probability = response.lvo_prediction?.probability || 0;
-    
   }
-  
+
   return probability;
 }
 
@@ -105,12 +84,12 @@ export function extractProbabilityFromResponse(response, predictionType) {
  */
 export function extractConfidenceFromResponse(response, predictionType) {
   let confidence = 0.85; // default
-  
+
   if (predictionType === 'ICH') {
     confidence = response.ich_prediction?.confidence || 0.85;
   } else if (predictionType === 'LVO') {
     confidence = response.lvo_prediction?.confidence || 0.85;
   }
-  
+
   return confidence;
 }

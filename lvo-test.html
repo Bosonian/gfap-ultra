@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LVO Model Test</title>
+</head>
+<body>
+    <h1>LVO Model Parameter Test</h1>
+    <div id="results"></div>
+
+    <script type="module">
+        // Simulate the exact parameters from the local model
+        const MODEL_PARAMS = {
+            POWER_TRANSFORMER_LAMBDA: 0.123,
+            GFAP_SCALER_MEAN: 0.0,
+            GFAP_SCALER_SCALE: 1.0,
+            FAST_ED_SCALER_MEAN: 3.6667,
+            FAST_ED_SCALER_SCALE: 2.3495,
+            BASE_MODEL_INTERCEPT: -0.8,
+            BASE_MODEL_COEF_GFAP: 0.3,
+            BASE_MODEL_COEF_FAST_ED: 2.1,
+            CALIBRATOR_A: 1.0,
+            CALIBRATOR_B: 0.0
+        };
+
+        // Yeo-Johnson power transform
+        function yeojohnson(x, lambda) {
+            if (x >= 0) {
+                return lambda === 0 ? Math.log(x + 1) : (Math.pow(x + 1, lambda) - 1) / lambda;
+            } else {
+                return lambda === 2 ? -Math.log(-x + 1) : -(Math.pow(-x + 1, 2 - lambda) - 1) / (2 - lambda);
+            }
+        }
+
+        function testLVO(gfapValue, fastEdScore) {
+            // Step 1: Power transform
+            const transformedGfap = yeojohnson(gfapValue, MODEL_PARAMS.POWER_TRANSFORMER_LAMBDA);
+
+            // Step 2: Scaling
+            const scaledGfap = (transformedGfap - MODEL_PARAMS.GFAP_SCALER_MEAN) / MODEL_PARAMS.GFAP_SCALER_SCALE;
+            const scaledFastEd = (fastEdScore - MODEL_PARAMS.FAST_ED_SCALER_MEAN) / MODEL_PARAMS.FAST_ED_SCALER_SCALE;
+
+            // Step 3: Logit calculation
+            const logitUncalibrated = MODEL_PARAMS.BASE_MODEL_INTERCEPT +
+                                     (MODEL_PARAMS.BASE_MODEL_COEF_GFAP * scaledGfap) +
+                                     (MODEL_PARAMS.BASE_MODEL_COEF_FAST_ED * scaledFastEd);
+
+            // Step 4: Calibration and sigmoid
+            const logitCalibrated = (MODEL_PARAMS.CALIBRATOR_A * logitUncalibrated) + MODEL_PARAMS.CALIBRATOR_B;
+            const probability = 1 / (1 + Math.exp(-logitCalibrated));
+
+            return {
+                gfap: gfapValue,
+                fastEd: fastEdScore,
+                transformedGfap,
+                scaledGfap,
+                scaledFastEd,
+                logitUncalibrated,
+                logitCalibrated,
+                probability: probability,
+                probabilityPercent: Math.round(probability * 100)
+            };
+        }
+
+        // Test with various scenarios
+        const testCases = [
+            { gfap: 100, fastEd: 8, expected: "30-70%" },
+            { gfap: 200, fastEd: 6, expected: "40-60%" },
+            { gfap: 50, fastEd: 4, expected: "20-40%" },
+            { gfap: 500, fastEd: 2, expected: "10-30%" },
+            { gfap: 100, fastEd: 0, expected: "5-15%" },
+            { gfap: 1000, fastEd: 9, expected: "60-90%" }
+        ];
+
+        let resultsHTML = '<table border="1"><tr><th>GFAP</th><th>FAST-ED</th><th>Expected Range</th><th>Actual %</th><th>Scaled GFAP</th><th>Scaled FAST-ED</th><th>Logit Uncal</th><th>Logit Cal</th><th>Status</th></tr>';
+
+        testCases.forEach(test => {
+            const result = testLVO(test.gfap, test.fastEd);
+            const status = result.probabilityPercent >= 20 && result.probabilityPercent <= 80 ? '✅ Reasonable' : '❌ Unrealistic';
+
+            resultsHTML += `<tr>
+                <td>${test.gfap}</td>
+                <td>${test.fastEd}</td>
+                <td>${test.expected}</td>
+                <td><strong>${result.probabilityPercent}%</strong></td>
+                <td>${result.scaledGfap.toFixed(3)}</td>
+                <td>${result.scaledFastEd.toFixed(3)}</td>
+                <td>${result.logitUncalibrated.toFixed(3)}</td>
+                <td>${result.logitCalibrated.toFixed(3)}</td>
+                <td>${status}</td>
+            </tr>`;
+        });
+
+        resultsHTML += '</table>';
+
+        // Add detailed analysis for FAST-ED 8 case
+        const criticalCase = testLVO(100, 8);
+        resultsHTML += `<h2>Critical Case Analysis (GFAP: 100, FAST-ED: 8)</h2>
+        <p><strong>Result: ${criticalCase.probabilityPercent}%</strong></p>
+        <p>This should be in the 30-70% range for high FAST-ED score.</p>
+        <p>Detailed calculation:</p>
+        <ul>
+            <li>Transformed GFAP: ${criticalCase.transformedGfap.toFixed(4)}</li>
+            <li>Scaled GFAP: ${criticalCase.scaledGfap.toFixed(4)}</li>
+            <li>Scaled FAST-ED: ${criticalCase.scaledFastEd.toFixed(4)}</li>
+            <li>Logit Uncalibrated: ${criticalCase.logitUncalibrated.toFixed(4)}</li>
+            <li>Logit Calibrated: ${criticalCase.logitCalibrated.toFixed(4)}</li>
+            <li>Final Probability: ${criticalCase.probability.toFixed(4)}</li>
+        </ul>`;
+
+        document.getElementById('results').innerHTML = resultsHTML;
+    </script>
+</body>
+</html>

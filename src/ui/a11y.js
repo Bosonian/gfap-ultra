@@ -7,19 +7,19 @@ export function announceScreenChange(screen) {
   announcement.className = 'sr-only';
   announcement.setAttribute('role', 'status');
   announcement.setAttribute('aria-live', 'polite');
-  
+
   const screenNames = {
-    'triage1': 'Coma assessment',
-    'triage2': 'Examination capability assessment',
-    'coma': 'Coma module',
-    'limited': 'Limited data module',
-    'full': 'Full stroke assessment',
-    'results': 'Assessment results'
+    triage1: 'Coma assessment',
+    triage2: 'Examination capability assessment',
+    coma: 'Coma module',
+    limited: 'Limited data module',
+    full: 'Full stroke assessment',
+    results: 'Assessment results',
   };
-  
+
   announcement.textContent = `Navigated to ${screenNames[screen] || screen}`;
   document.body.appendChild(announcement);
-  
+
   setTimeout(() => announcement.remove(), 1000);
 }
 
@@ -31,7 +31,7 @@ export function setPageTitle(screen) {
     coma: 'Coma Module',
     limited: 'Limited Data Module',
     full: 'Full Stroke Module',
-    results: 'Assessment Results'
+    results: 'Assessment Results',
   };
 
   const section = titles[screen];

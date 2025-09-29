@@ -1,0 +1,13 @@
+# --- requirements.txt ---
+# This file lists the Python libraries needed for the function.
+# Versions updated to match the model's training environment and resolve numpy issue.
+
+functions-framework==3.*
+scikit-learn==1.5.1
+joblib==1.4.2
+pandas==2.2.2
+numpy==2.0.0
+scipy==1.13.1
+xgboost==2.0.3
+shap==0.45.1
+imbalanced-learn==0.12.3

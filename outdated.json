@@ -1,0 +1,30 @@
+{
+  "@vitejs/plugin-react": {
+    "current": "4.7.0",
+    "wanted": "4.7.0",
+    "latest": "5.0.3",
+    "dependent": "0825",
+    "location": "/Users/deepak/iGFAPAUG/iGFAP08/stroke-triage/0825/node_modules/@vitejs/plugin-react"
+  },
+  "react": {
+    "current": "18.3.1",
+    "wanted": "18.3.1",
+    "latest": "19.1.1",
+    "dependent": "0825",
+    "location": "/Users/deepak/iGFAPAUG/iGFAP08/stroke-triage/0825/node_modules/react"
+  },
+  "react-dom": {
+    "current": "18.3.1",
+    "wanted": "18.3.1",
+    "latest": "19.1.1",
+    "dependent": "0825",
+    "location": "/Users/deepak/iGFAPAUG/iGFAP08/stroke-triage/0825/node_modules/react-dom"
+  },
+  "vite": {
+    "current": "5.4.20",
+    "wanted": "5.4.20",
+    "latest": "7.1.7",
+    "dependent": "0825",
+    "location": "/Users/deepak/iGFAPAUG/iGFAP08/stroke-triage/0825/node_modules/vite"
+  }
+}

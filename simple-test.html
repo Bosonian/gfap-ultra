@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test</title>
+</head>
+<body>
+    <h1>Simple Module Test</h1>
+    <div id="output" style="font-family: monospace; white-space: pre-line; padding: 20px; background: #f0f0f0; margin: 20px;"></div>
+
+    <script type="module">
+        const output = document.getElementById('output');
+
+        function log(message) {
+            output.textContent += message + '\n';
+            console.log(message);
+        }
+
+        async function test() {
+            try {
+                log('1. Starting module test...');
+
+                log('2. Testing error handler import...');
+                const errorHandler = await import('./src/utils/error-handler.js');
+                log('✅ Error handler loaded');
+
+                log('3. Testing medical logger import...');
+                const medicalLogger = await import('./src/utils/medical-logger.js');
+                log('✅ Medical logger loaded');
+
+                log('4. Testing store import...');
+                const store = await import('./src/state/store.js');
+                log('✅ Store loaded');
+
+                log('5. Testing auth manager import...');
+                const auth = await import('./src/auth/authentication.js');
+                log('✅ Auth manager loaded');
+
+                log('6. Testing app controller import...');
+                const appController = await import('./src/core/app-controller.js');
+                log('✅ App controller loaded');
+
+                log('7. Testing main app creation...');
+                const app = await appController.createApp();
+                log('✅ App created successfully!');
+
+                log('\n🎉 ALL TESTS PASSED! The app should work.');
+
+            } catch (error) {
+                log(`❌ ERROR: ${error.message}`);
+                log(`Stack trace: ${error.stack}`);
+
+                // Try to identify the specific failing module
+                if (error.message.includes('Failed to resolve module')) {
+                    log('\n🔍 This is a module resolution error.');
+                    log('Check if all imported files exist and have correct exports.');
+                }
+            }
+        }
+
+        test();
+    </script>
+</body>
+</html>

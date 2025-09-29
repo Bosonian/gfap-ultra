@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prerequisites Modal Fix Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .highlight { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .test-container { border: 2px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        iframe { border: 2px solid #007bff; border-radius: 8px; width: 100%; height: 600px; margin: 20px 0; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Prerequisites Modal Fix Test</h1>
+
+    <div class="highlight">
+        <h3>🎯 Testing:</h3>
+        <p><strong>Issue:</strong> Prerequisites modal fails HTML sanitization</p>
+        <p><strong>Expected:</strong> Modal should open when clicking "NO - Conscious" on triage1</p>
+        <p><strong>Fix Applied:</strong> Enhanced sanitizer to allow modal elements and data attributes</p>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="test-container">
+        <h2>🧪 Modal Sanitization Test</h2>
+        <button onclick="testModalRendering()">Test Modal HTML Generation</button>
+        <button onclick="testModalSanitization()">Test Modal Sanitization</button>
+        <div id="modalTest"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>🎮 Simulated Triage Flow</h2>
+        <button onclick="simulateTriageFlow()">Simulate "NO - Conscious" Click</button>
+        <div id="flowTest"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>📺 Main Application</h2>
+        <p>Click "NO - Conscious" in the application below to test the modal:</p>
+        <iframe src="/0925/" title="iGFAP Application"></iframe>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+        const modalTest = document.getElementById('modalTest');
+        const flowTest = document.getElementById('flowTest');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        window.testModalRendering = async function() {
+            try {
+                addResult('🔄 Testing modal HTML generation...', 'info');
+
+                const { renderPrerequisitesModal } = await import('./src/ui/components/prerequisites-modal.js');
+                addResult('✅ Prerequisites modal imported', 'success');
+
+                const modalHtml = renderPrerequisitesModal();
+                addResult(`📊 Generated modal HTML length: ${modalHtml.length}`, 'info');
+
+                // Check for specific elements
+                const hasButton = modalHtml.includes('<button');
+                const hasInput = modalHtml.includes('<input');
+                const hasDataId = modalHtml.includes('data-id=');
+                const hasCloseButton = modalHtml.includes('&times;');
+
+                addResult(`📊 Contains buttons: ${hasButton}`, hasButton ? 'success' : 'error');
+                addResult(`📊 Contains inputs: ${hasInput}`, hasInput ? 'success' : 'error');
+                addResult(`📊 Contains data-id: ${hasDataId}`, hasDataId ? 'success' : 'error');
+                addResult(`📊 Contains close symbol: ${hasCloseButton}`, hasCloseButton ? 'success' : 'error');
+
+                // Show a preview
+                modalTest.innerHTML = '<h4>Generated Modal HTML Preview:</h4><pre>' +
+                    modalHtml.substring(0, 500).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '...</pre>';
+
+            } catch (error) {
+                addResult(`❌ Modal generation error: ${error.message}`, 'error');
+            }
+        };
+
+        window.testModalSanitization = async function() {
+            try {
+                addResult('🔄 Testing modal sanitization...', 'info');
+
+                const { safeSetInnerHTML } = await import('./src/security/html-sanitizer.js');
+                const { renderPrerequisitesModal } = await import('./src/ui/components/prerequisites-modal.js');
+
+                const modalHtml = renderPrerequisitesModal();
+                const testContainer = document.createElement('div');
+
+                // This is the critical test - should not throw error
+                safeSetInnerHTML(testContainer, modalHtml);
+                addResult('✅ Modal HTML passed sanitization!', 'success');
+
+                // Check what survived sanitization
+                const buttons = testContainer.querySelectorAll('button');
+                const inputs = testContainer.querySelectorAll('input');
+                const dataIds = testContainer.querySelectorAll('[data-id]');
+
+                addResult(`📊 Buttons after sanitization: ${buttons.length}`, 'info');
+                addResult(`📊 Inputs after sanitization: ${inputs.length}`, 'info');
+                addResult(`📊 Elements with data-id: ${dataIds.length}`, 'info');
+
+                if (buttons.length >= 3 && inputs.length >= 4) {
+                    addResult('🎉 Modal sanitization successful!', 'success');
+                } else {
+                    addResult('⚠️ Some modal elements were stripped', 'error');
+                }
+
+            } catch (error) {
+                addResult(`❌ Sanitization error: ${error.message}`, 'error');
+                console.error('Sanitization failed:', error);
+            }
+        };
+
+        window.simulateTriageFlow = async function() {
+            try {
+                addResult('🔄 Simulating complete triage flow...', 'info');
+
+                // Import required modules
+                const { store } = await import('./src/state/store.js');
+                const { handleTriage1 } = await import('./src/logic/handlers.js');
+
+                addResult('✅ Flow modules imported', 'success');
+
+                // Navigate to triage1
+                store.navigate('triage1');
+                addResult('📍 Navigated to triage1', 'info');
+
+                // Simulate clicking "NO - Conscious" (false)
+                addResult('🖱️ Simulating "NO - Conscious" button click...', 'info');
+
+                try {
+                    handleTriage1(false); // This should trigger the prerequisites modal
+                    addResult('✅ handleTriage1(false) executed successfully', 'success');
+                    addResult('🎉 Prerequisites modal should now be displayed!', 'success');
+
+                    // Check if modal was created
+                    setTimeout(() => {
+                        const modal = document.getElementById('prerequisitesModal');
+                        if (modal) {
+                            addResult('✅ Prerequisites modal found in DOM!', 'success');
+                            flowTest.innerHTML = '<h4>Modal successfully created!</h4>';
+                        } else {
+                            addResult('⚠️ Modal not found in DOM', 'error');
+                        }
+                    }, 100);
+
+                } catch (flowError) {
+                    addResult(`❌ Flow error: ${flowError.message}`, 'error');
+                    console.error('Flow execution failed:', flowError);
+                }
+
+            } catch (error) {
+                addResult(`❌ Flow simulation error: ${error.message}`, 'error');
+            }
+        };
+
+        // Run initial tests
+        addResult('🚀 Prerequisites modal fix testing initialized', 'info');
+    </script>
+</body>
+</html>

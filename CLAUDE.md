@@ -37,7 +37,7 @@ git reset --hard ab9622a    # Only if you're sure!
 
 ### Core Structure
 - **PWA** built with Vite, vanilla JavaScript (no framework)
-- **Deployment**: GitHub Pages at `/0825/` subdirectory
+- **Deployment**: GitHub Pages at `/0925/` subdirectory
 - **Three AI Modules**: 
   - Coma Module (GCS < 8)
   - Limited Module (basic data)

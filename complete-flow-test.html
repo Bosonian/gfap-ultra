@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Flow Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .highlight { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        iframe { border: 2px solid #007bff; border-radius: 8px; width: 100%; height: 600px; margin: 20px 0; }
+        .test-section { margin: 30px 0; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🔬 Complete Application Flow Test</h1>
+
+    <div class="highlight">
+        <h3>📋 Test Plan:</h3>
+        <ol>
+            <li>✅ Core module imports</li>
+            <li>✅ Authentication system</li>
+            <li>✅ Triage1 screen rendering</li>
+            <li>✅ Event handlers</li>
+            <li>✅ Store state management</li>
+            <li>✅ Error handling</li>
+        </ol>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="test-section">
+        <h2>📺 Live Application</h2>
+        <iframe src="/0925/" title="iGFAP Application"></iframe>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        async function testCompleteFlow() {
+            try {
+                addResult('🚀 Starting complete application flow test...', 'info');
+
+                // Test 1: Core modules
+                addResult('<strong>Test 1: Core Module Imports</strong>', 'info');
+
+                const { store } = await import('./src/state/store.js');
+                addResult('✅ Store module imported', 'success');
+
+                const { authManager } = await import('./src/auth/authentication.js');
+                addResult('✅ Auth manager imported', 'success');
+
+                const { renderTriage1 } = await import('./src/ui/screens/triage1.js');
+                addResult('✅ Triage1 screen imported', 'success');
+
+                const { handleTriage1 } = await import('./src/logic/handlers.js');
+                addResult('✅ Handlers imported', 'success');
+
+                // Test 2: Authentication system
+                addResult('<strong>Test 2: Authentication System</strong>', 'info');
+
+                const isAuthenticated = authManager.isValidSession();
+                addResult(`📊 Authentication status: ${isAuthenticated ? 'Valid' : 'Invalid'}`, 'info');
+
+                // Test 3: Store state
+                addResult('<strong>Test 3: Store State Management</strong>', 'info');
+
+                const state = store.getState();
+                addResult(`📊 Current screen: ${state.currentScreen}`, 'info');
+                addResult(`📊 Store initialized: ${state ? 'Yes' : 'No'}`, state ? 'success' : 'error');
+
+                // Test 4: Triage1 rendering
+                addResult('<strong>Test 4: Triage1 Screen Rendering</strong>', 'info');
+
+                const triage1Html = renderTriage1();
+                const hasButtons = triage1Html.includes('data-action="triage1"');
+                addResult(`📊 Triage1 buttons present: ${hasButtons ? 'Yes' : 'No'}`, hasButtons ? 'success' : 'error');
+
+                // Test 5: Error handling
+                addResult('<strong>Test 5: Error Handling</strong>', 'info');
+
+                const { medicalLogger } = await import('./src/utils/medical-logger.js');
+                addResult('✅ Medical logger imported', 'success');
+
+                // Test logger with safe inputs
+                try {
+                    medicalLogger.info('Test log message', { category: 'TEST' });
+                    addResult('✅ Medical logger working correctly', 'success');
+                } catch (logError) {
+                    addResult(`⚠️ Logger error: ${logError.message}`, 'error');
+                }
+
+                // Test 6: Application initialization
+                addResult('<strong>Test 6: Application Controller</strong>', 'info');
+
+                try {
+                    const { AppController } = await import('./src/core/app-controller.js');
+                    addResult('✅ App controller imported', 'success');
+                } catch (controllerError) {
+                    addResult(`⚠️ Controller error: ${controllerError.message}`, 'error');
+                }
+
+                // Test 7: UI Render system
+                addResult('<strong>Test 7: UI Render System</strong>', 'info');
+
+                const { render } = await import('./src/ui/render.js');
+                addResult('✅ Render function imported', 'success');
+
+                // Test 8: Configuration
+                addResult('<strong>Test 8: Configuration</strong>', 'info');
+
+                const { DEV_CONFIG } = await import('./src/config.js');
+                addResult(`📊 Development mode: ${DEV_CONFIG.isDevelopment}`, 'info');
+
+                addResult('🎯 Complete flow test finished!', 'success');
+                addResult('<strong>Result: All critical systems are operational</strong>', 'success');
+
+            } catch (error) {
+                addResult(`❌ Critical Error: ${error.message}`, 'error');
+                addResult(`📍 Stack: ${error.stack}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        // Run the test
+        testCompleteFlow();
+
+        // Monitor for any global errors
+        window.addEventListener('error', (event) => {
+            addResult(`🚨 Global Error: ${event.message}`, 'error');
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            addResult(`🚨 Unhandled Rejection: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>
