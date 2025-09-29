@@ -728,7 +728,7 @@ export class OfflineInstallPrompt {
     dismissButton.className = 'dismiss-button';
     dismissButton.textContent = '×';
     dismissButton.addEventListener('click', () => {
-      this.dismissInstallPrompt();
+      this.hideInstallBanner();
     });
 
     bannerActions.appendChild(installButton);
