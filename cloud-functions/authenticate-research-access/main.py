@@ -104,7 +104,7 @@ def authenticate_research_access(request):
 
     # CORS headers for frontend
     headers = {
-        'Access-Control-Allow-Origin': 'https://deepakb-07.github.io',
+        'Access-Control-Allow-Origin': 'https://igfap.eu',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Max-Age': '3600'
