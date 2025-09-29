@@ -34,3 +34,9 @@ coverage/
 # Temporary files
 *.tmp
 *.temp
+
+# Machine learning model files
+*.joblib
+*.pkl
+*.h5
+*.model
