@@ -1,14 +1,14 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/0825/',
+  base: '/0925/',
   plugins: [
     {
       name: 'replace-base-url',
       transformIndexHtml: {
         order: 'post',
         handler(html) {
-          return html.replace(/%BASE_URL%/g, '/0825/');
+          return html.replace(/%BASE_URL%/g, '/0925/');
         }
       }
     }
