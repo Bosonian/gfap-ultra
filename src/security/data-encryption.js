@@ -36,7 +36,7 @@ export class MedicalDataEncryption {
       this.initializeEncryption();
     } else {
       medicalLogger.warn('Web Crypto API not supported, falling back to unencrypted storage', {
-        category: LOG_CATEGORIES.SECURITY
+        category: LOG_CATEGORIES.SECURITY,
       });
     }
   }
@@ -45,10 +45,10 @@ export class MedicalDataEncryption {
    * Check if Web Crypto API is supported
    */
   checkWebCryptoSupport() {
-    return typeof window !== 'undefined' &&
-           window.crypto &&
-           window.crypto.subtle &&
-           typeof window.crypto.subtle.encrypt === 'function';
+    return typeof window !== 'undefined'
+           && window.crypto
+           && window.crypto.subtle
+           && typeof window.crypto.subtle.encrypt === 'function';
   }
 
   /**
@@ -66,21 +66,21 @@ export class MedicalDataEncryption {
             name: 'PBKDF2',
             salt: new TextEncoder().encode('iGFAP-Medical-2024'), // Static salt for session consistency
             iterations: 100000,
-            hash: 'SHA-256'
+            hash: 'SHA-256',
           },
           keyMaterial,
           {
             name: this.algorithm,
-            length: this.keyLength
+            length: this.keyLength,
           },
           false, // Not extractable for security
-          ['encrypt', 'decrypt']
+          ['encrypt', 'decrypt'],
         );
 
         medicalLogger.info('Medical data encryption initialized', {
           category: LOG_CATEGORIES.SECURITY,
           algorithm: this.algorithm,
-          keyLength: this.keyLength
+          keyLength: this.keyLength,
         });
 
         return true;
@@ -88,8 +88,8 @@ export class MedicalDataEncryption {
       {
         category: ERROR_CATEGORIES.SECURITY,
         severity: ERROR_SEVERITY.HIGH,
-        context: { operation: 'encryption_initialization' }
-      }
+        context: { operation: 'encryption_initialization' },
+      },
     );
   }
 
@@ -105,16 +105,16 @@ export class MedicalDataEncryption {
         if (!keyData) {
           // Generate new key material for this session
           const randomBytes = window.crypto.getRandomValues(new Uint8Array(32));
-          keyData = Array.from(randomBytes, byte => byte.toString(16).padStart(2, '0')).join('');
+          keyData = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
           sessionStorage.setItem('_medical_km', keyData);
 
           medicalLogger.debug('Generated new encryption key material', {
-            category: LOG_CATEGORIES.SECURITY
+            category: LOG_CATEGORIES.SECURITY,
           });
         }
 
         // Convert hex string back to Uint8Array
-        const keyBytes = new Uint8Array(keyData.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const keyBytes = new Uint8Array(keyData.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 
         // Import key material
         return await window.crypto.subtle.importKey(
@@ -122,13 +122,13 @@ export class MedicalDataEncryption {
           keyBytes,
           'PBKDF2',
           false,
-          ['deriveKey']
+          ['deriveKey'],
         );
       },
       {
         category: ERROR_CATEGORIES.SECURITY,
-        context: { operation: 'key_material_generation' }
-      }
+        context: { operation: 'key_material_generation' },
+      },
     );
   }
 
@@ -140,7 +140,7 @@ export class MedicalDataEncryption {
   async encryptData(data) {
     if (!this.isSupported || !this.encryptionKey) {
       medicalLogger.warn('Encryption not available, storing data unencrypted', {
-        category: LOG_CATEGORIES.SECURITY
+        category: LOG_CATEGORIES.SECURITY,
       });
       return JSON.stringify(data);
     }
@@ -158,10 +158,10 @@ export class MedicalDataEncryption {
         const encryptedBuffer = await window.crypto.subtle.encrypt(
           {
             name: this.algorithm,
-            iv: iv
+            iv,
           },
           this.encryptionKey,
-          dataBytes
+          dataBytes,
         );
 
         // Convert to base64 for storage
@@ -173,12 +173,12 @@ export class MedicalDataEncryption {
           encrypted: encryptedBase64,
           iv: ivBase64,
           version: this.version,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
         medicalLogger.debug('Data encrypted successfully', {
           category: LOG_CATEGORIES.SECURITY,
-          dataSize: jsonString.length
+          dataSize: jsonString.length,
         });
 
         return JSON.stringify(encryptedData);
@@ -188,12 +188,12 @@ export class MedicalDataEncryption {
         severity: ERROR_SEVERITY.MEDIUM,
         fallback: () => {
           medicalLogger.warn('Encryption failed, storing data unencrypted', {
-            category: LOG_CATEGORIES.SECURITY
+            category: LOG_CATEGORIES.SECURITY,
           });
           return JSON.stringify(data);
         },
-        context: { operation: 'data_encryption' }
-      }
+        context: { operation: 'data_encryption' },
+      },
     );
   }
 
@@ -215,7 +215,7 @@ export class MedicalDataEncryption {
         } catch (parseError) {
           // Might be unencrypted legacy data
           medicalLogger.debug('Data appears to be unencrypted legacy format', {
-            category: LOG_CATEGORIES.SECURITY
+            category: LOG_CATEGORIES.SECURITY,
           });
           return JSON.parse(encryptedDataString);
         }
@@ -228,7 +228,7 @@ export class MedicalDataEncryption {
 
         if (!this.isSupported || !this.encryptionKey) {
           medicalLogger.warn('Cannot decrypt data: encryption not available', {
-            category: LOG_CATEGORIES.SECURITY
+            category: LOG_CATEGORIES.SECURITY,
           });
           return null;
         }
@@ -237,23 +237,23 @@ export class MedicalDataEncryption {
         const encryptedBytes = new Uint8Array(
           atob(encryptedData.encrypted)
             .split('')
-            .map(char => char.charCodeAt(0))
+            .map((char) => char.charCodeAt(0)),
         );
 
         const iv = new Uint8Array(
           atob(encryptedData.iv)
             .split('')
-            .map(char => char.charCodeAt(0))
+            .map((char) => char.charCodeAt(0)),
         );
 
         // Decrypt the data
         const decryptedBuffer = await window.crypto.subtle.decrypt(
           {
             name: this.algorithm,
-            iv: iv
+            iv,
           },
           this.encryptionKey,
-          encryptedBytes
+          encryptedBytes,
         );
 
         // Convert back to string and parse JSON
@@ -262,7 +262,7 @@ export class MedicalDataEncryption {
 
         medicalLogger.debug('Data decrypted successfully', {
           category: LOG_CATEGORIES.SECURITY,
-          dataSize: decryptedString.length
+          dataSize: decryptedString.length,
         });
 
         return decryptedData;
@@ -272,12 +272,12 @@ export class MedicalDataEncryption {
         severity: ERROR_SEVERITY.MEDIUM,
         fallback: () => {
           medicalLogger.warn('Decryption failed, returning null', {
-            category: LOG_CATEGORIES.SECURITY
+            category: LOG_CATEGORIES.SECURITY,
           });
           return null;
         },
-        context: { operation: 'data_decryption' }
-      }
+        context: { operation: 'data_decryption' },
+      },
     );
   }
 
@@ -302,15 +302,15 @@ export class MedicalDataEncryption {
         medicalLogger.debug('Data stored securely', {
           category: LOG_CATEGORIES.SECURITY,
           key: storageKey,
-          storage: useSessionStorage ? 'session' : 'local'
+          storage: useSessionStorage ? 'session' : 'local',
         });
 
         return true;
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'secure_store', key }
-      }
+        context: { operation: 'secure_store', key },
+      },
     );
   }
 
@@ -333,7 +333,7 @@ export class MedicalDataEncryption {
           if (legacyData) {
             medicalLogger.debug('Retrieved legacy unencrypted data', {
               category: LOG_CATEGORIES.SECURITY,
-              key
+              key,
             });
             try {
               return JSON.parse(legacyData);
@@ -351,15 +351,15 @@ export class MedicalDataEncryption {
           category: LOG_CATEGORIES.SECURITY,
           key: storageKey,
           storage: useSessionStorage ? 'session' : 'local',
-          hasData: !!decryptedData
+          hasData: !!decryptedData,
         });
 
         return decryptedData;
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'secure_retrieve', key }
-      }
+        context: { operation: 'secure_retrieve', key },
+      },
     );
   }
 
@@ -381,15 +381,15 @@ export class MedicalDataEncryption {
         medicalLogger.debug('Data removed securely', {
           category: LOG_CATEGORIES.SECURITY,
           key: storageKey,
-          storage: useSessionStorage ? 'session' : 'local'
+          storage: useSessionStorage ? 'session' : 'local',
         });
 
         return true;
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'secure_remove', key }
-      }
+        context: { operation: 'secure_remove', key },
+      },
     );
   }
 
@@ -421,7 +421,7 @@ export class MedicalDataEncryption {
         if (legacyData && !this.isDataEncrypted(legacyData)) {
           medicalLogger.info('Migrating legacy unencrypted data', {
             category: LOG_CATEGORIES.SECURITY,
-            key
+            key,
           });
 
           // Parse legacy data
@@ -440,7 +440,7 @@ export class MedicalDataEncryption {
 
           medicalLogger.info('Legacy data migration completed', {
             category: LOG_CATEGORIES.SECURITY,
-            key
+            key,
           });
 
           return true;
@@ -450,8 +450,8 @@ export class MedicalDataEncryption {
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'migrate_legacy_data', key }
-      }
+        context: { operation: 'migrate_legacy_data', key },
+      },
     );
   }
 
@@ -464,12 +464,12 @@ export class MedicalDataEncryption {
       this.encryptionKey = null;
 
       medicalLogger.info('Encryption keys cleared', {
-        category: LOG_CATEGORIES.SECURITY
+        category: LOG_CATEGORIES.SECURITY,
       });
     } catch (error) {
       medicalLogger.warn('Failed to clear encryption keys', {
         category: LOG_CATEGORIES.SECURITY,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -483,7 +483,7 @@ export class MedicalDataEncryption {
       isInitialized: !!this.encryptionKey,
       algorithm: this.algorithm,
       keyLength: this.keyLength,
-      version: this.version
+      version: this.version,
     };
   }
 }
@@ -492,14 +492,10 @@ export class MedicalDataEncryption {
 export const medicalEncryption = new MedicalDataEncryption();
 
 // Convenience functions
-export const secureStore = (key, data, useSessionStorage = false) =>
-  medicalEncryption.secureStore(key, data, useSessionStorage);
+export const secureStore = (key, data, useSessionStorage = false) => medicalEncryption.secureStore(key, data, useSessionStorage);
 
-export const secureRetrieve = (key, useSessionStorage = false) =>
-  medicalEncryption.secureRetrieve(key, useSessionStorage);
+export const secureRetrieve = (key, useSessionStorage = false) => medicalEncryption.secureRetrieve(key, useSessionStorage);
 
-export const secureRemove = (key, useSessionStorage = false) =>
-  medicalEncryption.secureRemove(key, useSessionStorage);
+export const secureRemove = (key, useSessionStorage = false) => medicalEncryption.secureRemove(key, useSessionStorage);
 
-export const clearEncryptionKeys = () =>
-  medicalEncryption.clearEncryptionKeys();
+export const clearEncryptionKeys = () => medicalEncryption.clearEncryptionKeys();

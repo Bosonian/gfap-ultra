@@ -8,9 +8,9 @@ const isDevelopment = !!(import.meta && import.meta.env && import.meta.env.DEV);
 const MOCK_AUTH_SUCCESS = {
   success: true,
   message: 'Development mode - authentication bypassed',
-  session_token: 'dev-token-' + Date.now(),
+  session_token: `dev-token-${Date.now()}`,
   expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-  session_duration: 1800
+  session_duration: 1800,
 };
 
 // Mock API responses for development (matching real Cloud Function format)
@@ -19,50 +19,50 @@ const MOCK_API_RESPONSES = {
     probability: 25.3,
     ich_probability: 25.3,
     drivers: {
-      "gfap_value": 0.4721,
-      "baseline_risk": 0.1456
+      gfap_value: 0.4721,
+      baseline_risk: 0.1456,
     },
-    confidence: 0.75
+    confidence: 0.75,
   },
   limited_ich: {
     probability: 31.7,
     ich_probability: 31.7,
     drivers: {
-      "age_years": 0.2845,
-      "systolic_bp": 0.1923,
-      "gfap_value": 0.4231,
-      "vigilanzminderung": 0.3456
+      age_years: 0.2845,
+      systolic_bp: 0.1923,
+      gfap_value: 0.4231,
+      vigilanzminderung: 0.3456,
     },
-    confidence: 0.65
+    confidence: 0.65,
   },
   full_stroke: {
     ich_prediction: {
       probability: 28.4,
       drivers: {
-        "age_years": 0.1834,
-        "gfap_value": 0.3921,
-        "systolic_bp": 0.2341,
-        "vigilanzminderung": 0.2876
+        age_years: 0.1834,
+        gfap_value: 0.3921,
+        systolic_bp: 0.2341,
+        vigilanzminderung: 0.2876,
       },
-      confidence: 0.88
+      confidence: 0.88,
     },
     lvo_prediction: {
       probability: 45.2,
       drivers: {
-        "fast_ed_score": 0.7834,
-        "age_years": 0.2341,
-        "eye_deviation": 0.1923
+        fast_ed_score: 0.7834,
+        age_years: 0.2341,
+        eye_deviation: 0.1923,
       },
-      confidence: 0.82
-    }
+      confidence: 0.82,
+    },
   },
   authenticate: {
     success: true,
     message: 'Development mode - authentication bypassed',
-    session_token: 'dev-token-' + Date.now(),
+    session_token: `dev-token-${Date.now()}`,
     expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    session_duration: 1800
-  }
+    session_duration: 1800,
+  },
 };
 
 export const API_URLS = isDevelopment ? {
@@ -84,7 +84,7 @@ export const API_URLS = isDevelopment ? {
 export const DEV_CONFIG = {
   isDevelopment,
   mockAuthResponse: MOCK_AUTH_SUCCESS,
-  mockApiResponses: MOCK_API_RESPONSES
+  mockApiResponses: MOCK_API_RESPONSES,
 };
 
 export const CRITICAL_THRESHOLDS = {

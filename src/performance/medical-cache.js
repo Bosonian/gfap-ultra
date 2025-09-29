@@ -218,7 +218,7 @@ export class MedicalCache {
         });
       }
     } catch (error) {
-      //('Failed to load cache from storage:', error.message);
+      // ('Failed to load cache from storage:', error.message);
     }
   }
 
@@ -245,7 +245,7 @@ export class MedicalCache {
 
       this.storage.setItem('medical_cache', JSON.stringify(cacheData));
     } catch (error) {
-      //('Failed to save cache to storage:', error.message);
+      // ('Failed to save cache to storage:', error.message);
     }
   }
 
@@ -254,7 +254,7 @@ export class MedicalCache {
    */
   async initializeIndexedDB() {
     // IndexedDB implementation for future enhancement
-    //('IndexedDB cache initialization planned for future implementation');
+    // ('IndexedDB cache initialization planned for future implementation');
   }
 
   /**
@@ -300,7 +300,7 @@ export class MedicalCache {
       return true;
     } catch (error) {
       medicalPerformanceMonitor.endMeasurement(metricId, { success: false, error: error.message });
-      //('Cache set error:', error);
+      // ('Cache set error:', error);
       return false;
     }
   }
@@ -339,7 +339,7 @@ export class MedicalCache {
       return entry.value;
     } catch (error) {
       medicalPerformanceMonitor.endMeasurement(metricId, { hit: false, error: error.message });
-      //('Cache get error:', error);
+      // ('Cache get error:', error);
       return null;
     }
   }

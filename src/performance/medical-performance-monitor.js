@@ -206,7 +206,7 @@ export class MedicalPerformanceMonitor {
       // Observe different types of performance entries
       this.performanceObserver.observe({ entryTypes: ['measure', 'navigation', 'resource'] });
     } catch (error) {
-      //('Performance Observer not supported:', error.message);
+      // ('Performance Observer not supported:', error.message);
     }
   }
 
@@ -285,7 +285,7 @@ export class MedicalPerformanceMonitor {
   endMeasurement(metricId, additionalMetadata = {}) {
     const metric = this.activeMetrics.get(metricId);
     if (!metric) {
-      //(`Performance metric ${metricId} not found`);
+      // (`Performance metric ${metricId} not found`);
       return null;
     }
 
@@ -302,7 +302,7 @@ export class MedicalPerformanceMonitor {
         performance.mark(`${metric.name}_end`);
         performance.measure(metric.name, `${metric.name}_start`, `${metric.name}_end`);
       } catch (error) {
-        //('Error creating performance measure:', error.message);
+        // ('Error creating performance measure:', error.message);
       }
     }
 
@@ -360,7 +360,7 @@ export class MedicalPerformanceMonitor {
 
     // Log critical violations
     if (metric.getPerformanceGrade() === 'CRITICAL') {
-      //('CRITICAL PERFORMANCE VIOLATION:', violation);
+      // ('CRITICAL PERFORMANCE VIOLATION:', violation);
     }
   }
 

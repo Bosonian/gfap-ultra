@@ -61,8 +61,8 @@ export class ThemeManager {
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'load_saved_theme' }
-      }
+        context: { operation: 'load_saved_theme' },
+      },
     );
   }
 
@@ -137,14 +137,13 @@ export class ThemeManager {
         this.updateThemeButton();
         return theme;
       },
-      (error) => {
+      (error) =>
         // Theme setting failed, keep current theme
-        return this.currentTheme;
-      },
+        this.currentTheme,
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'set_theme', theme }
-      }
+        context: { operation: 'set_theme', theme },
+      },
     );
   }
 
@@ -192,7 +191,7 @@ export class ThemeManager {
     // Set appropriate theme color
     const themeColors = {
       light: '#ffffff',
-      dark: '#1a1a1a'
+      dark: '#1a1a1a',
     };
 
     metaThemeColor.content = themeColors[theme] || themeColors.light;
@@ -207,8 +206,8 @@ export class ThemeManager {
       const event = new CustomEvent('themeChanged', {
         detail: {
           theme,
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       });
       document.dispatchEvent(event);
     } catch (error) {
@@ -269,7 +268,7 @@ export class ThemeManager {
       currentTheme: this.currentTheme,
       isDarkMode: this.isDarkMode(),
       systemPreferred: this.getSystemPreferredTheme(),
-      hasExplicitPreference: !!localStorage.getItem(this.storageKey)
+      hasExplicitPreference: !!localStorage.getItem(this.storageKey),
     };
   }
 

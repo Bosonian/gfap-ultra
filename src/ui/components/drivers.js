@@ -3,10 +3,10 @@ import { formatDriverName } from '../../utils/label-formatter.js';
 import { normalizeDrivers } from '../../logic/shap.js';
 
 export function renderDriversSection(ich, lvo) {
-  //('=== DRIVER RENDERING SECTION ===');
+  // ('=== DRIVER RENDERING SECTION ===');
 
   if (!ich?.drivers && !lvo?.drivers) {
-    //('❌ No drivers available for rendering');
+    // ('❌ No drivers available for rendering');
     return '';
   }
 
@@ -149,7 +149,7 @@ export function renderDriversPanel(drivers, title, type) {
 
 export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   if (!drivers || Object.keys(drivers).length === 0) {
-    //(`No drivers data for ${title}`);
+    // (`No drivers data for ${title}`);
     return `
       <div class="enhanced-drivers-panel ${type}">
         <div class="panel-header">
@@ -202,10 +202,10 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   );
 
   console.log(`[Drivers] ${type} maxWeight:`, maxWeight);
-  console.log(`[Drivers] ${type} positive:`, positiveDrivers.map(d => `${d.label}: ${d.weight}`));
-  console.log(`[Drivers] ${type} negative:`, negativeDrivers.map(d => `${d.label}: ${d.weight}`));
-  console.log(`[Drivers] ${type} positive weights:`, positiveDrivers.map(d => Math.abs(d.weight)));
-  console.log(`[Drivers] ${type} negative weights:`, negativeDrivers.map(d => Math.abs(d.weight)));
+  console.log(`[Drivers] ${type} positive:`, positiveDrivers.map((d) => `${d.label}: ${d.weight}`));
+  console.log(`[Drivers] ${type} negative:`, negativeDrivers.map((d) => `${d.label}: ${d.weight}`));
+  console.log(`[Drivers] ${type} positive weights:`, positiveDrivers.map((d) => Math.abs(d.weight)));
+  console.log(`[Drivers] ${type} negative weights:`, negativeDrivers.map((d) => Math.abs(d.weight)));
 
   let html = `
     <div class="enhanced-drivers-panel ${type}">

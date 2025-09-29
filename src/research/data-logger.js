@@ -37,10 +37,10 @@ export class ResearchDataLogger {
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(stored));
 
-      //(`📊 Research data logged (${stored.totalComparisons} comparisons)`);
+      // (`📊 Research data logged (${stored.totalComparisons} comparisons)`);
       return true;
     } catch (error) {
-      //('Research data logging failed (non-critical):', error);
+      // ('Research data logging failed (non-critical):', error);
       return false;
     }
   }
@@ -60,13 +60,13 @@ export class ResearchDataLogger {
 
       // Validate structure
       if (!data.entries || !Array.isArray(data.entries)) {
-        //('Invalid research data structure, resetting');
+        // ('Invalid research data structure, resetting');
         return this.createEmptyDataset();
       }
 
       return data;
     } catch (error) {
-      //('Failed to load research data, creating new:', error);
+      // ('Failed to load research data, creating new:', error);
       return this.createEmptyDataset();
     }
   }
@@ -169,10 +169,10 @@ export class ResearchDataLogger {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      //(`📥 Downloaded research data: ${filename}`);
+      // (`📥 Downloaded research data: ${filename}`);
       return true;
     } catch (error) {
-      //('Failed to download research data:', error);
+      // ('Failed to download research data:', error);
       return false;
     }
   }
@@ -183,10 +183,10 @@ export class ResearchDataLogger {
   static clearData() {
     try {
       localStorage.removeItem(this.STORAGE_KEY);
-      //('🗑️ Research data cleared');
+      // ('🗑️ Research data cleared');
       return true;
     } catch (error) {
-      //('Failed to clear research data:', error);
+      // ('Failed to clear research data:', error);
       return false;
     }
   }
@@ -272,7 +272,7 @@ export function safeLogResearchData(mainResults, legacyResults, inputs) {
     ResearchDataLogger.logComparison(comparisonData);
   } catch (error) {
     // Silently fail - never break main app functionality
-    //('Research logging failed (non-critical):', error);
+    // ('Research logging failed (non-critical):', error);
   }
 }
 
@@ -317,10 +317,10 @@ export function setResearchMode(enabled) {
   try {
     if (enabled) {
       localStorage.setItem('research_mode', 'true');
-      //('🔬 Research mode enabled');
+      // ('🔬 Research mode enabled');
     } else {
       localStorage.removeItem('research_mode');
-      //('🔬 Research mode disabled');
+      // ('🔬 Research mode disabled');
     }
 
     // Trigger page refresh to apply changes
@@ -335,7 +335,7 @@ export function setResearchMode(enabled) {
 
     return true;
   } catch (error) {
-    //('Failed to toggle research mode:', error);
+    // ('Failed to toggle research mode:', error);
     return false;
   }
 }

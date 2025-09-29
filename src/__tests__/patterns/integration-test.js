@@ -121,7 +121,7 @@ export class MedicalIntegrationTestHarness {
         }
         this.cleanupMocks();
       } catch (teardownError) {
-        //('Teardown error:', teardownError);
+        // ('Teardown error:', teardownError);
       }
     }
   }

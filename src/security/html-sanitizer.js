@@ -18,50 +18,50 @@ const ALLOWED_TAGS = [
   'table', 'tr', 'td', 'th', 'thead', 'tbody',
   'small', 'sub', 'sup',
   'button', 'input', 'form', 'label', 'select', 'option', 'textarea',
-  'a', 'img', 'canvas', 'svg', 'path', 'circle', 'rect', 'line', 'g'
+  'a', 'img', 'canvas', 'svg', 'path', 'circle', 'rect', 'line', 'g',
 ];
 
 /**
  * Allowed attributes for HTML tags
  */
 const ALLOWED_ATTRIBUTES = {
-  'div': ['class', 'id', 'style', 'data-id', 'data-action', 'data-value', 'data-module', 'data-target'],
-  'span': ['class', 'id', 'style', 'data-id'],
-  'p': ['class', 'style'],
-  'strong': ['class'],
-  'b': ['class'],
-  'em': ['class'],
-  'i': ['class'],
-  'table': ['class'],
-  'tr': ['class'],
-  'td': ['class', 'colspan', 'rowspan'],
-  'th': ['class', 'colspan', 'rowspan'],
-  'ul': ['class'],
-  'ol': ['class'],
-  'li': ['class'],
-  'h1': ['class'],
-  'h2': ['class'],
-  'h3': ['class'],
-  'h4': ['class'],
-  'h5': ['class'],
-  'h6': ['class'],
-  'small': ['class'],
-  'button': ['class', 'id', 'type', 'data-action', 'data-value', 'data-target', 'disabled'],
-  'input': ['class', 'id', 'type', 'name', 'value', 'placeholder', 'required', 'data-module', 'autocomplete', 'readonly', 'checked', 'min', 'max', 'step', 'aria-describedby'],
-  'form': ['class', 'id', 'data-module', 'action', 'method'],
-  'label': ['class', 'for'],
-  'select': ['class', 'id', 'name', 'required'],
-  'option': ['value', 'selected'],
-  'textarea': ['class', 'id', 'name', 'placeholder', 'required', 'rows', 'cols'],
-  'a': ['href', 'target', 'class', 'id'],
-  'img': ['src', 'alt', 'class', 'id', 'width', 'height'],
-  'canvas': ['class', 'id', 'width', 'height'],
-  'svg': ['class', 'id', 'width', 'height', 'viewBox', 'xmlns'],
-  'path': ['d', 'fill', 'stroke', 'stroke-width', 'class'],
-  'circle': ['cx', 'cy', 'r', 'fill', 'stroke', 'stroke-width', 'class'],
-  'rect': ['x', 'y', 'width', 'height', 'fill', 'stroke', 'stroke-width', 'class'],
-  'line': ['x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'class'],
-  'g': ['class', 'transform']
+  div: ['class', 'id', 'style', 'data-id', 'data-action', 'data-value', 'data-module', 'data-target'],
+  span: ['class', 'id', 'style', 'data-id'],
+  p: ['class', 'style'],
+  strong: ['class'],
+  b: ['class'],
+  em: ['class'],
+  i: ['class'],
+  table: ['class'],
+  tr: ['class'],
+  td: ['class', 'colspan', 'rowspan'],
+  th: ['class', 'colspan', 'rowspan'],
+  ul: ['class'],
+  ol: ['class'],
+  li: ['class'],
+  h1: ['class'],
+  h2: ['class'],
+  h3: ['class'],
+  h4: ['class'],
+  h5: ['class'],
+  h6: ['class'],
+  small: ['class'],
+  button: ['class', 'id', 'type', 'data-action', 'data-value', 'data-target', 'disabled'],
+  input: ['class', 'id', 'type', 'name', 'value', 'placeholder', 'required', 'data-module', 'autocomplete', 'readonly', 'checked', 'min', 'max', 'step', 'aria-describedby'],
+  form: ['class', 'id', 'data-module', 'action', 'method'],
+  label: ['class', 'for'],
+  select: ['class', 'id', 'name', 'required'],
+  option: ['value', 'selected'],
+  textarea: ['class', 'id', 'name', 'placeholder', 'required', 'rows', 'cols'],
+  a: ['href', 'target', 'class', 'id'],
+  img: ['src', 'alt', 'class', 'id', 'width', 'height'],
+  canvas: ['class', 'id', 'width', 'height'],
+  svg: ['class', 'id', 'width', 'height', 'viewBox', 'xmlns'],
+  path: ['d', 'fill', 'stroke', 'stroke-width', 'class'],
+  circle: ['cx', 'cy', 'r', 'fill', 'stroke', 'stroke-width', 'class'],
+  rect: ['x', 'y', 'width', 'height', 'fill', 'stroke', 'stroke-width', 'class'],
+  line: ['x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'class'],
+  g: ['class', 'transform'],
 };
 
 /**
@@ -70,7 +70,7 @@ const ALLOWED_ATTRIBUTES = {
 const ALLOWED_STYLES = [
   'color', 'background-color', 'font-size', 'font-weight',
   'text-align', 'margin', 'padding', 'border',
-  'display', 'visibility', 'opacity'
+  'display', 'visibility', 'opacity',
 ];
 
 /**
@@ -119,10 +119,10 @@ function containsXSSPatterns(html) {
     /<object\b/gi,
     /<embed\b/gi,
     /<meta\b/gi,
-    /<link\b(?![^>]*rel=["']manifest)/gi // Allow manifest links
+    /<link\b(?![^>]*rel=["']manifest)/gi, // Allow manifest links
   ];
 
-  return xssPatterns.some(pattern => pattern.test(html));
+  return xssPatterns.some((pattern) => pattern.test(html));
 }
 
 /**
@@ -160,7 +160,7 @@ function sanitizeNode(node, options) {
   }
 
   // Remove flagged nodes
-  nodesToRemove.forEach(nodeToRemove => {
+  nodesToRemove.forEach((nodeToRemove) => {
     node.removeChild(nodeToRemove);
   });
 }
@@ -194,7 +194,7 @@ function sanitizeAttributes(element) {
   }
 
   // Remove disallowed attributes
-  attrsToRemove.forEach(attrName => {
+  attrsToRemove.forEach((attrName) => {
     element.removeAttribute(attrName);
   });
 }
@@ -205,13 +205,15 @@ function sanitizeAttributes(element) {
  * @returns {string} - Sanitized style value
  */
 function sanitizeStyleAttribute(styleValue) {
-  if (!styleValue) return '';
+  if (!styleValue) {
+    return '';
+  }
 
   const styles = styleValue.split(';');
   const sanitizedStyles = [];
 
-  styles.forEach(style => {
-    const [property, value] = style.split(':').map(s => s.trim());
+  styles.forEach((style) => {
+    const [property, value] = style.split(':').map((s) => s.trim());
 
     if (property && value && ALLOWED_STYLES.includes(property.toLowerCase())) {
       // Basic CSS injection prevention
@@ -230,7 +232,9 @@ function sanitizeStyleAttribute(styleValue) {
  * @returns {string} - Escaped text
  */
 function escapeTextContent(text) {
-  if (!text) return '';
+  if (!text) {
+    return '';
+  }
 
   return text
     .replace(/&/g, '&amp;')
@@ -247,7 +251,9 @@ function escapeTextContent(text) {
  * @returns {string} - Escaped value
  */
 function escapeAttributeValue(value) {
-  if (!value) return '';
+  if (!value) {
+    return '';
+  }
 
   return value
     .replace(/&/g, '&amp;')
@@ -292,7 +298,7 @@ export function createSafeHTML(template, data = {}) {
   // Basic template interpolation with escaping
   let html = template;
 
-  Object.keys(data).forEach(key => {
+  Object.keys(data).forEach((key) => {
     const placeholder = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g');
     const value = data[key];
 
@@ -316,7 +322,7 @@ export function createSafeHTML(template, data = {}) {
 export function sanitizeMedicalContent(content) {
   const options = {
     allowMedicalTags: true,
-    preserveFormatting: true
+    preserveFormatting: true,
   };
 
   return sanitizeHTML(content, options);

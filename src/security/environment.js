@@ -107,11 +107,15 @@ class EnvironmentConfig {
         case 'number':
           return value !== null ? Number(value) : defaultValue;
         case 'boolean':
-          if (typeof value === 'boolean') return value;
+          if (typeof value === 'boolean') {
+            return value;
+          }
           return value === 'true' || value === '1' || value === 'yes';
         case 'array':
-          if (Array.isArray(value)) return value;
-          return typeof value === 'string' ? value.split(',').map(s => s.trim()) : defaultValue;
+          if (Array.isArray(value)) {
+            return value;
+          }
+          return typeof value === 'string' ? value.split(',').map((s) => s.trim()) : defaultValue;
         case 'string':
         default:
           return value !== null ? String(value) : defaultValue;
@@ -153,8 +157,8 @@ class EnvironmentConfig {
    * @returns {boolean} True if in development
    */
   isDevelopment() {
-    return this.get('NODE_ENV') === 'development' ||
-           typeof window !== 'undefined' && ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+    return this.get('NODE_ENV') === 'development'
+           || typeof window !== 'undefined' && ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
   }
 
   /**
@@ -213,14 +217,14 @@ class EnvironmentConfig {
       if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
         const array = new Uint8Array(32);
         crypto.getRandomValues(array);
-        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
       }
     } catch (error) {
       console.warn('Failed to generate cryptographically secure key, using fallback');
     }
 
     // Fallback for environments without crypto.getRandomValues
-    return 'fallback-key-' + Date.now() + '-' + Math.random().toString(36).substring(2);
+    return `fallback-key-${Date.now()}-${Math.random().toString(36).substring(2)}`;
   }
 
   /**
@@ -270,7 +274,7 @@ class EnvironmentConfig {
         auditTrail: this.get('ENABLE_AUDIT_TRAIL', true, 'boolean'),
         development: this.isDevelopment(),
         production: this.isProduction(),
-      }
+      },
     };
   }
 
@@ -284,11 +288,11 @@ class EnvironmentConfig {
       'SESSION_TIMEOUT_HOURS', 'BCRYPT_SALT_ROUNDS', 'ENCRYPTION_KEY_LENGTH',
       'MAX_AUTH_ATTEMPTS', 'RATE_LIMIT_WINDOW_MS',
       'ENABLE_DATA_ENCRYPTION', 'ENABLE_AUDIT_TRAIL', 'DATA_RETENTION_DAYS',
-      'GCP_PROJECT_ID', 'GCP_REGION'
+      'GCP_PROJECT_ID', 'GCP_REGION',
     ];
 
     const safeConfig = {};
-    safeKeys.forEach(key => {
+    safeKeys.forEach((key) => {
       safeConfig[key] = this.config[key];
     });
 

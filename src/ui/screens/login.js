@@ -112,7 +112,7 @@ export function initializeLoginScreen() {
         store.navigate('triage1');
       } else {
         // Handle authentication failure
-        let errorMessage = authResult.message;
+        const errorMessage = authResult.message;
 
         showLoginError(errorMessage);
         passwordInput.value = '';

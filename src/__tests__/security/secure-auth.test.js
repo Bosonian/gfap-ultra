@@ -8,23 +8,19 @@ import {
   AuthResult,
   TokenValidationResult,
   AuthenticationError,
-  RateLimitError
+  RateLimitError,
 } from '../../security/secure-auth.js';
 
 // Mock bcryptjs for browser environment
 jest.mock('bcryptjs', () => ({
   hash: jest.fn((password, saltRounds) => Promise.resolve(`hashed_${password}_${saltRounds}`)),
-  compare: jest.fn((password, hash) => {
-    return Promise.resolve(hash === `hashed_${password}_10`);
-  }),
+  compare: jest.fn((password, hash) => Promise.resolve(hash === `hashed_${password}_10`)),
   genSalt: jest.fn(() => Promise.resolve('salt')),
 }));
 
 // Mock jsonwebtoken
 jest.mock('jsonwebtoken', () => ({
-  sign: jest.fn((payload, secret, options) => {
-    return `jwt.${Buffer.from(JSON.stringify(payload)).toString('base64')}.signature`;
-  }),
+  sign: jest.fn((payload, secret, options) => `jwt.${Buffer.from(JSON.stringify(payload)).toString('base64')}.signature`),
   verify: jest.fn((token, secret) => {
     if (token.startsWith('invalid')) {
       throw new Error('Invalid token');
@@ -117,7 +113,7 @@ describe('SecureAuthenticationManager', () => {
       expect(token).toContain(Buffer.from(JSON.stringify({
         userId: 'user123',
         role: 'physician',
-        department: 'neurology'
+        department: 'neurology',
       })).toString('base64'));
     });
 
@@ -183,7 +179,7 @@ describe('SecureAuthenticationManager', () => {
       expect(authManager.isAccountLocked(username)).toBe(true);
       expect(mockAuditLogger.logRateLimitEvent).toHaveBeenCalledWith(
         username,
-        'Account locked due to excessive failed login attempts'
+        'Account locked due to excessive failed login attempts',
       );
     });
 
@@ -243,7 +239,7 @@ describe('SecureAuthenticationManager', () => {
       expect(mockAuditLogger.logAuthenticationAttempt).toHaveBeenCalledWith(
         'physician1',
         true,
-        expect.any(String)
+        expect.any(String),
       );
     });
 
@@ -268,7 +264,7 @@ describe('SecureAuthenticationManager', () => {
       expect(mockAuditLogger.logAuthenticationAttempt).toHaveBeenCalledWith(
         'physician1',
         false,
-        'Invalid password'
+        'Invalid password',
       );
     });
 
@@ -404,7 +400,7 @@ describe('SecureAuthenticationManager', () => {
         event.type,
         event.userId,
         event.ipAddress,
-        event.details
+        event.details,
       );
     });
 
@@ -415,7 +411,7 @@ describe('SecureAuthenticationManager', () => {
         'PASSWORD_CHANGE',
         'physician1',
         '192.168.1.1',
-        'Password changed successfully'
+        'Password changed successfully',
       );
     });
   });

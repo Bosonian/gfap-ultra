@@ -519,7 +519,7 @@ export async function calculateTravelTime(fromLat, fromLng, toLat, toLng, profil
     return {
       duration: estimatedTime,
       distance: Math.round(distance),
-      source: source,
+      source,
     };
   }
 }
@@ -553,7 +553,7 @@ export async function calculateEmergencyTravelTime(fromLat, fromLng, toLat, toLn
 
 // Find nearest stroke centers with travel time calculation
 export async function findNearestStrokeCentersWithTravelTime(lat, lng, maxResults = 5, maxTime = 120, useEmergencyRouting = true) {
-  //('Calculating travel times to stroke centers...');
+  // ('Calculating travel times to stroke centers...');
 
   const centersWithTravelTime = await Promise.all(
     strokeCenters.map(async (center) => {
@@ -569,7 +569,7 @@ export async function findNearestStrokeCentersWithTravelTime(lat, lng, maxResult
           travelSource: travelInfo.source,
         };
       } catch (error) {
-        //(`Failed to calculate travel time to ${center.name}:`, error);
+        // (`Failed to calculate travel time to ${center.name}:`, error);
         // Fallback to distance calculation
         const distance = calculateDistance(lat, lng, center.coordinates.lat, center.coordinates.lng);
         return {

@@ -15,7 +15,7 @@ export const ERROR_SEVERITY = {
   LOW: 'low',
   MEDIUM: 'medium',
   HIGH: 'high',
-  CRITICAL: 'critical'
+  CRITICAL: 'critical',
 };
 
 /**
@@ -29,7 +29,7 @@ export const ERROR_CATEGORIES = {
   STORAGE: 'storage',
   RENDERING: 'rendering',
   MEDICAL: 'medical',
-  SECURITY: 'security'
+  SECURITY: 'security',
 };
 
 /**
@@ -40,7 +40,7 @@ export const MEDICAL_ERROR_CODES = {
   CALCULATION_FAILED: 'MED002',
   DATA_INCOMPLETE: 'MED003',
   PREDICTION_UNAVAILABLE: 'MED004',
-  SAFETY_THRESHOLD_EXCEEDED: 'MED005'
+  SAFETY_THRESHOLD_EXCEEDED: 'MED005',
 };
 
 /**
@@ -119,7 +119,7 @@ class GlobalErrorHandler {
       severity,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent.substring(0, 100),
-      url: window.location.href
+      url: window.location.href,
     };
 
     // Add to queue
@@ -174,8 +174,8 @@ class GlobalErrorHandler {
   getErrorSummary() {
     return {
       totalErrors: this.errorQueue.length,
-      criticalErrors: this.errorQueue.filter(e => e.severity === ERROR_SEVERITY.CRITICAL).length,
-      recentErrors: this.errorQueue.slice(-10)
+      criticalErrors: this.errorQueue.filter((e) => e.severity === ERROR_SEVERITY.CRITICAL).length,
+      recentErrors: this.errorQueue.slice(-10),
     };
   }
 }
@@ -196,7 +196,7 @@ export async function safeAsync(asyncFn, options = {}) {
     fallback = null,
     timeout = 30000,
     retries = 0,
-    context = {}
+    context = {},
   } = options;
 
   let lastError;
@@ -210,7 +210,6 @@ export async function safeAsync(asyncFn, options = {}) {
 
       const result = await Promise.race([asyncFn(), timeoutPromise]);
       return result;
-
     } catch (error) {
       lastError = error;
 
@@ -219,7 +218,7 @@ export async function safeAsync(asyncFn, options = {}) {
 
       // If we have retries left, wait and retry
       if (attempt < retries) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
         continue;
       }
 
@@ -233,7 +232,7 @@ export async function safeAsync(asyncFn, options = {}) {
         error.message || 'Operation failed',
         error.code || 'UNKNOWN',
         category,
-        severity
+        severity,
       ).withContext(context);
 
       throw enhancedError;
@@ -257,15 +256,15 @@ export async function safeMedicalCalculation(calculationFn, inputs, options = {}
       fallback: () => ({
         error: true,
         message: 'Medical calculation unavailable',
-        fallbackUsed: true
+        fallbackUsed: true,
       }),
       context: {
         operation: 'medical_calculation',
         inputKeys: Object.keys(inputs || {}),
-        ...options.context
+        ...options.context,
       },
-      ...options
-    }
+      ...options,
+    },
   );
 }
 
@@ -284,9 +283,9 @@ export async function safeNetworkRequest(requestFn, options = {}) {
     fallback: () => ({
       error: true,
       message: 'Network request failed',
-      offline: true
+      offline: true,
     }),
-    ...options
+    ...options,
   });
 }
 
@@ -304,9 +303,9 @@ export async function safeAuthOperation(authFn, options = {}) {
     fallback: () => ({
       success: false,
       error: true,
-      message: 'Authentication service unavailable'
+      message: 'Authentication service unavailable',
     }),
-    ...options
+    ...options,
   });
 }
 
@@ -340,7 +339,7 @@ export function validateMedicalInputs(data, schema) {
   const errors = [];
   const warnings = [];
 
-  Object.keys(schema).forEach(key => {
+  Object.keys(schema).forEach((key) => {
     const rule = schema[key];
     const value = data[key];
 
@@ -349,7 +348,7 @@ export function validateMedicalInputs(data, schema) {
       errors.push({
         field: key,
         code: MEDICAL_ERROR_CODES.DATA_INCOMPLETE,
-        message: `${key} is required`
+        message: `${key} is required`,
       });
       return;
     }
@@ -363,7 +362,7 @@ export function validateMedicalInputs(data, schema) {
         errors.push({
           field: key,
           code: MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
-          message: `${key} must be a valid number`
+          message: `${key} must be a valid number`,
         });
         return;
       }
@@ -375,7 +374,7 @@ export function validateMedicalInputs(data, schema) {
         errors.push({
           field: key,
           code: MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
-          message: `${key} must be at least ${rule.min}`
+          message: `${key} must be at least ${rule.min}`,
         });
       }
 
@@ -383,7 +382,7 @@ export function validateMedicalInputs(data, schema) {
         errors.push({
           field: key,
           code: MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
-          message: `${key} must not exceed ${rule.max}`
+          message: `${key} must not exceed ${rule.max}`,
         });
       }
 
@@ -391,14 +390,14 @@ export function validateMedicalInputs(data, schema) {
       if (rule.warningMin !== undefined && value < rule.warningMin) {
         warnings.push({
           field: key,
-          message: `${key} is below typical range (${rule.warningMin})`
+          message: `${key} is below typical range (${rule.warningMin})`,
         });
       }
 
       if (rule.warningMax !== undefined && value > rule.warningMax) {
         warnings.push({
           field: key,
-          message: `${key} is above typical range (${rule.warningMax})`
+          message: `${key} is above typical range (${rule.warningMax})`,
         });
       }
     }
@@ -408,7 +407,7 @@ export function validateMedicalInputs(data, schema) {
     isValid: errors.length === 0,
     errors,
     warnings,
-    hasWarnings: warnings.length > 0
+    hasWarnings: warnings.length > 0,
   };
 }
 

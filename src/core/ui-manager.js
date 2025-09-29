@@ -93,7 +93,9 @@ export class UIManager {
    */
   initializeApiModeToggle() {
     const btn = document.getElementById('apiModeToggle');
-    if (!btn) return;
+    if (!btn) {
+      return;
+    }
 
     // Default to mock on localhost preview; API in other cases
     const isLocal = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
@@ -126,7 +128,9 @@ export class UIManager {
   /** Update the button label/title for API mode */
   updateApiModeButton() {
     const btn = document.getElementById('apiModeToggle');
-    if (!btn) return;
+    if (!btn) {
+      return;
+    }
     const useMock = localStorage.getItem('use_mock_api') !== 'false';
     if (useMock) {
       btn.textContent = '🧪';
@@ -218,8 +222,8 @@ export class UIManager {
       },
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'help_modal_setup' }
-      }
+        context: { operation: 'help_modal_setup' },
+      },
     );
   }
 
@@ -252,8 +256,8 @@ export class UIManager {
       },
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'language_toggle' }
-      }
+        context: { operation: 'language_toggle' },
+      },
     );
   }
 
@@ -359,9 +363,15 @@ export class UIManager {
     }
 
     const module = state.results.ich.module.toLowerCase();
-    if (module.includes('coma')) return 'coma';
-    if (module.includes('limited')) return 'limited';
-    if (module.includes('full')) return 'full';
+    if (module.includes('coma')) {
+      return 'coma';
+    }
+    if (module.includes('limited')) {
+      return 'limited';
+    }
+    if (module.includes('full')) {
+      return 'full';
+    }
     return null;
   }
 
@@ -420,8 +430,8 @@ export class UIManager {
       },
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'research_activation_message' }
-      }
+        context: { operation: 'research_activation_message' },
+      },
     );
   }
 
@@ -484,7 +494,7 @@ export class UIManager {
     // Log error without crashing the UI
     try {
       const errorEvent = new CustomEvent('uiError', {
-        detail: { error, context, timestamp: Date.now() }
+        detail: { error, context, timestamp: Date.now() },
       });
       document.dispatchEvent(errorEvent);
     } catch (e) {
@@ -503,10 +513,10 @@ export class UIManager {
           'appContainer',
           'helpModal',
           'languageToggle',
-          'darkModeToggle'
+          'darkModeToggle',
         ];
 
-        const missingElements = criticalElements.filter(id => !document.getElementById(id));
+        const missingElements = criticalElements.filter((id) => !document.getElementById(id));
 
         if (missingElements.length > 0) {
           throw new Error(`Missing critical UI elements: ${missingElements.join(', ')}`);
@@ -514,13 +524,11 @@ export class UIManager {
 
         return true;
       },
-      (error) => {
-        return false;
-      },
+      (error) => false,
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'preload_critical_components' }
-      }
+        context: { operation: 'preload_critical_components' },
+      },
     );
   }
 
@@ -533,7 +541,7 @@ export class UIManager {
       hasContainer: !!this.container,
       eventListenersCount: this.eventListeners.size,
       currentLanguage: i18n.getCurrentLanguage(),
-      isDarkMode: document.body.classList.contains('dark-mode')
+      isDarkMode: document.body.classList.contains('dark-mode'),
     };
   }
 

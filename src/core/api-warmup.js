@@ -11,24 +11,24 @@ const API_ENDPOINTS = {
   comaIch: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich',
   limitedIch: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich',
   fullStroke: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke',
-  lvo: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo'
+  lvo: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo',
 };
 
 // Lightweight test payloads to warm up APIs
 const WARMUP_PAYLOADS = {
   authentication: {
     action: 'validate_session',
-    session_token: 'warmup-test-token'
+    session_token: 'warmup-test-token',
   },
   comaIch: {
-    gfap_value: 100
+    gfap_value: 100,
   },
   limitedIch: {
     age_years: 65,
     systolic_bp: 140,
     diastolic_bp: 80,
     gfap_value: 100,
-    vigilanzminderung: 0
+    vigilanzminderung: 0,
   },
   fullStroke: {
     age_years: 65,
@@ -43,12 +43,12 @@ const WARMUP_PAYLOADS = {
     eye_deviation: 0,
     atrial_fibrillation: 0,
     anticoagulated_noak: 0,
-    antiplatelets: 0
+    antiplatelets: 0,
   },
   lvo: {
     gfap_value: 100,
-    fast_ed_score: 4
-  }
+    fast_ed_score: 4,
+  },
 };
 
 class APIWarmupService {
@@ -77,7 +77,7 @@ class APIWarmupService {
 
     medicalLogger.info('Starting API warmup process', {
       category: 'WARMUP',
-      endpoints: Object.keys(API_ENDPOINTS).length
+      endpoints: Object.keys(API_ENDPOINTS).length,
     });
 
     const warmupPromises = Object.entries(API_ENDPOINTS).map(async ([name, url]) => {
@@ -93,7 +93,7 @@ class APIWarmupService {
           success: false,
           error: error.message,
           duration: 0,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
         this.warmupResults[name] = errorResult;
         return errorResult;
@@ -107,18 +107,17 @@ class APIWarmupService {
       }).catch((error) => {
         medicalLogger.error('Background API warmup failed', {
           category: 'WARMUP',
-          error: error.message
+          error: error.message,
         });
         this.isWarming = false;
       });
 
       return { status: 'warming', message: 'APIs warming up in background' };
-    } else {
-      // Wait for all warmups to complete
-      await Promise.all(warmupPromises);
-      this.completeWarmup();
-      return this.warmupResults;
     }
+    // Wait for all warmups to complete
+    await Promise.all(warmupPromises);
+    this.completeWarmup();
+    return this.warmupResults;
   }
 
   /**
@@ -139,10 +138,10 @@ class APIWarmupService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'iGFAP-Warmup/2.1.0'
+          'User-Agent': 'iGFAP-Warmup/2.1.0',
         },
         body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(10000) // 10 second timeout
+        signal: AbortSignal.timeout(10000), // 10 second timeout
       });
 
       const duration = Date.now() - startTime;
@@ -154,17 +153,16 @@ class APIWarmupService {
         status: response.status,
         duration,
         message: `${name} API warmed up`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       medicalLogger.info(`Successfully warmed up ${name} API`, {
         category: 'WARMUP',
         duration,
-        status: response.status
+        status: response.status,
       });
 
       return result;
-
     } catch (error) {
       const duration = Date.now() - startTime;
 
@@ -172,7 +170,7 @@ class APIWarmupService {
       if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
         medicalLogger.info(`${name} API warmup encountered CORS (expected), function still warmed`, {
           category: 'WARMUP',
-          duration
+          duration,
         });
 
         return {
@@ -180,21 +178,21 @@ class APIWarmupService {
           status: 'cors-blocked',
           duration,
           message: `${name} API warmed (CORS blocked but function activated)`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
 
       medicalLogger.warn(`Failed to warm up ${name} API`, {
         category: 'WARMUP',
         error: error.message,
-        duration
+        duration,
       });
 
       return {
         success: false,
         error: error.message,
         duration,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -209,18 +207,18 @@ class APIWarmupService {
       total: this.warmupAttempts,
       successful: this.successfulWarmups,
       failed: this.warmupAttempts - this.successfulWarmups,
-      results: this.warmupResults
+      results: this.warmupResults,
     };
 
     medicalLogger.info('API warmup process completed', {
       category: 'WARMUP',
-      summary
+      summary,
     });
 
     // Dispatch custom event for UI feedback
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('api-warmup-complete', {
-        detail: summary
+        detail: summary,
       }));
     }
   }
@@ -234,7 +232,7 @@ class APIWarmupService {
       isWarming: this.isWarming,
       attempts: this.warmupAttempts,
       successful: this.successfulWarmups,
-      results: this.warmupResults
+      results: this.warmupResults,
     };
   }
 
@@ -247,7 +245,7 @@ class APIWarmupService {
 
     medicalLogger.info('Starting critical API warmup', {
       category: 'WARMUP',
-      apis: criticalAPIs
+      apis: criticalAPIs,
     });
 
     const results = {};
@@ -257,14 +255,14 @@ class APIWarmupService {
         results[apiName] = await this.warmupSingleAPI(
           apiName,
           API_ENDPOINTS[apiName],
-          WARMUP_PAYLOADS[apiName]
+          WARMUP_PAYLOADS[apiName],
         );
       }
     }
 
     medicalLogger.info('Critical API warmup completed', {
       category: 'WARMUP',
-      results
+      results,
     });
 
     return results;
@@ -287,13 +285,12 @@ export async function initializeAPIWarmup(options = {}) {
   try {
     if (criticalOnly) {
       return await apiWarmupService.warmupCriticalAPIs();
-    } else {
-      return await apiWarmupService.warmupAllAPIs(background);
     }
+    return await apiWarmupService.warmupAllAPIs(background);
   } catch (error) {
     medicalLogger.error('API warmup initialization failed', {
       category: 'WARMUP',
-      error: error.message
+      error: error.message,
     });
     return { error: error.message };
   }
@@ -312,13 +309,13 @@ export async function warmupSpecificAPIs(apiNames) {
       results[apiName] = await apiWarmupService.warmupSingleAPI(
         apiName,
         API_ENDPOINTS[apiName],
-        WARMUP_PAYLOADS[apiName]
+        WARMUP_PAYLOADS[apiName],
       );
     } else {
       results[apiName] = {
         success: false,
         error: `Unknown API: ${apiName}`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }

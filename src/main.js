@@ -31,10 +31,10 @@ async function initializeApplication() {
       // Start API warmup in background to prevent cold starts
       setTimeout(() => {
         initializeAPIWarmup({ background: true, criticalOnly: false })
-          .then(result => {
+          .then((result) => {
             console.info('[Main] API warmup started:', result.status || 'completed');
           })
-          .catch(error => {
+          .catch((error) => {
             console.warn('[Main] API warmup failed:', error.message);
           });
       }, 2000); // Start warmup 2 seconds after app initialization
@@ -46,8 +46,8 @@ async function initializeApplication() {
           timestamp: new Date().toISOString(),
           status,
           version: '2.1.0',
-          build: 'production'
-        }
+          build: 'production',
+        },
       });
       document.dispatchEvent(startupEvent);
 
@@ -64,9 +64,9 @@ async function initializeApplication() {
       timeout: 30000,
       context: {
         operation: 'application_initialization',
-        version: '2.1.0'
-      }
-    }
+        version: '2.1.0',
+      },
+    },
   );
 }
 
@@ -146,8 +146,8 @@ function handleInitializationFailure(error) {
     detail: {
       error: error.message,
       timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent.substring(0, 100)
-    }
+      userAgent: navigator.userAgent.substring(0, 100),
+    },
   });
   document.dispatchEvent(errorEvent);
 }
@@ -192,14 +192,18 @@ async function main() {
   try {
     // In local preview, make sure no service worker is controlling (avoids stale assets)
     try {
-      const isLocalPreview = ['localhost','127.0.0.1','0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+      const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
       if (isLocalPreview && 'serviceWorker' in navigator) {
         const regs = await navigator.serviceWorker.getRegistrations();
         for (const reg of regs) {
-          try { await reg.unregister(); } catch {}
+          try {
+            await reg.unregister();
+          } catch {}
         }
         // Also clear any pending beforeinstallprompt side-effects
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); });
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+        });
       }
     } catch {}
 
@@ -213,11 +217,10 @@ async function main() {
     const event = new CustomEvent('appReady', {
       detail: {
         timestamp: new Date().toISOString(),
-        version: '2.1.0'
-      }
+        version: '2.1.0',
+      },
     });
     document.dispatchEvent(event);
-
   } catch (error) {
     // Main initialization failed - already handled by handleInitializationFailure
   }
@@ -247,16 +250,24 @@ if (typeof window !== 'undefined') {
     },
     // Debug helpers
     getCurrentScreen: () => {
-      try { return store.getState().currentScreen; } catch { return 'unknown'; }
+      try {
+        return store.getState().currentScreen;
+      } catch {
+        return 'unknown';
+      }
     },
     forceResults: () => {
       try {
         store.navigate('results');
         const container = document.getElementById('appContainer');
-        if (container) render(container);
+        if (container) {
+          render(container);
+        }
         return true;
-      } catch { return false; }
-    }
+      } catch {
+        return false;
+      }
+    },
   };
 }
 

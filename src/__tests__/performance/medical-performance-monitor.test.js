@@ -8,7 +8,7 @@ import {
   PerformanceMetricType,
   PerformanceThreshold,
   PerformanceAlert,
-  MedicalPerformanceReport
+  MedicalPerformanceReport,
 } from '../../performance/medical-performance-monitor.js';
 
 // Mock Performance API
@@ -79,7 +79,7 @@ describe('MedicalPerformanceMonitor', () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'api-call-test',
         PerformanceMetricType.API_CALL,
-        { endpoint: '/predict', method: 'POST' }
+        { endpoint: '/predict', method: 'POST' },
       );
 
       expect(metricId).toBeDefined();
@@ -97,7 +97,7 @@ describe('MedicalPerformanceMonitor', () => {
     test('should end measurement and calculate duration', () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'duration-test',
-        PerformanceMetricType.PREDICTION
+        PerformanceMetricType.PREDICTION,
       );
 
       // Mock some time passing
@@ -152,7 +152,7 @@ describe('MedicalPerformanceMonitor', () => {
     test('should check API call thresholds', () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'slow-api-call',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
 
       // Mock slow response (6 seconds)
@@ -166,7 +166,7 @@ describe('MedicalPerformanceMonitor', () => {
     test('should check prediction thresholds', () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'slow-prediction',
-        PerformanceMetricType.PREDICTION
+        PerformanceMetricType.PREDICTION,
       );
 
       // Mock slow prediction (3.5 seconds)
@@ -180,7 +180,7 @@ describe('MedicalPerformanceMonitor', () => {
     test('should not violate thresholds for fast operations', () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'fast-api-call',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
 
       // Mock fast response (1 second)
@@ -200,7 +200,7 @@ describe('MedicalPerformanceMonitor', () => {
 
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'slow-operation',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
 
       performance.now.mockReturnValue(performance.now() + 6000);
@@ -217,7 +217,7 @@ describe('MedicalPerformanceMonitor', () => {
     test('should track alert history', () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'alert-test',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
 
       performance.now.mockReturnValue(performance.now() + 6000);
@@ -236,7 +236,7 @@ describe('MedicalPerformanceMonitor', () => {
       for (let i = 0; i < 5; i++) {
         const metricId = medicalPerformanceMonitor.startMeasurement(
           `test-${i}`,
-          PerformanceMetricType.API_CALL
+          PerformanceMetricType.API_CALL,
         );
 
         performance.now.mockReturnValue(performance.now() + (i + 1) * 1000);
@@ -258,7 +258,7 @@ describe('MedicalPerformanceMonitor', () => {
       // Create API call measurement
       const apiMetricId = medicalPerformanceMonitor.startMeasurement(
         'api-test',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 2000);
       medicalPerformanceMonitor.endMeasurement(apiMetricId);
@@ -266,7 +266,7 @@ describe('MedicalPerformanceMonitor', () => {
       // Create prediction measurement
       const predMetricId = medicalPerformanceMonitor.startMeasurement(
         'pred-test',
-        PerformanceMetricType.PREDICTION
+        PerformanceMetricType.PREDICTION,
       );
       performance.now.mockReturnValue(performance.now() + 3000);
       medicalPerformanceMonitor.endMeasurement(predMetricId);
@@ -283,7 +283,7 @@ describe('MedicalPerformanceMonitor', () => {
       // Create measurements that meet SLA
       const fastMetricId = medicalPerformanceMonitor.startMeasurement(
         'fast-api',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 1000);
       medicalPerformanceMonitor.endMeasurement(fastMetricId);
@@ -291,7 +291,7 @@ describe('MedicalPerformanceMonitor', () => {
       // Create measurements that violate SLA
       const slowMetricId = medicalPerformanceMonitor.startMeasurement(
         'slow-api',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 6000);
       medicalPerformanceMonitor.endMeasurement(slowMetricId);
@@ -311,7 +311,7 @@ describe('MedicalPerformanceMonitor', () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'report-test',
         PerformanceMetricType.API_CALL,
-        { endpoint: '/predict' }
+        { endpoint: '/predict' },
       );
       performance.now.mockReturnValue(performance.now() + 2000);
       medicalPerformanceMonitor.endMeasurement(metricId);
@@ -330,7 +330,7 @@ describe('MedicalPerformanceMonitor', () => {
       // Create slow API call to trigger recommendations
       const metricId = medicalPerformanceMonitor.startMeasurement(
         'slow-recommendation-test',
-        PerformanceMetricType.API_CALL
+        PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 6000);
       medicalPerformanceMonitor.endMeasurement(metricId);
@@ -348,7 +348,7 @@ describe('MedicalPerformanceMonitor', () => {
       for (let i = 0; i < 1100; i++) {
         const metricId = medicalPerformanceMonitor.startMeasurement(
           `cleanup-test-${i}`,
-          PerformanceMetricType.CACHE
+          PerformanceMetricType.CACHE,
         );
         medicalPerformanceMonitor.endMeasurement(metricId);
       }
@@ -432,7 +432,7 @@ describe('MedicalPerformanceMonitor', () => {
       const validationId = medicalPerformanceMonitor.startMeasurement(
         `${workflowId}-validation`,
         PerformanceMetricType.VALIDATION,
-        { patientId: 'P123', module: 'coma' }
+        { patientId: 'P123', module: 'coma' },
       );
       performance.now.mockReturnValue(performance.now() + 100);
       medicalPerformanceMonitor.endMeasurement(validationId);
@@ -441,7 +441,7 @@ describe('MedicalPerformanceMonitor', () => {
       const apiId = medicalPerformanceMonitor.startMeasurement(
         `${workflowId}-api`,
         PerformanceMetricType.API_CALL,
-        { endpoint: '/predict_coma_ich' }
+        { endpoint: '/predict_coma_ich' },
       );
       performance.now.mockReturnValue(performance.now() + 2000);
       medicalPerformanceMonitor.endMeasurement(apiId);
@@ -450,7 +450,7 @@ describe('MedicalPerformanceMonitor', () => {
       const predictionId = medicalPerformanceMonitor.startMeasurement(
         `${workflowId}-prediction`,
         PerformanceMetricType.PREDICTION,
-        { algorithm: 'coma_ich_model' }
+        { algorithm: 'coma_ich_model' },
       );
       performance.now.mockReturnValue(performance.now() + 1500);
       medicalPerformanceMonitor.endMeasurement(predictionId);

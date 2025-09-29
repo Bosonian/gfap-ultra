@@ -5,9 +5,9 @@ import {
 import { t } from '../localization/i18n.js';
 import { showPrerequisitesModal } from '../ui/components/prerequisites-modal.js';
 import { safeSetInnerHTML } from '../security/html-sanitizer.js';
+import { DEV_CONFIG } from '../config.js';
 
 import { validateForm, showValidationErrors } from './validate.js';
-import { DEV_CONFIG } from '../config.js';
 
 export function handleTriage1(isComatose) {
   store.logEvent('triage1_answer', { comatose: isComatose });
@@ -143,7 +143,7 @@ export async function handleSubmit(e, container) {
         results = {
           ich: {
             ...comaResult,
-            module: 'Coma'
+            module: 'Coma',
           },
           lvo: null,
         };
@@ -154,7 +154,7 @@ export async function handleSubmit(e, container) {
         results = {
           ich: {
             ...limitedResult,
-            module: 'Limited'
+            module: 'Limited',
           },
           lvo: { notPossible: true },
         };
@@ -166,7 +166,7 @@ export async function handleSubmit(e, container) {
           ich: !!results?.ich,
           lvo: !!results?.lvo,
           ichP: results?.ich?.probability,
-          lvoP: results?.lvo?.probability
+          lvoP: results?.lvo?.probability,
         });
         // Validate results structure
         if (!results || !results.ich) {
@@ -198,7 +198,7 @@ export async function handleSubmit(e, container) {
     const storedState = store.getState();
     console.log('[Submit] State after setResults:', {
       hasResults: !!storedState.results,
-      currentScreen: storedState.currentScreen
+      currentScreen: storedState.currentScreen,
     });
 
     console.log('[Submit] Navigating to results...');
@@ -231,14 +231,14 @@ export async function handleSubmit(e, container) {
             probability: pIch > 1 ? pIch / 100 : pIch,
             drivers: ich.drivers || null,
             confidence: parseFloat(ich.confidence) || 0.85,
-            module: 'Full Stroke'
+            module: 'Full Stroke',
           },
           lvo: {
             probability: pLvo > 1 ? pLvo / 100 : pLvo,
             drivers: lvo.drivers || null,
             confidence: parseFloat(lvo.confidence) || 0.85,
-            module: 'Full Stroke'
-          }
+            module: 'Full Stroke',
+          },
         };
         store.setResults(fallbackResults);
         store.logEvent('models_complete_fallback', { module, reason: error.message });
@@ -327,7 +327,9 @@ function showToast(message, duration = 2000) {
       transition: opacity 160ms ease;
     `;
     document.body.appendChild(toast);
-    requestAnimationFrame(() => { toast.style.opacity = '1'; });
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+    });
     setTimeout(() => {
       toast.style.opacity = '0';
       setTimeout(() => toast.remove(), 200);

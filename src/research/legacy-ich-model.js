@@ -59,7 +59,7 @@ export class LegacyICHModel {
     }
 
     if (gfapValue < 10 || gfapValue > 20000) {
-      //(`GFAP ${gfapValue} outside typical range (10-20000 pg/ml)`);
+      // (`GFAP ${gfapValue} outside typical range (10-20000 pg/ml)`);
     }
 
     try {
@@ -97,7 +97,7 @@ export class LegacyICHModel {
         calculationMethod: 'logistic_regression_age_gfap',
       };
     } catch (error) {
-      //('Legacy model calculation error:', error);
+      // ('Legacy model calculation error:', error);
       return {
         probability: 0,
         confidence: 0,
@@ -342,7 +342,7 @@ export function calculateLegacyICH(patientData) {
 
     return LegacyICHModel.calculateProbability(age, gfap);
   } catch (error) {
-    //('Legacy ICH calculation failed (non-critical):', error);
+    // ('Legacy ICH calculation failed (non-critical):', error);
     return null;
   }
 }
@@ -351,15 +351,15 @@ export function calculateLegacyICH(patientData) {
  * Export test function for validation
  */
 export function testLegacyModel() {
-  //('🧪 Legacy ICH Model Validation Tests');
+  // ('🧪 Legacy ICH Model Validation Tests');
   const testResults = LegacyICHModel.runValidationTests();
 
-  //(`✅ Passed: ${testResults.summary.passed}/${testResults.summary.total} tests`);
-  //(`📊 Pass Rate: ${testResults.summary.passRate}%`);
+  // (`✅ Passed: ${testResults.summary.passed}/${testResults.summary.total} tests`);
+  // (`📊 Pass Rate: ${testResults.summary.passRate}%`);
 
   testResults.details.forEach((test) => {
     const icon = test.passed ? '✅' : '❌';
-    //(`${icon} ${test.description}: ${test.result.probability.toFixed(1)}% (${test.result.riskCategory.level})`);
+    // (`${icon} ${test.description}: ${test.result.probability.toFixed(1)}% (${test.result.riskCategory.level})`);
   });
 
   return testResults;

@@ -239,7 +239,7 @@ export class MedicalServiceContainer {
         try {
           instance.dispose();
         } catch (error) {
-          //(`Error disposing scoped service: ${error.message}`);
+          // (`Error disposing scoped service: ${error.message}`);
         }
       }
       this.scopes.delete(key);
@@ -323,7 +323,7 @@ export class MedicalServiceContainer {
         try {
           registration.instance.dispose();
         } catch (error) {
-          //(`Error disposing service: ${error.message}`);
+          // (`Error disposing service: ${error.message}`);
         }
       }
     });

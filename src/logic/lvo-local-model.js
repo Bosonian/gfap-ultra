@@ -104,9 +104,9 @@ export function predictLVO(gfapValue, fastEdScore) {
     const _0x3Scaled = _0xTransforms._0x7e2d(fastEdScore, _0xParams[_0xKeys.fastMean], _0xParams[_0xKeys.fastScale]);
 
     // Step 3: Obfuscated logit calculation
-    const _0xLogitUncal = _0xParams[_0xKeys.intercept] +
-                          (_0xParams[_0xKeys.gfapCoef] * _0x2Scaled) +
-                          (_0xParams[_0xKeys.fastCoef] * _0x3Scaled);
+    const _0xLogitUncal = _0xParams[_0xKeys.intercept]
+                          + (_0xParams[_0xKeys.gfapCoef] * _0x2Scaled)
+                          + (_0xParams[_0xKeys.fastCoef] * _0x3Scaled);
 
     // Step 4: Obfuscated calibration and sigmoid
     const _0xLogitCal = (_0xParams[_0xKeys.calA] * _0xLogitUncal) + _0xParams[_0xKeys.calB];
@@ -186,8 +186,8 @@ export function predictLVO(gfapValue, fastEdScore) {
         logitUncalibrated,
         logitCalibrated,
         gfapContribution,
-        fastEdContribution
-      }
+        fastEdContribution,
+      },
     };
   } catch (error) {
     return {

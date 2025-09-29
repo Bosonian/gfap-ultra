@@ -13,7 +13,9 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { getResearchPassword, getSessionConfig, getSecurityConfig, isDevelopment } from './environment.js';
+import {
+  getResearchPassword, getSessionConfig, getSecurityConfig, isDevelopment,
+} from './environment.js';
 
 // Mock bcrypt implementation for browser environment
 const mockBcrypt = {
@@ -72,19 +74,18 @@ const mockBcrypt = {
       const data = encoder.encode(password + salt);
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 31);
-    } else {
-      // Fallback hash for environments without WebCrypto
-      let hash = 0;
-      const str = password + salt;
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32bit integer
-      }
-      return Math.abs(hash).toString(16).padStart(31, '0').substring(0, 31);
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').substring(0, 31);
     }
-  }
+    // Fallback hash for environments without WebCrypto
+    let hash = 0;
+    const str = password + salt;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash &= hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString(16).padStart(31, '0').substring(0, 31);
+  },
 };
 
 // Mock JWT implementation for browser environment
@@ -96,7 +97,7 @@ const mockJwt = {
     const jwtPayload = {
       ...payload,
       iat: now,
-      exp: now + (options.expiresIn || 3600) // Default 1 hour
+      exp: now + (options.expiresIn || 3600), // Default 1 hour
     };
 
     const encodedHeader = this.base64UrlEncode(JSON.stringify(header));
@@ -154,23 +155,22 @@ const mockJwt = {
         encoder.encode(secret),
         { name: 'HMAC', hash: 'SHA-256' },
         false,
-        ['sign']
+        ['sign'],
       );
       const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
       const hashArray = Array.from(new Uint8Array(signature));
       return this.base64UrlEncode(String.fromCharCode.apply(null, hashArray));
-    } else {
-      // Fallback signature for environments without WebCrypto
-      let hash = 0;
-      const str = data + secret;
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-      }
-      return this.base64UrlEncode(Math.abs(hash).toString(16));
     }
-  }
+    // Fallback signature for environments without WebCrypto
+    let hash = 0;
+    const str = data + secret;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash &= hash;
+    }
+    return this.base64UrlEncode(Math.abs(hash).toString(16));
+  },
 };
 
 export class SecureAuthenticationManager {
@@ -213,7 +213,7 @@ export class SecureAuthenticationManager {
         this.logAuditEvent('auth', 'AUTH_BLOCKED_IP', {
           clientIp,
           blockExpiresAt: blockInfo.expiresAt,
-          attemptCount: blockInfo.attemptCount
+          attemptCount: blockInfo.attemptCount,
         });
 
         throw new Error(`IP temporarily blocked. Try again after ${new Date(blockInfo.expiresAt).toLocaleString()}`);
@@ -246,7 +246,7 @@ export class SecureAuthenticationManager {
           clientIp,
           reason: 'invalid_password',
           attemptCount: this.getFailedAttemptCount(clientIp),
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         });
 
         // Add delay to prevent timing attacks
@@ -259,13 +259,13 @@ export class SecureAuthenticationManager {
         sub: 'research_user',
         role: 'researcher',
         permissions: ['read_data', 'analyze_results'],
-        clientIp: isDevelopment() ? clientIp : 'masked'
+        clientIp: isDevelopment() ? clientIp : 'masked',
       };
 
       const token = mockJwt.sign(
         tokenPayload,
         this.sessionConfig.secretKey,
-        { expiresIn: this.sessionConfig.timeoutHours * 3600 }
+        { expiresIn: this.sessionConfig.timeoutHours * 3600 },
       );
 
       // Clear failed attempts on successful authentication
@@ -276,29 +276,28 @@ export class SecureAuthenticationManager {
         token,
         expiresIn: this.sessionConfig.timeoutHours * 3600,
         permissions: tokenPayload.permissions,
-        sessionId: this.generateSessionId()
+        sessionId: this.generateSessionId(),
       };
 
       this.logAuditEvent('auth', 'AUTH_SUCCESS', {
         clientIp,
         sessionId: authResult.sessionId,
         duration: Date.now() - startTime,
-        tokenExpiry: new Date(Date.now() + authResult.expiresIn * 1000).toISOString()
+        tokenExpiry: new Date(Date.now() + authResult.expiresIn * 1000).toISOString(),
       });
 
       return authResult;
-
     } catch (error) {
       this.logAuditEvent('auth', 'AUTH_ERROR', {
         clientIp,
         error: error.message,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
 
       return {
         success: false,
         error: error.message,
-        retryAfter: this.getRetryAfter(clientIp)
+        retryAfter: this.getRetryAfter(clientIp),
       };
     }
   }
@@ -315,23 +314,23 @@ export class SecureAuthenticationManager {
       this.logAuditEvent('auth', 'TOKEN_VERIFIED', {
         sub: payload.sub,
         sessionId: payload.sessionId || 'unknown',
-        expiresAt: new Date(payload.exp * 1000).toISOString()
+        expiresAt: new Date(payload.exp * 1000).toISOString(),
       });
 
       return {
         valid: true,
         payload,
-        expiresAt: new Date(payload.exp * 1000)
+        expiresAt: new Date(payload.exp * 1000),
       };
     } catch (error) {
       this.logAuditEvent('auth', 'TOKEN_INVALID', {
         error: error.message,
-        tokenPrefix: token ? token.substring(0, 20) + '...' : 'null'
+        tokenPrefix: token ? `${token.substring(0, 20)}...` : 'null',
       });
 
       return {
         valid: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -377,14 +376,14 @@ export class SecureAuthenticationManager {
     this.blockedIPs.set(clientIp, {
       expiresAt: Date.now() + blockDuration,
       attemptCount: attempts.count,
-      blockedAt: Date.now()
+      blockedAt: Date.now(),
     });
 
     this.logAuditEvent('security', 'IP_BLOCKED', {
       clientIp,
       blockDuration,
       attemptCount: attempts.count,
-      expiresAt: new Date(Date.now() + blockDuration).toISOString()
+      expiresAt: new Date(Date.now() + blockDuration).toISOString(),
     });
   }
 
@@ -395,7 +394,9 @@ export class SecureAuthenticationManager {
    */
   isIpBlocked(clientIp) {
     const blockInfo = this.blockedIPs.get(clientIp);
-    if (!blockInfo) return false;
+    if (!blockInfo) {
+      return false;
+    }
 
     if (Date.now() > blockInfo.expiresAt) {
       this.blockedIPs.delete(clientIp);
@@ -425,7 +426,7 @@ export class SecureAuthenticationManager {
   generateSessionId() {
     const timestamp = Date.now().toString(36);
     const randomBytes = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-      .map(b => b.toString(16).padStart(2, '0'))
+      .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
     return `${timestamp}-${randomBytes}`;
   }
@@ -436,7 +437,7 @@ export class SecureAuthenticationManager {
    */
   async secureDelay() {
     const delay = 100 + Math.random() * 200; // 100-300ms random delay
-    return new Promise(resolve => setTimeout(resolve, delay));
+    return new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   /**
@@ -453,8 +454,8 @@ export class SecureAuthenticationManager {
       details: {
         ...details,
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
-        environment: isDevelopment() ? 'development' : 'production'
-      }
+        environment: isDevelopment() ? 'development' : 'production',
+      },
     };
 
     this.auditLog.push(auditEntry);
@@ -479,19 +480,19 @@ export class SecureAuthenticationManager {
     let filteredLog = [...this.auditLog];
 
     if (filters.category) {
-      filteredLog = filteredLog.filter(entry => entry.category === filters.category);
+      filteredLog = filteredLog.filter((entry) => entry.category === filters.category);
     }
 
     if (filters.action) {
-      filteredLog = filteredLog.filter(entry => entry.action === filters.action);
+      filteredLog = filteredLog.filter((entry) => entry.action === filters.action);
     }
 
     if (filters.startDate) {
-      filteredLog = filteredLog.filter(entry => new Date(entry.timestamp) >= new Date(filters.startDate));
+      filteredLog = filteredLog.filter((entry) => new Date(entry.timestamp) >= new Date(filters.startDate));
     }
 
     if (filters.endDate) {
-      filteredLog = filteredLog.filter(entry => new Date(entry.timestamp) <= new Date(filters.endDate));
+      filteredLog = filteredLog.filter((entry) => new Date(entry.timestamp) <= new Date(filters.endDate));
     }
 
     return filteredLog;
@@ -506,28 +507,24 @@ export class SecureAuthenticationManager {
     const last24Hours = now - (24 * 60 * 60 * 1000);
     const lastHour = now - (60 * 60 * 1000);
 
-    const recent24h = this.auditLog.filter(entry =>
-      new Date(entry.timestamp).getTime() > last24Hours &&
-      entry.category === 'auth'
-    );
+    const recent24h = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > last24Hours
+      && entry.category === 'auth');
 
-    const recentHour = this.auditLog.filter(entry =>
-      new Date(entry.timestamp).getTime() > lastHour &&
-      entry.category === 'auth'
-    );
+    const recentHour = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > lastHour
+      && entry.category === 'auth');
 
     return {
       totalAttempts24h: recent24h.length,
-      successfulLogins24h: recent24h.filter(e => e.action === 'AUTH_SUCCESS').length,
-      failedAttempts24h: recent24h.filter(e => e.action === 'AUTH_FAILED').length,
-      blockedIPs24h: recent24h.filter(e => e.action === 'IP_BLOCKED').length,
+      successfulLogins24h: recent24h.filter((e) => e.action === 'AUTH_SUCCESS').length,
+      failedAttempts24h: recent24h.filter((e) => e.action === 'AUTH_FAILED').length,
+      blockedIPs24h: recent24h.filter((e) => e.action === 'IP_BLOCKED').length,
 
       totalAttemptsLastHour: recentHour.length,
-      successfulLoginsLastHour: recentHour.filter(e => e.action === 'AUTH_SUCCESS').length,
-      failedAttemptsLastHour: recentHour.filter(e => e.action === 'AUTH_FAILED').length,
+      successfulLoginsLastHour: recentHour.filter((e) => e.action === 'AUTH_SUCCESS').length,
+      failedAttemptsLastHour: recentHour.filter((e) => e.action === 'AUTH_FAILED').length,
 
-      currentlyBlockedIPs: Array.from(this.blockedIPs.keys()).filter(ip => this.isIpBlocked(ip)).length,
-      systemUptime: now - (this.auditLog.find(e => e.action === 'AUTH_SYSTEM_INITIALIZED')?.timestamp || now)
+      currentlyBlockedIPs: Array.from(this.blockedIPs.keys()).filter((ip) => this.isIpBlocked(ip)).length,
+      systemUptime: now - (this.auditLog.find((e) => e.action === 'AUTH_SYSTEM_INITIALIZED')?.timestamp || now),
     };
   }
 
@@ -553,14 +550,12 @@ export class SecureAuthenticationManager {
 
     // Clean old audit logs (keep only last 7 days)
     const weekAgo = now - (7 * 24 * 60 * 60 * 1000);
-    this.auditLog = this.auditLog.filter(entry =>
-      new Date(entry.timestamp).getTime() > weekAgo
-    );
+    this.auditLog = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > weekAgo);
 
     this.logAuditEvent('system', 'MAINTENANCE_CLEANUP', {
       cleanedBlocks: this.blockedIPs.size,
       cleanedAttempts: this.failedAttempts.size,
-      auditLogSize: this.auditLog.length
+      auditLogSize: this.auditLog.length,
     });
   }
 }

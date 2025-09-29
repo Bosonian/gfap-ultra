@@ -43,7 +43,7 @@ export function initializeStrokeCenterMap(results) {
     locationManual: !!locationManual,
     locationInput: !!locationInput,
     searchLocationButton: !!searchLocationButton,
-    resultsContainer: !!resultsContainer
+    resultsContainer: !!resultsContainer,
   });
 
   if (useGpsButton) {
@@ -236,7 +236,7 @@ async function geocodeLocation(locationString, results, resultsContainer) {
       `, resultsContainer);
     }
   } catch (error) {
-    //('Geocoding failed:', error);
+    // ('Geocoding failed:', error);
     showLocationError(`
       <strong>Unable to search location.</strong><br>
       <small>Please try entering coordinates directly (e.g., "48.1351, 11.5820")</small>
@@ -323,9 +323,9 @@ async function showNearestCenters(lat, lng, results, resultsContainer) {
     console.log('🏥 Stroke Center Debug:', {
       primaryDestination: destination.name,
       alternativesCount: alternatives.length,
-      alternativeNames: alternatives.map(alt => alt.name),
+      alternativeNames: alternatives.map((alt) => alt.name),
       allHospitalsCount: allHospitals.length,
-      routingState: routing.state
+      routingState: routing.state,
     });
 
     // Add travel times to alternatives
@@ -397,7 +397,7 @@ async function showNearestCenters(lat, lng, results, resultsContainer) {
         altDiv.className = 'alternative-centers';
         altDiv.innerHTML = '<h4>Alternative Centers</h4>';
 
-        alternatives.forEach(alt => {
+        alternatives.forEach((alt) => {
           const altCard = createStrokeCenterCard(alt, false, routing);
           altDiv.appendChild(altCard);
         });
@@ -408,14 +408,13 @@ async function showNearestCenters(lat, lng, results, resultsContainer) {
       // Add travel time note
       const noteDiv = document.createElement('div');
       noteDiv.className = 'travel-time-note';
-      noteDiv.innerHTML = `<small>Travel times estimated for emergency vehicles</small>`;
+      noteDiv.innerHTML = '<small>Travel times estimated for emergency vehicles</small>';
       mainDiv.appendChild(noteDiv);
 
       resultsContainer.appendChild(mainDiv);
 
       // Add event listeners after DOM creation
       addStrokeCenterEventListeners(resultsContainer);
-
     } catch (error) {
       console.error('🚨 Stroke Center Display Error:', error);
 
@@ -432,7 +431,7 @@ async function showNearestCenters(lat, lng, results, resultsContainer) {
       `;
     }
   } catch (error) {
-    //('Enhanced routing failed, using basic display:', error);
+    // ('Enhanced routing failed, using basic display:', error);
 
     // Fallback to basic display
     try {
@@ -623,9 +622,15 @@ function createStrokeCenterCard(center, isRecommended, routing) {
   card.className = `stroke-center-card ${isRecommended ? 'recommended' : 'alternative'} enhanced`;
 
   const capabilities = [];
-  if (center.neurosurgery) capabilities.push('🧠 Neurosurgery');
-  if (center.thrombectomy) capabilities.push('🩸 Thrombectomy');
-  if (center.thrombolysis) capabilities.push('💉 Thrombolysis');
+  if (center.neurosurgery) {
+    capabilities.push('🧠 Neurosurgery');
+  }
+  if (center.thrombectomy) {
+    capabilities.push('🩸 Thrombectomy');
+  }
+  if (center.thrombolysis) {
+    capabilities.push('💉 Thrombolysis');
+  }
 
   const networkBadge = center.network ? `<span class="network-badge">${center.network}</span>` : '';
 
@@ -683,19 +688,19 @@ function addStrokeCenterEventListeners(container) {
   const callButtons = container.querySelectorAll('.call-button');
   const directionsButtons = container.querySelectorAll('.directions-button');
 
-  callButtons.forEach(button => {
+  callButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      const phone = button.dataset.phone;
+      const { phone } = button.dataset;
       if (phone) {
         window.open(`tel:${phone}`);
       }
     });
   });
 
-  directionsButtons.forEach(button => {
+  directionsButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      const lat = button.dataset.lat;
-      const lng = button.dataset.lng;
+      const { lat } = button.dataset;
+      const { lng } = button.dataset;
       if (lat && lng) {
         window.open(`https://maps.google.com/maps?daddr=${lat},${lng}`, '_blank');
       }

@@ -75,18 +75,18 @@ export function renderPrerequisitesModal() {
 export function initPrerequisitesModal() {
   const modal = document.getElementById('prerequisitesModal');
   if (!modal) {
-    //('Prerequisites modal not found');
+    // ('Prerequisites modal not found');
     return;
   }
 
-  //('Initializing prerequisites modal');
+  // ('Initializing prerequisites modal');
 
   // Close button handlers
   const closeBtn = document.getElementById('closePrerequisites');
   const cancelBtn = document.getElementById('cancelPrerequisites');
   const confirmBtn = document.getElementById('confirmPrerequisites');
 
-  //('Modal buttons found:', { closeBtn: !!closeBtn, cancelBtn: !!cancelBtn, confirmBtn: !!confirmBtn });
+  // ('Modal buttons found:', { closeBtn: !!closeBtn, cancelBtn: !!cancelBtn, confirmBtn: !!confirmBtn });
 
   const closeModal = () => {
     modal.remove();
@@ -102,18 +102,18 @@ export function initPrerequisitesModal() {
     e.preventDefault();
     e.stopPropagation();
 
-    //('Prerequisites confirm button clicked');
+    // ('Prerequisites confirm button clicked');
     const checkboxes = modal.querySelectorAll('.toggle-input');
     const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
-    //('All prerequisites checked:', allChecked);
+    // ('All prerequisites checked:', allChecked);
 
     if (allChecked) {
-      //('Navigating to triage2');
+      // ('Navigating to triage2');
       modal.remove();
       // Proceed to triage2 (stroke module selection)
       navigate('triage2');
     } else {
-      //('Showing prerequisites warning');
+      // ('Showing prerequisites warning');
       // Show warning
       const warning = document.getElementById('prerequisitesWarning');
       if (warning) {

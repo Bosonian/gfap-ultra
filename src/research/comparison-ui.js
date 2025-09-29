@@ -26,7 +26,7 @@ export function renderResearchToggle() {
 export function renderModelComparison(mainResults, legacyResults, inputs) {
   // Show debug info if legacy results are invalid
   if (!legacyResults?.isValid) {
-    //('🔬 Legacy model results invalid:', legacyResults);
+    // ('🔬 Legacy model results invalid:', legacyResults);
     return `
       <div class="research-panel" id="researchPanel" style="display: none;">
         <div class="research-header">
@@ -256,10 +256,10 @@ export function initializeResearchMode() {
 
         // Update display
         const summary = ResearchDataLogger.getDataSummary();
-        //(`Data cleared. Total entries: ${summary.totalEntries}`);
+        // (`Data cleared. Total entries: ${summary.totalEntries}`);
       }
     });
   }
 
-  //('🔬 Research mode initialized');
+  // ('🔬 Research mode initialized');
 }

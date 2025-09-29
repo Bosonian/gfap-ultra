@@ -31,17 +31,21 @@ export class InputValidator {
       age_years: { min: 0, max: 120, type: 'integer' },
       systolic_bp: { min: 50, max: 300, type: 'integer' },
       diastolic_bp: { min: 30, max: 200, type: 'integer' },
-      gfap_value: { min: 29, max: 10001, type: 'float', precision: 2 },
+      gfap_value: {
+        min: 29, max: 10001, type: 'float', precision: 2,
+      },
       fast_ed_score: { min: 0, max: 10, type: 'integer' },
       gcs_score: { min: 3, max: 15, type: 'integer' },
-      ich_volume: { min: 0, max: 500, type: 'float', precision: 2 }
+      ich_volume: {
+        min: 0, max: 500, type: 'float', precision: 2,
+      },
     };
 
     // Boolean fields that should only accept true/false
     this.booleanFields = [
       'headache', 'beinparese', 'eye_deviation', 'armparese',
       'vigilanzminderung', 'atrial_fibrillation', 'anticoagulated_noak',
-      'antiplatelets', 'examinable'
+      'antiplatelets', 'examinable',
     ];
 
     // XSS patterns to block
@@ -56,7 +60,7 @@ export class InputValidator {
       /javascript:/gi,
       /vbscript:/gi,
       /data:\s*text\/html/gi,
-      /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi
+      /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi,
     ];
 
     // SQL injection patterns
@@ -65,7 +69,7 @@ export class InputValidator {
       /((\%27)|(\')|(--)|(\%23)|(#))/gi,
       /((\%3D)|(=))[^\n]*((\%27)|(\')|(--)|(\%23)|(#))/gi,
       /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/gi,
-      /((\%27)|(\'))union/gi
+      /((\%27)|(\'))union/gi,
     ];
 
     // Allowed HTML tags for sanitization (very restrictive for medical app)
@@ -89,8 +93,8 @@ export class InputValidator {
         fieldsValidated: 0,
         errorsFound: 0,
         warningsFound: 0,
-        securityIssues: 0
-      }
+        securityIssues: 0,
+      },
     };
 
     if (!data || typeof data !== 'object') {
@@ -99,7 +103,7 @@ export class InputValidator {
         field: 'root',
         message: 'Invalid data format: expected object',
         severity: 'error',
-        code: 'INVALID_FORMAT'
+        code: 'INVALID_FORMAT',
       });
       return result;
     }
@@ -140,7 +144,7 @@ export class InputValidator {
           field: requiredField,
           message: `Required field missing for ${moduleType} module`,
           severity: 'error',
-          code: 'MISSING_REQUIRED_FIELD'
+          code: 'MISSING_REQUIRED_FIELD',
         });
         result.validationSummary.errorsFound++;
       }
@@ -169,7 +173,7 @@ export class InputValidator {
       errors: [],
       warnings: [],
       sanitizedValue: value,
-      securityIssues: 0
+      securityIssues: 0,
     };
 
     // Security checks first
@@ -181,7 +185,7 @@ export class InputValidator {
           field: fieldName,
           message: `Security violation detected: ${securityCheck.violations.join(', ')}`,
           severity: 'critical',
-          code: 'SECURITY_VIOLATION'
+          code: 'SECURITY_VIOLATION',
         });
         result.securityIssues = securityCheck.violations.length;
       }
@@ -233,7 +237,7 @@ export class InputValidator {
     const result = {
       safe: true,
       violations: [],
-      sanitizedValue: input
+      sanitizedValue: input,
     };
 
     if (typeof input !== 'string') {
@@ -298,11 +302,13 @@ export class InputValidator {
       valid: true,
       errors: [],
       warnings: [],
-      sanitizedValue: value
+      sanitizedValue: value,
     };
 
     const range = this.medicalRanges[fieldName];
-    if (!range) return result;
+    if (!range) {
+      return result;
+    }
 
     // Convert to appropriate type
     let numericValue;
@@ -314,7 +320,7 @@ export class InputValidator {
           field: fieldName,
           message: `Invalid integer value: ${value}`,
           severity: 'error',
-          code: 'INVALID_INTEGER'
+          code: 'INVALID_INTEGER',
         });
         return result;
       }
@@ -326,7 +332,7 @@ export class InputValidator {
           field: fieldName,
           message: `Invalid numeric value: ${value}`,
           severity: 'error',
-          code: 'INVALID_FLOAT'
+          code: 'INVALID_FLOAT',
         });
         return result;
       }
@@ -344,7 +350,7 @@ export class InputValidator {
         field: fieldName,
         message: `Value ${numericValue} below minimum ${range.min}`,
         severity: 'error',
-        code: 'VALUE_BELOW_MINIMUM'
+        code: 'VALUE_BELOW_MINIMUM',
       });
     }
 
@@ -354,7 +360,7 @@ export class InputValidator {
         field: fieldName,
         message: `Value ${numericValue} above maximum ${range.max}`,
         severity: 'error',
-        code: 'VALUE_ABOVE_MAXIMUM'
+        code: 'VALUE_ABOVE_MAXIMUM',
       });
     }
 
@@ -378,7 +384,7 @@ export class InputValidator {
     const result = {
       valid: true,
       errors: [],
-      sanitizedValue: value
+      sanitizedValue: value,
     };
 
     if (typeof value === 'boolean') {
@@ -409,7 +415,7 @@ export class InputValidator {
       field: fieldName,
       message: `Invalid boolean value: ${value}`,
       severity: 'error',
-      code: 'INVALID_BOOLEAN'
+      code: 'INVALID_BOOLEAN',
     });
 
     return result;
@@ -424,7 +430,7 @@ export class InputValidator {
     const result = {
       valid: true,
       errors: [],
-      sanitizedValue: patientId
+      sanitizedValue: patientId,
     };
 
     if (typeof patientId !== 'string') {
@@ -433,7 +439,7 @@ export class InputValidator {
         field: 'patient_id',
         message: 'Patient ID must be a string',
         severity: 'error',
-        code: 'INVALID_PATIENT_ID_TYPE'
+        code: 'INVALID_PATIENT_ID_TYPE',
       });
       return result;
     }
@@ -452,7 +458,7 @@ export class InputValidator {
         field: 'patient_id',
         message: 'Patient ID must be 1-50 characters long',
         severity: 'error',
-        code: 'INVALID_PATIENT_ID_LENGTH'
+        code: 'INVALID_PATIENT_ID_LENGTH',
       });
     }
 
@@ -468,7 +474,7 @@ export class InputValidator {
     const result = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Blood pressure validation
@@ -479,7 +485,7 @@ export class InputValidator {
           field: 'blood_pressure',
           message: 'Systolic BP must be greater than diastolic BP',
           severity: 'error',
-          code: 'INVALID_BLOOD_PRESSURE_RATIO'
+          code: 'INVALID_BLOOD_PRESSURE_RATIO',
         });
       }
 
@@ -490,7 +496,7 @@ export class InputValidator {
           field: 'blood_pressure',
           message: 'Unusually high pulse pressure detected',
           severity: 'warning',
-          code: 'HIGH_PULSE_PRESSURE'
+          code: 'HIGH_PULSE_PRESSURE',
         });
       }
     }
@@ -502,7 +508,7 @@ export class InputValidator {
           field: 'age_gfap_correlation',
           message: 'Unusually high GFAP for pediatric patient',
           severity: 'warning',
-          code: 'PEDIATRIC_HIGH_GFAP'
+          code: 'PEDIATRIC_HIGH_GFAP',
         });
       }
     }
@@ -514,7 +520,7 @@ export class InputValidator {
           field: 'gcs_examination_consistency',
           message: 'Patient with GCS < 8 marked as examinable - verify',
           severity: 'warning',
-          code: 'GCS_EXAMINATION_INCONSISTENCY'
+          code: 'GCS_EXAMINATION_INCONSISTENCY',
         });
       }
     }
@@ -538,7 +544,7 @@ export class InputValidator {
             field: fieldName,
             message: 'Extremely high systolic BP - verify measurement',
             severity: 'warning',
-            code: 'EXTREME_SYSTOLIC_BP'
+            code: 'EXTREME_SYSTOLIC_BP',
           });
         }
         break;
@@ -549,7 +555,7 @@ export class InputValidator {
             field: fieldName,
             message: 'Extremely high GFAP value - verify laboratory result',
             severity: 'warning',
-            code: 'EXTREME_GFAP'
+            code: 'EXTREME_GFAP',
           });
         }
         break;
@@ -560,7 +566,7 @@ export class InputValidator {
             field: fieldName,
             message: 'Centenarian patient - verify age',
             severity: 'warning',
-            code: 'CENTENARIAN_PATIENT'
+            code: 'CENTENARIAN_PATIENT',
           });
         }
         break;
@@ -577,7 +583,7 @@ export class InputValidator {
   sanitizeHtml(html) {
     const result = {
       sanitized: html,
-      modified: false
+      modified: false,
     };
 
     // Remove all HTML tags except allowed ones
@@ -585,10 +591,9 @@ export class InputValidator {
       if (this.allowedTags.includes(tagName.toLowerCase())) {
         // For allowed tags, still remove all attributes for security
         return `<${tagName.toLowerCase()}>`;
-      } else {
-        result.modified = true;
-        return '';
       }
+      result.modified = true;
+      return '';
     });
 
     // Remove any remaining < or > characters that might be malformed tags
@@ -608,7 +613,9 @@ export class InputValidator {
    * @returns {string} Encoded string
    */
   encodeSpecialCharacters(input) {
-    if (typeof input !== 'string') return input;
+    if (typeof input !== 'string') {
+      return input;
+    }
 
     return input
       .replace(/&/g, '&amp;')
@@ -637,7 +644,7 @@ export class InputValidator {
           'age_years', 'systolic_bp', 'diastolic_bp', 'gfap_value',
           'fast_ed_score', 'headache', 'beinparese', 'eye_deviation',
           'armparese', 'vigilanzminderung', 'atrial_fibrillation',
-          'anticoagulated_noak', 'antiplatelets'
+          'anticoagulated_noak', 'antiplatelets',
         ];
 
       default:
@@ -657,15 +664,15 @@ export class InputValidator {
       securityStatus: {
         securityIssuesFound: validationResult.validationSummary.securityIssues,
         riskLevel: this.calculateRiskLevel(validationResult),
-        mitigationApplied: validationResult.validationSummary.securityIssues > 0
+        mitigationApplied: validationResult.validationSummary.securityIssues > 0,
       },
       compliance: {
         dataIntegrityMaintained: validationResult.valid,
         auditTrailGenerated: true,
-        hipaaCompliant: this.isHipaaCompliant(validationResult)
+        hipaaCompliant: this.isHipaaCompliant(validationResult),
       },
       errors: validationResult.errors,
-      warnings: validationResult.warnings
+      warnings: validationResult.warnings,
     };
   }
 
@@ -677,9 +684,15 @@ export class InputValidator {
   calculateRiskLevel(validationResult) {
     const { securityIssues, errorsFound } = validationResult.validationSummary;
 
-    if (securityIssues > 0) return 'critical';
-    if (errorsFound > 5) return 'high';
-    if (errorsFound > 2) return 'medium';
+    if (securityIssues > 0) {
+      return 'critical';
+    }
+    if (errorsFound > 5) {
+      return 'high';
+    }
+    if (errorsFound > 2) {
+      return 'medium';
+    }
     return 'low';
   }
 
@@ -693,8 +706,8 @@ export class InputValidator {
     // 1. No security violations
     // 2. Proper data validation
     // 3. Audit trail maintained
-    return validationResult.validationSummary.securityIssues === 0 &&
-           validationResult.valid;
+    return validationResult.validationSummary.securityIssues === 0
+           && validationResult.valid;
   }
 }
 

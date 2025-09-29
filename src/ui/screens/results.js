@@ -7,7 +7,9 @@ import { CRITICAL_THRESHOLDS } from '../../config.js';
 import { t, i18n } from '../../localization/i18n.js';
 import { store } from '../../state/store.js';
 import { formatSummaryLabel, formatDisplayValue, formatDriverName } from '../../utils/label-formatter.js';
-import { calculateICHVolume, estimateVolumeFromGFAP, estimateMortalityFromVolume, formatVolumeDisplay } from '../../logic/ich-volume-calculator.js';
+import {
+  calculateICHVolume, estimateVolumeFromGFAP, estimateMortalityFromVolume, formatVolumeDisplay,
+} from '../../logic/ich-volume-calculator.js';
 import { renderCircularBrainDisplay, initializeVolumeAnimations } from '../components/brain-visualization.js';
 // Dynamic import for React islands to avoid module resolution issues
 // Using React island tachometer instead of the vanilla premium gauge
@@ -225,53 +227,53 @@ export function renderResults(results, startTime) {
 
     const { ich, lvo } = results;
 
-  // Determine current module
-  const currentModule = getCurrentModuleName(ich);
+    // Determine current module
+    const currentModule = getCurrentModuleName(ich);
 
-  // Calculate legacy model for research comparison (only for stroke modules)
-  const legacyResults = currentModule !== 'coma' ? calculateLegacyFromResults(results) : null;
+    // Calculate legacy model for research comparison (only for stroke modules)
+    const legacyResults = currentModule !== 'coma' ? calculateLegacyFromResults(results) : null;
 
-  // Debug logging for research mode
+    // Debug logging for research mode
 
-  // Log research data if research mode is enabled (background, non-breaking)
-  if (legacyResults && isResearchModeEnabled(currentModule)) {
-    safeLogResearchData(ich, legacyResults, getPatientInputs());
-  }
-
-  // Detect which module was used based on the data
-  const isLimitedOrComa = ich?.module === 'Limited' || ich?.module === 'Coma' || lvo?.notPossible === true;
-  const isFullModule = ich?.module === 'Full Stroke' || ich?.module?.includes('Full');
-
-  let resultsHtml;
-
-  // Debug logging
-  console.log('[Results] ICH data:', ich);
-  console.log('[Results] LVO data:', lvo);
-  console.log('[Results] ICH module:', ich?.module);
-  console.log('[Results] isLimitedOrComa:', isLimitedOrComa);
-  console.log('[Results] isFullModule:', isFullModule);
-
-  // For limited/coma modules - only show ICH
-  if (isLimitedOrComa) {
-    resultsHtml = renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule);
-  } else {
-    // For full module - show ICH prominently with conditional LVO text
-    resultsHtml = renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule);
-  }
-
-  // Initialize animations after DOM update
-  setTimeout(async () => {
-    console.log('[Results] Initializing volume animations...');
-    initializeVolumeAnimations();
-    try {
-      const { mountIslands } = await import('../../react/mountIslands.jsx');
-      mountIslands();
-    } catch (err) {
-      //('React islands not available:', err);
+    // Log research data if research mode is enabled (background, non-breaking)
+    if (legacyResults && isResearchModeEnabled(currentModule)) {
+      safeLogResearchData(ich, legacyResults, getPatientInputs());
     }
-  }, 100);
 
-  return resultsHtml;
+    // Detect which module was used based on the data
+    const isLimitedOrComa = ich?.module === 'Limited' || ich?.module === 'Coma' || lvo?.notPossible === true;
+    const isFullModule = ich?.module === 'Full Stroke' || ich?.module?.includes('Full');
+
+    let resultsHtml;
+
+    // Debug logging
+    console.log('[Results] ICH data:', ich);
+    console.log('[Results] LVO data:', lvo);
+    console.log('[Results] ICH module:', ich?.module);
+    console.log('[Results] isLimitedOrComa:', isLimitedOrComa);
+    console.log('[Results] isFullModule:', isFullModule);
+
+    // For limited/coma modules - only show ICH
+    if (isLimitedOrComa) {
+      resultsHtml = renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule);
+    } else {
+    // For full module - show ICH prominently with conditional LVO text
+      resultsHtml = renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule);
+    }
+
+    // Initialize animations after DOM update
+    setTimeout(async () => {
+      console.log('[Results] Initializing volume animations...');
+      initializeVolumeAnimations();
+      try {
+        const { mountIslands } = await import('../../react/mountIslands.jsx');
+        mountIslands();
+      } catch (err) {
+      // ('React islands not available:', err);
+      }
+    }, 100);
+
+    return resultsHtml;
   } catch (error) {
     console.error('Error in renderResults:', error);
     return `
@@ -401,10 +403,10 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   const hasValidLVO = lvo && typeof lvo.probability === 'number' && !lvo.notPossible;
   const showLVORiskCard = isFullModule && fastEdScore > 3 && hasValidLVO;
 
-  //('  Conditions: isFullModule:', isFullModule);
-  //('  Conditions: fastEdScore > 3:', fastEdScore > 3);
-  //('  Conditions: hasValidLVO:', hasValidLVO);
-  //('  Show LVO Card:', showLVORiskCard);
+  // ('  Conditions: isFullModule:', isFullModule);
+  // ('  Conditions: fastEdScore > 3:', fastEdScore > 3);
+  // ('  Conditions: hasValidLVO:', hasValidLVO);
+  // ('  Show LVO Card:', showLVORiskCard);
 
   // Determine layout configuration
   const showVolumeCard = ichPercent >= 50;
@@ -663,10 +665,10 @@ function calculateLegacyFromResults(results) {
     const patientInputs = getPatientInputs();
 
     if (!patientInputs.age || !patientInputs.gfap) {
-      //console.log('🔍 Missing required inputs for legacy model:', {
+      // console.log('🔍 Missing required inputs for legacy model:', {
       //  age: patientInputs.age,
       //  gfap: patientInputs.gfap,
-      //});
+      // });
       return null;
     }
 
@@ -674,7 +676,7 @@ function calculateLegacyFromResults(results) {
 
     return legacyResult;
   } catch (error) {
-    //console.log('Legacy model calculation failed (non-critical):', error);
+    // console.log('Legacy model calculation failed (non-critical):', error);
     return null;
   }
 }

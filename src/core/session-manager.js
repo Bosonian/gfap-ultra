@@ -61,8 +61,8 @@ export class SessionManager {
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
         severity: ERROR_SEVERITY.MEDIUM,
-        context: { operation: 'validate_stored_session' }
-      }
+        context: { operation: 'validate_stored_session' },
+      },
     );
   }
 
@@ -113,15 +113,14 @@ export class SessionManager {
         this.lastAutoSave = Date.now();
         return savedCount > 0;
       },
-      (error) => {
+      (error) =>
         // Auto-save failure is non-critical
-        return false;
-      },
+        false,
       {
         category: ERROR_CATEGORIES.STORAGE,
         severity: ERROR_SEVERITY.LOW,
-        context: { operation: 'auto_save' }
-      }
+        context: { operation: 'auto_save' },
+      },
     );
   }
 
@@ -180,7 +179,7 @@ export class SessionManager {
 
         const forms = container.querySelectorAll('form[data-module]');
 
-        forms.forEach(form => {
+        forms.forEach((form) => {
           try {
             const { module } = form.dataset;
             if (module) {
@@ -199,8 +198,8 @@ export class SessionManager {
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'restore_form_data' }
-      }
+        context: { operation: 'restore_form_data' },
+      },
     );
   }
 
@@ -273,14 +272,13 @@ export class SessionManager {
 
         return true;
       },
-      (error) => {
+      (error) =>
         // Session validation failed - continue with local session
-        return authManager.isValidSession();
-      },
+        authManager.isValidSession(),
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
-        context: { operation: 'validate_current_session' }
-      }
+        context: { operation: 'validate_current_session' },
+      },
     );
   }
 
@@ -291,7 +289,7 @@ export class SessionManager {
     safeAsync(
       async () => {
         const shouldContinue = confirm(
-          'Your session will expire in 1 minute. Would you like to continue?'
+          'Your session will expire in 1 minute. Would you like to continue?',
         );
 
         if (shouldContinue) {
@@ -309,8 +307,8 @@ export class SessionManager {
       },
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
-        context: { operation: 'session_timeout_warning' }
-      }
+        context: { operation: 'session_timeout_warning' },
+      },
     );
   }
 
@@ -370,7 +368,7 @@ export class SessionManager {
   async clearSessionData() {
     try {
       medicalLogger.info('Clearing session data', {
-        category: LOG_CATEGORIES.SECURITY
+        category: LOG_CATEGORIES.SECURITY,
       });
 
       // Clear form data from store
@@ -385,12 +383,12 @@ export class SessionManager {
       sessionStorage.removeItem('research_data');
 
       medicalLogger.info('Session data cleared successfully', {
-        category: LOG_CATEGORIES.SECURITY
+        category: LOG_CATEGORIES.SECURITY,
       });
     } catch (error) {
       medicalLogger.warn('Failed to clear some session data', {
         category: LOG_CATEGORIES.SECURITY,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -412,7 +410,7 @@ export class SessionManager {
       lastAutoSave: this.lastAutoSave,
       autoSaveActive: !!this.autoSaveInterval,
       sessionCheckActive: !!this.sessionCheckInterval,
-      sessionInfo: authManager.getSessionInfo?.() || {}
+      sessionInfo: authManager.getSessionInfo?.() || {},
     };
   }
 

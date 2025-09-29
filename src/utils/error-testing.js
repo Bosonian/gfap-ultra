@@ -9,12 +9,13 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { getErrorHandler } from './error-handler.js';
 import { predictComaIch, predictLimitedIch, predictFullStroke } from '../api/client.js';
 import { authManager } from '../auth/authentication.js';
 import { calculateICHVolume, calculateHemorrhageSizePercent, testVolumeCalculator } from '../logic/ich-volume-calculator.js';
 import { medicalSyncManager } from '../sync/medical-sync-manager.js';
 import { medicalSWManager } from '../workers/sw-manager.js';
+
+import { getErrorHandler } from './error-handler.js';
 
 /**
  * Global unhandled promise rejection tracker
@@ -32,12 +33,12 @@ class UnhandledPromiseTracker {
         reason: event.reason,
         promise: event.promise,
         timestamp: new Date().toISOString(),
-        stack: event.reason?.stack || 'No stack trace available'
+        stack: event.reason?.stack || 'No stack trace available',
       });
 
       console.error('🔴 UNHANDLED PROMISE REJECTION DETECTED:', {
         reason: event.reason,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -71,7 +72,7 @@ export class ErrorHandlingTestSuite {
       passed: 0,
       failed: 0,
       errors: [],
-      unhandledRejections: 0
+      unhandledRejections: 0,
     };
   }
 
@@ -104,7 +105,7 @@ export class ErrorHandlingTestSuite {
       await this.testUIErrorBoundaries();
 
       // Wait for any pending promises to settle
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Check for unhandled rejections
       this.testResults.unhandledRejections = this.tracker.getUnhandledRejections().length;
@@ -115,7 +116,7 @@ export class ErrorHandlingTestSuite {
         ...this.testResults,
         duration,
         success: this.testResults.failed === 0 && this.testResults.unhandledRejections === 0,
-        unhandledRejectionDetails: this.tracker.getUnhandledRejections()
+        unhandledRejectionDetails: this.tracker.getUnhandledRejections(),
       };
 
       console.info('🏁 Error handling test suite completed:', summary);
@@ -130,14 +131,13 @@ export class ErrorHandlingTestSuite {
       }
 
       return summary;
-
     } catch (error) {
       console.error('💥 Test suite itself failed:', error);
       return {
         ...this.testResults,
         duration: Date.now() - startTime,
         success: false,
-        criticalError: error.message
+        criticalError: error.message,
       };
     }
   }
@@ -154,21 +154,21 @@ export class ErrorHandlingTestSuite {
         test: async () => {
           const result = await predictComaIch({ invalid: 'data' });
           return result.fallbackUsed === true;
-        }
+        },
       },
       {
         name: 'API with null/undefined data',
         test: async () => {
           const result = await predictComaIch(null);
           return result.fallbackUsed === true;
-        }
+        },
       },
       {
         name: 'Limited API with missing required fields',
         test: async () => {
           const result = await predictLimitedIch({});
           return result.fallbackUsed === true;
-        }
+        },
       },
       {
         name: 'Full stroke API with invalid GFAP values',
@@ -178,11 +178,11 @@ export class ErrorHandlingTestSuite {
             systolic_bp: 140,
             diastolic_bp: 90,
             gfap_value: -999, // Invalid negative value
-            fast_ed_score: 3
+            fast_ed_score: 3,
           });
           return result.fallbackUsed === true;
-        }
-      }
+        },
+      },
     ];
 
     for (const testCase of tests) {
@@ -202,29 +202,29 @@ export class ErrorHandlingTestSuite {
         test: async () => {
           const result = await authManager.authenticate('');
           return result.success === false && result.message.includes('required');
-        }
+        },
       },
       {
         name: 'Authentication with null password',
         test: async () => {
           const result = await authManager.authenticate(null);
           return result.success === false;
-        }
+        },
       },
       {
         name: 'Session validation when controller unavailable',
         test: async () => {
           const result = await authManager.validateSessionWithServer();
           return typeof result === 'boolean'; // Should not throw
-        }
+        },
       },
       {
         name: 'Password hashing with invalid input',
         test: async () => {
           const result = await authManager.hashPassword(null);
           return typeof result === 'string'; // Should return fallback hash
-        }
-      }
+        },
+      },
     ];
 
     for (const testCase of tests) {
@@ -244,36 +244,36 @@ export class ErrorHandlingTestSuite {
         test: async () => {
           const result = await calculateICHVolume(-999);
           return result.fallbackUsed === true || result.volume === 0;
-        }
+        },
       },
       {
         name: 'ICH volume calculation with NaN',
         test: async () => {
           const result = await calculateICHVolume(NaN);
           return result.fallbackUsed === true || result.volume === 0;
-        }
+        },
       },
       {
         name: 'ICH volume calculation with extremely high value',
         test: async () => {
           const result = await calculateICHVolume(999999);
           return result.warnings && result.warnings.length > 0;
-        }
+        },
       },
       {
         name: 'Hemorrhage size calculation with invalid volume',
         test: async () => {
           const result = await calculateHemorrhageSizePercent(-50);
           return result >= 0 && result <= 100; // Should return valid percentage
-        }
+        },
       },
       {
         name: 'Volume calculator test suite',
         test: async () => {
           const result = await testVolumeCalculator();
           return result.summary && result.summary.total > 0;
-        }
-      }
+        },
+      },
     ];
 
     for (const testCase of tests) {
@@ -293,14 +293,14 @@ export class ErrorHandlingTestSuite {
         test: async () => {
           const result = await medicalSyncManager.initialize();
           return typeof result === 'boolean';
-        }
+        },
       },
       {
         name: 'Sync with no pending operations',
         test: async () => {
           const result = await medicalSyncManager.performSync();
           return result.skipped === true || result.success !== undefined;
-        }
+        },
       },
       {
         name: 'Load pending operations with corrupted data',
@@ -319,8 +319,8 @@ export class ErrorHandlingTestSuite {
           }
 
           return result.cleared === true || result.errors > 0;
-        }
-      }
+        },
+      },
     ];
 
     for (const testCase of tests) {
@@ -340,22 +340,22 @@ export class ErrorHandlingTestSuite {
         test: async () => {
           const result = await medicalSWManager.initialize();
           return typeof result === 'boolean';
-        }
+        },
       },
       {
         name: 'Cache status retrieval',
         test: async () => {
           const result = await medicalSWManager.getCacheStatus();
           return result !== undefined; // Should not throw, even if it returns error object
-        }
+        },
       },
       {
         name: 'Service worker update check',
         test: async () => {
           const result = await medicalSWManager.checkForUpdates();
           return typeof result === 'boolean' || result === undefined;
-        }
-      }
+        },
+      },
     ];
 
     for (const testCase of tests) {
@@ -382,7 +382,7 @@ export class ErrorHandlingTestSuite {
           } catch (error) {
             return false;
           }
-        }
+        },
       },
       {
         name: 'Event handler error boundaries',
@@ -395,8 +395,8 @@ export class ErrorHandlingTestSuite {
           } catch (error) {
             return false;
           }
-        }
-      }
+        },
+      },
     ];
 
     for (const testCase of tests) {
@@ -413,9 +413,7 @@ export class ErrorHandlingTestSuite {
     try {
       const result = await Promise.race([
         testFn(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Test timeout')), 10000)
-        )
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Test timeout')), 10000)),
       ]);
 
       if (result === true) {
@@ -445,7 +443,7 @@ export class ErrorHandlingTestSuite {
       unhandledRejections: this.tracker.getUnhandledRejections(),
       globalErrorSummary: errorSummary,
       recommendations: this.generateRecommendations(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -496,7 +494,7 @@ export async function quickErrorCheck() {
 window.errorHandlingTest = {
   runQuickCheck: quickErrorCheck,
   runFullSuite: () => new ErrorHandlingTestSuite().runCompleteTestSuite(),
-  generateReport: () => new ErrorHandlingTestSuite().generateReport()
+  generateReport: () => new ErrorHandlingTestSuite().generateReport(),
 };
 
 // Auto-run basic check in development

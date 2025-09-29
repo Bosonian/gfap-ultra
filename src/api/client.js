@@ -14,8 +14,9 @@
  */
 
 import { API_URLS, APP_CONFIG, DEV_CONFIG } from '../config.js';
-import { extractDriversFromResponse, extractProbabilityFromResponse, extractConfidenceFromResponse } from './drivers.js';
 import { lvoProbability, lvoClass } from '../lib/lvoModel.js';
+
+import { extractDriversFromResponse, extractProbabilityFromResponse, extractConfidenceFromResponse } from './drivers.js';
 
 // APIError class for medical API errors
 export class APIError extends Error {
@@ -37,7 +38,9 @@ export class MedicalAPIError extends APIError {
 
 // Helper function to format drivers from flat dictionary
 function formatDriversFromDict(drivers, predictionType) {
-  if (!drivers || typeof drivers !== 'object') return null;
+  if (!drivers || typeof drivers !== 'object') {
+    return null;
+  }
 
   const positive = [];
   const negative = [];
@@ -74,7 +77,7 @@ const clientHelpers = {
 
   normalizeBooleans: (payload) => {
     const normalized = { ...payload };
-    Object.keys(normalized).forEach(key => {
+    Object.keys(normalized).forEach((key) => {
       if (normalized[key] === 'true' || normalized[key] === true) {
         normalized[key] = 1;
       } else if (normalized[key] === 'false' || normalized[key] === false) {
@@ -86,7 +89,7 @@ const clientHelpers = {
 
   async makeApiCall(endpoint, payload, endpointType = 'unknown') {
     console.log(`[API] Making ${endpointType} request to:`, endpoint);
-    console.log(`[API] Payload:`, payload);
+    console.log('[API] Payload:', payload);
 
     try {
       const controller = new AbortController();
@@ -99,11 +102,11 @@ const clientHelpers = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         body: JSON.stringify(normalizedPayload),
         signal: controller.signal,
-        mode: 'cors'
+        mode: 'cors',
       });
 
       clearTimeout(timeoutId);
@@ -113,7 +116,7 @@ const clientHelpers = {
         throw new MedicalAPIError(
           `API request failed: ${response.status} ${response.statusText} - ${errorText}`,
           response.status,
-          endpoint
+          endpoint,
         );
       }
 
@@ -132,11 +135,10 @@ const clientHelpers = {
       }
 
       return result;
-
     } catch (error) {
       if (error.name === 'AbortError') {
         console.warn(`[API] ${endpointType} request timeout`);
-        throw new MedicalAPIError(`Request timeout after ${timeout/1000}s`, 408, endpoint);
+        throw new MedicalAPIError(`Request timeout after ${timeout / 1000}s`, 408, endpoint);
       }
 
       if (error instanceof MedicalAPIError) {
@@ -147,7 +149,7 @@ const clientHelpers = {
       throw new MedicalAPIError(
         `Network error: ${error.message}`,
         0,
-        endpoint
+        endpoint,
       );
     }
   },
@@ -157,10 +159,10 @@ const clientHelpers = {
 
   async predict(moduleType, payload) {
     const endpointMap = {
-      'coma_ich': API_URLS.COMA_ICH,
-      'limited_ich': API_URLS.LDM_ICH,
-      'full_stroke': API_URLS.FULL_STROKE,
-      'lvo': API_URLS.LVO_PREDICTION
+      coma_ich: API_URLS.COMA_ICH,
+      limited_ich: API_URLS.LDM_ICH,
+      full_stroke: API_URLS.FULL_STROKE,
+      lvo: API_URLS.LVO_PREDICTION,
     };
 
     const endpoint = endpointMap[moduleType];
@@ -169,7 +171,7 @@ const clientHelpers = {
     }
 
     return await this.makeApiCall(endpoint, payload, moduleType);
-  }
+  },
 };
 
 /**
@@ -180,15 +182,15 @@ export async function warmUpFunctions() {
   console.log('Warming up Cloud Functions...');
 
   const prioritizedUrls = [
-    API_URLS.FULL_STROKE,      // Warm this first - most complex
-    API_URLS.LVO_PREDICTION,   // New LVO endpoint
+    API_URLS.FULL_STROKE, // Warm this first - most complex
+    API_URLS.LVO_PREDICTION, // New LVO endpoint
     API_URLS.COMA_ICH,
     API_URLS.LDM_ICH,
-    API_URLS.AUTHENTICATE
+    API_URLS.AUTHENTICATE,
   ];
 
   const warmUpPromises = prioritizedUrls.map(async (url, index) => {
-    await new Promise(resolve => setTimeout(resolve, index * 200));
+    await new Promise((resolve) => setTimeout(resolve, index * 200));
 
     try {
       const controller = new AbortController();
@@ -200,7 +202,7 @@ export async function warmUpFunctions() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
         signal: controller.signal,
-        mode: 'cors'
+        mode: 'cors',
       });
 
       clearTimeout(timeoutId);
@@ -271,7 +273,7 @@ export async function predictLVO(payload, retryCount = 0) {
     throw new MedicalAPIError(
       'Missing required parameters: gfap_value and fast_ed_score',
       400,
-      API_URLS.LVO_PREDICTION
+      API_URLS.LVO_PREDICTION,
     );
   }
 
@@ -283,7 +285,6 @@ export async function predictLVO(payload, retryCount = 0) {
     const result = await clientHelpers.predict('lvo', payload);
     console.log('[API] LVO Cloud Function response:', result);
     return result;
-
   } catch (error) {
     console.warn('⚠️ LVO Cloud Function failed, falling back to local model:', error.message);
     console.log('🏠 Using New LVO Model (fallback)');
@@ -304,13 +305,13 @@ export async function predictLVO(payload, retryCount = 0) {
         units: 'normalized_contribution',
         positive: [
           { label: 'GFAP Biomarker', weight: gfapValue > 100 ? 0.6 : 0.3 },
-          { label: 'FAST-ED Score', weight: fastEdScore * 0.1 }
+          { label: 'FAST-ED Score', weight: fastEdScore * 0.1 },
         ].sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight)),
         negative: [],
         meta: {
           riskLevel: probability > 0.7 ? 'high' : probability > 0.4 ? 'moderate' : 'low',
-          interpretation: `${(probability * 100).toFixed(1)}% LVO probability (${classification === 1 ? 'Positive' : 'Negative'})`
-        }
+          interpretation: `${(probability * 100).toFixed(1)}% LVO probability (${classification === 1 ? 'Positive' : 'Negative'})`,
+        },
       };
 
       return {
@@ -318,15 +319,14 @@ export async function predictLVO(payload, retryCount = 0) {
         drivers,
         confidence: probability > 0.7 ? 0.9 : probability > 0.4 ? 0.7 : 0.5,
         module: 'New LVO Model (Scientifically Calibrated)',
-        interpretation: `${(probability * 100).toFixed(1)}% LVO probability based on GFAP=${gfapValue} and FAST-ED=${fastEdScore}`
+        interpretation: `${(probability * 100).toFixed(1)}% LVO probability based on GFAP=${gfapValue} and FAST-ED=${fastEdScore}`,
       };
-
     } catch (localError) {
       console.warn('⚠️ New LVO Model fallback failed:', localError.message);
       throw new MedicalAPIError(
         `LVO prediction failed: ${error.message}`,
         error.status || 500,
-        API_URLS.LVO_PREDICTION
+        API_URLS.LVO_PREDICTION,
       );
     }
   }
@@ -366,7 +366,7 @@ export async function predictFullStroke(payload, retryCount = 0) {
           probability: ichResult.lvo_prediction.probability || 0,
           drivers: ichResult.lvo_prediction.drivers || null,
           confidence: ichResult.lvo_prediction.confidence || 0.8,
-          module: 'Full Stroke (API Fallback)'
+          module: 'Full Stroke (API Fallback)',
         };
       } else {
         // Final fallback to local LVO model
@@ -379,11 +379,10 @@ export async function predictFullStroke(payload, retryCount = 0) {
         probability: ichResult.probability,
         drivers: ichResult.drivers ? formatDriversFromDict(ichResult.drivers, 'ICH') : ichResult.drivers,
         confidence: ichResult.confidence,
-        module: ichResult.module
+        module: ichResult.module,
       },
-      lvo: lvoResult
+      lvo: lvoResult,
     };
-
   } catch (error) {
     console.error('Full Stroke prediction failed:', error);
 
@@ -403,21 +402,21 @@ export async function predictFullStroke(payload, retryCount = 0) {
           probability: clientHelpers.safeParseFloat(ichPrediction.probability, 0),
           drivers: ichPrediction.drivers || null,
           confidence: clientHelpers.safeParseFloat(ichPrediction.confidence, 0.85),
-          module: 'Full Stroke (Mock)'
+          module: 'Full Stroke (Mock)',
         },
         lvo: {
           probability: clientHelpers.safeParseFloat(lvoPrediction.probability, 0),
           drivers: lvoPrediction.drivers || null,
           confidence: clientHelpers.safeParseFloat(lvoPrediction.confidence, 0.85),
-          module: 'Full Stroke (Mock)'
-        }
+          module: 'Full Stroke (Mock)',
+        },
       };
     }
 
     throw new MedicalAPIError(
       `Failed to get stroke predictions: ${error.message}`,
       error.status,
-      API_URLS.FULL_STROKE
+      API_URLS.FULL_STROKE,
     );
   }
 }

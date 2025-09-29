@@ -636,7 +636,7 @@ export class QualityMetricsTracker {
         error: error.message,
       });
 
-      //('Quality metrics tracker initialization failed:', error);
+      // ('Quality metrics tracker initialization failed:', error);
       throw error;
     }
   }
@@ -738,7 +738,7 @@ export class QualityMetricsTracker {
             return { indicator: collector.indicator, value, success: true };
           }
         } catch (error) {
-          //(`Failed to collect metric ${collector.indicator}:`, error);
+          // (`Failed to collect metric ${collector.indicator}:`, error);
           return { indicator: collector.indicator, error: error.message, success: false };
         }
         return null;
@@ -757,7 +757,7 @@ export class QualityMetricsTracker {
         error: error.message,
       });
 
-      //('Metric collection failed:', error);
+      // ('Metric collection failed:', error);
     }
   }
 

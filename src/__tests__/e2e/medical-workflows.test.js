@@ -97,7 +97,7 @@ describe('End-to-End Medical Workflows', () => {
       // Step 3: Medical parameter validation
       const medicalValidation = await validateMedicalInput(
         securityValidation.sanitizedData,
-        'coma'
+        'coma',
       );
       expect(medicalValidation.isValid).toBe(true);
 
@@ -695,11 +695,11 @@ describe('End-to-End Medical Workflows', () => {
       expect(medicalPerformanceMonitor.startMeasurement).toHaveBeenCalledWith(
         expect.stringContaining('coma_ich'),
         'api_call',
-        expect.any(Object)
+        expect.any(Object),
       );
 
       expect(medicalPerformanceMonitor.endMeasurement).toHaveBeenCalledWith(
-        'workflow-metric-id'
+        'workflow-metric-id',
       );
 
       // Get performance statistics
@@ -737,7 +737,7 @@ describe('End-to-End Medical Workflows', () => {
           module: 'coma_ich',
           result_probability: 0.75,
           timestamp: expect.any(String),
-        })
+        }),
       );
 
       expect(result.probability).toBe(0.75);

@@ -10,14 +10,14 @@ const ERROR_CATEGORIES = {
   CACHE: 'cache',
   NETWORK: 'network',
   MEDICAL: 'medical',
-  STORAGE: 'storage'
+  STORAGE: 'storage',
 };
 
 const ERROR_SEVERITY = {
   LOW: 'low',
   MEDIUM: 'medium',
   HIGH: 'high',
-  CRITICAL: 'critical'
+  CRITICAL: 'critical',
 };
 
 /**
@@ -32,14 +32,14 @@ async function safeAsync(operation, fallback = null, context = {}) {
     // Send error to main thread
     try {
       const clients = await self.clients.matchAll();
-      clients.forEach(client => {
+      clients.forEach((client) => {
         client.postMessage({
           type: 'SW_ERROR',
           error: {
             message: error.message,
             context,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         });
       });
     } catch (msgError) {
@@ -108,17 +108,16 @@ self.addEventListener('install', (event) => {
               const response = await fetch(resource);
               if (response.ok) {
                 return staticCache.put(resource, response);
-              } else {
-                throw new Error(`Failed to fetch ${resource}: ${response.status}`);
               }
+              throw new Error(`Failed to fetch ${resource}: ${response.status}`);
             } catch (fetchError) {
               console.warn(`Failed to cache critical resource ${resource}:`, fetchError.message);
               return null;
             }
-          })
+          }),
         );
 
-        const successfulCaches = cacheResults.filter(result => result.status === 'fulfilled').length;
+        const successfulCaches = cacheResults.filter((result) => result.status === 'fulfilled').length;
         const failedCaches = CRITICAL_RESOURCES.length - successfulCaches;
 
         if (failedCaches > CRITICAL_RESOURCES.length / 2) {
@@ -128,7 +127,7 @@ self.addEventListener('install', (event) => {
         // Initialize API and runtime caches
         await Promise.allSettled([
           caches.open(API_CACHE_NAME),
-          caches.open(RUNTIME_CACHE_NAME)
+          caches.open(RUNTIME_CACHE_NAME),
         ]);
 
         // Medical Service Worker installed successfully
@@ -136,14 +135,14 @@ self.addEventListener('install', (event) => {
         // Send installation success message
         try {
           const clients = await self.clients.matchAll();
-          clients.forEach(client => {
+          clients.forEach((client) => {
             client.postMessage({
               type: 'SW_INSTALLED',
               cacheVersion: CACHE_VERSION,
               criticalResourcesCount: CRITICAL_RESOURCES.length,
               successfulCaches,
               failedCaches,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
             });
           });
         } catch (msgError) {
@@ -161,12 +160,12 @@ self.addEventListener('install', (event) => {
 
         try {
           const clients = self.clients.matchAll();
-          clients.then(clientList => {
-            clientList.forEach(client => {
+          clients.then((clientList) => {
+            clientList.forEach((client) => {
               client.postMessage({
                 type: 'SW_INSTALL_ERROR',
                 error: error.message,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
               });
             });
           });
@@ -178,9 +177,9 @@ self.addEventListener('install', (event) => {
       },
       {
         operation: 'service_worker_installation',
-        criticalResourcesCount: CRITICAL_RESOURCES.length
-      }
-    )
+        criticalResourcesCount: CRITICAL_RESOURCES.length,
+      },
+    ),
   );
 });
 
@@ -206,33 +205,31 @@ self.addEventListener('activate', (event) => {
               console.warn(`Failed to delete cache ${cacheName}:`, error.message);
               return { cacheName, deleted: false, error: error.message };
             }
-          })
+          }),
         );
 
-        const successfulCleanups = cleanupResults.filter(result =>
-          result.status === 'fulfilled' && result.value.deleted
-        ).length;
+        const successfulCleanups = cleanupResults.filter((result) => result.status === 'fulfilled' && result.value.deleted).length;
 
         // Cleaned up old caches
 
         // Claim all clients with timeout
         await Promise.race([
           self.clients.claim(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Client claim timeout')), 5000))
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Client claim timeout')), 5000)),
         ]);
 
         // Medical Service Worker activated
 
         // Notify clients of activation
         const clients = await self.clients.matchAll();
-        const notificationPromises = clients.map(client => {
+        const notificationPromises = clients.map((client) => {
           try {
             return client.postMessage({
               type: 'SW_ACTIVATED',
               cacheVersion: CACHE_VERSION,
               cleanedCaches: successfulCleanups,
               totalOldCaches: oldCaches.length,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
             });
           } catch (error) {
             console.warn('Failed to notify client of activation:', error.message);
@@ -251,24 +248,24 @@ self.addEventListener('activate', (event) => {
         safeAsync(
           async () => {
             const clients = await self.clients.matchAll();
-            clients.forEach(client => {
+            clients.forEach((client) => {
               client.postMessage({
                 type: 'SW_ACTIVATION_ERROR',
                 error: error.message,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
               });
             });
           },
           null,
-          { operation: 'activation_error_notification' }
+          { operation: 'activation_error_notification' },
         );
 
         return { success: false, error: error.message };
       },
       {
-        operation: 'service_worker_activation'
-      }
-    )
+        operation: 'service_worker_activation',
+      },
+    ),
   );
 });
 
@@ -328,7 +325,7 @@ async function handleAPIRequest(request) {
             }
           },
           null,
-          { operation: 'background_cache_update', url: request.url }
+          { operation: 'background_cache_update', url: request.url },
         );
 
         return cachedResponse;
@@ -340,7 +337,7 @@ async function handleAPIRequest(request) {
 
       try {
         const networkResponse = await fetch(request, {
-          signal: controller.signal
+          signal: controller.signal,
         });
         clearTimeout(timeoutId);
 
@@ -366,8 +363,8 @@ async function handleAPIRequest(request) {
     {
       operation: 'api_request_handling',
       url: request.url,
-      method: request.method
-    }
+      method: request.method,
+    },
   );
 }
 
@@ -403,7 +400,7 @@ async function handlePredictionRequest(request) {
               await cache.put(cacheKey, responseWithMetadata);
             },
             null,
-            { operation: 'prediction_cache_storage', url: request.url }
+            { operation: 'prediction_cache_storage', url: request.url },
           );
 
           return networkResponse;
@@ -422,7 +419,7 @@ async function handlePredictionRequest(request) {
       const localPrediction = await safeAsync(
         () => tryLocalPrediction(request),
         null,
-        { operation: 'local_prediction_attempt' }
+        { operation: 'local_prediction_attempt' },
       );
 
       if (localPrediction) {
@@ -433,7 +430,7 @@ async function handlePredictionRequest(request) {
       const cachedPrediction = await safeAsync(
         () => findSimilarCachedPrediction(request),
         null,
-        { operation: 'cached_prediction_lookup' }
+        { operation: 'cached_prediction_lookup' },
       );
 
       if (cachedPrediction) {
@@ -445,8 +442,8 @@ async function handlePredictionRequest(request) {
     },
     {
       operation: 'prediction_request_handling',
-      url: request.url
-    }
+      url: request.url,
+    },
   );
 }
 
@@ -498,7 +495,7 @@ async function tryLocalPrediction(request) {
           source: 'local_model',
           offline: true,
           timestamp: new Date().toISOString(),
-          warning: 'This is an offline prediction using a simplified model. Seek professional medical advice.'
+          warning: 'This is an offline prediction using a simplified model. Seek professional medical advice.',
         }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
@@ -513,8 +510,8 @@ async function tryLocalPrediction(request) {
     },
     {
       operation: 'local_prediction',
-      url: request.url
-    }
+      url: request.url,
+    },
   );
 }
 
@@ -544,8 +541,8 @@ function calculateLocalLVO(gfap, fastEd) {
     const ichProb = Math.max(0.05, Math.min(0.5, gfap / 2000)); // Very conservative ICH estimate
 
     // Validate calculated probabilities
-    if (!isFinite(lvoProb) || !isFinite(ichProb) ||
-        lvoProb < 0 || lvoProb > 1 || ichProb < 0 || ichProb > 1) {
+    if (!isFinite(lvoProb) || !isFinite(ichProb)
+        || lvoProb < 0 || lvoProb > 1 || ichProb < 0 || ichProb > 1) {
       throw new Error('Calculated probabilities are invalid');
     }
 
@@ -554,19 +551,19 @@ function calculateLocalLVO(gfap, fastEd) {
         probability: Math.round(lvoProb * 100) / 100, // Round to 2 decimal places
         confidence: 0.6, // Lower confidence for offline model
         module: 'Local Offline Model',
-        warning: 'Simplified offline calculation - not for clinical decisions'
+        warning: 'Simplified offline calculation - not for clinical decisions',
       },
       ich: {
         probability: Math.round(ichProb * 100) / 100,
         confidence: 0.4, // Very low confidence for ICH estimation
         module: 'Local Offline Model',
-        warning: 'Conservative estimate - seek immediate medical evaluation'
+        warning: 'Conservative estimate - seek immediate medical evaluation',
       },
       metadata: {
         calculatedAt: new Date().toISOString(),
         inputs: { gfap, fastEd },
-        disclaimer: 'This is a simplified offline model for emergency use only. Clinical judgment and professional medical evaluation are essential.'
-      }
+        disclaimer: 'This is a simplified offline model for emergency use only. Clinical judgment and professional medical evaluation are essential.',
+      },
     };
   } catch (error) {
     console.error('Local LVO calculation failed:', error.message);
@@ -577,19 +574,19 @@ function calculateLocalLVO(gfap, fastEd) {
         probability: 0.1,
         confidence: 0.1,
         module: 'Emergency Fallback',
-        error: 'Calculation failed - using minimum risk estimate'
+        error: 'Calculation failed - using minimum risk estimate',
       },
       ich: {
         probability: 0.1,
         confidence: 0.1,
         module: 'Emergency Fallback',
-        error: 'Calculation failed - using minimum risk estimate'
+        error: 'Calculation failed - using minimum risk estimate',
       },
       metadata: {
         calculatedAt: new Date().toISOString(),
         error: error.message,
-        disclaimer: 'Calculation failed. Immediate medical evaluation required.'
-      }
+        disclaimer: 'Calculation failed. Immediate medical evaluation required.',
+      },
     };
   }
 }

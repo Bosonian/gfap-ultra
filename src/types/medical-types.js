@@ -243,7 +243,7 @@ export const MEDICAL_CONSTANTS = {
     LOW: 0.25,
     MODERATE: 0.50,
     HIGH: 0.70,
-    CRITICAL: 0.85
+    CRITICAL: 0.85,
   },
 
   /** @type {Object.<string, number>} Volume thresholds in mL */
@@ -251,8 +251,8 @@ export const MEDICAL_CONSTANTS = {
     SMALL: 10,
     MODERATE: 30,
     LARGE: 60,
-    MASSIVE: 100
-  }
+    MASSIVE: 100,
+  },
 };
 
 /**
@@ -294,8 +294,8 @@ export class TypeChecker {
 
     if (!isValid) {
       throw new TypeError(
-        `Type error in ${fieldName}: expected ${expectedType}, got ${actualType}. ` +
-        `This is a critical error in medical calculations.`
+        `Type error in ${fieldName}: expected ${expectedType}, got ${actualType}. `
+        + 'This is a critical error in medical calculations.',
       );
     }
   }
@@ -313,8 +313,8 @@ export class TypeChecker {
 
     if (value < min || value > max) {
       throw new RangeError(
-        `Range error in ${fieldName}: value ${value} must be between ${min} and ${max}. ` +
-        `This is a critical error in medical calculations.`
+        `Range error in ${fieldName}: value ${value} must be between ${min} and ${max}. `
+        + 'This is a critical error in medical calculations.',
       );
     }
   }

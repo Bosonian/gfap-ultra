@@ -236,7 +236,7 @@ describe('API Endpoints Integration Tests', () => {
           'Atrial fibrillation',
           'Arm paresis',
           'Eye deviation',
-          'Severe hypertension'
+          'Severe hypertension',
         ],
         risk_stratification: {
           lvo_probability: 0.82,
@@ -386,9 +386,7 @@ describe('API Endpoints Integration Tests', () => {
         });
       });
 
-      const promises = testData.map(({ endpoint, data }) =>
-        predictionClient.predict(endpoint, data)
-      );
+      const promises = testData.map(({ endpoint, data }) => predictionClient.predict(endpoint, data));
 
       const results = await Promise.all(promises);
 

@@ -407,7 +407,7 @@ class AuditStorage {
       const sanitizedEvent = event.sanitize();
       await predictionCache.set(`audit_${event.id}`, sanitizedEvent, 24 * 60 * 60 * 1000);
     } catch (error) {
-      //('Failed to persist audit event:', error);
+      // ('Failed to persist audit event:', error);
     }
   }
 
@@ -566,14 +566,14 @@ export class ClinicalAuditTrail {
         },
       });
 
-      //('📋 Clinical audit trail system initialized');
+      // ('📋 Clinical audit trail system initialized');
     } catch (error) {
       medicalPerformanceMonitor.endMeasurement(metricId, {
         success: false,
         error: error.message,
       });
 
-      //('Audit trail initialization failed:', error);
+      // ('Audit trail initialization failed:', error);
       throw error;
     }
   }
@@ -669,7 +669,7 @@ export class ClinicalAuditTrail {
 
       return event.id;
     } catch (error) {
-      //('Failed to log audit event:', error);
+      // ('Failed to log audit event:', error);
       return null;
     }
   }
@@ -1062,7 +1062,7 @@ export class ClinicalAuditTrail {
    * Notify critical event
    */
   notifyCriticalEvent(event) {
-    //(`🚨 Critical audit event: ${event.eventType} - ${event.action}`);
+    // (`🚨 Critical audit event: ${event.eventType} - ${event.action}`);
 
     // In real implementation, this would trigger alerts to administrators
     medicalEventObserver.publish(MEDICAL_EVENTS.CLINICAL_ALERT, {
@@ -1103,7 +1103,7 @@ export class ClinicalAuditTrail {
     }
 
     this.isActive = false;
-    //('📋 Clinical audit trail system stopped');
+    // ('📋 Clinical audit trail system stopped');
   }
 
   /**
@@ -1115,7 +1115,7 @@ export class ClinicalAuditTrail {
     this.storage.indices.clear();
     this.currentSession = null;
 
-    //('📋 Clinical audit trail system disposed');
+    // ('📋 Clinical audit trail system disposed');
   }
 }
 

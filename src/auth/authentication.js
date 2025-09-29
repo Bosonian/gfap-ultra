@@ -18,7 +18,7 @@ import {
   MedicalError,
   ERROR_CATEGORIES,
   ERROR_SEVERITY,
-  MEDICAL_ERROR_CODES
+  MEDICAL_ERROR_CODES,
 } from '../utils/error-handler.js';
 
 // Type safety utilities
@@ -50,7 +50,7 @@ export class AuthenticationManager {
         medicalLogger.info('Authentication attempt started', {
           category: LOG_CATEGORIES.AUTHENTICATION,
           hasPassword: !!password && password.length > 0,
-          isDevelopment: DEV_CONFIG.isDevelopment
+          isDevelopment: DEV_CONFIG.isDevelopment,
         });
 
         // Type safety validation
@@ -58,13 +58,13 @@ export class AuthenticationManager {
 
         if (!password || password.trim().length === 0) {
           medicalLogger.warn('Authentication failed: empty password', {
-            category: LOG_CATEGORIES.AUTHENTICATION
+            category: LOG_CATEGORIES.AUTHENTICATION,
           });
           throw new MedicalError(
             'Password is required',
             'EMPTY_PASSWORD',
             ERROR_CATEGORIES.VALIDATION,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           );
         }
 
@@ -72,7 +72,7 @@ export class AuthenticationManager {
         const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
         if (isLocalPreview || DEV_CONFIG.isDevelopment) {
           medicalLogger.info('Development mode authentication path', {
-            category: LOG_CATEGORIES.AUTHENTICATION
+            category: LOG_CATEGORIES.AUTHENTICATION,
           });
 
           // SECURITY: Use environment-based research password
@@ -82,11 +82,11 @@ export class AuthenticationManager {
             return {
               success: false,
               message: 'Invalid credentials',
-              errorCode: 'INVALID_CREDENTIALS'
+              errorCode: 'INVALID_CREDENTIALS',
             };
           }
 
-          await new Promise(resolve => setTimeout(resolve, 300)); // small UX delay
+          await new Promise((resolve) => setTimeout(resolve, 300)); // small UX delay
 
           this.isAuthenticated = true;
           this.sessionToken = DEV_CONFIG.mockAuthResponse.session_token;
@@ -103,7 +103,7 @@ export class AuthenticationManager {
           return {
             success: true,
             message: 'Authentication successful',
-            sessionDuration: DEV_CONFIG.mockAuthResponse.session_duration
+            sessionDuration: DEV_CONFIG.mockAuthResponse.session_duration,
           };
         }
 
@@ -116,30 +116,32 @@ export class AuthenticationManager {
             return {
               success: false,
               message: 'Invalid credentials',
-              errorCode: 'INVALID_CREDENTIALS'
+              errorCode: 'INVALID_CREDENTIALS',
             };
           }
 
           // Simulate minimal delay for UX
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise((resolve) => setTimeout(resolve, 200));
 
           this.isAuthenticated = true;
-          this.sessionToken = 'local-preview-token-' + Date.now();
+          this.sessionToken = `local-preview-token-${Date.now()}`;
           this.sessionExpiry = new Date(Date.now() + 30 * 60 * 1000);
           this.lastActivity = Date.now();
 
-          try { this.storeSecureSession(); } catch {}
+          try {
+            this.storeSecureSession();
+          } catch {}
 
           return {
             success: true,
             message: 'Authentication successful',
-            sessionDuration: 1800
+            sessionDuration: 1800,
           };
         }
 
         medicalLogger.debug('Sending authentication request', {
           category: LOG_CATEGORIES.AUTHENTICATION,
-          url: API_URLS.AUTHENTICATE
+          url: API_URLS.AUTHENTICATE,
         });
 
         const response = await fetch(API_URLS.AUTHENTICATE, {
@@ -149,8 +151,8 @@ export class AuthenticationManager {
           },
           body: JSON.stringify({
             action: 'login',
-            password: password.trim()
-          })
+            password: password.trim(),
+          }),
         });
 
         if (!response.ok) {
@@ -169,7 +171,7 @@ export class AuthenticationManager {
             errorMessage,
             errorCode,
             ERROR_CATEGORIES.AUTHENTICATION,
-            response.status >= 500 ? ERROR_SEVERITY.HIGH : ERROR_SEVERITY.MEDIUM
+            response.status >= 500 ? ERROR_SEVERITY.HIGH : ERROR_SEVERITY.MEDIUM,
           ).withContext({ statusCode: response.status, url: API_URLS.AUTHENTICATE });
         }
 
@@ -180,7 +182,7 @@ export class AuthenticationManager {
             'Invalid response from authentication service',
             'INVALID_RESPONSE',
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.HIGH
+            ERROR_SEVERITY.HIGH,
           );
         }
 
@@ -201,22 +203,21 @@ export class AuthenticationManager {
           return {
             success: true,
             message: 'Authentication successful',
-            sessionDuration: data.session_duration
+            sessionDuration: data.session_duration,
           };
-        } else {
-          // Handle authentication failure
-          await this.delayFailedAttempt();
-
-          throw new MedicalError(
-            data.message || 'Invalid credentials',
-            'INVALID_CREDENTIALS',
-            ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.MEDIUM
-          ).withContext({
-            remainingAttempts: data.rate_limit_remaining,
-            statusCode: response.status
-          });
         }
+        // Handle authentication failure
+        await this.delayFailedAttempt();
+
+        throw new MedicalError(
+          data.message || 'Invalid credentials',
+          'INVALID_CREDENTIALS',
+          ERROR_CATEGORIES.AUTHENTICATION,
+          ERROR_SEVERITY.MEDIUM,
+        ).withContext({
+          remainingAttempts: data.rate_limit_remaining,
+          statusCode: response.status,
+        });
       },
       {
         timeout: 15000,
@@ -225,13 +226,13 @@ export class AuthenticationManager {
           message: error instanceof MedicalError ? error.getUserMessage() : 'Authentication service unavailable. Please try again.',
           errorCode: error.code || 'NETWORK_ERROR',
           details: error.message,
-          remainingAttempts: error.context?.remainingAttempts
+          remainingAttempts: error.context?.remainingAttempts,
         }),
         context: {
           operation: 'user_authentication',
-          endpoint: 'authenticate'
-        }
-      }
+          endpoint: 'authenticate',
+        },
+      },
     );
   }
 
@@ -278,8 +279,8 @@ export class AuthenticationManager {
           },
           body: JSON.stringify({
             action: 'validate_session',
-            session_token: this.sessionToken
-          })
+            session_token: this.sessionToken,
+          }),
         });
 
         if (!response.ok) {
@@ -293,7 +294,7 @@ export class AuthenticationManager {
             'Session validation service error',
             'VALIDATION_ERROR',
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           ).withContext({ statusCode: response.status });
         }
 
@@ -304,17 +305,16 @@ export class AuthenticationManager {
             'Invalid response from session validation service',
             'INVALID_RESPONSE',
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           );
         }
 
         if (data.success) {
           this.updateActivity();
           return true;
-        } else {
-          this.logout();
-          return false;
         }
+        this.logout();
+        return false;
       },
       {
         timeout: 10000,
@@ -326,9 +326,9 @@ export class AuthenticationManager {
         },
         context: {
           operation: 'session_validation',
-          endpoint: 'validate_session'
-        }
-      }
+          endpoint: 'validate_session',
+        },
+      },
     );
   }
 
@@ -345,7 +345,7 @@ export class AuthenticationManager {
    */
   async logout() {
     medicalLogger.info('User logout initiated', {
-      category: LOG_CATEGORIES.AUTHENTICATION
+      category: LOG_CATEGORIES.AUTHENTICATION,
     });
 
     this.isAuthenticated = false;
@@ -366,12 +366,12 @@ export class AuthenticationManager {
       sessionStorage.removeItem('session_expiry');
 
       medicalLogger.info('Session data cleared during logout', {
-        category: LOG_CATEGORIES.SECURITY
+        category: LOG_CATEGORIES.SECURITY,
       });
     } catch (error) {
       medicalLogger.warn('Failed to clear some session data during logout', {
         category: LOG_CATEGORIES.SECURITY,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -390,7 +390,7 @@ export class AuthenticationManager {
             'Invalid input for password hashing',
             'INVALID_INPUT',
             ERROR_CATEGORIES.VALIDATION,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           );
         }
 
@@ -399,7 +399,7 @@ export class AuthenticationManager {
             'Crypto API not available',
             'CRYPTO_UNAVAILABLE',
             ERROR_CATEGORIES.SECURITY,
-            ERROR_SEVERITY.HIGH
+            ERROR_SEVERITY.HIGH,
           );
         }
 
@@ -420,15 +420,15 @@ export class AuthenticationManager {
           for (let i = 0; i < input.length; i++) {
             const char = input.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
+            hash &= hash; // Convert to 32-bit integer
           }
           return Math.abs(hash).toString(16);
         },
         context: {
           operation: 'password_hashing',
-          inputLength: input ? input.length : 0
-        }
-      }
+          inputLength: input ? input.length : 0,
+        },
+      },
     );
   }
 
@@ -443,7 +443,7 @@ export class AuthenticationManager {
             'Cannot store session: not authenticated',
             'NOT_AUTHENTICATED',
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.LOW
+            ERROR_SEVERITY.LOW,
           );
         }
 
@@ -452,7 +452,7 @@ export class AuthenticationManager {
             'Session storage not available',
             'STORAGE_UNAVAILABLE',
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           );
         }
 
@@ -477,9 +477,9 @@ export class AuthenticationManager {
         context: {
           operation: 'store_session',
           hasToken: !!this.sessionToken,
-          hasExpiry: !!this.sessionExpiry
-        }
-      }
+          hasExpiry: !!this.sessionExpiry,
+        },
+      },
     );
   }
 
@@ -503,7 +503,7 @@ export class AuthenticationManager {
               'Session storage not available',
               'STORAGE_UNAVAILABLE',
               ERROR_CATEGORIES.STORAGE,
-              ERROR_SEVERITY.LOW
+              ERROR_SEVERITY.LOW,
             );
           }
 
@@ -530,7 +530,7 @@ export class AuthenticationManager {
                 'Invalid session timestamp',
                 'INVALID_SESSION_DATA',
                 ERROR_CATEGORIES.STORAGE,
-                ERROR_SEVERITY.MEDIUM
+                ERROR_SEVERITY.MEDIUM,
               );
             }
 
@@ -553,9 +553,9 @@ export class AuthenticationManager {
             return false;
           },
           context: {
-            operation: 'check_stored_session'
-          }
-        }
+            operation: 'check_stored_session',
+          },
+        },
       );
     } catch (error) {
       this.logout();
@@ -586,23 +586,20 @@ export class AuthenticationManager {
    */
   async delayFailedAttempt() {
     return safeAsync(
-      async () => {
-        return new Promise((resolve) => {
-          setTimeout(resolve, 1000); // 1 second delay
-        });
-      },
+      async () => new Promise((resolve) => {
+        setTimeout(resolve, 1000); // 1 second delay
+      }),
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
         severity: ERROR_SEVERITY.LOW,
         timeout: 2000,
-        fallback: () => {
+        fallback: () =>
           // If delay fails, continue without delay
-          return Promise.resolve();
-        },
+          Promise.resolve(),
         context: {
-          operation: 'auth_delay'
-        }
-      }
+          operation: 'auth_delay',
+        },
+      },
     );
   }
 

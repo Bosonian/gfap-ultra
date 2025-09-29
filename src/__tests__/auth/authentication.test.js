@@ -99,8 +99,12 @@ describe('Authentication System', () => {
     test('should restore valid session from storage', async () => {
       const currentTime = Date.now();
       global.sessionStorage.getItem.mockImplementation((key) => {
-        if (key === 'auth_session') return 'verified';
-        if (key === 'auth_timestamp') return currentTime.toString();
+        if (key === 'auth_session') {
+          return 'verified';
+        }
+        if (key === 'auth_timestamp') {
+          return currentTime.toString();
+        }
         return null;
       });
 
@@ -113,8 +117,12 @@ describe('Authentication System', () => {
     test('should reject expired session from storage', async () => {
       const expiredTime = Date.now() - (5 * 60 * 60 * 1000); // 5 hours ago
       global.sessionStorage.getItem.mockImplementation((key) => {
-        if (key === 'auth_session') return 'verified';
-        if (key === 'auth_timestamp') return expiredTime.toString();
+        if (key === 'auth_session') {
+          return 'verified';
+        }
+        if (key === 'auth_timestamp') {
+          return expiredTime.toString();
+        }
         return null;
       });
 
@@ -182,8 +190,12 @@ describe('Authentication System', () => {
 
     test('should handle malformed session data safely', async () => {
       global.sessionStorage.getItem.mockImplementation((key) => {
-        if (key === 'auth_session') return 'verified';
-        if (key === 'auth_timestamp') return 'invalid_timestamp';
+        if (key === 'auth_session') {
+          return 'verified';
+        }
+        if (key === 'auth_timestamp') {
+          return 'invalid_timestamp';
+        }
         return null;
       });
 
@@ -195,8 +207,12 @@ describe('Authentication System', () => {
       const now = Date.now();
       authManager.sessionTimeout = 3600000;
       global.sessionStorage.getItem.mockImplementation((key) => {
-        if (key === 'auth_session') return 'verified';
-        if (key === 'auth_timestamp') return (now - authManager.sessionTimeout).toString();
+        if (key === 'auth_session') {
+          return 'verified';
+        }
+        if (key === 'auth_timestamp') {
+          return (now - authManager.sessionTimeout).toString();
+        }
         return null;
       });
 

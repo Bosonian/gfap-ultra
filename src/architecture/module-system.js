@@ -151,7 +151,7 @@ export class MedicalModule {
       try {
         unsubscribe();
       } catch (error) {
-        //(`Error unsubscribing event handler: ${error.message}`);
+        // (`Error unsubscribing event handler: ${error.message}`);
       }
     });
     this.eventHandlers.clear();
@@ -162,7 +162,7 @@ export class MedicalModule {
         try {
           service.dispose();
         } catch (error) {
-          //(`Error disposing service: ${error.message}`);
+          // (`Error disposing service: ${error.message}`);
         }
       }
     });

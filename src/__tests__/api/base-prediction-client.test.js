@@ -261,7 +261,7 @@ describe('BasePredictionClient', () => {
         }),
         expect.any(Number),
         expect.any(String),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -400,7 +400,7 @@ describe('BasePredictionClient', () => {
       client.getCacheEntryInfo('coma_ich', payload);
 
       expect(mockPredictionCache.getEntryInfo).toHaveBeenCalledWith(
-        expect.stringMatching(/^coma_ich_\d+$/)
+        expect.stringMatching(/^coma_ich_\d+$/),
       );
     });
   });

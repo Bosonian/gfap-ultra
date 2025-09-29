@@ -5,6 +5,7 @@ import {
 import { clearValidationErrors, clearAllValidation } from '../logic/validate.js';
 import { initializeResearchMode } from '../research/comparison-ui.js';
 import { authManager } from '../auth/authentication.js';
+import { safeSetInnerHTML } from '../security/html-sanitizer.js';
 
 import { renderTriage1 } from './screens/triage1.js';
 import { renderTriage2 } from './screens/triage2.js';
@@ -16,7 +17,6 @@ import { renderLoginScreen, initializeLoginScreen } from './screens/login.js';
 import { announceScreenChange, setPageTitle, focusMainHeading } from './a11y.js';
 import { initializeStrokeCenterMap } from './components/stroke-center-map.js';
 import { fastEdCalculator } from './components/fastEdModal.js';
-import { safeSetInnerHTML } from '../security/html-sanitizer.js';
 
 export function render(container) {
   const state = store.getState();
@@ -116,7 +116,9 @@ export function render(container) {
 
   // Initialize research mode components
   setTimeout(() => {
-    try { initializeResearchMode(); } catch {}
+    try {
+      initializeResearchMode();
+    } catch {}
   }, 150);
 
   // Accessibility updates

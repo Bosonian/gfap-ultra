@@ -4,7 +4,6 @@
  * Extract and format drivers from new backend flat dictionary format
  */
 export function extractDriversFromResponse(response, predictionType) {
-
   let rawDrivers = null;
 
   if (predictionType === 'ICH') {
@@ -67,7 +66,6 @@ function formatDriversFromDictionary(drivers, predictionType) {
  * Clean probability extraction with source tracking
  */
 export function extractProbabilityFromResponse(response, predictionType) {
-
   let probability = 0;
 
   if (predictionType === 'ICH') {

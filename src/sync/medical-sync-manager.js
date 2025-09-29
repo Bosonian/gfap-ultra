@@ -16,7 +16,7 @@ import {
   MedicalError,
   ERROR_CATEGORIES,
   ERROR_SEVERITY,
-  MEDICAL_ERROR_CODES
+  MEDICAL_ERROR_CODES,
 } from '../utils/error-handler.js';
 
 /**
@@ -123,7 +123,7 @@ export class MedicalSyncManager {
   async initialize() {
     return safeAsync(
       async () => {
-        //('🔄 Initializing Medical Sync Manager...');
+        // ('🔄 Initializing Medical Sync Manager...');
 
         // Load pending operations from storage with error handling
         await safeAsync(
@@ -132,7 +132,7 @@ export class MedicalSyncManager {
             console.warn('Failed to load pending operations, starting fresh:', error.message);
             this.pendingOperations.clear();
           },
-          { operation: 'load_pending_operations' }
+          { operation: 'load_pending_operations' },
         );
 
         // Start periodic sync if online
@@ -140,7 +140,7 @@ export class MedicalSyncManager {
           await safeAsync(
             () => this.startPeriodicSync(),
             null,
-            { operation: 'start_periodic_sync' }
+            { operation: 'start_periodic_sync' },
           );
         }
 
@@ -150,7 +150,7 @@ export class MedicalSyncManager {
           (error) => {
             console.warn('Initial sync failed, will retry later:', error.message);
           },
-          { operation: 'initial_sync' }
+          { operation: 'initial_sync' },
         );
 
         medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
@@ -158,7 +158,7 @@ export class MedicalSyncManager {
           pendingOperations: this.pendingOperations.size,
         });
 
-        //('✅ Medical Sync Manager initialized');
+        // ('✅ Medical Sync Manager initialized');
         return true;
       },
       (error) => {
@@ -166,7 +166,7 @@ export class MedicalSyncManager {
 
         medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
           action: 'sync_manager_initialization_failed',
-          error: error.message
+          error: error.message,
         });
 
         return false;
@@ -176,9 +176,9 @@ export class MedicalSyncManager {
         severity: ERROR_SEVERITY.MEDIUM,
         timeout: 30000,
         context: {
-          operation: 'sync_manager_initialization'
-        }
-      }
+          operation: 'sync_manager_initialization',
+        },
+      },
     );
   }
 
@@ -218,7 +218,7 @@ export class MedicalSyncManager {
    * Handle connection status changes
    */
   async handleConnectionChange(isOnline) {
-    //(`🌐 Connection status changed: ${isOnline ? 'Online' : 'Offline'}`);
+    // (`🌐 Connection status changed: ${isOnline ? 'Online' : 'Offline'}`);
 
     this.status = isOnline ? SyncStatus.IDLE : SyncStatus.OFFLINE;
 
@@ -310,7 +310,7 @@ export class MedicalSyncManager {
         if (!this.isOnline || this.syncInProgress || this.pendingOperations.size === 0) {
           return {
             skipped: true,
-            reason: !this.isOnline ? 'offline' : this.syncInProgress ? 'already_syncing' : 'no_operations'
+            reason: !this.isOnline ? 'offline' : this.syncInProgress ? 'already_syncing' : 'no_operations',
           };
         }
 
@@ -322,7 +322,7 @@ export class MedicalSyncManager {
         this.syncInProgress = true;
         this.status = SyncStatus.SYNCING;
 
-        //(`🔄 Starting sync of ${this.pendingOperations.size} operations...`);
+        // (`🔄 Starting sync of ${this.pendingOperations.size} operations...`);
 
         let completedCount = 0;
         let errorCount = 0;
@@ -342,7 +342,7 @@ export class MedicalSyncManager {
                 'Sync operation timeout',
                 'SYNC_TIMEOUT',
                 ERROR_CATEGORIES.NETWORK,
-                ERROR_SEVERITY.MEDIUM
+                ERROR_SEVERITY.MEDIUM,
               ).withContext({ processedBatches: Math.floor(i / batchSize), totalBatches: Math.ceil(operations.length / batchSize) });
             }
 
@@ -351,17 +351,17 @@ export class MedicalSyncManager {
               () => this.processSyncBatch(batch),
               (error) => {
                 console.warn(`Batch ${Math.floor(i / batchSize)} sync failed:`, error.message);
-                return batch.map(op => ({
+                return batch.map((op) => ({
                   operationId: op.id,
                   status: 'error',
-                  error: error.message
+                  error: error.message,
                 }));
               },
               {
                 operation: 'process_sync_batch',
                 batchIndex: Math.floor(i / batchSize),
-                timeout: 30000
-              }
+                timeout: 30000,
+              },
             );
 
             results.forEach((result) => {
@@ -373,7 +373,7 @@ export class MedicalSyncManager {
                 safeAsync(
                   () => this.handleSyncConflict(result),
                   null,
-                  { operation: 'handle_sync_conflict' }
+                  { operation: 'handle_sync_conflict' },
                 );
               } else {
                 errorCount++;
@@ -389,10 +389,10 @@ export class MedicalSyncManager {
             (error) => {
               console.warn('Failed to save pending operations after sync:', error.message);
             },
-            { operation: 'save_pending_operations_after_sync' }
+            { operation: 'save_pending_operations_after_sync' },
           );
 
-          //(`✅ Sync completed: ${completedCount} success, ${errorCount} errors, ${conflictCount} conflicts`);
+          // (`✅ Sync completed: ${completedCount} success, ${errorCount} errors, ${conflictCount} conflicts`);
 
           medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
             action: 'sync_completed',
@@ -412,7 +412,7 @@ export class MedicalSyncManager {
             completedCount,
             errorCount,
             conflictCount,
-            duration: Date.now() - startTime
+            duration: Date.now() - startTime,
           };
         } catch (error) {
           medicalPerformanceMonitor.endMeasurement(metricId, {
@@ -433,14 +433,14 @@ export class MedicalSyncManager {
         medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
           action: 'sync_failed',
           error: error.message,
-          pendingOperations: this.pendingOperations.size
+          pendingOperations: this.pendingOperations.size,
         });
 
         this.status = SyncStatus.ERROR;
 
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       },
       {
@@ -449,9 +449,9 @@ export class MedicalSyncManager {
         timeout: 150000, // 2.5 minutes
         context: {
           operation: 'perform_sync',
-          pendingOperations: this.pendingOperations.size
-        }
-      }
+          pendingOperations: this.pendingOperations.size,
+        },
+      },
     );
   }
 
@@ -484,9 +484,9 @@ export class MedicalSyncManager {
           operation.markFailed(error.message);
 
           if (operation.canRetry()) {
-            //(`⚠️ Operation ${operation.id} failed, will retry: ${error.message}`);
+            // (`⚠️ Operation ${operation.id} failed, will retry: ${error.message}`);
           } else {
-            //(`❌ Operation ${operation.id} failed permanently: ${error.message}`);
+            // (`❌ Operation ${operation.id} failed permanently: ${error.message}`);
             this.pendingOperations.delete(operation.id);
           }
 
@@ -643,7 +643,7 @@ export class MedicalSyncManager {
       }
     }, this.config.syncIntervalMs);
 
-    //(`🔄 Periodic sync started (${this.config.syncIntervalMs}ms interval)`);
+    // (`🔄 Periodic sync started (${this.config.syncIntervalMs}ms interval)`);
   }
 
   /**
@@ -653,7 +653,7 @@ export class MedicalSyncManager {
     if (this.syncInterval) {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
-      //('⏹️ Periodic sync stopped');
+      // ('⏹️ Periodic sync stopped');
     }
   }
 
@@ -695,13 +695,13 @@ export class MedicalSyncManager {
             'Local storage not available',
             'STORAGE_UNAVAILABLE',
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           );
         }
 
         const stored = localStorage.getItem('medical_sync_pending');
         if (!stored) {
-          //('No pending sync operations found');
+          // ('No pending sync operations found');
           return { loaded: 0 };
         }
 
@@ -713,7 +713,7 @@ export class MedicalSyncManager {
             'Failed to parse stored sync operations',
             'PARSE_ERROR',
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           ).withContext({ parseError: parseError.message });
         }
 
@@ -722,7 +722,7 @@ export class MedicalSyncManager {
             'Invalid stored operations format',
             'INVALID_FORMAT',
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           ).withContext({ type: typeof operations });
         }
 
@@ -754,7 +754,7 @@ export class MedicalSyncManager {
           }
         });
 
-        //(`📦 Loaded ${loadedCount} pending sync operations (${errorCount} errors)`);
+        // (`📦 Loaded ${loadedCount} pending sync operations (${errorCount} errors)`);
 
         return { loaded: loadedCount, errors: errorCount };
       },
@@ -775,9 +775,9 @@ export class MedicalSyncManager {
         severity: ERROR_SEVERITY.LOW,
         timeout: 5000,
         context: {
-          operation: 'load_pending_operations'
-        }
-      }
+          operation: 'load_pending_operations',
+        },
+      },
     );
   }
 
@@ -792,7 +792,7 @@ export class MedicalSyncManager {
             'Local storage not available',
             'STORAGE_UNAVAILABLE',
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.MEDIUM
+            ERROR_SEVERITY.MEDIUM,
           );
         }
 
@@ -812,7 +812,7 @@ export class MedicalSyncManager {
             console.warn(`Failed to serialize operation ${op.id}:`, serializeError.message);
             return null;
           }
-        }).filter(op => op !== null);
+        }).filter((op) => op !== null);
 
         const serialized = JSON.stringify(operations);
 
@@ -871,9 +871,9 @@ export class MedicalSyncManager {
         timeout: 5000,
         context: {
           operation: 'save_pending_operations',
-          operationCount: this.pendingOperations.size
-        }
-      }
+          operationCount: this.pendingOperations.size,
+        },
+      },
     );
   }
 

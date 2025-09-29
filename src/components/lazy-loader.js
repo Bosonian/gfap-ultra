@@ -110,7 +110,7 @@ class LazyComponent {
       });
 
       if (this.retryCount < this.maxRetries) {
-        //(`⚠️ Component ${this.name} load failed, retrying (${this.retryCount}/${this.maxRetries}):`, error);
+        // (`⚠️ Component ${this.name} load failed, retrying (${this.retryCount}/${this.maxRetries}):`, error);
 
         // Exponential backoff
         const delay = Math.min(1000 * 2 ** (this.retryCount - 1), 5000);
@@ -120,7 +120,7 @@ class LazyComponent {
         return this.load();
       }
       this.state = LoadState.ERROR;
-      //(`❌ Component ${this.name} failed to load after ${this.maxRetries} attempts:`, error);
+      // (`❌ Component ${this.name} failed to load after ${this.maxRetries} attempts:`, error);
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
         action: 'lazy_component_load_failed',
@@ -292,7 +292,7 @@ export class LazyLoader {
         const componentName = entry.target.dataset.lazyComponent;
         if (componentName) {
           this.load(componentName).catch((error) => {
-            //(`Failed to load component ${componentName}:`, error);
+            // (`Failed to load component ${componentName}:`, error);
           });
 
           // Stop observing once loaded
@@ -319,7 +319,7 @@ export class LazyLoader {
       // Process high priority components
       await this.processQueueByPriority(LoadPriority.HIGH);
     } catch (error) {
-      //('Error processing load queue:', error);
+      // ('Error processing load queue:', error);
     } finally {
       this.isProcessingQueue = false;
     }
@@ -336,10 +336,9 @@ export class LazyLoader {
       return;
     }
 
-    const loadPromises = pendingComponents.map((component) => component.load().catch((error) => {
-      //(`Component ${component.name} failed to load:`, error);
-      return null;
-    }));
+    const loadPromises = pendingComponents.map((component) => component.load().catch((error) =>
+      // (`Component ${component.name} failed to load:`, error);
+      null));
 
     await Promise.allSettled(loadPromises);
   }
@@ -384,7 +383,7 @@ export class LazyLoader {
         try {
           await component.load();
         } catch (error) {
-          //(`Idle loading failed for ${component.name}:`, error);
+          // (`Idle loading failed for ${component.name}:`, error);
         }
       } else {
         break; // No more time available
@@ -603,18 +602,16 @@ export class MedicalComponentLoader {
       'sw-manager',
       'advanced-analytics',
       'clinical-reporting',
-      'audit-trail'
+      'audit-trail',
     ];
 
-    const loadPromises = enterpriseComponents.map((comp) =>
-      this.lazyLoader.load(comp).catch((error) => {
-        console.warn(`Enterprise feature ${comp} failed to load:`, error);
-        return null;
-      })
-    );
+    const loadPromises = enterpriseComponents.map((comp) => this.lazyLoader.load(comp).catch((error) => {
+      console.warn(`Enterprise feature ${comp} failed to load:`, error);
+      return null;
+    }));
 
     const results = await Promise.allSettled(loadPromises);
-    const loadedCount = results.filter(r => r.status === 'fulfilled' && r.value !== null).length;
+    const loadedCount = results.filter((r) => r.status === 'fulfilled' && r.value !== null).length;
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
       action: 'enterprise_features_loaded',

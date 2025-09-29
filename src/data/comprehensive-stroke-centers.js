@@ -848,7 +848,7 @@ const ROUTING_ALGORITHM = {
   // Helper function to find nearest hospital
   findNearest(userLocation, hospitals) {
     if (!hospitals || hospitals.length === 0) {
-      //('No hospitals available in database');
+      // ('No hospitals available in database');
       return null;
     }
 
@@ -856,7 +856,7 @@ const ROUTING_ALGORITHM = {
       .map((hospital) => {
         // Validate hospital has coordinates
         if (!hospital.coordinates || typeof hospital.coordinates.lat !== 'number') {
-          //(`Hospital ${hospital.name} missing valid coordinates`);
+          // (`Hospital ${hospital.name} missing valid coordinates`);
           return null;
         }
 

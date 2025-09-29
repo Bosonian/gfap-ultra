@@ -15,7 +15,7 @@ import {
   ERROR_CATEGORIES,
   ERROR_SEVERITY,
   MEDICAL_ERROR_CODES,
-  validateMedicalInputs
+  validateMedicalInputs,
 } from '../utils/error-handler.js';
 
 // Type safety utilities
@@ -67,7 +67,7 @@ export async function calculateICHVolume(gfapValue) {
       medicalLogger.info('ICH volume calculation started', {
         category: LOG_CATEGORIES.MEDICAL_CALCULATION,
         gfapValue: gfap,
-        operation: 'ich_volume_calculation'
+        operation: 'ich_volume_calculation',
       });
 
       // Type safety validation first
@@ -84,9 +84,9 @@ export async function calculateICHVolume(gfapValue) {
             min: 0,
             max: 10001,
             warningMin: 29,
-            warningMax: 10000
-          }
-        }
+            warningMax: 10000,
+          },
+        },
       );
 
       if (!validation.isValid) {
@@ -94,7 +94,7 @@ export async function calculateICHVolume(gfapValue) {
           validation.errors[0]?.message || 'Invalid GFAP value',
           MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
           ERROR_CATEGORIES.VALIDATION,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ validationErrors: validation.errors, gfapValue: gfap });
       }
 
@@ -107,7 +107,7 @@ export async function calculateICHVolume(gfapValue) {
           mortalityRate: '~0%',
           isValid: true,
           calculation: 'No hemorrhage detected',
-          warnings: []
+          warnings: [],
         };
       }
 
@@ -129,7 +129,7 @@ export async function calculateICHVolume(gfapValue) {
           'GFAP value must be positive for volume calculation',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ gfapValue: cappedGfap });
       }
 
@@ -139,7 +139,7 @@ export async function calculateICHVolume(gfapValue) {
           'Invalid logarithm calculation for GFAP value',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ gfapValue: cappedGfap, logValue: logGfap });
       }
 
@@ -149,7 +149,7 @@ export async function calculateICHVolume(gfapValue) {
           'Invalid volume calculation result',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ logGfap, logVolume });
       }
 
@@ -159,7 +159,7 @@ export async function calculateICHVolume(gfapValue) {
           'Calculated volume is invalid',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ logVolume, calculatedVolume });
       }
 
@@ -204,8 +204,8 @@ export async function calculateICHVolume(gfapValue) {
         metadata: {
           originalGfap: gfap,
           cappedGfap,
-          calculationTimestamp: new Date().toISOString()
-        }
+          calculationTimestamp: new Date().toISOString(),
+        },
       };
 
       // Validate final result
@@ -214,13 +214,13 @@ export async function calculateICHVolume(gfapValue) {
           category: LOG_CATEGORIES.MEDICAL_CALCULATION,
           gfapValue: gfap,
           resultVolume: result.volume,
-          resultType: typeof result.volume
+          resultType: typeof result.volume,
         });
         throw new MedicalError(
           'Final volume calculation result is invalid',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.CRITICAL
+          ERROR_SEVERITY.CRITICAL,
         ).withContext({ result });
       }
 
@@ -230,7 +230,7 @@ export async function calculateICHVolume(gfapValue) {
         calculatedVolume: result.volume,
         volumeCategory: result.volumeCategory,
         riskLevel: result.riskLevel,
-        confidence: result.confidence
+        confidence: result.confidence,
       });
 
       return result;
@@ -247,14 +247,14 @@ export async function calculateICHVolume(gfapValue) {
         calculation: 'Calculation error - using fallback',
         error: error.message,
         fallbackUsed: true,
-        warnings: ['Volume calculation failed - fallback values used']
+        warnings: ['Volume calculation failed - fallback values used'],
       }),
       context: {
         operation: 'ich_volume_calculation',
         gfapValue,
-        formula: 'log₁₀(Volume) = 0.0192 + 0.4533 × log₁₀(GFAP)'
-      }
-    }
+        formula: 'log₁₀(Volume) = 0.0192 + 0.4533 × log₁₀(GFAP)',
+      },
+    },
   );
 }
 
@@ -279,11 +279,21 @@ export function estimateVolumeFromGFAP(gfap) {
  * @returns {string}
  */
 export function estimateMortalityFromVolume(volume) {
-  if (!Number.isFinite(volume) || volume <= 0) return '5-10%';
-  if (volume >= 60) return '91-100%';
-  if (volume >= 50) return '44-91%';
-  if (volume >= 30) return '19-44%';
-  if (volume >= 10) return '10-19%';
+  if (!Number.isFinite(volume) || volume <= 0) {
+    return '5-10%';
+  }
+  if (volume >= 60) {
+    return '91-100%';
+  }
+  if (volume >= 50) {
+    return '44-91%';
+  }
+  if (volume >= 30) {
+    return '19-44%';
+  }
+  if (volume >= 10) {
+    return '10-19%';
+  }
   return '5-10%';
 }
 
@@ -300,7 +310,7 @@ function getVolumeRiskLevel(volume) {
         'Invalid volume for risk level calculation',
         MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
         ERROR_CATEGORIES.MEDICAL,
-        ERROR_SEVERITY.MEDIUM
+        ERROR_SEVERITY.MEDIUM,
       ).withContext({ volume, type: typeof volume });
     }
 
@@ -309,7 +319,7 @@ function getVolumeRiskLevel(volume) {
         'Volume cannot be negative',
         MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
         ERROR_CATEGORIES.MEDICAL,
-        ERROR_SEVERITY.MEDIUM
+        ERROR_SEVERITY.MEDIUM,
       ).withContext({ volume });
     }
 
@@ -344,7 +354,7 @@ function getMortalityRate(volume) {
         'Invalid volume for mortality rate calculation',
         MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
         ERROR_CATEGORIES.MEDICAL,
-        ERROR_SEVERITY.MEDIUM
+        ERROR_SEVERITY.MEDIUM,
       ).withContext({ volume, type: typeof volume });
     }
 
@@ -368,7 +378,7 @@ function getMortalityRate(volume) {
           'Calculated mortality rate out of valid range',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%⁴`;
@@ -384,7 +394,7 @@ function getMortalityRate(volume) {
           'Calculated mortality rate out of valid range',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%³`;
@@ -400,7 +410,7 @@ function getMortalityRate(volume) {
           'Calculated mortality rate out of valid range',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%²`;
@@ -416,7 +426,7 @@ function getMortalityRate(volume) {
           'Calculated mortality rate out of valid range',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%¹`;
@@ -446,7 +456,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           'Invalid volume for size percentage calculation',
           MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
           ERROR_CATEGORIES.VALIDATION,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume, type: typeof volume });
       }
 
@@ -455,7 +465,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           'Volume cannot be negative for visualization',
           MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
           ERROR_CATEGORIES.VALIDATION,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume });
       }
 
@@ -474,7 +484,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           'Invalid square root calculation for visualization',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume, sqrtValue });
       }
 
@@ -487,7 +497,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           'Calculated percentage out of valid range',
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume, basePercent, result });
       }
 
@@ -499,15 +509,19 @@ export async function calculateHemorrhageSizePercent(volume) {
       timeout: 1000,
       fallback: () => {
         // Safe fallback based on simple linear scaling
-        if (volume <= 0) return 0;
-        if (volume >= 100) return 70;
+        if (volume <= 0) {
+          return 0;
+        }
+        if (volume >= 100) {
+          return 70;
+        }
         return Math.min((volume / 100) * 70, 70);
       },
       context: {
         operation: 'hemorrhage_size_calculation',
-        volume
-      }
-    }
+        volume,
+      },
+    },
   );
 }
 
@@ -542,35 +556,36 @@ export async function testVolumeCalculator() {
         testCases.map(async (test) => {
           try {
             const result = await calculateICHVolume(test.gfap);
-            return { gfap: test.gfap, result, expected: test.expectedVolume, success: true };
+            return {
+              gfap: test.gfap, result, expected: test.expectedVolume, success: true,
+            };
           } catch (error) {
             return {
               gfap: test.gfap,
               result: null,
               expected: test.expectedVolume,
               success: false,
-              error: error.message
+              error: error.message,
             };
           }
-        })
+        }),
       );
 
       // Process results and handle any failures
       const processedResults = results.map((result, index) => {
         if (result.status === 'fulfilled') {
           return result.value;
-        } else {
-          return {
-            gfap: testCases[index].gfap,
-            result: null,
-            expected: testCases[index].expectedVolume,
-            success: false,
-            error: result.reason?.message || 'Test failed'
-          };
         }
+        return {
+          gfap: testCases[index].gfap,
+          result: null,
+          expected: testCases[index].expectedVolume,
+          success: false,
+          error: result.reason?.message || 'Test failed',
+        };
       });
 
-      const successfulTests = processedResults.filter(r => r.success).length;
+      const successfulTests = processedResults.filter((r) => r.success).length;
       const totalTests = testCases.length;
 
       return {
@@ -579,9 +594,9 @@ export async function testVolumeCalculator() {
           total: totalTests,
           successful: successfulTests,
           failed: totalTests - successfulTests,
-          successRate: `${Math.round((successfulTests / totalTests) * 100)}%`
+          successRate: `${Math.round((successfulTests / totalTests) * 100)}%`,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     },
     {
@@ -594,15 +609,15 @@ export async function testVolumeCalculator() {
           total: 0,
           successful: 0,
           failed: 0,
-          successRate: '0%'
+          successRate: '0%',
         },
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       context: {
-        operation: 'volume_calculator_test'
-      }
-    }
+        operation: 'volume_calculator_test',
+      },
+    },
   );
 }
 

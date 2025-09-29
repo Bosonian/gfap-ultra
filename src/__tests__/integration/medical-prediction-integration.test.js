@@ -143,7 +143,7 @@ describe('Medical Prediction Integration Tests', () => {
           expect.any(String),
           expect.objectContaining({
             body: expect.stringContaining('"vigilanzminderung":1'),
-          })
+          }),
         );
       });
     });
@@ -191,7 +191,7 @@ describe('Medical Prediction Integration Tests', () => {
           expect.any(String),
           expect.objectContaining({
             body: expect.stringMatching(/headache.*vigilanzminderung.*armparese/),
-          })
+          }),
         );
       });
     });
@@ -228,7 +228,7 @@ describe('Medical Prediction Integration Tests', () => {
           expect.any(String),
           expect.objectContaining({
             body: expect.stringContaining('"gfap_value":320.5'),
-          })
+          }),
         );
       });
     });

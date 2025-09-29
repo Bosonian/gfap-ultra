@@ -89,7 +89,7 @@ export class MedicalEventObserver {
           eventObservers.delete(observer);
         }
       } catch (error) {
-        //(`Medical observer error for event ${eventType}:`, error);
+        // (`Medical observer error for event ${eventType}:`, error);
         // Don't propagate observer errors to prevent cascade failures
       }
     });

@@ -237,19 +237,19 @@ export function initializeVolumeVisualization() {
     }
   });
 
-  //('🧠 ICH Volume Visualization initialized');
+  // ('🧠 ICH Volume Visualization initialized');
 }
 
 /**
  * Test the volume integration with sample data
  */
 export function testVolumeIntegration() {
-  //('🧪 Testing ICH Volume Integration:');
+  // ('🧪 Testing ICH Volume Integration:');
 
   const testValues = [100, 500, 1000, 1500, 3000, 5000];
 
   testValues.forEach((gfap) => {
     const result = calculateICHVolume(gfap);
-    //(`GFAP ${gfap}: ${result.displayVolume} (${result.riskLevel}) - ${result.mortalityRate}`);
+    // (`GFAP ${gfap}: ${result.displayVolume} (${result.riskLevel}) - ${result.mortalityRate}`);
   });
 }

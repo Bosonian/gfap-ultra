@@ -7,7 +7,7 @@ import {
   EnvironmentConfig,
   EnvironmentValidationError,
   SecurityLevel,
-  ConfigurationManager
+  ConfigurationManager,
 } from '../../security/environment.js';
 
 // Mock environment variables
@@ -35,10 +35,10 @@ const mockEnv = {
 Object.defineProperty(globalThis, 'import', {
   value: {
     meta: {
-      env: mockEnv
-    }
+      env: mockEnv,
+    },
   },
-  writable: true
+  writable: true,
 });
 
 describe('EnvironmentConfig', () => {

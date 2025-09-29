@@ -216,7 +216,7 @@ class ClinicalReportGenerator {
         error: error.message,
       });
 
-      //(`Report generation failed for ${reportType}:`, error);
+      // (`Report generation failed for ${reportType}:`, error);
       throw error;
     }
   }
@@ -260,7 +260,7 @@ class ClinicalReportGenerator {
           dataQuality.issues = dataQuality.issues.concat(section.quality.issues || []);
         }
       } catch (error) {
-        //(`Failed to generate section ${sectionName}:`, error);
+        // (`Failed to generate section ${sectionName}:`, error);
         sections[sectionName] = {
           title: this.getSectionTitle(sectionName),
           content: `Error generating section: ${error.message}`,
@@ -1232,7 +1232,7 @@ export class ClinicalReportingSystem {
             this.deliveryQueue.push(deliveryItem);
           }, 60000 * deliveryItem.attempts); // Exponential backoff
         } else {
-          //('Failed to deliver report after max attempts:', error);
+          // ('Failed to deliver report after max attempts:', error);
         }
       }
     }
@@ -1297,7 +1297,7 @@ export class ClinicalReportingSystem {
    */
   async emailReport(report, options) {
     // In real implementation, this would integrate with email service
-    //(`Email report ${report.metadata.id} to ${options.recipient}`);
+    // (`Email report ${report.metadata.id} to ${options.recipient}`);
   }
 
   /**
@@ -1305,7 +1305,7 @@ export class ClinicalReportingSystem {
    */
   async integrateWithEHR(report, options) {
     // In real implementation, this would integrate with EHR system
-    //(`Integrate report ${report.metadata.id} with EHR system`);
+    // (`Integrate report ${report.metadata.id} with EHR system`);
   }
 
   /**
@@ -1313,7 +1313,7 @@ export class ClinicalReportingSystem {
    */
   async sendToAPI(report, options) {
     // In real implementation, this would send to external API
-    //(`Send report ${report.metadata.id} to API endpoint`);
+    // (`Send report ${report.metadata.id} to API endpoint`);
   }
 
   /**
