@@ -256,10 +256,10 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
             <span class="font-semibold text-red-700 dark:text-red-300">${t("increaseRisk")}</span>
           </div>
           ${
-            positiveDrivers.length
-              ? positiveDrivers.map(d => renderDriverBar(d, "+", "red", "rose")).join("")
-              : `<p class="text-gray-500 italic">${t("noPositiveFactors")}</p>`
-          }
+  positiveDrivers.length
+    ? positiveDrivers.map(d => renderDriverBar(d, "+", "red", "rose")).join("")
+    : `<p class="text-gray-500 italic">${t("noPositiveFactors")}</p>`
+}
         </div>
 
         <!-- Decreasing Risk -->
@@ -269,10 +269,10 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
             <span class="font-semibold text-blue-700 dark:text-blue-300">${t("decreaseRisk")}</span>
           </div>
           ${
-            negativeDrivers.length
-              ? negativeDrivers.map(d => renderDriverBar(d, "-", "blue", "indigo")).join("")
-              : `<p class="text-gray-500 italic">${t("noNegativeFactors")}</p>`
-          }
+  negativeDrivers.length
+    ? negativeDrivers.map(d => renderDriverBar(d, "-", "blue", "indigo")).join("")
+    : `<p class="text-gray-500 italic">${t("noNegativeFactors")}</p>`
+}
         </div>
       </div>
     </div>

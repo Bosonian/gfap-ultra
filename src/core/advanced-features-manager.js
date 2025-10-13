@@ -8,18 +8,18 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from '../utils/error-handler.js';
+import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from "../utils/error-handler.js";
 
 // Phase 3: Advanced offline capabilities
-import { medicalSWManager } from '../workers/sw-manager.js';
-import { medicalPerformanceMonitor } from '../performance/medical-performance-monitor.js';
-import { medicalSyncManager } from '../sync/medical-sync-manager.js';
-import { lazyLoader } from '../components/lazy-loader.js';
+import { medicalSWManager } from "../workers/sw-manager.js";
+import { medicalPerformanceMonitor } from "../performance/medical-performance-monitor.js";
+import { medicalSyncManager } from "../sync/medical-sync-manager.js";
+import { lazyLoader } from "../components/lazy-loader.js";
 
 // Phase 4: Medical Intelligence & Analytics - Selected Features
-import { clinicalReportingSystem } from '../analytics/clinical-reporting.js';
-import { qualityMetricsTracker } from '../analytics/quality-metrics.js';
-import { clinicalAuditTrail } from '../analytics/audit-trail.js';
+import { clinicalReportingSystem } from "../analytics/clinical-reporting.js";
+import { qualityMetricsTracker } from "../analytics/quality-metrics.js";
+import { clinicalAuditTrail } from "../analytics/audit-trail.js";
 
 /**
  * Manages advanced features initialization and coordination
@@ -63,7 +63,7 @@ export class AdvancedFeaturesManager {
         severity: ERROR_SEVERITY.MEDIUM,
         timeout: 60000, // Allow more time for advanced features
         context: {
-          operation: 'initialize_advanced_features',
+          operation: "initialize_advanced_features",
         },
       },
     );
@@ -94,7 +94,7 @@ export class AdvancedFeaturesManager {
         false,
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'initialize_phase3_features' },
+        context: { operation: "initialize_phase3_features" },
       },
     );
   }
@@ -115,7 +115,7 @@ export class AdvancedFeaturesManager {
       },
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'initialize_performance_monitor' },
+        context: { operation: "initialize_performance_monitor" },
       },
     );
   }
@@ -143,7 +143,7 @@ export class AdvancedFeaturesManager {
       },
       {
         category: ERROR_CATEGORIES.NETWORK,
-        context: { operation: 'initialize_service_worker' },
+        context: { operation: "initialize_service_worker" },
       },
     );
   }
@@ -164,7 +164,7 @@ export class AdvancedFeaturesManager {
       },
       {
         category: ERROR_CATEGORIES.NETWORK,
-        context: { operation: 'initialize_sync_manager' },
+        context: { operation: "initialize_sync_manager" },
       },
     );
   }
@@ -176,7 +176,7 @@ export class AdvancedFeaturesManager {
     return safeAsync(
       async () => {
         // Preload critical components immediately
-        await lazyLoader.preload('critical');
+        await lazyLoader.preload("critical");
 
         // Setup viewport-based loading for result visualizations
         setTimeout(() => this.setupViewportLoading(), 100);
@@ -190,7 +190,7 @@ export class AdvancedFeaturesManager {
       },
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'initialize_progressive_loading' },
+        context: { operation: "initialize_progressive_loading" },
       },
     );
   }
@@ -200,14 +200,14 @@ export class AdvancedFeaturesManager {
    */
   setupViewportLoading() {
     try {
-      const brainVizElements = document.querySelectorAll('.brain-visualization-placeholder');
+      const brainVizElements = document.querySelectorAll(".brain-visualization-placeholder");
       brainVizElements.forEach((element) => {
-        lazyLoader.observeElement(element, 'brain-visualization');
+        lazyLoader.observeElement(element, "brain-visualization");
       });
 
-      const mapElements = document.querySelectorAll('.stroke-center-map-placeholder');
+      const mapElements = document.querySelectorAll(".stroke-center-map-placeholder");
       mapElements.forEach((element) => {
-        lazyLoader.observeElement(element, 'stroke-center-map');
+        lazyLoader.observeElement(element, "stroke-center-map");
       });
     } catch (error) {
       // Viewport loading setup failed - continue without it
@@ -221,10 +221,10 @@ export class AdvancedFeaturesManager {
     return safeAsync(
       async () => {
         const criticalResources = [
-          '/0925/src/logic/lvo-local-model.js',
-          '/0925/src/logic/ich-volume-calculator.js',
-          '/0925/src/patterns/prediction-strategy.js',
-          '/0925/src/performance/medical-cache.js',
+          "/0925/src/logic/lvo-local-model.js",
+          "/0925/src/logic/ich-volume-calculator.js",
+          "/0925/src/patterns/prediction-strategy.js",
+          "/0925/src/performance/medical-cache.js",
         ];
 
         await medicalSWManager.prefetchResources(criticalResources);
@@ -235,7 +235,7 @@ export class AdvancedFeaturesManager {
         false,
       {
         category: ERROR_CATEGORIES.NETWORK,
-        context: { operation: 'prefetch_critical_resources' },
+        context: { operation: "prefetch_critical_resources" },
       },
     );
   }
@@ -265,7 +265,7 @@ export class AdvancedFeaturesManager {
         false,
       {
         category: ERROR_CATEGORIES.RENDERING,
-        context: { operation: 'initialize_phase4_features' },
+        context: { operation: "initialize_phase4_features" },
       },
     );
   }
@@ -286,7 +286,7 @@ export class AdvancedFeaturesManager {
       },
       {
         category: ERROR_CATEGORIES.MEDICAL,
-        context: { operation: 'initialize_audit_trail' },
+        context: { operation: "initialize_audit_trail" },
       },
     );
   }
@@ -307,7 +307,7 @@ export class AdvancedFeaturesManager {
       },
       {
         category: ERROR_CATEGORIES.MEDICAL,
-        context: { operation: 'initialize_reporting_system' },
+        context: { operation: "initialize_reporting_system" },
       },
     );
   }
@@ -328,7 +328,7 @@ export class AdvancedFeaturesManager {
       },
       {
         category: ERROR_CATEGORIES.MEDICAL,
-        context: { operation: 'initialize_quality_metrics' },
+        context: { operation: "initialize_quality_metrics" },
       },
     );
   }
@@ -338,7 +338,7 @@ export class AdvancedFeaturesManager {
    */
   setupPhase4EventHandlers() {
     // Listen for form submissions to trigger quality metrics and audit logging
-    document.addEventListener('submit', async (event) => {
+    document.addEventListener("submit", async (event) => {
       const form = event.target;
       if (form.dataset.module) {
         await safeAsync(
@@ -348,7 +348,7 @@ export class AdvancedFeaturesManager {
 
             // Log audit trail
             if (this.phase4Status.auditTrail) {
-              clinicalAuditTrail.logEvent('data_entry', {
+              clinicalAuditTrail.logEvent("data_entry", {
                 module: form.dataset.module,
                 timestamp: new Date().toISOString(),
                 data_points: Object.keys(patientData).length,
@@ -357,10 +357,10 @@ export class AdvancedFeaturesManager {
 
             // Record quality metrics
             if (this.phase4Status.qualityMetrics) {
-              qualityMetricsTracker.recordMetric('form_completion', 'count', 1);
+              qualityMetricsTracker.recordMetric("form_completion", "count", 1);
               qualityMetricsTracker.recordMetric(
-                'data_quality',
-                'completeness',
+                "data_quality",
+                "completeness",
                 Object.values(patientData).filter((v) => v && v.trim()).length / Object.keys(patientData).length * 100,
               );
             }
@@ -372,7 +372,7 @@ export class AdvancedFeaturesManager {
             false,
           {
             category: ERROR_CATEGORIES.MEDICAL,
-            context: { operation: 'phase4_event_handling' },
+            context: { operation: "phase4_event_handling" },
           },
         );
       }
@@ -402,12 +402,12 @@ export class AdvancedFeaturesManager {
    */
   getSystemStatus() {
     return {
-      serviceWorkerSupported: 'serviceWorker' in navigator,
-      indexedDBSupported: 'indexedDB' in window,
-      notificationSupported: 'Notification' in window,
-      cacheSupported: 'caches' in window,
-      webLockSupported: 'locks' in navigator,
-      performanceSupported: 'performance' in window,
+      serviceWorkerSupported: "serviceWorker" in navigator,
+      indexedDBSupported: "indexedDB" in window,
+      notificationSupported: "Notification" in window,
+      cacheSupported: "caches" in window,
+      webLockSupported: "locks" in navigator,
+      performanceSupported: "performance" in window,
     };
   }
 

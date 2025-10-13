@@ -152,12 +152,12 @@ function renderRiskCard(type, data, results) {
       <!-- Risk Level -->
       <div class="risk-level ${level} text-center mt-4 px-3 py-1 rounded-full text-sm font-semibold
         ${
-          level === "critical"
-            ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-            : level === "high"
-              ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
-              : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-        }">
+  level === "critical"
+    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+    : level === "high"
+      ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+      : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+}">
         ${riskLevel}
       </div>
     </div>
@@ -327,14 +327,14 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
 
       <!-- ICH Volume (Coma only) -->
       ${
-        ich?.module === "Coma" && ichPercentLocal >= 50
-          ? `
+  ich?.module === "Coma" && ichPercentLocal >= 50
+    ? `
           <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 mb-6">
             ${renderVolumeCard(ich)}
           </div>
         `
-          : ""
-      }
+    : ""
+}
 
       <!-- Alternative Diagnoses (Coma) -->
       ${alternativeDiagnosesHtml ? `<div class="mb-6">${alternativeDiagnosesHtml}</div>` : ""}
@@ -347,8 +347,8 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
 
       <!-- ICH Drivers (non-Coma) -->
       ${
-        ich?.module !== "Coma"
-          ? `
+  ich?.module !== "Coma"
+    ? `
           <div class="alternative-diagnosis-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 my-6 transition-all duration-300 hover:shadow-lg">
           <div class="diagnosis-header flex items-center gap-3 border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
             <span class="text-3xl">⚡</span>
@@ -356,8 +356,8 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
           </div>
            ${renderICHDriversOnly(ich)}
         </div>`
-          : ""
-      }
+    : ""
+}
 
       <!-- Collapsible Sections -->
       <div class="space-y-4 mb-8">
@@ -664,15 +664,15 @@ function renderICHDriversOnly(ich) {
         </div>
         <div class="compact-drivers p-4 space-y-2">
           ${
-            positive.length > 0
-              ? positive
-                  .slice(0, 5)
-                  .map(d => renderCompactDriver(d, "positive"))
-                  .join("")
-              : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm"> 
+  positive.length > 0
+    ? positive
+      .slice(0, 5)
+      .map(d => renderCompactDriver(d, "positive"))
+      .join("")
+    : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm"> 
                   ${t("noFactors") || "No factors"} 
                  </p>`
-          }
+}
         </div>
       </div>
 
@@ -686,15 +686,15 @@ function renderICHDriversOnly(ich) {
         </div>
         <div class="compact-drivers p-4 space-y-2">
           ${
-            negative.length > 0
-              ? negative
-                  .slice(0, 5)
-                  .map(d => renderCompactDriver(d, "negative"))
-                  .join("")
-              : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm">
+  negative.length > 0
+    ? negative
+      .slice(0, 5)
+      .map(d => renderCompactDriver(d, "negative"))
+      .join("")
+    : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm">
                   ${t("noFactors") || "No factors"}
                  </p>`
-          }
+}
         </div>
       </div>
     </div>

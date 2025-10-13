@@ -8,7 +8,7 @@ import {
   getVolumeColor,
   calculateICHVolume,
   formatVolumeDisplay,
-} from '../../logic/ich-volume-calculator.js';
+} from "../../logic/ich-volume-calculator.js";
 
 /**
  * Render brain visualization with hemorrhage overlay
@@ -16,8 +16,8 @@ import {
  * @param {string} size - 'compact' or 'detailed'
  * @returns {string} HTML string with SVG brain visualization
  */
-export function renderBrainVisualization(volume, size = 'compact') {
-  const dimensions = size === 'compact' ? { width: 120, height: 120 } : { width: 200, height: 200 };
+export function renderBrainVisualization(volume, size = "compact") {
+  const dimensions = size === "compact" ? { width: 120, height: 120 } : { width: 200, height: 200 };
   const centerX = dimensions.width / 2;
   const centerY = dimensions.height / 2;
 
@@ -54,8 +54,8 @@ export function renderBrainVisualization(volume, size = 'compact') {
         
         <!-- 30ml reference indicator (detailed view only) -->
         ${
-          size === 'detailed' && volume > 0
-            ? `
+  size === "detailed" && volume > 0
+    ? `
           <circle 
             cx="${hemorrhageX}" 
             cy="${hemorrhageY}" 
@@ -74,13 +74,13 @@ export function renderBrainVisualization(volume, size = 'compact') {
             font-family="system-ui"
           >30ml</text>
         `
-            : ''
-        }
+    : ""
+}
         
         <!-- Hemorrhage visualization -->
         ${
-          volume > 0
-            ? `
+  volume > 0
+    ? `
           <circle 
             cx="${hemorrhageX}" 
             cy="${hemorrhageY}" 
@@ -97,8 +97,8 @@ export function renderBrainVisualization(volume, size = 'compact') {
               repeatCount="indefinite"
             />
             ${
-              hemorrhageRadius > 15
-                ? `
+  hemorrhageRadius > 15
+    ? `
             <animate 
               attributeName="r" 
               values="${hemorrhageRadius * 0.95};${hemorrhageRadius};${hemorrhageRadius * 0.95}" 
@@ -106,14 +106,14 @@ export function renderBrainVisualization(volume, size = 'compact') {
               repeatCount="indefinite"
             />
             `
-                : ''
-            }
+    : ""
+}
           </circle>
           
           <!-- Volume label (detailed view only) -->
           ${
-            size === 'detailed'
-              ? `
+  size === "detailed"
+    ? `
             <text 
               x="${centerX}" 
               y="${dimensions.height - 10}" 
@@ -122,13 +122,13 @@ export function renderBrainVisualization(volume, size = 'compact') {
               font-weight="bold"
               fill="#374151"
               font-family="system-ui"
-            >${volume < 1 ? '<1' : volume.toFixed(1)} ml</text>
+            >${volume < 1 ? "<1" : volume.toFixed(1)} ml</text>
           `
-              : ''
-          }
+    : ""
+}
         `
-            : ''
-        }
+    : ""
+}
         
         <style>
           .hemorrhage-circle {
@@ -175,8 +175,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
     
     <!-- Hemorrhage overlay in basal ganglia region -->
     ${
-      volume > 0
-        ? `
+  volume > 0
+    ? `
       <circle 
         cx="${hemorrhageX}" 
         cy="${hemorrhageY}" 
@@ -193,8 +193,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
           repeatCount="indefinite"
         />
         ${
-          hemorrhageRadius > 8
-            ? `
+  hemorrhageRadius > 8
+    ? `
         <animate 
           attributeName="r" 
           values="${hemorrhageRadius * 0.96};${hemorrhageRadius * 1.02};${hemorrhageRadius * 0.96}" 
@@ -202,8 +202,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
           repeatCount="indefinite"
         />
         `
-            : ''
-        }
+    : ""
+}
       </circle>
       
       <!-- Hemorrhage center highlight -->
@@ -216,8 +216,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
         class="hemorrhage-center"
       />
     `
-        : ''
-    }
+    : ""
+}
   `;
 }
 
@@ -285,8 +285,8 @@ export function renderCompactBrainIcon(volume, size = 24) {
       
       <!-- Hemorrhage indicator -->
       ${
-        volume > 0
-          ? `
+  volume > 0
+    ? `
         <circle 
           cx="${size / 2 + size * 0.1}" 
           cy="${size / 2}" 
@@ -295,8 +295,8 @@ export function renderCompactBrainIcon(volume, size = 24) {
           opacity="0.9"
         />
       `
-          : ''
-      }
+    : ""
+}
     </svg>
   `;
 }
@@ -325,7 +325,7 @@ export function renderCircularBrainDisplay(volume) {
  * Call this after DOM is updated with new volume circles
  */
 export function initializeVolumeAnimations() {
-  const canvases = document.querySelectorAll('.volume-canvas');
+  const canvases = document.querySelectorAll(".volume-canvas");
 
   canvases.forEach(canvas => {
     // Set canvas internal size to match CSS size
@@ -347,7 +347,7 @@ export function initializeVolumeAnimations() {
  * @param {number} volume - ICH volume in ml
  */
 function drawVolumeFluid(canvas, volume) {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
   const radius = canvas.width * 0.45; // 45% of canvas width for the circle
@@ -356,8 +356,8 @@ function drawVolumeFluid(canvas, volume) {
 
   // Check dark mode once
   const isDarkMode =
-    document.body.classList.contains('dark-mode') ||
-    window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.body.classList.contains("dark-mode") ||
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   function draw() {
     if (!isAnimating) {
@@ -392,13 +392,13 @@ function drawVolumeFluid(canvas, volume) {
       ctx.clip();
 
       // Draw base fluid rectangle
-      ctx.fillStyle = '#dc2626';
+      ctx.fillStyle = "#dc2626";
       ctx.globalAlpha = 0.7;
       ctx.fillRect(0, baseLevel + 5, canvas.width, canvas.height);
 
       // Draw animated wave surface
       ctx.globalAlpha = 0.9;
-      ctx.fillStyle = '#dc2626';
+      ctx.fillStyle = "#dc2626";
       ctx.beginPath();
 
       // Create wave path
@@ -423,8 +423,8 @@ function drawVolumeFluid(canvas, volume) {
 
     // Draw background border circle (like ICH risk ring)
     const borderColor =
-      getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim() ||
-      (isDarkMode ? '#8899a6' : '#6c757d');
+      getComputedStyle(document.documentElement).getPropertyValue("--text-secondary").trim() ||
+      (isDarkMode ? "#8899a6" : "#6c757d");
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 8;
     ctx.globalAlpha = 0.4;
@@ -440,12 +440,12 @@ function drawVolumeFluid(canvas, volume) {
 
     // Progress ring (dark mode aware)
     const progressColor =
-      getComputedStyle(document.documentElement).getPropertyValue('--danger-color').trim() ||
-      '#dc2626';
+      getComputedStyle(document.documentElement).getPropertyValue("--danger-color").trim() ||
+      "#dc2626";
     ctx.strokeStyle = progressColor;
     ctx.lineWidth = 8;
     ctx.setLineDash([]);
-    ctx.lineCap = 'round';
+    ctx.lineCap = "round";
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + volumePercent * 2 * Math.PI);
     ctx.stroke();
@@ -476,7 +476,7 @@ function drawVolumeFluid(canvas, volume) {
  * @returns {string} CSS classes
  */
 export function getBrainVisualizationClasses(size) {
-  const baseClasses = 'brain-visualization';
-  const sizeClasses = size === 'compact' ? 'compact-brain' : 'detailed-brain';
+  const baseClasses = "brain-visualization";
+  const sizeClasses = size === "compact" ? "compact-brain" : "detailed-brain";
   return `${baseClasses} ${sizeClasses}`;
 }

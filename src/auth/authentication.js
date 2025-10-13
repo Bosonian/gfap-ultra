@@ -8,8 +8,8 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { API_URLS, DEV_CONFIG } from '../config.js';
-import { getResearchPassword, isDevelopment, getSecurityConfig } from '../security/environment.js';
+import { API_URLS, DEV_CONFIG } from "../config.js";
+import { getResearchPassword, isDevelopment, getSecurityConfig } from "../security/environment.js";
 
 // Bulletproof error handling utilities
 import {
@@ -19,16 +19,16 @@ import {
   ERROR_CATEGORIES,
   ERROR_SEVERITY,
   MEDICAL_ERROR_CODES,
-} from '../utils/error-handler.js';
+} from "../utils/error-handler.js";
 
 // Type safety utilities
-import { TypeChecker } from '../types/medical-types.js';
+import { TypeChecker } from "../types/medical-types.js";
 
 // Professional logging
-import { medicalLogger, LOG_CATEGORIES } from '../utils/medical-logger.js';
+import { medicalLogger, LOG_CATEGORIES } from "../utils/medical-logger.js";
 
 // Encrypted storage
-import { secureStore, secureRetrieve, secureRemove } from '../security/data-encryption.js';
+import { secureStore, secureRetrieve, secureRemove } from "../security/data-encryption.js";
 
 export class AuthenticationManager {
   constructor() {
@@ -47,31 +47,31 @@ export class AuthenticationManager {
   async authenticate(password) {
     return safeAuthOperation(
       async () => {
-        medicalLogger.info('Authentication attempt started', {
+        medicalLogger.info("Authentication attempt started", {
           category: LOG_CATEGORIES.AUTHENTICATION,
           hasPassword: !!password && password.length > 0,
           isDevelopment: DEV_CONFIG.isDevelopment,
         });
 
         // Type safety validation
-        TypeChecker.ensureType(password, 'string', 'authentication password');
+        TypeChecker.ensureType(password, "string", "authentication password");
 
         if (!password || password.trim().length === 0) {
-          medicalLogger.warn('Authentication failed: empty password', {
+          medicalLogger.warn("Authentication failed: empty password", {
             category: LOG_CATEGORIES.AUTHENTICATION,
           });
           throw new MedicalError(
-            'Password is required',
-            'EMPTY_PASSWORD',
+            "Password is required",
+            "EMPTY_PASSWORD",
             ERROR_CATEGORIES.VALIDATION,
             ERROR_SEVERITY.MEDIUM,
           );
         }
 
         // Local preview (localhost, vite preview): authenticate locally to avoid CORS
-        const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+        const isLocalPreview = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
         if (isLocalPreview || DEV_CONFIG.isDevelopment) {
-          medicalLogger.info('Development mode authentication path', {
+          medicalLogger.info("Development mode authentication path", {
             category: LOG_CATEGORIES.AUTHENTICATION,
           });
 
@@ -81,8 +81,8 @@ export class AuthenticationManager {
             await this.delayFailedAttempt();
             return {
               success: false,
-              message: 'Invalid credentials',
-              errorCode: 'INVALID_CREDENTIALS',
+              message: "Invalid credentials",
+              errorCode: "INVALID_CREDENTIALS",
             };
           }
 
@@ -97,26 +97,26 @@ export class AuthenticationManager {
           try {
             this.storeSecureSession();
           } catch (storageError) {
-            console.warn('Session storage failed:', storageError.message);
+            console.warn("Session storage failed:", storageError.message);
           }
 
           return {
             success: true,
-            message: 'Authentication successful',
+            message: "Authentication successful",
             sessionDuration: DEV_CONFIG.mockAuthResponse.session_duration,
           };
         }
 
         // This branch is now unreachable due to isLocalPreview handling above; keep as guard
-        const isLocalHost = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
-        const preferMock = localStorage.getItem('use_mock_api') !== 'false';
+        const isLocalHost = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
+        const preferMock = localStorage.getItem("use_mock_api") !== "false";
         if (isLocalHost && preferMock && !(import.meta && import.meta.env && import.meta.env.DEV)) {
           if (password.trim() !== getResearchPassword()) {
             await this.delayFailedAttempt();
             return {
               success: false,
-              message: 'Invalid credentials',
-              errorCode: 'INVALID_CREDENTIALS',
+              message: "Invalid credentials",
+              errorCode: "INVALID_CREDENTIALS",
             };
           }
 
@@ -134,37 +134,37 @@ export class AuthenticationManager {
 
           return {
             success: true,
-            message: 'Authentication successful',
+            message: "Authentication successful",
             sessionDuration: 1800,
           };
         }
 
-        medicalLogger.debug('Sending authentication request', {
+        medicalLogger.debug("Sending authentication request", {
           category: LOG_CATEGORIES.AUTHENTICATION,
           url: API_URLS.AUTHENTICATE,
         });
 
         const response = await fetch(API_URLS.AUTHENTICATE, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            action: 'login',
+            action: "login",
             password: password.trim(),
           }),
         });
 
         if (!response.ok) {
-          let errorMessage = 'Authentication failed';
-          let errorCode = 'AUTH_FAILED';
+          let errorMessage = "Authentication failed";
+          let errorCode = "AUTH_FAILED";
 
           if (response.status === 429) {
-            errorMessage = 'Too many authentication attempts. Please wait and try again.';
-            errorCode = 'RATE_LIMITED';
+            errorMessage = "Too many authentication attempts. Please wait and try again.";
+            errorCode = "RATE_LIMITED";
           } else if (response.status >= 500) {
-            errorMessage = 'Authentication service temporarily unavailable';
-            errorCode = 'SERVICE_ERROR';
+            errorMessage = "Authentication service temporarily unavailable";
+            errorCode = "SERVICE_ERROR";
           }
 
           throw new MedicalError(
@@ -177,10 +177,10 @@ export class AuthenticationManager {
 
         const data = await response.json();
 
-        if (!data || typeof data !== 'object') {
+        if (!data || typeof data !== "object") {
           throw new MedicalError(
-            'Invalid response from authentication service',
-            'INVALID_RESPONSE',
+            "Invalid response from authentication service",
+            "INVALID_RESPONSE",
             ERROR_CATEGORIES.AUTHENTICATION,
             ERROR_SEVERITY.HIGH,
           );
@@ -197,12 +197,12 @@ export class AuthenticationManager {
             this.storeSecureSession();
           } catch (storageError) {
             // Continue with authentication even if storage fails
-            console.warn('Session storage failed:', storageError.message);
+            console.warn("Session storage failed:", storageError.message);
           }
 
           return {
             success: true,
-            message: 'Authentication successful',
+            message: "Authentication successful",
             sessionDuration: data.session_duration,
           };
         }
@@ -210,8 +210,8 @@ export class AuthenticationManager {
         await this.delayFailedAttempt();
 
         throw new MedicalError(
-          data.message || 'Invalid credentials',
-          'INVALID_CREDENTIALS',
+          data.message || "Invalid credentials",
+          "INVALID_CREDENTIALS",
           ERROR_CATEGORIES.AUTHENTICATION,
           ERROR_SEVERITY.MEDIUM,
         ).withContext({
@@ -223,14 +223,14 @@ export class AuthenticationManager {
         timeout: 15000,
         fallback: (error) => ({
           success: false,
-          message: error instanceof MedicalError ? error.getUserMessage() : 'Authentication service unavailable. Please try again.',
-          errorCode: error.code || 'NETWORK_ERROR',
+          message: error instanceof MedicalError ? error.getUserMessage() : "Authentication service unavailable. Please try again.",
+          errorCode: error.code || "NETWORK_ERROR",
           details: error.message,
           remainingAttempts: error.context?.remainingAttempts,
         }),
         context: {
-          operation: 'user_authentication',
-          endpoint: 'authenticate',
+          operation: "user_authentication",
+          endpoint: "authenticate",
         },
       },
     );
@@ -266,19 +266,19 @@ export class AuthenticationManager {
     return safeAuthOperation(
       async () => {
         // Skip remote validation on local preview to avoid CORS noise
-        const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+        const isLocalPreview = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
         if (isLocalPreview) {
           this.updateActivity();
           return true;
         }
 
         const response = await fetch(API_URLS.AUTHENTICATE, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            action: 'validate_session',
+            action: "validate_session",
             session_token: this.sessionToken,
           }),
         });
@@ -291,8 +291,8 @@ export class AuthenticationManager {
           }
 
           throw new MedicalError(
-            'Session validation service error',
-            'VALIDATION_ERROR',
+            "Session validation service error",
+            "VALIDATION_ERROR",
             ERROR_CATEGORIES.AUTHENTICATION,
             ERROR_SEVERITY.MEDIUM,
           ).withContext({ statusCode: response.status });
@@ -300,10 +300,10 @@ export class AuthenticationManager {
 
         const data = await response.json();
 
-        if (!data || typeof data !== 'object') {
+        if (!data || typeof data !== "object") {
           throw new MedicalError(
-            'Invalid response from session validation service',
-            'INVALID_RESPONSE',
+            "Invalid response from session validation service",
+            "INVALID_RESPONSE",
             ERROR_CATEGORIES.AUTHENTICATION,
             ERROR_SEVERITY.MEDIUM,
           );
@@ -321,12 +321,12 @@ export class AuthenticationManager {
         fallback: (error) => {
           // On network errors, allow local session to continue
           // This prevents logout during temporary network issues
-          console.warn('Session validation failed, continuing with local session:', error.message);
+          console.warn("Session validation failed, continuing with local session:", error.message);
           return this.isValidSession();
         },
         context: {
-          operation: 'session_validation',
-          endpoint: 'validate_session',
+          operation: "session_validation",
+          endpoint: "validate_session",
         },
       },
     );
@@ -344,7 +344,7 @@ export class AuthenticationManager {
    * Logout and clear session securely
    */
   async logout() {
-    medicalLogger.info('User logout initiated', {
+    medicalLogger.info("User logout initiated", {
       category: LOG_CATEGORIES.AUTHENTICATION,
     });
 
@@ -354,22 +354,22 @@ export class AuthenticationManager {
 
     // Clear all encrypted session storage securely
     try {
-      await secureRemove('auth_session', true);
-      await secureRemove('auth_timestamp', true);
-      await secureRemove('session_token', true);
-      await secureRemove('session_expiry', true);
+      await secureRemove("auth_session", true);
+      await secureRemove("auth_timestamp", true);
+      await secureRemove("session_token", true);
+      await secureRemove("session_expiry", true);
 
       // Clear legacy unencrypted data
-      sessionStorage.removeItem('auth_session');
-      sessionStorage.removeItem('auth_timestamp');
-      sessionStorage.removeItem('session_token');
-      sessionStorage.removeItem('session_expiry');
+      sessionStorage.removeItem("auth_session");
+      sessionStorage.removeItem("auth_timestamp");
+      sessionStorage.removeItem("session_token");
+      sessionStorage.removeItem("session_expiry");
 
-      medicalLogger.info('Session data cleared during logout', {
+      medicalLogger.info("Session data cleared during logout", {
         category: LOG_CATEGORIES.SECURITY,
       });
     } catch (error) {
-      medicalLogger.warn('Failed to clear some session data during logout', {
+      medicalLogger.warn("Failed to clear some session data during logout", {
         category: LOG_CATEGORIES.SECURITY,
         error: error.message,
       });
@@ -385,10 +385,10 @@ export class AuthenticationManager {
   async hashPassword(input) {
     return safeAsync(
       async () => {
-        if (!input || typeof input !== 'string') {
+        if (!input || typeof input !== "string") {
           throw new MedicalError(
-            'Invalid input for password hashing',
-            'INVALID_INPUT',
+            "Invalid input for password hashing",
+            "INVALID_INPUT",
             ERROR_CATEGORIES.VALIDATION,
             ERROR_SEVERITY.MEDIUM,
           );
@@ -396,8 +396,8 @@ export class AuthenticationManager {
 
         if (!crypto || !crypto.subtle) {
           throw new MedicalError(
-            'Crypto API not available',
-            'CRYPTO_UNAVAILABLE',
+            "Crypto API not available",
+            "CRYPTO_UNAVAILABLE",
             ERROR_CATEGORIES.SECURITY,
             ERROR_SEVERITY.HIGH,
           );
@@ -405,9 +405,9 @@ export class AuthenticationManager {
 
         const encoder = new TextEncoder();
         const data = encoder.encode(input);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
         return hashHex;
       },
       {
@@ -425,7 +425,7 @@ export class AuthenticationManager {
           return Math.abs(hash).toString(16);
         },
         context: {
-          operation: 'password_hashing',
+          operation: "password_hashing",
           inputLength: input ? input.length : 0,
         },
       },
@@ -440,28 +440,28 @@ export class AuthenticationManager {
       async () => {
         if (!this.isAuthenticated || !this.sessionToken) {
           throw new MedicalError(
-            'Cannot store session: not authenticated',
-            'NOT_AUTHENTICATED',
+            "Cannot store session: not authenticated",
+            "NOT_AUTHENTICATED",
             ERROR_CATEGORIES.AUTHENTICATION,
             ERROR_SEVERITY.LOW,
           );
         }
 
-        if (typeof sessionStorage === 'undefined') {
+        if (typeof sessionStorage === "undefined") {
           throw new MedicalError(
-            'Session storage not available',
-            'STORAGE_UNAVAILABLE',
+            "Session storage not available",
+            "STORAGE_UNAVAILABLE",
             ERROR_CATEGORIES.STORAGE,
             ERROR_SEVERITY.MEDIUM,
           );
         }
 
         // Store session data securely
-        sessionStorage.setItem('auth_session', 'verified');
-        sessionStorage.setItem('auth_timestamp', this.lastActivity.toString());
-        sessionStorage.setItem('session_token', this.sessionToken);
+        sessionStorage.setItem("auth_session", "verified");
+        sessionStorage.setItem("auth_timestamp", this.lastActivity.toString());
+        sessionStorage.setItem("session_token", this.sessionToken);
         if (this.sessionExpiry) {
-          sessionStorage.setItem('session_expiry', this.sessionExpiry.toISOString());
+          sessionStorage.setItem("session_expiry", this.sessionExpiry.toISOString());
         }
 
         return true;
@@ -471,11 +471,11 @@ export class AuthenticationManager {
         severity: ERROR_SEVERITY.LOW,
         timeout: 1000,
         fallback: (error) => {
-          console.warn('Failed to store session:', error.message);
+          console.warn("Failed to store session:", error.message);
           return false;
         },
         context: {
-          operation: 'store_session',
+          operation: "store_session",
           hasToken: !!this.sessionToken,
           hasExpiry: !!this.sessionExpiry,
         },
@@ -498,21 +498,21 @@ export class AuthenticationManager {
     try {
       return safeAsync(
         async () => {
-          if (typeof sessionStorage === 'undefined') {
+          if (typeof sessionStorage === "undefined") {
             throw new MedicalError(
-              'Session storage not available',
-              'STORAGE_UNAVAILABLE',
+              "Session storage not available",
+              "STORAGE_UNAVAILABLE",
               ERROR_CATEGORIES.STORAGE,
               ERROR_SEVERITY.LOW,
             );
           }
 
-          const session = await secureRetrieve('auth_session', true);
-          const timestamp = await secureRetrieve('auth_timestamp', true);
-          const storedToken = await secureRetrieve('session_token', true);
-          const storedExpiry = await secureRetrieve('session_expiry', true);
+          const session = await secureRetrieve("auth_session", true);
+          const timestamp = await secureRetrieve("auth_timestamp", true);
+          const storedToken = await secureRetrieve("session_token", true);
+          const storedExpiry = await secureRetrieve("session_expiry", true);
 
-          if (session === 'verified' && timestamp && storedToken) {
+          if (session === "verified" && timestamp && storedToken) {
             // Check if session has expired
             if (storedExpiry) {
               const expiryDate = new Date(storedExpiry);
@@ -527,8 +527,8 @@ export class AuthenticationManager {
             const timestampNum = parseInt(timestamp);
             if (isNaN(timestampNum)) {
               throw new MedicalError(
-                'Invalid session timestamp',
-                'INVALID_SESSION_DATA',
+                "Invalid session timestamp",
+                "INVALID_SESSION_DATA",
                 ERROR_CATEGORIES.STORAGE,
                 ERROR_SEVERITY.MEDIUM,
               );
@@ -548,12 +548,12 @@ export class AuthenticationManager {
           severity: ERROR_SEVERITY.LOW,
           timeout: 1000,
           fallback: (error) => {
-            console.warn('Failed to check stored session:', error.message);
+            console.warn("Failed to check stored session:", error.message);
             this.logout();
             return false;
           },
           context: {
-            operation: 'check_stored_session',
+            operation: "check_stored_session",
           },
         },
       );
@@ -568,7 +568,7 @@ export class AuthenticationManager {
    */
   setupActivityTracking() {
     // Track user interactions to maintain session
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
 
     const updateActivity = () => {
       if (this.isAuthenticated) {
@@ -597,7 +597,7 @@ export class AuthenticationManager {
           // If delay fails, continue without delay
           Promise.resolve(),
         context: {
-          operation: 'auth_delay',
+          operation: "auth_delay",
         },
       },
     );

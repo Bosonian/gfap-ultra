@@ -5,51 +5,51 @@
  * Comprehensive audit logging and compliance tracking for clinical decisions
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from '../patterns/observer.js';
-import { medicalPerformanceMonitor, PerformanceMetricType } from '../performance/medical-performance-monitor.js';
-import { predictionCache } from '../performance/medical-cache.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
+import { medicalPerformanceMonitor, PerformanceMetricType } from "../performance/medical-performance-monitor.js";
+import { predictionCache } from "../performance/medical-cache.js";
 
 /**
  * Audit event types
  */
 export const AuditEventTypes = {
-  USER_LOGIN: 'user_login',
-  USER_LOGOUT: 'user_logout',
-  PATIENT_ACCESS: 'patient_access',
-  DATA_ENTRY: 'data_entry',
-  DATA_MODIFICATION: 'data_modification',
-  PREDICTION_GENERATED: 'prediction_generated',
-  ALERT_TRIGGERED: 'alert_triggered',
-  ALERT_ACKNOWLEDGED: 'alert_acknowledged',
-  TREATMENT_RECOMMENDED: 'treatment_recommended',
-  REPORT_GENERATED: 'report_generated',
-  DATA_EXPORT: 'data_export',
-  SYSTEM_ERROR: 'system_error',
-  CONFIGURATION_CHANGE: 'configuration_change',
-  MODEL_PREDICTION: 'model_prediction',
-  QUALITY_METRIC: 'quality_metric',
-  CLINICAL_DECISION: 'clinical_decision',
+  USER_LOGIN: "user_login",
+  USER_LOGOUT: "user_logout",
+  PATIENT_ACCESS: "patient_access",
+  DATA_ENTRY: "data_entry",
+  DATA_MODIFICATION: "data_modification",
+  PREDICTION_GENERATED: "prediction_generated",
+  ALERT_TRIGGERED: "alert_triggered",
+  ALERT_ACKNOWLEDGED: "alert_acknowledged",
+  TREATMENT_RECOMMENDED: "treatment_recommended",
+  REPORT_GENERATED: "report_generated",
+  DATA_EXPORT: "data_export",
+  SYSTEM_ERROR: "system_error",
+  CONFIGURATION_CHANGE: "configuration_change",
+  MODEL_PREDICTION: "model_prediction",
+  QUALITY_METRIC: "quality_metric",
+  CLINICAL_DECISION: "clinical_decision",
 };
 
 /**
  * Audit severity levels
  */
 export const AuditSeverity = {
-  INFO: 'info',
-  WARNING: 'warning',
-  ERROR: 'error',
-  CRITICAL: 'critical',
+  INFO: "info",
+  WARNING: "warning",
+  ERROR: "error",
+  CRITICAL: "critical",
 };
 
 /**
  * Compliance frameworks
  */
 export const ComplianceFrameworks = {
-  HIPAA: 'hipaa',
-  GDPR: 'gdpr',
-  FDA_21CFR11: 'fda_21cfr11',
-  IEC_62304: 'iec_62304',
-  ISO_27001: 'iso_27001',
+  HIPAA: "hipaa",
+  GDPR: "gdpr",
+  FDA_21CFR11: "fda_21cfr11",
+  IEC_62304: "iec_62304",
+  ISO_27001: "iso_27001",
 };
 
 /**
@@ -61,7 +61,7 @@ class AuditEvent {
     this.timestamp = new Date().toISOString();
     this.eventType = eventType;
     this.severity = data.severity || AuditSeverity.INFO;
-    this.userId = data.userId || 'system';
+    this.userId = data.userId || "system";
     this.sessionId = data.sessionId || null;
     this.patientId = data.patientId || null;
     this.ipAddress = data.ipAddress || this.getClientIP();
@@ -71,7 +71,7 @@ class AuditEvent {
     this.resource = data.resource || null;
     this.oldValue = data.oldValue || null;
     this.newValue = data.newValue || null;
-    this.outcome = data.outcome || 'success';
+    this.outcome = data.outcome || "success";
     this.errorMessage = data.errorMessage || null;
     this.metadata = data.metadata || {};
     this.compliance = this.determineComplianceRequirements(eventType);
@@ -83,7 +83,7 @@ class AuditEvent {
    */
   getClientIP() {
     // In real implementation, this would get actual client IP
-    return '127.0.0.1';
+    return "127.0.0.1";
   }
 
   /**
@@ -161,11 +161,11 @@ class AuditEvent {
       sanitized.patientId = this.hashSensitiveData(sanitized.patientId);
     }
 
-    if (sanitized.oldValue && typeof sanitized.oldValue === 'object') {
+    if (sanitized.oldValue && typeof sanitized.oldValue === "object") {
       sanitized.oldValue = this.sanitizeObject(sanitized.oldValue);
     }
 
-    if (sanitized.newValue && typeof sanitized.newValue === 'object') {
+    if (sanitized.newValue && typeof sanitized.newValue === "object") {
       sanitized.newValue = this.sanitizeObject(sanitized.newValue);
     }
 
@@ -185,11 +185,11 @@ class AuditEvent {
    */
   sanitizeObject(obj) {
     const sanitized = { ...obj };
-    const sensitiveFields = ['name', 'ssn', 'address', 'phone', 'email'];
+    const sensitiveFields = ["name", "ssn", "address", "phone", "email"];
 
     sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
-        sanitized[field] = '[REDACTED]';
+        sanitized[field] = "[REDACTED]";
       }
     });
 
@@ -210,38 +210,38 @@ class AuditEvent {
     };
 
     switch (framework) {
-      case ComplianceFrameworks.HIPAA:
-        return {
-          ...baseExport,
-          patientId: this.patientId ? '[PROTECTED]' : null,
-          accessType: this.action,
-          reasonForAccess: this.metadata.reason || 'Clinical care',
-          minimalNecessary: true,
-        };
+    case ComplianceFrameworks.HIPAA:
+      return {
+        ...baseExport,
+        patientId: this.patientId ? "[PROTECTED]" : null,
+        accessType: this.action,
+        reasonForAccess: this.metadata.reason || "Clinical care",
+        minimalNecessary: true,
+      };
 
-      case ComplianceFrameworks.FDA_21CFR11:
-        return {
-          ...baseExport,
-          electronicSignature: this.metadata.signature || null,
-          recordIntegrity: this.hash,
-          auditTrailComplete: true,
-          dataModification: {
-            old: this.oldValue ? '[RECORDED]' : null,
-            new: this.newValue ? '[RECORDED]' : null,
-          },
-        };
+    case ComplianceFrameworks.FDA_21CFR11:
+      return {
+        ...baseExport,
+        electronicSignature: this.metadata.signature || null,
+        recordIntegrity: this.hash,
+        auditTrailComplete: true,
+        dataModification: {
+          old: this.oldValue ? "[RECORDED]" : null,
+          new: this.newValue ? "[RECORDED]" : null,
+        },
+      };
 
-      case ComplianceFrameworks.IEC_62304:
-        return {
-          ...baseExport,
-          softwareVersion: this.metadata.version || '1.0',
-          riskClass: this.metadata.riskClass || 'B',
-          safetyRequirement: this.metadata.safetyRequirement || null,
-          traceabilityId: this.metadata.traceabilityId || null,
-        };
+    case ComplianceFrameworks.IEC_62304:
+      return {
+        ...baseExport,
+        softwareVersion: this.metadata.version || "1.0",
+        riskClass: this.metadata.riskClass || "B",
+        safetyRequirement: this.metadata.safetyRequirement || null,
+        traceabilityId: this.metadata.traceabilityId || null,
+      };
 
-      default:
-        return baseExport;
+    default:
+      return baseExport;
     }
   }
 }
@@ -279,20 +279,20 @@ class AuditStorage {
    */
   updateIndices(event) {
     // Index by event type
-    if (!this.indices.has('eventType')) {
-      this.indices.set('eventType', new Map());
+    if (!this.indices.has("eventType")) {
+      this.indices.set("eventType", new Map());
     }
-    const eventTypeIndex = this.indices.get('eventType');
+    const eventTypeIndex = this.indices.get("eventType");
     if (!eventTypeIndex.has(event.eventType)) {
       eventTypeIndex.set(event.eventType, []);
     }
     eventTypeIndex.get(event.eventType).push(event.id);
 
     // Index by user ID
-    if (!this.indices.has('userId')) {
-      this.indices.set('userId', new Map());
+    if (!this.indices.has("userId")) {
+      this.indices.set("userId", new Map());
     }
-    const userIndex = this.indices.get('userId');
+    const userIndex = this.indices.get("userId");
     if (!userIndex.has(event.userId)) {
       userIndex.set(event.userId, []);
     }
@@ -300,10 +300,10 @@ class AuditStorage {
 
     // Index by patient ID
     if (event.patientId) {
-      if (!this.indices.has('patientId')) {
-        this.indices.set('patientId', new Map());
+      if (!this.indices.has("patientId")) {
+        this.indices.set("patientId", new Map());
       }
-      const patientIndex = this.indices.get('patientId');
+      const patientIndex = this.indices.get("patientId");
       if (!patientIndex.has(event.patientId)) {
         patientIndex.set(event.patientId, []);
       }
@@ -311,11 +311,11 @@ class AuditStorage {
     }
 
     // Index by date (day granularity)
-    const dateKey = event.timestamp.split('T')[0];
-    if (!this.indices.has('date')) {
-      this.indices.set('date', new Map());
+    const dateKey = event.timestamp.split("T")[0];
+    if (!this.indices.has("date")) {
+      this.indices.set("date", new Map());
     }
-    const dateIndex = this.indices.get('date');
+    const dateIndex = this.indices.get("date");
     if (!dateIndex.has(dateKey)) {
       dateIndex.set(dateKey, []);
     }
@@ -355,7 +355,7 @@ class AuditStorage {
    */
   removeFromIndices(event) {
     // Remove from event type index
-    const eventTypeIndex = this.indices.get('eventType');
+    const eventTypeIndex = this.indices.get("eventType");
     if (eventTypeIndex && eventTypeIndex.has(event.eventType)) {
       const eventIds = eventTypeIndex.get(event.eventType);
       const index = eventIds.indexOf(event.id);
@@ -365,7 +365,7 @@ class AuditStorage {
     }
 
     // Remove from user index
-    const userIndex = this.indices.get('userId');
+    const userIndex = this.indices.get("userId");
     if (userIndex && userIndex.has(event.userId)) {
       const eventIds = userIndex.get(event.userId);
       const index = eventIds.indexOf(event.id);
@@ -376,7 +376,7 @@ class AuditStorage {
 
     // Remove from patient index
     if (event.patientId) {
-      const patientIndex = this.indices.get('patientId');
+      const patientIndex = this.indices.get("patientId");
       if (patientIndex && patientIndex.has(event.patientId)) {
         const eventIds = patientIndex.get(event.patientId);
         const index = eventIds.indexOf(event.id);
@@ -387,8 +387,8 @@ class AuditStorage {
     }
 
     // Remove from date index
-    const dateKey = event.timestamp.split('T')[0];
-    const dateIndex = this.indices.get('date');
+    const dateKey = event.timestamp.split("T")[0];
+    const dateIndex = this.indices.get("date");
     if (dateIndex && dateIndex.has(dateKey)) {
       const eventIds = dateIndex.get(dateKey);
       const index = eventIds.indexOf(event.id);
@@ -505,7 +505,7 @@ class AuditStorage {
       eventsBySeverity[event.severity] = (eventsBySeverity[event.severity] || 0) + 1;
 
       // Count by day
-      const day = event.timestamp.split('T')[0];
+      const day = event.timestamp.split("T")[0];
       eventsBy日[day] = (eventsBy日[day] || 0) + 1;
     });
 
@@ -542,7 +542,7 @@ export class ClinicalAuditTrail {
   async initialize() {
     const metricId = medicalPerformanceMonitor.startMeasurement(
       PerformanceMetricType.SYSTEM_STARTUP,
-      'audit_trail_init',
+      "audit_trail_init",
     );
 
     try {
@@ -557,12 +557,12 @@ export class ClinicalAuditTrail {
       medicalPerformanceMonitor.endMeasurement(metricId, { success: true });
 
       this.logEvent(AuditEventTypes.CONFIGURATION_CHANGE, {
-        action: 'audit_trail_initialized',
-        resource: 'audit_system',
+        action: "audit_trail_initialized",
+        resource: "audit_system",
         metadata: {
-          version: '1.0',
-          riskClass: 'B',
-          safetyRequirement: 'Clinical decision audit logging',
+          version: "1.0",
+          riskClass: "B",
+          safetyRequirement: "Clinical decision audit logging",
         },
       });
 
@@ -590,24 +590,24 @@ export class ClinicalAuditTrail {
     });
 
     // Listen for form submissions
-    document.addEventListener('submit', (event) => {
+    document.addEventListener("submit", (event) => {
       this.handleFormSubmission(event);
     });
 
     // Listen for page navigation
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.logEvent(AuditEventTypes.USER_LOGOUT, {
-        action: 'session_ended',
-        resource: 'application',
+        action: "session_ended",
+        resource: "application",
       });
     });
 
     // Listen for errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener("error", (event) => {
       this.logEvent(AuditEventTypes.SYSTEM_ERROR, {
         severity: AuditSeverity.ERROR,
-        action: 'javascript_error',
-        resource: event.filename || 'unknown',
+        action: "javascript_error",
+        resource: event.filename || "unknown",
         errorMessage: event.message,
         metadata: {
           line: event.lineno,
@@ -625,13 +625,13 @@ export class ClinicalAuditTrail {
     this.currentSession = {
       id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       startTime: new Date().toISOString(),
-      userId: 'clinical_user', // In real implementation, get from auth
+      userId: "clinical_user", // In real implementation, get from auth
       events: [],
     };
 
     this.logEvent(AuditEventTypes.USER_LOGIN, {
-      action: 'session_started',
-      resource: 'application',
+      action: "session_started",
+      resource: "application",
       sessionId: this.currentSession.id,
     });
   }
@@ -679,47 +679,47 @@ export class ClinicalAuditTrail {
    */
   handleAutomaticEvent(eventType, data) {
     switch (eventType) {
-      case MEDICAL_EVENTS.PREDICTION_GENERATED:
-        this.logEvent(AuditEventTypes.PREDICTION_GENERATED, {
-          action: 'prediction_generated',
-          resource: 'predictive_engine',
-          patientId: data.patientId,
-          metadata: {
-            predictions: Object.keys(data.predictions || {}),
-            confidence: data.predictions?.mortality?.confidence?.level,
-          },
-        });
-        break;
+    case MEDICAL_EVENTS.PREDICTION_GENERATED:
+      this.logEvent(AuditEventTypes.PREDICTION_GENERATED, {
+        action: "prediction_generated",
+        resource: "predictive_engine",
+        patientId: data.patientId,
+        metadata: {
+          predictions: Object.keys(data.predictions || {}),
+          confidence: data.predictions?.mortality?.confidence?.level,
+        },
+      });
+      break;
 
-      case MEDICAL_EVENTS.CLINICAL_ALERT:
-        this.logEvent(AuditEventTypes.ALERT_TRIGGERED, {
-          severity: data.alert?.severity?.level === 'critical' ? AuditSeverity.CRITICAL : AuditSeverity.WARNING,
-          action: data.action === 'activated' ? 'alert_triggered' : 'alert_acknowledged',
-          resource: 'clinical_decision_support',
-          patientId: data.alert?.patientId,
-          metadata: {
-            alertId: data.alert?.id,
-            alertType: data.alert?.ruleId,
-            alertTitle: data.alert?.title,
-          },
-        });
-        break;
+    case MEDICAL_EVENTS.CLINICAL_ALERT:
+      this.logEvent(AuditEventTypes.ALERT_TRIGGERED, {
+        severity: data.alert?.severity?.level === "critical" ? AuditSeverity.CRITICAL : AuditSeverity.WARNING,
+        action: data.action === "activated" ? "alert_triggered" : "alert_acknowledged",
+        resource: "clinical_decision_support",
+        patientId: data.alert?.patientId,
+        metadata: {
+          alertId: data.alert?.id,
+          alertType: data.alert?.ruleId,
+          alertTitle: data.alert?.title,
+        },
+      });
+      break;
 
-      case MEDICAL_EVENTS.FORM_UPDATED:
-        this.logEvent(AuditEventTypes.DATA_ENTRY, {
-          action: 'form_data_updated',
-          resource: `form_${data.module}`,
-          patientId: data.patientId,
-          metadata: {
-            module: data.module,
-            fieldsUpdated: Object.keys(data.formData || {}),
-          },
-        });
-        break;
+    case MEDICAL_EVENTS.FORM_UPDATED:
+      this.logEvent(AuditEventTypes.DATA_ENTRY, {
+        action: "form_data_updated",
+        resource: `form_${data.module}`,
+        patientId: data.patientId,
+        metadata: {
+          module: data.module,
+          fieldsUpdated: Object.keys(data.formData || {}),
+        },
+      });
+      break;
 
-      case MEDICAL_EVENTS.AUDIT_EVENT:
-        // Don't log audit events to avoid recursion
-        break;
+    case MEDICAL_EVENTS.AUDIT_EVENT:
+      // Don't log audit events to avoid recursion
+      break;
     }
   }
 
@@ -733,7 +733,7 @@ export class ClinicalAuditTrail {
       const patientData = Object.fromEntries(formData.entries());
 
       this.logEvent(AuditEventTypes.CLINICAL_DECISION, {
-        action: 'clinical_assessment_submitted',
+        action: "clinical_assessment_submitted",
         resource: `module_${form.dataset.module}`,
         metadata: {
           module: form.dataset.module,
@@ -749,13 +749,13 @@ export class ClinicalAuditTrail {
    */
   logDataModification(resource, oldValue, newValue, options = {}) {
     return this.logEvent(AuditEventTypes.DATA_MODIFICATION, {
-      action: 'data_modified',
+      action: "data_modified",
       resource,
       oldValue,
       newValue,
       patientId: options.patientId,
       metadata: {
-        reason: options.reason || 'Clinical update',
+        reason: options.reason || "Clinical update",
         signature: options.signature,
       },
     });
@@ -766,14 +766,14 @@ export class ClinicalAuditTrail {
    */
   logReportGeneration(reportType, patientId, options = {}) {
     return this.logEvent(AuditEventTypes.REPORT_GENERATED, {
-      action: 'clinical_report_generated',
+      action: "clinical_report_generated",
       resource: `report_${reportType}`,
       patientId,
       metadata: {
         reportType,
-        format: options.format || 'html',
+        format: options.format || "html",
         recipient: options.recipient,
-        reason: options.reason || 'Clinical documentation',
+        reason: options.reason || "Clinical documentation",
       },
     });
   }
@@ -784,14 +784,14 @@ export class ClinicalAuditTrail {
   logDataExport(dataType, format, options = {}) {
     return this.logEvent(AuditEventTypes.DATA_EXPORT, {
       severity: AuditSeverity.WARNING,
-      action: 'data_exported',
+      action: "data_exported",
       resource: `export_${dataType}`,
       metadata: {
         dataType,
         format,
         recordCount: options.recordCount,
         recipient: options.recipient,
-        purpose: options.purpose || 'Clinical analysis',
+        purpose: options.purpose || "Clinical analysis",
       },
     });
   }
@@ -843,8 +843,8 @@ export class ClinicalAuditTrail {
     const report = {
       framework,
       reportPeriod: {
-        start: options.startDate || 'N/A',
-        end: options.endDate || 'N/A',
+        start: options.startDate || "N/A",
+        end: options.endDate || "N/A",
       },
       totalEvents: complianceEvents.length,
       events: complianceEvents.map((event) => event.exportForCompliance(framework)),
@@ -854,7 +854,7 @@ export class ClinicalAuditTrail {
 
     // Log report generation
     this.logEvent(AuditEventTypes.REPORT_GENERATED, {
-      action: 'compliance_report_generated',
+      action: "compliance_report_generated",
       resource: `compliance_${framework}`,
       metadata: {
         framework,
@@ -887,29 +887,29 @@ export class ClinicalAuditTrail {
 
     // Framework-specific metrics
     switch (framework) {
-      case ComplianceFrameworks.HIPAA:
-        summary.complianceMetrics = {
-          patientAccesses: summary.eventsByType[AuditEventTypes.PATIENT_ACCESS] || 0,
-          dataExports: summary.eventsByType[AuditEventTypes.DATA_EXPORT] || 0,
-          unauthorizedAttempts: events.filter((e) => e.outcome === 'failure').length,
-        };
-        break;
+    case ComplianceFrameworks.HIPAA:
+      summary.complianceMetrics = {
+        patientAccesses: summary.eventsByType[AuditEventTypes.PATIENT_ACCESS] || 0,
+        dataExports: summary.eventsByType[AuditEventTypes.DATA_EXPORT] || 0,
+        unauthorizedAttempts: events.filter((e) => e.outcome === "failure").length,
+      };
+      break;
 
-      case ComplianceFrameworks.FDA_21CFR11:
-        summary.complianceMetrics = {
-          electronicRecords: summary.eventsByType[AuditEventTypes.DATA_ENTRY] || 0,
-          recordModifications: summary.eventsByType[AuditEventTypes.DATA_MODIFICATION] || 0,
-          signedRecords: events.filter((e) => e.metadata?.signature).length,
-        };
-        break;
+    case ComplianceFrameworks.FDA_21CFR11:
+      summary.complianceMetrics = {
+        electronicRecords: summary.eventsByType[AuditEventTypes.DATA_ENTRY] || 0,
+        recordModifications: summary.eventsByType[AuditEventTypes.DATA_MODIFICATION] || 0,
+        signedRecords: events.filter((e) => e.metadata?.signature).length,
+      };
+      break;
 
-      case ComplianceFrameworks.IEC_62304:
-        summary.complianceMetrics = {
-          softwareEvents: summary.eventsByType[AuditEventTypes.MODEL_PREDICTION] || 0,
-          systemErrors: summary.eventsByType[AuditEventTypes.SYSTEM_ERROR] || 0,
-          configurationChanges: summary.eventsByType[AuditEventTypes.CONFIGURATION_CHANGE] || 0,
-        };
-        break;
+    case ComplianceFrameworks.IEC_62304:
+      summary.complianceMetrics = {
+        softwareEvents: summary.eventsByType[AuditEventTypes.MODEL_PREDICTION] || 0,
+        systemErrors: summary.eventsByType[AuditEventTypes.SYSTEM_ERROR] || 0,
+        configurationChanges: summary.eventsByType[AuditEventTypes.CONFIGURATION_CHANGE] || 0,
+      };
+      break;
     }
 
     return summary;
@@ -935,16 +935,16 @@ export class ClinicalAuditTrail {
         results.issues.push({
           eventId: event.id,
           timestamp: event.timestamp,
-          issue: 'Hash mismatch - possible tampering',
+          issue: "Hash mismatch - possible tampering",
         });
       }
     });
 
     // Log integrity check
     this.logEvent(AuditEventTypes.CONFIGURATION_CHANGE, {
-      action: 'integrity_verification',
-      resource: 'audit_trail',
-      outcome: results.failed === 0 ? 'success' : 'warning',
+      action: "integrity_verification",
+      resource: "audit_trail",
+      outcome: results.failed === 0 ? "success" : "warning",
       metadata: {
         verified: results.verified,
         failed: results.failed,
@@ -958,7 +958,7 @@ export class ClinicalAuditTrail {
   /**
    * Export audit trail
    */
-  exportAuditTrail(format = 'json', options = {}) {
+  exportAuditTrail(format = "json", options = {}) {
     const events = this.storage.search({
       startDate: options.startDate,
       endDate: options.endDate,
@@ -972,8 +972,8 @@ export class ClinicalAuditTrail {
         exportedAt: new Date().toISOString(),
         totalEvents: events.length,
         period: {
-          start: options.startDate || 'beginning',
-          end: options.endDate || 'now',
+          start: options.startDate || "beginning",
+          end: options.endDate || "now",
         },
         filters: options,
       },
@@ -981,23 +981,23 @@ export class ClinicalAuditTrail {
     };
 
     // Log export
-    this.logDataExport('audit_trail', format, {
+    this.logDataExport("audit_trail", format, {
       recordCount: events.length,
-      purpose: options.purpose || 'Compliance audit',
+      purpose: options.purpose || "Compliance audit",
     });
 
     switch (format) {
-      case 'json':
-        return JSON.stringify(exportData, null, 2);
+    case "json":
+      return JSON.stringify(exportData, null, 2);
 
-      case 'csv':
-        return this.convertToCSV(exportData.events);
+    case "csv":
+      return this.convertToCSV(exportData.events);
 
-      case 'xml':
-        return this.convertToXML(exportData);
+    case "xml":
+      return this.convertToXML(exportData);
 
-      default:
-        return exportData;
+    default:
+      return exportData;
     }
   }
 
@@ -1006,10 +1006,10 @@ export class ClinicalAuditTrail {
    */
   convertToCSV(events) {
     if (events.length === 0) {
-      return '';
+      return "";
     }
 
-    const headers = ['Timestamp', 'Event Type', 'User ID', 'Action', 'Resource', 'Outcome', 'Severity'];
+    const headers = ["Timestamp", "Event Type", "User ID", "Action", "Resource", "Outcome", "Severity"];
     const rows = [headers];
 
     events.forEach((event) => {
@@ -1017,43 +1017,43 @@ export class ClinicalAuditTrail {
         event.timestamp,
         event.eventType,
         event.userId,
-        event.action || '',
-        event.resource || '',
+        event.action || "",
+        event.resource || "",
         event.outcome,
         event.severity,
       ]);
     });
 
-    return rows.map((row) => row.map((cell) => `"${cell}"`).join(',')).join('\n');
+    return rows.map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n");
   }
 
   /**
    * Convert events to XML format
    */
   convertToXML(exportData) {
-    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    xml += '<auditTrail>\n';
-    xml += '  <metadata>\n';
+    let xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    xml += "<auditTrail>\n";
+    xml += "  <metadata>\n";
     xml += `    <exportedAt>${exportData.metadata.exportedAt}</exportedAt>\n`;
     xml += `    <totalEvents>${exportData.metadata.totalEvents}</totalEvents>\n`;
-    xml += '  </metadata>\n';
-    xml += '  <events>\n';
+    xml += "  </metadata>\n";
+    xml += "  <events>\n";
 
     exportData.events.forEach((event) => {
-      xml += '    <event>\n';
+      xml += "    <event>\n";
       xml += `      <id>${event.id}</id>\n`;
       xml += `      <timestamp>${event.timestamp}</timestamp>\n`;
       xml += `      <eventType>${event.eventType}</eventType>\n`;
       xml += `      <userId>${event.userId}</userId>\n`;
-      xml += `      <action>${event.action || ''}</action>\n`;
-      xml += `      <resource>${event.resource || ''}</resource>\n`;
+      xml += `      <action>${event.action || ""}</action>\n`;
+      xml += `      <resource>${event.resource || ""}</resource>\n`;
       xml += `      <outcome>${event.outcome}</outcome>\n`;
       xml += `      <severity>${event.severity}</severity>\n`;
-      xml += '    </event>\n';
+      xml += "    </event>\n";
     });
 
-    xml += '  </events>\n';
-    xml += '</auditTrail>';
+    xml += "  </events>\n";
+    xml += "</auditTrail>";
 
     return xml;
   }
@@ -1068,12 +1068,12 @@ export class ClinicalAuditTrail {
     medicalEventObserver.publish(MEDICAL_EVENTS.CLINICAL_ALERT, {
       alert: {
         id: `audit_${event.id}`,
-        severity: { level: 'critical', icon: '🚨' },
-        title: 'Critical Audit Event',
+        severity: { level: "critical", icon: "🚨" },
+        title: "Critical Audit Event",
         message: `${event.eventType}: ${event.action}`,
-        recommendation: 'Review audit event immediately',
+        recommendation: "Review audit event immediately",
       },
-      action: 'activated',
+      action: "activated",
     });
   }
 
@@ -1097,8 +1097,8 @@ export class ClinicalAuditTrail {
   stop() {
     if (this.currentSession) {
       this.logEvent(AuditEventTypes.USER_LOGOUT, {
-        action: 'audit_system_stopped',
-        resource: 'audit_system',
+        action: "audit_system_stopped",
+        resource: "audit_system",
       });
     }
 

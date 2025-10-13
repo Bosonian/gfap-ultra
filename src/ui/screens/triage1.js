@@ -1,5 +1,5 @@
-import { renderProgressIndicator } from '../components/progress.js';
-import { t } from '../../localization/i18n.js';
+import { renderProgressIndicator } from "../components/progress.js";
+import { t } from "../../localization/i18n.js";
 
 export default function renderTriage1() {
   return `
@@ -13,16 +13,16 @@ export default function renderTriage1() {
       <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
         <!-- Title -->
         <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 text-center">
-          ${t('triage1Title')}
+          ${t("triage1Title")}
         </h2>
 
         <!-- Question -->
         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl mb-6">
           <p class="text-lg text-gray-800 dark:text-gray-200 font-medium mb-2 text-center">
-            ${t('triage1Question')}
+            ${t("triage1Question")}
           </p>
           <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
-            ${t('triage1Help')}
+            ${t("triage1Help")}
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export default function renderTriage1() {
             data-action="triage1" 
             data-value="true"
           >
-             ${t('triage1Yes')} ✅
+             ${t("triage1Yes")} ✅
           </button>
           
           <button 
@@ -41,7 +41,7 @@ export default function renderTriage1() {
             data-action="triage1" 
             data-value="false"
           >
-             ${t('triage1No')} ❌
+             ${t("triage1No")} ❌
           </button>
         </div>
       </div>

@@ -858,21 +858,21 @@ self.addEventListener("message", event => {
   const { type, data } = event.data;
 
   switch (type) {
-    case "SKIP_WAITING":
-      self.skipWaiting();
-      break;
+  case "SKIP_WAITING":
+    self.skipWaiting();
+    break;
 
-    case "GET_CACHE_STATUS":
-      event.ports[0].postMessage(getCacheStatus());
-      break;
+  case "GET_CACHE_STATUS":
+    event.ports[0].postMessage(getCacheStatus());
+    break;
 
-    case "CLEAR_CACHE":
-      event.waitUntil(clearAllCaches());
-      break;
+  case "CLEAR_CACHE":
+    event.waitUntil(clearAllCaches());
+    break;
 
-    case "PREFETCH_RESOURCES":
-      event.waitUntil(prefetchResources(data.resources));
-      break;
+  case "PREFETCH_RESOURCES":
+    event.waitUntil(prefetchResources(data.resources));
+    break;
   }
 });
 

@@ -3,37 +3,37 @@
  * HIPAA, FDA 21CFR11, IEC 62304, GDPR Compliance Engine
  */
 
-import { EnvironmentConfig } from '../security/environment.js';
-import { ClinicalAuditTrail } from '../analytics/audit-trail.js';
+import { EnvironmentConfig } from "../security/environment.js";
+import { ClinicalAuditTrail } from "../analytics/audit-trail.js";
 
 export const ComplianceStandard = {
-  HIPAA: 'HIPAA',
-  FDA_21CFR11: 'FDA_21CFR11',
-  IEC_62304: 'IEC_62304',
-  GDPR: 'GDPR',
-  ISO_14155: 'ISO_14155',
-  ISO_27001: 'ISO_27001',
+  HIPAA: "HIPAA",
+  FDA_21CFR11: "FDA_21CFR11",
+  IEC_62304: "IEC_62304",
+  GDPR: "GDPR",
+  ISO_14155: "ISO_14155",
+  ISO_27001: "ISO_27001",
 };
 
 export const ComplianceStatus = {
-  COMPLIANT: 'compliant',
-  NON_COMPLIANT: 'non_compliant',
-  NEEDS_REVIEW: 'needs_review',
-  PENDING_VALIDATION: 'pending_validation',
+  COMPLIANT: "compliant",
+  NON_COMPLIANT: "non_compliant",
+  NEEDS_REVIEW: "needs_review",
+  PENDING_VALIDATION: "pending_validation",
 };
 
 export const ViolationSeverity = {
-  CRITICAL: 'critical',
-  HIGH: 'high',
-  MEDIUM: 'medium',
-  LOW: 'low',
-  INFORMATIONAL: 'informational',
+  CRITICAL: "critical",
+  HIGH: "high",
+  MEDIUM: "medium",
+  LOW: "low",
+  INFORMATIONAL: "informational",
 };
 
 export class ComplianceValidationError extends Error {
   constructor(message, standard, violationType, severity = ViolationSeverity.MEDIUM) {
     super(message);
-    this.name = 'ComplianceValidationError';
+    this.name = "ComplianceValidationError";
     this.standard = standard;
     this.violationType = violationType;
     this.severity = severity;
@@ -100,7 +100,7 @@ export class MedicalComplianceValidator {
         overallStatus.recommendations.push(...result.recommendations);
       } catch (error) {
         this.auditTrail.logComplianceEvent({
-          type: 'validation_error',
+          type: "validation_error",
           standard,
           error: error.message,
           severity: ViolationSeverity.HIGH,
@@ -109,7 +109,7 @@ export class MedicalComplianceValidator {
         overallStatus.compliant = false;
         overallStatus.violations.push({
           standard,
-          type: 'validation_failure',
+          type: "validation_failure",
           message: `Failed to validate ${standard}: ${error.message}`,
           severity: ViolationSeverity.HIGH,
         });
@@ -118,8 +118,8 @@ export class MedicalComplianceValidator {
 
     // Log overall compliance status
     await this.auditTrail.logComplianceEvent({
-      type: 'system_compliance_validation',
-      status: overallStatus.compliant ? 'passed' : 'failed',
+      type: "system_compliance_validation",
+      status: overallStatus.compliant ? "passed" : "failed",
       standards: this.config.enabledStandards,
       violationCount: overallStatus.violations.length,
       warningCount: overallStatus.warnings.length,
@@ -141,7 +141,7 @@ export class MedicalComplianceValidator {
       throw new ComplianceValidationError(
         `Unknown compliance standard: ${standard}`,
         standard,
-        'unknown_standard',
+        "unknown_standard",
         ViolationSeverity.CRITICAL,
       );
     }
@@ -156,7 +156,7 @@ export class MedicalComplianceValidator {
       warnings: [],
       recommendations: [],
       validatedAt: new Date(),
-      validatedBy: 'automated_compliance_validator',
+      validatedBy: "automated_compliance_validator",
     };
 
     // Execute all rules for this standard
@@ -246,10 +246,10 @@ export class MedicalComplianceValidator {
       if (!decision.electronicSignature || !this.validateElectronicSignature(decision.electronicSignature)) {
         violations.push({
           standard: ComplianceStandard.FDA_21CFR11,
-          type: 'missing_electronic_signature',
-          message: 'Clinical decision requires valid electronic signature',
+          type: "missing_electronic_signature",
+          message: "Clinical decision requires valid electronic signature",
           severity: ViolationSeverity.HIGH,
-          section: '21CFR11.100',
+          section: "21CFR11.100",
         });
       }
     }
@@ -259,10 +259,10 @@ export class MedicalComplianceValidator {
       if (!evidence.algorithmValidation || !evidence.riskAnalysis) {
         violations.push({
           standard: ComplianceStandard.IEC_62304,
-          type: 'insufficient_algorithm_validation',
-          message: 'AI-assisted decisions require algorithm validation and risk analysis',
+          type: "insufficient_algorithm_validation",
+          message: "AI-assisted decisions require algorithm validation and risk analysis",
           severity: ViolationSeverity.HIGH,
-          section: '5.1.1',
+          section: "5.1.1",
         });
       }
     }
@@ -327,7 +327,7 @@ export class MedicalComplianceValidator {
     // Validate retention period compliance
     if (config.dataRetentionDays < 2555) { // 7 years minimum for medical data
       violations.push({
-        type: 'insufficient_retention_period',
+        type: "insufficient_retention_period",
         message: `Data retention period (${config.dataRetentionDays} days) below medical requirement (2555 days)`,
         severity: ViolationSeverity.HIGH,
         standards: [ComplianceStandard.HIPAA, ComplianceStandard.FDA_21CFR11],
@@ -338,8 +338,8 @@ export class MedicalComplianceValidator {
     const archivalPolicy = await this.validateArchivalPolicy();
     if (!archivalPolicy.secureDeleteionImplemented) {
       violations.push({
-        type: 'missing_secure_deletion',
-        message: 'Secure deletion procedures not implemented for expired data',
+        type: "missing_secure_deletion",
+        message: "Secure deletion procedures not implemented for expired data",
         severity: ViolationSeverity.MEDIUM,
         standards: [ComplianceStandard.GDPR, ComplianceStandard.HIPAA],
       });
@@ -360,8 +360,8 @@ export class MedicalComplianceValidator {
   async generateComplianceReport(standards = this.config.enabledStandards, options = {}) {
     const report = {
       generatedAt: new Date(),
-      generatedBy: 'medical_compliance_validator',
-      version: '1.0',
+      generatedBy: "medical_compliance_validator",
+      version: "1.0",
       standards: {},
       summary: {
         overallCompliant: true,
@@ -395,7 +395,7 @@ export class MedicalComplianceValidator {
 
     // Save report for audit trail
     await this.auditTrail.logComplianceEvent({
-      type: 'compliance_report_generated',
+      type: "compliance_report_generated",
       standards,
       overallCompliant: report.summary.overallCompliant,
       violationCount: report.summary.totalViolations,
@@ -427,7 +427,7 @@ export class MedicalComplianceValidator {
         this.updateComplianceDashboard(quickValidation);
       } catch (error) {
         await this.auditTrail.logComplianceEvent({
-          type: 'monitoring_error',
+          type: "monitoring_error",
           error: error.message,
           severity: ViolationSeverity.HIGH,
         });
@@ -467,10 +467,10 @@ export class MedicalComplianceValidator {
 
     // Define data access requirements by operation type
     const accessRequirements = {
-      view_assessment: ['demographics', 'strokeAssessment'],
-      create_assessment: ['demographics', 'clinicalData', 'strokeAssessment'],
-      generate_report: ['demographics', 'strokeAssessment', 'outcomes'],
-      research_analysis: ['strokeAssessment', 'outcomes'], // No demographics for research
+      view_assessment: ["demographics", "strokeAssessment"],
+      create_assessment: ["demographics", "clinicalData", "strokeAssessment"],
+      generate_report: ["demographics", "strokeAssessment", "outcomes"],
+      research_analysis: ["strokeAssessment", "outcomes"], // No demographics for research
     };
 
     const allowedData = accessRequirements[operation] || [];
@@ -481,11 +481,11 @@ export class MedicalComplianceValidator {
     if (excessiveAccess.length > 0) {
       violations.push({
         standard: ComplianceStandard.HIPAA,
-        type: 'excessive_data_access',
-        message: `Accessed unnecessary data fields: ${excessiveAccess.join(', ')}`,
+        type: "excessive_data_access",
+        message: `Accessed unnecessary data fields: ${excessiveAccess.join(", ")}`,
         severity: ViolationSeverity.MEDIUM,
         fields: excessiveAccess,
-        section: '164.502(b)',
+        section: "164.502(b)",
       });
     }
 
@@ -493,10 +493,10 @@ export class MedicalComplianceValidator {
     if (!this.validateUserAuthorization(user, operation)) {
       violations.push({
         standard: ComplianceStandard.HIPAA,
-        type: 'unauthorized_access',
+        type: "unauthorized_access",
         message: `User ${user.userId} not authorized for operation: ${operation}`,
         severity: ViolationSeverity.HIGH,
-        section: '164.308(a)(4)',
+        section: "164.308(a)(4)",
       });
     }
 
@@ -512,10 +512,10 @@ export class MedicalComplianceValidator {
     if (!dataMinimizationResult.compliant) {
       violations.push({
         standard: ComplianceStandard.GDPR,
-        type: 'data_minimization_violation',
+        type: "data_minimization_violation",
         message: dataMinimizationResult.message,
         severity: ViolationSeverity.MEDIUM,
-        article: 'Article 5(1)(c)',
+        article: "Article 5(1)(c)",
       });
     }
 
@@ -524,10 +524,10 @@ export class MedicalComplianceValidator {
     if (!lawfulBasis) {
       violations.push({
         standard: ComplianceStandard.GDPR,
-        type: 'missing_lawful_basis',
-        message: 'No lawful basis established for data processing',
+        type: "missing_lawful_basis",
+        message: "No lawful basis established for data processing",
         severity: ViolationSeverity.HIGH,
-        article: 'Article 6',
+        article: "Article 6",
       });
     }
 
@@ -553,8 +553,8 @@ export class MedicalComplianceValidator {
     // Validate encryption at rest
     if (!securityConfig.encryptionRequired) {
       violations.push({
-        type: 'encryption_at_rest_disabled',
-        message: 'Encryption at rest is not enabled',
+        type: "encryption_at_rest_disabled",
+        message: "Encryption at rest is not enabled",
         severity: ViolationSeverity.CRITICAL,
         standards: [ComplianceStandard.HIPAA, ComplianceStandard.GDPR],
       });
@@ -563,8 +563,8 @@ export class MedicalComplianceValidator {
     // Validate encryption key strength
     if (securityConfig.encryptionKey && securityConfig.encryptionKey.length < 32) {
       violations.push({
-        type: 'weak_encryption_key',
-        message: 'Encryption key does not meet minimum length requirements',
+        type: "weak_encryption_key",
+        message: "Encryption key does not meet minimum length requirements",
         severity: ViolationSeverity.HIGH,
         standards: [ComplianceStandard.HIPAA, ComplianceStandard.ISO_27001],
       });
@@ -581,8 +581,8 @@ export class MedicalComplianceValidator {
     // Validate session timeout
     if (securityConfig.sessionTimeout > 3600000) { // 1 hour
       warnings.push({
-        type: 'long_session_timeout',
-        message: 'Session timeout exceeds recommended 1 hour for medical applications',
+        type: "long_session_timeout",
+        message: "Session timeout exceeds recommended 1 hour for medical applications",
         severity: ViolationSeverity.MEDIUM,
       });
     }
@@ -590,8 +590,8 @@ export class MedicalComplianceValidator {
     // Validate maximum login attempts
     if (securityConfig.maxLoginAttempts > 5) {
       warnings.push({
-        type: 'high_login_attempts',
-        message: 'Maximum login attempts should not exceed 5 for security',
+        type: "high_login_attempts",
+        message: "Maximum login attempts should not exceed 5 for security",
         severity: ViolationSeverity.LOW,
       });
     }
@@ -607,8 +607,8 @@ export class MedicalComplianceValidator {
     const auditStatus = await this.auditTrail.getStatus();
     if (!auditStatus.enabled) {
       violations.push({
-        type: 'audit_trail_disabled',
-        message: 'Audit trail is not enabled',
+        type: "audit_trail_disabled",
+        message: "Audit trail is not enabled",
         severity: ViolationSeverity.CRITICAL,
         standards: [ComplianceStandard.HIPAA, ComplianceStandard.FDA_21CFR11],
       });
@@ -618,7 +618,7 @@ export class MedicalComplianceValidator {
     const integrityReport = await this.auditTrail.verifyIntegrity();
     if (integrityReport.integrityScore < 0.95) {
       violations.push({
-        type: 'audit_integrity_compromised',
+        type: "audit_integrity_compromised",
         message: `Audit trail integrity score (${integrityReport.integrityScore}) below required threshold`,
         severity: ViolationSeverity.HIGH,
         standards: [ComplianceStandard.FDA_21CFR11],
@@ -633,18 +633,18 @@ export class MedicalComplianceValidator {
 
     violations.forEach((violation) => {
       switch (violation.severity) {
-        case ViolationSeverity.CRITICAL:
-          score -= 25;
-          break;
-        case ViolationSeverity.HIGH:
-          score -= 15;
-          break;
-        case ViolationSeverity.MEDIUM:
-          score -= 10;
-          break;
-        case ViolationSeverity.LOW:
-          score -= 5;
-          break;
+      case ViolationSeverity.CRITICAL:
+        score -= 25;
+        break;
+      case ViolationSeverity.HIGH:
+        score -= 15;
+        break;
+      case ViolationSeverity.MEDIUM:
+        score -= 10;
+        break;
+      case ViolationSeverity.LOW:
+        score -= 5;
+        break;
       }
     });
 
@@ -660,27 +660,27 @@ export class MedicalComplianceValidator {
 
     violations.forEach((violation) => {
       switch (violation.type) {
-        case 'excessive_data_access':
-          recommendations.push({
-            priority: 'high',
-            action: 'Implement role-based data access controls',
-            description: 'Restrict data access to minimum necessary for each user role',
-          });
-          break;
-        case 'missing_electronic_signature':
-          recommendations.push({
-            priority: 'high',
-            action: 'Implement electronic signature system',
-            description: 'Deploy FDA 21CFR11 compliant electronic signature capability',
-          });
-          break;
-        case 'weak_encryption_key':
-          recommendations.push({
-            priority: 'critical',
-            action: 'Upgrade encryption key strength',
-            description: 'Use minimum 256-bit encryption keys for medical data',
-          });
-          break;
+      case "excessive_data_access":
+        recommendations.push({
+          priority: "high",
+          action: "Implement role-based data access controls",
+          description: "Restrict data access to minimum necessary for each user role",
+        });
+        break;
+      case "missing_electronic_signature":
+        recommendations.push({
+          priority: "high",
+          action: "Implement electronic signature system",
+          description: "Deploy FDA 21CFR11 compliant electronic signature capability",
+        });
+        break;
+      case "weak_encryption_key":
+        recommendations.push({
+          priority: "critical",
+          action: "Upgrade encryption key strength",
+          description: "Use minimum 256-bit encryption keys for medical data",
+        });
+        break;
       }
     });
 
@@ -701,7 +701,7 @@ export class MedicalComplianceValidator {
           remediation: this.getRemediationActions(violation),
           timeline: this.getRemediationTimeline(violation.severity),
           assignedTo: this.getResponsibleParty(violation.type),
-          status: 'pending',
+          status: "pending",
         });
       });
     });
@@ -738,17 +738,17 @@ export class MedicalComplianceValidator {
   getRemediationTimeline(severity) {
     // Return timeline based on severity
     const timelines = {
-      critical: '24 hours',
-      high: '1 week',
-      medium: '1 month',
-      low: '3 months',
+      critical: "24 hours",
+      high: "1 week",
+      medium: "1 month",
+      low: "3 months",
     };
-    return timelines[severity] || '1 month';
+    return timelines[severity] || "1 month";
   }
 
   getResponsibleParty(violationType) {
     // Return responsible team/person based on violation type
-    return 'compliance_team';
+    return "compliance_team";
   }
 }
 

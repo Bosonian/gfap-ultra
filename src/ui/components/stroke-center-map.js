@@ -3,11 +3,7 @@ import {
   COMPREHENSIVE_HOSPITAL_DATABASE,
   ROUTING_ALGORITHM,
 } from "../../data/comprehensive-stroke-centers.js";
-import {
-  calculateDistance,
-  calculateTravelTime,
-  calculateEmergencyTravelTime,
-} from "../../data/stroke-centers.js";
+import { calculateDistance, calculateEmergencyTravelTime } from "../../data/stroke-centers.js";
 import { t } from "../../localization/i18n.js";
 import { safeSetInnerHTML } from "../../security/html-sanitizer.js";
 

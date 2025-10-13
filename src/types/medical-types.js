@@ -127,39 +127,39 @@ export function validatePatientData(data) {
   const errors = [];
   const warnings = [];
 
-  if (!data || typeof data !== 'object') {
-    errors.push('Patient data must be an object');
+  if (!data || typeof data !== "object") {
+    errors.push("Patient data must be an object");
     return { isValid: false, errors, warnings };
   }
 
   // Required fields validation
-  if (typeof data.age !== 'number' || data.age < 0 || data.age > 120) {
-    errors.push('Age must be a number between 0 and 120');
+  if (typeof data.age !== "number" || data.age < 0 || data.age > 120) {
+    errors.push("Age must be a number between 0 and 120");
   }
 
-  if (!['male', 'female', 'other'].includes(data.gender)) {
-    errors.push('Gender must be "male", "female", or "other"');
+  if (!["male", "female", "other"].includes(data.gender)) {
+    errors.push("Gender must be \"male\", \"female\", or \"other\"");
   }
 
-  if (typeof data.gfap !== 'number' || data.gfap < 29 || data.gfap > 10001) {
-    errors.push('GFAP must be a number between 29 and 10001 pg/mL');
+  if (typeof data.gfap !== "number" || data.gfap < 29 || data.gfap > 10001) {
+    errors.push("GFAP must be a number between 29 and 10001 pg/mL");
   }
 
   // Optional fields validation
-  if (data.nihss !== undefined && (typeof data.nihss !== 'number' || data.nihss < 0 || data.nihss > 42)) {
-    errors.push('NIHSS must be a number between 0 and 42');
+  if (data.nihss !== undefined && (typeof data.nihss !== "number" || data.nihss < 0 || data.nihss > 42)) {
+    errors.push("NIHSS must be a number between 0 and 42");
   }
 
-  if (data.gcs !== undefined && (typeof data.gcs !== 'number' || data.gcs < 3 || data.gcs > 15)) {
-    errors.push('GCS must be a number between 3 and 15');
+  if (data.gcs !== undefined && (typeof data.gcs !== "number" || data.gcs < 3 || data.gcs > 15)) {
+    errors.push("GCS must be a number between 3 and 15");
   }
 
-  if (data.sbp !== undefined && (typeof data.sbp !== 'number' || data.sbp < 50 || data.sbp > 300)) {
-    warnings.push('Systolic BP should typically be between 50-300 mmHg');
+  if (data.sbp !== undefined && (typeof data.sbp !== "number" || data.sbp < 50 || data.sbp > 300)) {
+    warnings.push("Systolic BP should typically be between 50-300 mmHg");
   }
 
-  if (data.dbp !== undefined && (typeof data.dbp !== 'number' || data.dbp < 30 || data.dbp > 200)) {
-    warnings.push('Diastolic BP should typically be between 30-200 mmHg');
+  if (data.dbp !== undefined && (typeof data.dbp !== "number" || data.dbp < 30 || data.dbp > 200)) {
+    warnings.push("Diastolic BP should typically be between 30-200 mmHg");
   }
 
   return { isValid: errors.length === 0, errors, warnings };
@@ -174,25 +174,25 @@ export function validateICHRiskResult(result) {
   const errors = [];
   const warnings = [];
 
-  if (!result || typeof result !== 'object') {
-    errors.push('ICH risk result must be an object');
+  if (!result || typeof result !== "object") {
+    errors.push("ICH risk result must be an object");
     return { isValid: false, errors, warnings };
   }
 
-  if (typeof result.probability !== 'number' || result.probability < 0 || result.probability > 1) {
-    errors.push('Probability must be a number between 0 and 1');
+  if (typeof result.probability !== "number" || result.probability < 0 || result.probability > 1) {
+    errors.push("Probability must be a number between 0 and 1");
   }
 
-  if (typeof result.percentage !== 'number' || result.percentage < 0 || result.percentage > 100) {
-    errors.push('Percentage must be a number between 0 and 100');
+  if (typeof result.percentage !== "number" || result.percentage < 0 || result.percentage > 100) {
+    errors.push("Percentage must be a number between 0 and 100");
   }
 
-  if (!['low', 'moderate', 'high', 'critical'].includes(result.riskLevel)) {
-    errors.push('Risk level must be "low", "moderate", "high", or "critical"');
+  if (!["low", "moderate", "high", "critical"].includes(result.riskLevel)) {
+    errors.push("Risk level must be \"low\", \"moderate\", \"high\", or \"critical\"");
   }
 
   if (!result.timestamp || !Date.parse(result.timestamp)) {
-    errors.push('Timestamp must be a valid ISO date string');
+    errors.push("Timestamp must be a valid ISO date string");
   }
 
   return { isValid: errors.length === 0, errors, warnings };
@@ -271,31 +271,31 @@ export class TypeChecker {
     let actualType = typeof value;
 
     switch (expectedType) {
-      case 'PatientData':
-        isValid = isPatientData(value);
-        actualType = 'Invalid PatientData';
-        break;
-      case 'ICHRiskResult':
-        isValid = isICHRiskResult(value);
-        actualType = 'Invalid ICHRiskResult';
-        break;
-      case 'number':
-        isValid = typeof value === 'number' && !isNaN(value);
-        break;
-      case 'string':
-        isValid = typeof value === 'string';
-        break;
-      case 'boolean':
-        isValid = typeof value === 'boolean';
-        break;
-      default:
-        isValid = typeof value === expectedType;
+    case "PatientData":
+      isValid = isPatientData(value);
+      actualType = "Invalid PatientData";
+      break;
+    case "ICHRiskResult":
+      isValid = isICHRiskResult(value);
+      actualType = "Invalid ICHRiskResult";
+      break;
+    case "number":
+      isValid = typeof value === "number" && !isNaN(value);
+      break;
+    case "string":
+      isValid = typeof value === "string";
+      break;
+    case "boolean":
+      isValid = typeof value === "boolean";
+      break;
+    default:
+      isValid = typeof value === expectedType;
     }
 
     if (!isValid) {
       throw new TypeError(
         `Type error in ${fieldName}: expected ${expectedType}, got ${actualType}. `
-        + 'This is a critical error in medical calculations.',
+        + "This is a critical error in medical calculations.",
       );
     }
   }
@@ -308,13 +308,13 @@ export class TypeChecker {
    * @throws {RangeError} If value is out of range
    */
   static ensureRange(value, range, fieldName) {
-    this.ensureType(value, 'number', fieldName);
+    this.ensureType(value, "number", fieldName);
     const [min, max] = range;
 
     if (value < min || value > max) {
       throw new RangeError(
         `Range error in ${fieldName}: value ${value} must be between ${min} and ${max}. `
-        + 'This is a critical error in medical calculations.',
+        + "This is a critical error in medical calculations.",
       );
     }
   }

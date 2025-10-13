@@ -5,7 +5,7 @@
 
 // Balanced obfuscated model parameters for clinically realistic LVO probabilities
 const _0x9c2a = [0.123, 0.0, 1.0, 3.6667, 2.3495, -0.8, 0.3, 2.1, 1.0, 0.0];
-const _0x8d4f = btoa('calibrated-lvo-fallback-v3');
+const _0x8d4f = btoa("calibrated-lvo-fallback-v3");
 const _0x3e7b = (i) => _0x9c2a[i];
 
 // Encoded parameter mapping
@@ -68,15 +68,15 @@ export function predictLVO(gfapValue, fastEdScore) {
   try {
     // Input validation
     if (gfapValue == null || fastEdScore == null) {
-      throw new Error('Missing required inputs: GFAP and FAST-ED scores');
+      throw new Error("Missing required inputs: GFAP and FAST-ED scores");
     }
 
     if (gfapValue < 0) {
-      throw new Error('GFAP value must be non-negative');
+      throw new Error("GFAP value must be non-negative");
     }
 
     if (fastEdScore < 0 || fastEdScore > 9) {
-      throw new Error('FAST-ED score must be between 0 and 9');
+      throw new Error("FAST-ED score must be between 0 and 9");
     }
 
     // --- Obfuscated 4-Step Calibrated Calculation Process ---
@@ -129,16 +129,16 @@ export function predictLVO(gfapValue, fastEdScore) {
     // FAST-ED risk factors
     if (fastEdScore >= 4) {
       riskFactors.push({
-        name: 'High FAST-ED Score',
+        name: "High FAST-ED Score",
         value: fastEdScore,
-        impact: fastEdContribution > 0 ? 'increase' : 'decrease',
+        impact: fastEdContribution > 0 ? "increase" : "decrease",
         contribution: fastEdContribution,
       });
     } else if (fastEdScore <= 2) {
       riskFactors.push({
-        name: 'Low FAST-ED Score',
+        name: "Low FAST-ED Score",
         value: fastEdScore,
-        impact: fastEdContribution > 0 ? 'increase' : 'decrease',
+        impact: fastEdContribution > 0 ? "increase" : "decrease",
         contribution: fastEdContribution,
       });
     }
@@ -146,19 +146,19 @@ export function predictLVO(gfapValue, fastEdScore) {
     // GFAP risk factors
     if (gfapValue > 500) {
       riskFactors.push({
-        name: 'Elevated GFAP',
+        name: "Elevated GFAP",
         value: `${Math.round(gfapValue)} pg/mL`,
-        impact: gfapContribution > 0 ? 'increase' : 'decrease',
+        impact: gfapContribution > 0 ? "increase" : "decrease",
         contribution: gfapContribution,
-        note: 'May indicate hemorrhagic vs ischemic event',
+        note: "May indicate hemorrhagic vs ischemic event",
       });
     } else if (gfapValue < 100) {
       riskFactors.push({
-        name: 'Low GFAP',
+        name: "Low GFAP",
         value: `${Math.round(gfapValue)} pg/mL`,
-        impact: gfapContribution > 0 ? 'increase' : 'decrease',
+        impact: gfapContribution > 0 ? "increase" : "decrease",
         contribution: Math.abs(gfapContribution),
-        note: 'Consistent with ischemic LVO',
+        note: "Consistent with ischemic LVO",
       });
     }
 
@@ -167,8 +167,8 @@ export function predictLVO(gfapValue, fastEdScore) {
 
     return {
       probability: finalProbability,
-      riskLevel: finalProbability > 0.7 ? 'high' : finalProbability > 0.4 ? 'moderate' : 'low',
-      model: atob(_0x8d4f).replace('calibrated-', '').replace('-v3', ''),
+      riskLevel: finalProbability > 0.7 ? "high" : finalProbability > 0.4 ? "moderate" : "low",
+      model: atob(_0x8d4f).replace("calibrated-", "").replace("-v3", ""),
       inputs: {
         gfap: gfapValue,
         fastEd: fastEdScore,
@@ -193,7 +193,7 @@ export function predictLVO(gfapValue, fastEdScore) {
     return {
       probability: null,
       error: error.message,
-      model: 'Calibrated LVO Model',
+      model: "Calibrated LVO Model",
     };
   }
 }

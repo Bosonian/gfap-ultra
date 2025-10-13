@@ -1,4 +1,4 @@
-import { VALIDATION_RULES } from '../config.js';
+import { VALIDATION_RULES } from "../config.js";
 
 export function validateInput(name, value, rules, formData = null) {
   const result = {
@@ -7,23 +7,23 @@ export function validateInput(name, value, rules, formData = null) {
   };
 
   if (rules.required && !value && value !== 0) {
-    result.errors.push('This field is required');
+    result.errors.push("This field is required");
   }
 
-  if (rules.min !== undefined && value !== '' && !isNaN(value) && parseFloat(value) < rules.min) {
+  if (rules.min !== undefined && value !== "" && !isNaN(value) && parseFloat(value) < rules.min) {
     result.errors.push(`Value must be at least ${rules.min}`);
   }
 
-  if (rules.max !== undefined && value !== '' && !isNaN(value) && parseFloat(value) > rules.max) {
+  if (rules.max !== undefined && value !== "" && !isNaN(value) && parseFloat(value) > rules.max) {
     result.errors.push(`Value must be at most ${rules.max}`);
   }
 
   if (rules.pattern && !rules.pattern.test(value)) {
-    result.errors.push('Invalid format');
+    result.errors.push("Invalid format");
   }
 
   // Medical validation checks (warnings, not blocking errors)
-  if (rules.medicalCheck && value !== '' && !isNaN(value)) {
+  if (rules.medicalCheck && value !== "" && !isNaN(value)) {
     const medicalWarning = rules.medicalCheck(parseFloat(value), formData);
     if (medicalWarning) {
       result.warnings.push(medicalWarning);
@@ -85,18 +85,18 @@ export function showValidationErrors(container, validationErrors) {
   Object.entries(validationErrors).forEach(([name, errors]) => {
     const input = container.querySelector(`[name="${name}"]`);
     if (input) {
-      const group = input.closest('.input-group');
+      const group = input.closest(".input-group");
       if (group) {
-        group.classList.add('error');
+        group.classList.add("error");
         // Remove existing error messages
-        group.querySelectorAll('.error-message').forEach((el) => el.remove());
+        group.querySelectorAll(".error-message").forEach((el) => el.remove());
         // Add new error message safely without innerHTML
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-message';
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "error-message";
 
-        const iconSpan = document.createElement('span');
-        iconSpan.className = 'error-icon';
-        iconSpan.textContent = '⚠️';
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "error-icon";
+        iconSpan.textContent = "⚠️";
 
         errorDiv.appendChild(iconSpan);
         errorDiv.appendChild(document.createTextNode(` ${errors[0]}`));
@@ -110,18 +110,18 @@ export function showValidationWarnings(container, validationWarnings) {
   Object.entries(validationWarnings).forEach(([name, warnings]) => {
     const input = container.querySelector(`[name="${name}"]`);
     if (input) {
-      const group = input.closest('.input-group');
+      const group = input.closest(".input-group");
       if (group) {
-        group.classList.add('warning');
+        group.classList.add("warning");
         // Remove existing warning messages
-        group.querySelectorAll('.warning-message').forEach((el) => el.remove());
+        group.querySelectorAll(".warning-message").forEach((el) => el.remove());
         // Add new warning message safely without innerHTML
-        const warningDiv = document.createElement('div');
-        warningDiv.className = 'warning-message';
+        const warningDiv = document.createElement("div");
+        warningDiv.className = "warning-message";
 
-        const iconSpan = document.createElement('span');
-        iconSpan.className = 'warning-icon';
-        iconSpan.textContent = '💡';
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "warning-icon";
+        iconSpan.textContent = "💡";
 
         warningDiv.appendChild(iconSpan);
         warningDiv.appendChild(document.createTextNode(` ${warnings[0]}`));
@@ -132,16 +132,16 @@ export function showValidationWarnings(container, validationWarnings) {
 }
 
 export function clearValidationErrors(container) {
-  container.querySelectorAll('.input-group.error').forEach((group) => {
-    group.classList.remove('error');
-    group.querySelectorAll('.error-message').forEach((el) => el.remove());
+  container.querySelectorAll(".input-group.error").forEach((group) => {
+    group.classList.remove("error");
+    group.querySelectorAll(".error-message").forEach((el) => el.remove());
   });
 }
 
 export function clearValidationWarnings(container) {
-  container.querySelectorAll('.input-group.warning').forEach((group) => {
-    group.classList.remove('warning');
-    group.querySelectorAll('.warning-message').forEach((el) => el.remove());
+  container.querySelectorAll(".input-group.warning").forEach((group) => {
+    group.classList.remove("warning");
+    group.querySelectorAll(".warning-message").forEach((el) => el.remove());
   });
 }
 

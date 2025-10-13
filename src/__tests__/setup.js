@@ -1,7 +1,7 @@
 // Jest Setup for Medical Software Testing
 // iGFAP Stroke Triage Assistant Test Environment
 
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // Mock crypto.subtle for testing environment
 global.crypto = {
@@ -58,19 +58,19 @@ global.performance = {
 
 // Mock navigator
 global.navigator = {
-  userAgent: 'Jest Test Environment',
-  platform: 'Test',
-  language: 'en',
+  userAgent: "Jest Test Environment",
+  platform: "Test",
+  language: "en",
   onLine: true,
 };
 
 // Mock window methods
-Object.defineProperty(window, 'scrollTo', {
+Object.defineProperty(window, "scrollTo", {
   value: jest.fn(),
   writable: true,
 });
 
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
@@ -87,9 +87,9 @@ Object.defineProperty(window, 'matchMedia', {
 // Setup medical testing constants
 global.MEDICAL_TEST_DATA = {
   VALID_GFAP_VALUES: [29, 50, 100, 500, 1000, 5000, 10001],
-  INVALID_GFAP_VALUES: [-1, 0, 28, 10002, null, undefined, ''],
+  INVALID_GFAP_VALUES: [-1, 0, 28, 10002, null, undefined, ""],
   VALID_AGE_VALUES: [18, 25, 45, 65, 85, 100],
-  INVALID_AGE_VALUES: [-1, 0, 17, 101, null, undefined, ''],
+  INVALID_AGE_VALUES: [-1, 0, 17, 101, null, undefined, ""],
   VALID_BP_VALUES: {
     systolic: [90, 120, 140, 160, 180, 200],
     diastolic: [60, 80, 90, 100, 110, 120],
@@ -110,7 +110,7 @@ global.MEDICAL_TEST_DATA = {
     },
     full: {
       age: 72,
-      sex: 'male',
+      sex: "male",
       systolic_bp: 170,
       diastolic_bp: 100,
       gfap: 400.0,
@@ -150,12 +150,12 @@ beforeEach(() => {
     subtle: {
       digest: jest.fn().mockImplementation(async (algorithm) => {
         // Mock SHA-256 hash for testing
-        if (algorithm === 'SHA-256') {
+        if (algorithm === "SHA-256") {
           const encoder = new TextEncoder();
-          const testData = encoder.encode('test-hash');
+          const testData = encoder.encode("test-hash");
           return testData.buffer;
         }
-        throw new Error('Unsupported algorithm');
+        throw new Error("Unsupported algorithm");
       }),
     },
     getRandomValues: jest.fn().mockImplementation((array) => {
@@ -202,12 +202,12 @@ beforeEach(() => {
     },
   };
 
-  Object.defineProperty(window, 'scrollTo', {
+  Object.defineProperty(window, "scrollTo", {
     value: jest.fn(),
     writable: true,
   });
 
-  Object.defineProperty(window, 'matchMedia', {
+  Object.defineProperty(window, "matchMedia", {
     value: jest.fn().mockImplementation((query) => ({
       matches: false,
       media: query,
@@ -226,29 +226,29 @@ beforeEach(() => {
 expect.extend({
   toBeValidMedicalValue(received, type) {
     let pass = false;
-    let message = '';
+    let message = "";
 
     switch (type) {
-      case 'gfap':
-        pass = typeof received === 'number' && received >= 29 && received <= 10001;
-        message = pass
-          ? `Expected ${received} not to be a valid GFAP value`
-          : `Expected ${received} to be a valid GFAP value (29-10001 pg/mL)`;
-        break;
-      case 'age':
-        pass = typeof received === 'number' && received >= 18 && received <= 100;
-        message = pass
-          ? `Expected ${received} not to be a valid age`
-          : `Expected ${received} to be a valid age (18-100 years)`;
-        break;
-      case 'bloodPressure':
-        pass = typeof received === 'number' && received >= 50 && received <= 250;
-        message = pass
-          ? `Expected ${received} not to be a valid blood pressure`
-          : `Expected ${received} to be a valid blood pressure (50-250 mmHg)`;
-        break;
-      default:
-        throw new Error(`Unknown medical value type: ${type}`);
+    case "gfap":
+      pass = typeof received === "number" && received >= 29 && received <= 10001;
+      message = pass
+        ? `Expected ${received} not to be a valid GFAP value`
+        : `Expected ${received} to be a valid GFAP value (29-10001 pg/mL)`;
+      break;
+    case "age":
+      pass = typeof received === "number" && received >= 18 && received <= 100;
+      message = pass
+        ? `Expected ${received} not to be a valid age`
+        : `Expected ${received} to be a valid age (18-100 years)`;
+      break;
+    case "bloodPressure":
+      pass = typeof received === "number" && received >= 50 && received <= 250;
+      message = pass
+        ? `Expected ${received} not to be a valid blood pressure`
+        : `Expected ${received} to be a valid blood pressure (50-250 mmHg)`;
+      break;
+    default:
+      throw new Error(`Unknown medical value type: ${type}`);
     }
 
     return {

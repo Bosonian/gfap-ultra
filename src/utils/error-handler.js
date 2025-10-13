@@ -12,35 +12,35 @@
  * Error severity levels
  */
 export const ERROR_SEVERITY = {
-  LOW: 'low',
-  MEDIUM: 'medium',
-  HIGH: 'high',
-  CRITICAL: 'critical',
+  LOW: "low",
+  MEDIUM: "medium",
+  HIGH: "high",
+  CRITICAL: "critical",
 };
 
 /**
  * Error categories for medical applications
  */
 export const ERROR_CATEGORIES = {
-  NETWORK: 'network',
-  VALIDATION: 'validation',
-  AUTHENTICATION: 'authentication',
-  CALCULATION: 'calculation',
-  STORAGE: 'storage',
-  RENDERING: 'rendering',
-  MEDICAL: 'medical',
-  SECURITY: 'security',
+  NETWORK: "network",
+  VALIDATION: "validation",
+  AUTHENTICATION: "authentication",
+  CALCULATION: "calculation",
+  STORAGE: "storage",
+  RENDERING: "rendering",
+  MEDICAL: "medical",
+  SECURITY: "security",
 };
 
 /**
  * Medical error codes
  */
 export const MEDICAL_ERROR_CODES = {
-  INVALID_VITAL_SIGNS: 'MED001',
-  CALCULATION_FAILED: 'MED002',
-  DATA_INCOMPLETE: 'MED003',
-  PREDICTION_UNAVAILABLE: 'MED004',
-  SAFETY_THRESHOLD_EXCEEDED: 'MED005',
+  INVALID_VITAL_SIGNS: "MED001",
+  CALCULATION_FAILED: "MED002",
+  DATA_INCOMPLETE: "MED003",
+  PREDICTION_UNAVAILABLE: "MED004",
+  SAFETY_THRESHOLD_EXCEEDED: "MED005",
 };
 
 /**
@@ -54,7 +54,7 @@ export class MedicalError extends Error {
     severity = ERROR_SEVERITY.MEDIUM
   ) {
     super(message);
-    this.name = 'MedicalError';
+    this.name = "MedicalError";
     this.code = code;
     this.category = category;
     this.severity = severity;
@@ -78,18 +78,18 @@ export class MedicalError extends Error {
    */
   getUserMessage() {
     switch (this.category) {
-      case ERROR_CATEGORIES.NETWORK:
-        return 'Network connection issue. Please check your internet connection and try again.';
-      case ERROR_CATEGORIES.VALIDATION:
-        return 'Please check your input data and try again.';
-      case ERROR_CATEGORIES.AUTHENTICATION:
-        return 'Authentication failed. Please log in again.';
-      case ERROR_CATEGORIES.CALCULATION:
-        return 'Unable to complete calculation. Please verify your input data.';
-      case ERROR_CATEGORIES.MEDICAL:
-        return 'Medical calculation could not be completed. Please verify all clinical data.';
-      default:
-        return 'An unexpected error occurred. Please try again.';
+    case ERROR_CATEGORIES.NETWORK:
+      return "Network connection issue. Please check your internet connection and try again.";
+    case ERROR_CATEGORIES.VALIDATION:
+      return "Please check your input data and try again.";
+    case ERROR_CATEGORIES.AUTHENTICATION:
+      return "Authentication failed. Please log in again.";
+    case ERROR_CATEGORIES.CALCULATION:
+      return "Unable to complete calculation. Please verify your input data.";
+    case ERROR_CATEGORIES.MEDICAL:
+      return "Medical calculation could not be completed. Please verify all clinical data.";
+    default:
+      return "An unexpected error occurred. Please try again.";
     }
   }
 }
@@ -106,13 +106,13 @@ class GlobalErrorHandler {
 
   setupGlobalHandlers() {
     // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', event => {
+    window.addEventListener("unhandledrejection", event => {
       this.handleError(event.reason, ERROR_CATEGORIES.NETWORK, ERROR_SEVERITY.HIGH);
       event.preventDefault();
     });
 
     // Handle uncaught errors
-    window.addEventListener('error', event => {
+    window.addEventListener("error", event => {
       this.handleError(event.error, ERROR_CATEGORIES.RENDERING, ERROR_SEVERITY.MEDIUM);
     });
   }
@@ -148,8 +148,8 @@ class GlobalErrorHandler {
 
   showMedicalAlert(message) {
     // Create a critical medical alert
-    const alert = document.createElement('div');
-    alert.className = 'critical-medical-alert';
+    const alert = document.createElement("div");
+    alert.className = "critical-medical-alert";
     alert.style.cssText = `
       position: fixed;
       top: 20px;
@@ -210,7 +210,7 @@ export async function safeAsync(asyncFn, options = {}) {
     try {
       // Add timeout wrapper
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Operation timeout')), timeout);
+        setTimeout(() => reject(new Error("Operation timeout")), timeout);
       });
 
       const result = await Promise.race([asyncFn(), timeoutPromise]);
@@ -229,13 +229,13 @@ export async function safeAsync(asyncFn, options = {}) {
 
       // Final attempt failed
       if (fallback !== null) {
-        return typeof fallback === 'function' ? fallback(error) : fallback;
+        return typeof fallback === "function" ? fallback(error) : fallback;
       }
 
       // Throw enhanced error
       const enhancedError = new MedicalError(
-        error.message || 'Operation failed',
-        error.code || 'UNKNOWN',
+        error.message || "Operation failed",
+        error.code || "UNKNOWN",
         category,
         severity
       ).withContext(context);
@@ -258,11 +258,11 @@ export async function safeMedicalCalculation(calculationFn, inputs, options = {}
     severity: ERROR_SEVERITY.HIGH,
     fallback: () => ({
       error: true,
-      message: 'Medical calculation unavailable',
+      message: "Medical calculation unavailable",
       fallbackUsed: true,
     }),
     context: {
-      operation: 'medical_calculation',
+      operation: "medical_calculation",
       inputKeys: Object.keys(inputs || {}),
       ...options.context,
     },
@@ -284,7 +284,7 @@ export async function safeNetworkRequest(requestFn, options = {}) {
     timeout: 10000,
     fallback: () => ({
       error: true,
-      message: 'Network request failed',
+      message: "Network request failed",
       offline: true,
     }),
     ...options,
@@ -305,7 +305,7 @@ export async function safeAuthOperation(authFn, options = {}) {
     fallback: () => ({
       success: false,
       error: true,
-      message: 'Authentication service unavailable',
+      message: "Authentication service unavailable",
     }),
     ...options,
   });
@@ -326,7 +326,7 @@ export function createErrorBoundary(element, renderFn, errorFn) {
     if (errorFn) {
       errorFn(error);
     } else {
-      element.textContent = 'Content could not be displayed due to an error.';
+      element.textContent = "Content could not be displayed due to an error.";
     }
   }
 }
@@ -346,7 +346,7 @@ export function validateMedicalInputs(data, schema) {
     const value = data[key];
 
     // Required field check
-    if (rule.required && (value === undefined || value === null || value === '')) {
+    if (rule.required && (value === undefined || value === null || value === "")) {
       errors.push({
         field: key,
         code: MEDICAL_ERROR_CODES.DATA_INCOMPLETE,
@@ -360,7 +360,7 @@ export function validateMedicalInputs(data, schema) {
       const expectedType = rule.type;
       const actualType = typeof value;
 
-      if (expectedType === 'number' && (isNaN(value) || actualType !== 'number')) {
+      if (expectedType === "number" && (isNaN(value) || actualType !== "number")) {
         errors.push({
           field: key,
           code: MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
@@ -371,7 +371,7 @@ export function validateMedicalInputs(data, schema) {
     }
 
     // Range check for medical values
-    if (value !== undefined && typeof value === 'number') {
+    if (value !== undefined && typeof value === "number") {
       if (rule.min !== undefined && value < rule.min) {
         errors.push({
           field: key,

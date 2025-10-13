@@ -67,22 +67,22 @@ const MOCK_API_RESPONSES = {
 
 export const API_URLS = isDevelopment
   ? {
-      // Development mode - use Vite proxy to bypass CORS
-      COMA_ICH: "/api/cloud-functions/predict_coma_ich",
-      LDM_ICH: "/api/cloud-functions/predict_limited_data_ich",
-      FULL_STROKE: "/api/cloud-functions/predict_full_stroke",
-      LVO_PREDICTION: "/api/cloud-functions/predict_lvo",
-      AUTHENTICATE: "/api/cloud-functions/authenticate-research-access",
-    }
+    // Development mode - use Vite proxy to bypass CORS
+    COMA_ICH: "/api/cloud-functions/predict_coma_ich",
+    LDM_ICH: "/api/cloud-functions/predict_limited_data_ich",
+    FULL_STROKE: "/api/cloud-functions/predict_full_stroke",
+    LVO_PREDICTION: "/api/cloud-functions/predict_lvo",
+    AUTHENTICATE: "/api/cloud-functions/authenticate-research-access",
+  }
   : {
-      // Production mode - use direct endpoints
-      COMA_ICH: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich",
-      LDM_ICH: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
-      FULL_STROKE: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
-      LVO_PREDICTION: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo",
-      AUTHENTICATE:
+    // Production mode - use direct endpoints
+    COMA_ICH: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich",
+    LDM_ICH: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
+    FULL_STROKE: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
+    LVO_PREDICTION: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo",
+    AUTHENTICATE:
         "https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access",
-    };
+  };
 
 export const DEV_CONFIG = {
   isDevelopment,

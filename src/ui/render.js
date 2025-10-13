@@ -40,34 +40,34 @@ export function render(container) {
   // Render the appropriate screen
   let html = "";
   switch (currentScreen) {
-    case "login":
-      html = renderLoginScreen();
-      break;
-    case "triage1":
-      // Verify authentication for all clinical screens
-      if (!authManager.isValidSession()) {
-        store.navigate("login");
-        return;
-      }
-      html = renderTriage1();
-      break;
-    case "triage2":
-      html = renderTriage2();
-      break;
-    case "coma":
-      html = renderComa();
-      break;
-    case "limited":
-      html = renderLimited();
-      break;
-    case "full":
-      html = renderFull();
-      break;
-    case "results":
-      html = renderResults(results, startTime);
-      break;
-    default:
-      html = renderTriage1();
+  case "login":
+    html = renderLoginScreen();
+    break;
+  case "triage1":
+    // Verify authentication for all clinical screens
+    if (!authManager.isValidSession()) {
+      store.navigate("login");
+      return;
+    }
+    html = renderTriage1();
+    break;
+  case "triage2":
+    html = renderTriage2();
+    break;
+  case "coma":
+    html = renderComa();
+    break;
+  case "limited":
+    html = renderLimited();
+    break;
+  case "full":
+    html = renderFull();
+    break;
+  case "results":
+    html = renderResults(results, startTime);
+    break;
+  default:
+    html = renderTriage1();
   }
 
   // Use secure DOM update to minimize reflows and prevent XSS
@@ -149,7 +149,7 @@ function restoreFormData(form, module) {
 
 function attachEvents(container) {
   // Clear validation errors when user starts typing in a field
-  container.querySelectorAll('input[type="number"]').forEach(input => {
+  container.querySelectorAll("input[type=\"number\"]").forEach(input => {
     input.addEventListener("input", () => {
       // Only clear errors for the specific field being edited
       const group = input.closest(".input-group");
@@ -167,21 +167,21 @@ function attachEvents(container) {
       const boolVal = value === "true";
 
       switch (action) {
-        case "triage1":
-          handleTriage1(boolVal);
-          break;
-        case "triage2":
-          handleTriage2(boolVal);
-          break;
-        case "reset":
-          reset();
-          break;
-        case "goBack":
-          goBack();
-          break;
-        case "goHome":
-          goHome();
-          break;
+      case "triage1":
+        handleTriage1(boolVal);
+        break;
+      case "triage2":
+        handleTriage2(boolVal);
+        break;
+      case "reset":
+        reset();
+        break;
+      case "goBack":
+        goBack();
+        break;
+      case "goHome":
+        goHome();
+        break;
       }
     });
   });

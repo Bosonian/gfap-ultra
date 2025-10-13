@@ -1,19 +1,19 @@
-import { store } from '../state/store.js';
+import { store } from "../state/store.js";
 import {
   predictComaIch, predictLimitedIch, predictFullStroke, APIError,
-} from '../api/client.js';
-import { t } from '../localization/i18n.js';
-import { showPrerequisitesModal } from '../ui/components/prerequisites-modal.js';
-import { safeSetInnerHTML } from '../security/html-sanitizer.js';
-import { DEV_CONFIG } from '../config.js';
+} from "../api/client.js";
+import { t } from "../localization/i18n.js";
+import { showPrerequisitesModal } from "../ui/components/prerequisites-modal.js";
+import { safeSetInnerHTML } from "../security/html-sanitizer.js";
+import { DEV_CONFIG } from "../config.js";
 
-import { validateForm, showValidationErrors } from './validate.js';
+import { validateForm, showValidationErrors } from "./validate.js";
 
 export function handleTriage1(isComatose) {
-  store.logEvent('triage1_answer', { comatose: isComatose });
+  store.logEvent("triage1_answer", { comatose: isComatose });
 
   if (isComatose) {
-    navigate('coma');
+    navigate("coma");
   } else {
     // Show prerequisites modal for conscious patients
     showPrerequisitesModal();
@@ -21,13 +21,13 @@ export function handleTriage1(isComatose) {
 }
 
 export function handleTriage2(isExaminable) {
-  store.logEvent('triage2_answer', { examinable: isExaminable });
-  const nextScreen = isExaminable ? 'full' : 'limited';
+  store.logEvent("triage2_answer", { examinable: isExaminable });
+  const nextScreen = isExaminable ? "full" : "limited";
   navigate(nextScreen);
 }
 
 export function navigate(screen) {
-  store.logEvent('navigate', {
+  store.logEvent("navigate", {
     from: store.getState().currentScreen,
     to: screen,
   });
@@ -37,11 +37,11 @@ export function navigate(screen) {
 
 export function reset() {
   if (store.hasUnsavedData()) {
-    if (!confirm('Are you sure you want to start over? All entered data will be lost.')) {
+    if (!confirm("Are you sure you want to start over? All entered data will be lost.")) {
       return;
     }
   }
-  store.logEvent('reset');
+  store.logEvent("reset");
   store.reset();
 }
 
@@ -49,7 +49,7 @@ export function goBack() {
   const success = store.goBack();
 
   if (success) {
-    store.logEvent('navigate_back');
+    store.logEvent("navigate_back");
     window.scrollTo(0, 0);
   } else {
     goHome();
@@ -57,7 +57,7 @@ export function goBack() {
 }
 
 export function goHome() {
-  store.logEvent('navigate_home');
+  store.logEvent("navigate_home");
   store.goHome();
   window.scrollTo(0, 0);
 }
@@ -77,14 +77,14 @@ export async function handleSubmit(e, container) {
       if (firstErrorName && form.elements[firstErrorName]) {
         const el = form.elements[firstErrorName];
         el.focus({ preventScroll: true });
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-      const sr = document.createElement('div');
-      sr.className = 'sr-only';
-      sr.setAttribute('role', 'status');
-      sr.setAttribute('aria-live', 'polite');
+      const sr = document.createElement("div");
+      sr.className = "sr-only";
+      sr.setAttribute("role", "status");
+      sr.setAttribute("aria-live", "polite");
       const errorCount = Object.keys(validation.validationErrors).length;
-      sr.textContent = `${errorCount} field${errorCount === 1 ? '' : 's'} need attention.`;
+      sr.textContent = `${errorCount} field${errorCount === 1 ? "" : "s"} need attention.`;
       document.body.appendChild(sr);
       setTimeout(() => sr.remove(), 1200);
     } catch {}
@@ -97,15 +97,15 @@ export async function handleSubmit(e, container) {
   // Process all form elements to ensure checkboxes are included
   Array.from(form.elements).forEach((element) => {
     if (element.name) {
-      if (element.type === 'checkbox') {
+      if (element.type === "checkbox") {
         inputs[element.name] = element.checked;
-      } else if (element.type === 'number') {
+      } else if (element.type === "number") {
         const n = parseFloat(element.value);
         inputs[element.name] = isNaN(n) ? 0 : n;
-      } else if (element.type === 'hidden') {
+      } else if (element.type === "hidden") {
         // Handle hidden fields (like armparese from FAST-ED)
-        if (element.name === 'armparese') {
-          inputs[element.name] = element.value === 'true';
+        if (element.name === "armparese") {
+          inputs[element.name] = element.value === "true";
         } else {
           inputs[element.name] = element.value;
         }
@@ -119,107 +119,107 @@ export async function handleSubmit(e, container) {
   store.setFormData(module, inputs);
 
   // Show loading state
-  const button = form.querySelector('button[type=submit]');
-  const originalContent = button ? button.innerHTML : '';
+  const button = form.querySelector("button[type=submit]");
+  const originalContent = button ? button.innerHTML : "";
   if (button) {
     button.disabled = true;
     try {
-      safeSetInnerHTML(button, `<span class="loading-spinner"></span> ${t('analyzing')}`);
+      safeSetInnerHTML(button, `<span class="loading-spinner"></span> ${t("analyzing")}`);
     } catch (error) {
-      console.error('Button loading state sanitization failed:', error);
-      button.textContent = t('analyzing') || 'Analyzing...';
+      console.error("Button loading state sanitization failed:", error);
+      button.textContent = t("analyzing") || "Analyzing...";
     }
   }
 
   try {
-    console.log('[Submit] Module:', module);
-    console.log('[Submit] Inputs:', inputs);
+    console.log("[Submit] Module:", module);
+    console.log("[Submit] Inputs:", inputs);
     // Run models based on module
     let results;
 
     switch (module) {
-      case 'coma':
-        const comaResult = await predictComaIch(inputs);
-        results = {
-          ich: {
-            ...comaResult,
-            module: 'Coma',
-          },
-          lvo: null,
-        };
-        break;
+    case "coma":
+      const comaResult = await predictComaIch(inputs);
+      results = {
+        ich: {
+          ...comaResult,
+          module: "Coma",
+        },
+        lvo: null,
+      };
+      break;
 
-      case 'limited':
-        const limitedResult = await predictLimitedIch(inputs);
-        results = {
-          ich: {
-            ...limitedResult,
-            module: 'Limited',
-          },
-          lvo: { notPossible: true },
-        };
-        break;
+    case "limited":
+      const limitedResult = await predictLimitedIch(inputs);
+      results = {
+        ich: {
+          ...limitedResult,
+          module: "Limited",
+        },
+        lvo: { notPossible: true },
+      };
+      break;
 
-      case 'full':
-        results = await predictFullStroke(inputs);
-        console.log('[Submit] Full results:', {
-          ich: !!results?.ich,
-          lvo: !!results?.lvo,
-          ichP: results?.ich?.probability,
-          lvoP: results?.lvo?.probability,
-        });
-        // Validate results structure
-        if (!results || !results.ich) {
-          throw new Error('Invalid response structure from Full Stroke API');
-        }
-        // Fix ICH probability mapping for Full Stroke
-        if (results.ich && !results.ich.probability && results.ich.ich_probability !== undefined) {
-          results.ich.probability = results.ich.ich_probability;
-          console.log('[Submit] Fixed ICH probability for Full Stroke:', results.ich.probability);
-        }
-        // Ensure module property is set
-        if (results.ich && !results.ich.module) {
-          results.ich.module = 'Full Stroke';
-        }
-        if (results.lvo && !results.lvo.module) {
-          results.lvo.module = 'Full Stroke';
-        }
-        break;
+    case "full":
+      results = await predictFullStroke(inputs);
+      console.log("[Submit] Full results:", {
+        ich: !!results?.ich,
+        lvo: !!results?.lvo,
+        ichP: results?.ich?.probability,
+        lvoP: results?.lvo?.probability,
+      });
+      // Validate results structure
+      if (!results || !results.ich) {
+        throw new Error("Invalid response structure from Full Stroke API");
+      }
+      // Fix ICH probability mapping for Full Stroke
+      if (results.ich && !results.ich.probability && results.ich.ich_probability !== undefined) {
+        results.ich.probability = results.ich.ich_probability;
+        console.log("[Submit] Fixed ICH probability for Full Stroke:", results.ich.probability);
+      }
+      // Ensure module property is set
+      if (results.ich && !results.ich.module) {
+        results.ich.module = "Full Stroke";
+      }
+      if (results.lvo && !results.lvo.module) {
+        results.lvo.module = "Full Stroke";
+      }
+      break;
 
-      default:
-        throw new Error(`Unknown module: ${module}`);
+    default:
+      throw new Error(`Unknown module: ${module}`);
     }
 
-    console.log('[Submit] Setting results in store:', results);
+    console.log("[Submit] Setting results in store:", results);
     store.setResults(results);
-    store.logEvent('models_complete', { module, results });
+    store.logEvent("models_complete", { module, results });
 
     // Verify results were stored
     const storedState = store.getState();
-    console.log('[Submit] State after setResults:', {
+    console.log("[Submit] State after setResults:", {
       hasResults: !!storedState.results,
       currentScreen: storedState.currentScreen,
     });
 
-    console.log('[Submit] Navigating to results...');
-    navigate('results');
+    console.log("[Submit] Navigating to results...");
+    navigate("results");
     // Visual confirmation that results screen loaded
-    showToast('✅ Results loaded', 2000);
+    showToast("✅ Results loaded", 2000);
     // Double-check navigation and force if needed
     setTimeout(() => {
       try {
         const cs = store.getState().currentScreen;
-        console.log('[Submit] currentScreen after navigate:', cs);
-        if (cs !== 'results') {
-          store.navigate('results');
-          showToast('🔁 Forced results view', 1500);
+        console.log("[Submit] currentScreen after navigate:", cs);
+        if (cs !== "results") {
+          store.navigate("results");
+          showToast("🔁 Forced results view", 1500);
         }
       } catch {}
     }, 0);
   } catch (error) {
     // Error running models - handle gracefully, with Full module fallback in preview
-    const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
-    if (module === 'full' && isLocalPreview) {
+    const isLocalPreview = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+    if (module === "full" && isLocalPreview) {
       try {
         const m = DEV_CONFIG.mockApiResponses.full_stroke;
         const ich = m.ich_prediction || {};
@@ -231,25 +231,25 @@ export async function handleSubmit(e, container) {
             probability: pIch > 1 ? pIch / 100 : pIch,
             drivers: ich.drivers || null,
             confidence: parseFloat(ich.confidence) || 0.85,
-            module: 'Full Stroke',
+            module: "Full Stroke",
           },
           lvo: {
             probability: pLvo > 1 ? pLvo / 100 : pLvo,
             drivers: lvo.drivers || null,
             confidence: parseFloat(lvo.confidence) || 0.85,
-            module: 'Full Stroke',
+            module: "Full Stroke",
           },
         };
         store.setResults(fallbackResults);
-        store.logEvent('models_complete_fallback', { module, reason: error.message });
-        navigate('results');
+        store.logEvent("models_complete_fallback", { module, reason: error.message });
+        navigate("results");
         return;
       } catch (e) {
         // Continue to show error below
       }
     }
 
-    let errorMessage = 'An error occurred during analysis. Please try again.';
+    let errorMessage = "An error occurred during analysis. Please try again.";
     if (error instanceof APIError) {
       errorMessage = error.message;
     }
@@ -261,8 +261,8 @@ export async function handleSubmit(e, container) {
       try {
         safeSetInnerHTML(button, originalContent);
       } catch (e2) {
-        console.error('Button restore sanitization failed:', e2);
-        button.textContent = 'Submit';
+        console.error("Button restore sanitization failed:", e2);
+        button.textContent = "Submit";
       }
     }
   }
@@ -270,30 +270,30 @@ export async function handleSubmit(e, container) {
 
 function showError(container, message) {
   // Remove existing error alerts
-  container.querySelectorAll('.critical-alert').forEach((alert) => {
-    if (alert.querySelector('h4')?.textContent?.includes('Error')) {
+  container.querySelectorAll(".critical-alert").forEach((alert) => {
+    if (alert.querySelector("h4")?.textContent?.includes("Error")) {
       alert.remove();
     }
   });
 
-  const alert = document.createElement('div');
-  alert.className = 'critical-alert';
+  const alert = document.createElement("div");
+  alert.className = "critical-alert";
 
   // Create safe DOM structure without innerHTML to prevent XSS
-  const h4 = document.createElement('h4');
-  const iconSpan = document.createElement('span');
-  iconSpan.className = 'alert-icon';
-  iconSpan.textContent = '⚠️';
+  const h4 = document.createElement("h4");
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "alert-icon";
+  iconSpan.textContent = "⚠️";
   h4.appendChild(iconSpan);
-  h4.appendChild(document.createTextNode(' Error'));
+  h4.appendChild(document.createTextNode(" Error"));
 
-  const p = document.createElement('p');
+  const p = document.createElement("p");
   p.textContent = message; // Safe text content only
 
   alert.appendChild(h4);
   alert.appendChild(p);
 
-  const containerDiv = container.querySelector('.container');
+  const containerDiv = container.querySelector(".container");
   if (containerDiv) {
     containerDiv.prepend(alert);
   } else {
@@ -306,10 +306,10 @@ function showError(container, message) {
 // Lightweight toast helper (overlays at top center)
 function showToast(message, duration = 2000) {
   try {
-    const toast = document.createElement('div');
+    const toast = document.createElement("div");
     toast.textContent = message;
-    toast.setAttribute('role', 'status');
-    toast.setAttribute('aria-live', 'polite');
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
     toast.style.cssText = `
       position: fixed;
       top: 16px;
@@ -328,10 +328,10 @@ function showToast(message, duration = 2000) {
     `;
     document.body.appendChild(toast);
     requestAnimationFrame(() => {
-      toast.style.opacity = '1';
+      toast.style.opacity = "1";
     });
     setTimeout(() => {
-      toast.style.opacity = '0';
+      toast.style.opacity = "0";
       setTimeout(() => toast.remove(), 200);
     }, duration);
   } catch {}

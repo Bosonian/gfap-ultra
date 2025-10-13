@@ -117,7 +117,7 @@ function renderProbabilityBars(mainResults, legacyResults) {
  */
 function renderDifferenceAnalysis(comparison) {
   if (!comparison.isValid) {
-    return '<div class="comparison-error">Unable to compare models</div>';
+    return "<div class=\"comparison-error\">Unable to compare models</div>";
   }
 
   const { differences, agreement } = comparison;

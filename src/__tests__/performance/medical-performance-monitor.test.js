@@ -9,7 +9,7 @@ import {
   PerformanceThreshold,
   PerformanceAlert,
   MedicalPerformanceReport,
-} from '../../performance/medical-performance-monitor.js';
+} from "../../performance/medical-performance-monitor.js";
 
 // Mock Performance API
 global.performance = {
@@ -30,7 +30,7 @@ global.console = {
   info: jest.fn(),
 };
 
-describe('MedicalPerformanceMonitor', () => {
+describe("MedicalPerformanceMonitor", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     medicalPerformanceMonitor.reset();
@@ -41,13 +41,13 @@ describe('MedicalPerformanceMonitor', () => {
     medicalPerformanceMonitor.stop();
   });
 
-  describe('Initialization and Lifecycle', () => {
-    test('should initialize with default configuration', () => {
+  describe("Initialization and Lifecycle", () => {
+    test("should initialize with default configuration", () => {
       expect(medicalPerformanceMonitor.isMonitoring).toBe(true);
       expect(medicalPerformanceMonitor.startTime).toBeDefined();
     });
 
-    test('should start monitoring', () => {
+    test("should start monitoring", () => {
       medicalPerformanceMonitor.stop();
       expect(medicalPerformanceMonitor.isMonitoring).toBe(false);
 
@@ -55,17 +55,17 @@ describe('MedicalPerformanceMonitor', () => {
       expect(medicalPerformanceMonitor.isMonitoring).toBe(true);
     });
 
-    test('should stop monitoring', () => {
+    test("should stop monitoring", () => {
       expect(medicalPerformanceMonitor.isMonitoring).toBe(true);
 
       medicalPerformanceMonitor.stop();
       expect(medicalPerformanceMonitor.isMonitoring).toBe(false);
     });
 
-    test('should reset metrics', () => {
+    test("should reset metrics", () => {
       // Add some metrics first
-      medicalPerformanceMonitor.startMeasurement('test', PerformanceMetricType.API_CALL);
-      medicalPerformanceMonitor.endMeasurement('test');
+      medicalPerformanceMonitor.startMeasurement("test", PerformanceMetricType.API_CALL);
+      medicalPerformanceMonitor.endMeasurement("test");
 
       expect(medicalPerformanceMonitor.metrics.size).toBeGreaterThan(0);
 
@@ -74,29 +74,29 @@ describe('MedicalPerformanceMonitor', () => {
     });
   });
 
-  describe('Performance Measurement', () => {
-    test('should start measurement with correct metadata', () => {
+  describe("Performance Measurement", () => {
+    test("should start measurement with correct metadata", () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'api-call-test',
+        "api-call-test",
         PerformanceMetricType.API_CALL,
-        { endpoint: '/predict', method: 'POST' },
+        { endpoint: "/predict", method: "POST" },
       );
 
       expect(metricId).toBeDefined();
-      expect(typeof metricId).toBe('string');
+      expect(typeof metricId).toBe("string");
 
       const metric = medicalPerformanceMonitor.metrics.get(metricId);
       expect(metric).toBeDefined();
-      expect(metric.name).toBe('api-call-test');
+      expect(metric.name).toBe("api-call-test");
       expect(metric.type).toBe(PerformanceMetricType.API_CALL);
-      expect(metric.metadata.endpoint).toBe('/predict');
+      expect(metric.metadata.endpoint).toBe("/predict");
       expect(metric.startTime).toBeDefined();
       expect(metric.endTime).toBeNull();
     });
 
-    test('should end measurement and calculate duration', () => {
+    test("should end measurement and calculate duration", () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'duration-test',
+        "duration-test",
         PerformanceMetricType.PREDICTION,
       );
 
@@ -111,21 +111,21 @@ describe('MedicalPerformanceMonitor', () => {
       expect(result.endTime).toBeDefined();
     });
 
-    test('should handle non-existent measurement IDs', () => {
-      const result = medicalPerformanceMonitor.endMeasurement('non-existent-id');
+    test("should handle non-existent measurement IDs", () => {
+      const result = medicalPerformanceMonitor.endMeasurement("non-existent-id");
       expect(result).toBeNull();
     });
 
-    test('should generate unique measurement IDs', () => {
-      const id1 = medicalPerformanceMonitor.startMeasurement('test1', PerformanceMetricType.API_CALL);
-      const id2 = medicalPerformanceMonitor.startMeasurement('test2', PerformanceMetricType.API_CALL);
+    test("should generate unique measurement IDs", () => {
+      const id1 = medicalPerformanceMonitor.startMeasurement("test1", PerformanceMetricType.API_CALL);
+      const id2 = medicalPerformanceMonitor.startMeasurement("test2", PerformanceMetricType.API_CALL);
 
       expect(id1).not.toBe(id2);
     });
   });
 
-  describe('Metric Type Validation', () => {
-    test('should accept valid metric types', () => {
+  describe("Metric Type Validation", () => {
+    test("should accept valid metric types", () => {
       const validTypes = [
         PerformanceMetricType.API_CALL,
         PerformanceMetricType.PREDICTION,
@@ -136,22 +136,22 @@ describe('MedicalPerformanceMonitor', () => {
 
       validTypes.forEach(type => {
         expect(() => {
-          medicalPerformanceMonitor.startMeasurement('test', type);
+          medicalPerformanceMonitor.startMeasurement("test", type);
         }).not.toThrow();
       });
     });
 
-    test('should reject invalid metric types', () => {
+    test("should reject invalid metric types", () => {
       expect(() => {
-        medicalPerformanceMonitor.startMeasurement('test', 'INVALID_TYPE');
+        medicalPerformanceMonitor.startMeasurement("test", "INVALID_TYPE");
       }).toThrow();
     });
   });
 
-  describe('Performance Thresholds', () => {
-    test('should check API call thresholds', () => {
+  describe("Performance Thresholds", () => {
+    test("should check API call thresholds", () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'slow-api-call',
+        "slow-api-call",
         PerformanceMetricType.API_CALL,
       );
 
@@ -160,12 +160,12 @@ describe('MedicalPerformanceMonitor', () => {
       const result = medicalPerformanceMonitor.endMeasurement(metricId);
 
       expect(result.thresholdViolation).toBe(true);
-      expect(result.violatedThreshold).toBe('API_CALL');
+      expect(result.violatedThreshold).toBe("API_CALL");
     });
 
-    test('should check prediction thresholds', () => {
+    test("should check prediction thresholds", () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'slow-prediction',
+        "slow-prediction",
         PerformanceMetricType.PREDICTION,
       );
 
@@ -174,12 +174,12 @@ describe('MedicalPerformanceMonitor', () => {
       const result = medicalPerformanceMonitor.endMeasurement(metricId);
 
       expect(result.thresholdViolation).toBe(true);
-      expect(result.violatedThreshold).toBe('PREDICTION');
+      expect(result.violatedThreshold).toBe("PREDICTION");
     });
 
-    test('should not violate thresholds for fast operations', () => {
+    test("should not violate thresholds for fast operations", () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'fast-api-call',
+        "fast-api-call",
         PerformanceMetricType.API_CALL,
       );
 
@@ -192,14 +192,14 @@ describe('MedicalPerformanceMonitor', () => {
     });
   });
 
-  describe('Performance Alerts', () => {
-    test('should generate alerts for threshold violations', () => {
+  describe("Performance Alerts", () => {
+    test("should generate alerts for threshold violations", () => {
       const originalAlertCallback = medicalPerformanceMonitor.alertCallback;
       const mockAlertCallback = jest.fn();
       medicalPerformanceMonitor.setAlertCallback(mockAlertCallback);
 
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'slow-operation',
+        "slow-operation",
         PerformanceMetricType.API_CALL,
       );
 
@@ -208,15 +208,15 @@ describe('MedicalPerformanceMonitor', () => {
 
       expect(mockAlertCallback).toHaveBeenCalled();
       const alertCall = mockAlertCallback.mock.calls[0][0];
-      expect(alertCall.type).toBe('THRESHOLD_VIOLATION');
-      expect(alertCall.severity).toBe('HIGH');
+      expect(alertCall.type).toBe("THRESHOLD_VIOLATION");
+      expect(alertCall.severity).toBe("HIGH");
 
       medicalPerformanceMonitor.setAlertCallback(originalAlertCallback);
     });
 
-    test('should track alert history', () => {
+    test("should track alert history", () => {
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'alert-test',
+        "alert-test",
         PerformanceMetricType.API_CALL,
       );
 
@@ -225,12 +225,12 @@ describe('MedicalPerformanceMonitor', () => {
 
       const alerts = medicalPerformanceMonitor.getAlerts();
       expect(alerts.length).toBeGreaterThan(0);
-      expect(alerts[0].type).toBe('THRESHOLD_VIOLATION');
+      expect(alerts[0].type).toBe("THRESHOLD_VIOLATION");
     });
   });
 
-  describe('Performance Statistics', () => {
-    test('should calculate comprehensive statistics', () => {
+  describe("Performance Statistics", () => {
+    test("should calculate comprehensive statistics", () => {
       // Create multiple measurements
       const measurements = [];
       for (let i = 0; i < 5; i++) {
@@ -254,10 +254,10 @@ describe('MedicalPerformanceMonitor', () => {
       expect(stats.maxDuration).toBeDefined();
     });
 
-    test('should calculate statistics by metric type', () => {
+    test("should calculate statistics by metric type", () => {
       // Create API call measurement
       const apiMetricId = medicalPerformanceMonitor.startMeasurement(
-        'api-test',
+        "api-test",
         PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 2000);
@@ -265,7 +265,7 @@ describe('MedicalPerformanceMonitor', () => {
 
       // Create prediction measurement
       const predMetricId = medicalPerformanceMonitor.startMeasurement(
-        'pred-test',
+        "pred-test",
         PerformanceMetricType.PREDICTION,
       );
       performance.now.mockReturnValue(performance.now() + 3000);
@@ -279,10 +279,10 @@ describe('MedicalPerformanceMonitor', () => {
       expect(stats.PREDICTION.count).toBe(1);
     });
 
-    test('should track SLA compliance', () => {
+    test("should track SLA compliance", () => {
       // Create measurements that meet SLA
       const fastMetricId = medicalPerformanceMonitor.startMeasurement(
-        'fast-api',
+        "fast-api",
         PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 1000);
@@ -290,7 +290,7 @@ describe('MedicalPerformanceMonitor', () => {
 
       // Create measurements that violate SLA
       const slowMetricId = medicalPerformanceMonitor.startMeasurement(
-        'slow-api',
+        "slow-api",
         PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 6000);
@@ -305,13 +305,13 @@ describe('MedicalPerformanceMonitor', () => {
     });
   });
 
-  describe('Performance Reporting', () => {
-    test('should generate comprehensive performance report', () => {
+  describe("Performance Reporting", () => {
+    test("should generate comprehensive performance report", () => {
       // Create sample data
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'report-test',
+        "report-test",
         PerformanceMetricType.API_CALL,
-        { endpoint: '/predict' },
+        { endpoint: "/predict" },
       );
       performance.now.mockReturnValue(performance.now() + 2000);
       medicalPerformanceMonitor.endMeasurement(metricId);
@@ -326,10 +326,10 @@ describe('MedicalPerformanceMonitor', () => {
       expect(report.alerts).toBeDefined();
     });
 
-    test('should include performance recommendations', () => {
+    test("should include performance recommendations", () => {
       // Create slow API call to trigger recommendations
       const metricId = medicalPerformanceMonitor.startMeasurement(
-        'slow-recommendation-test',
+        "slow-recommendation-test",
         PerformanceMetricType.API_CALL,
       );
       performance.now.mockReturnValue(performance.now() + 6000);
@@ -338,12 +338,12 @@ describe('MedicalPerformanceMonitor', () => {
       const report = medicalPerformanceMonitor.generateReport();
 
       expect(report.recommendations.length).toBeGreaterThan(0);
-      expect(report.recommendations[0]).toContain('API response');
+      expect(report.recommendations[0]).toContain("API response");
     });
   });
 
-  describe('Memory and Resource Management', () => {
-    test('should cleanup old metrics', () => {
+  describe("Memory and Resource Management", () => {
+    test("should cleanup old metrics", () => {
       // Create many metrics to trigger cleanup
       for (let i = 0; i < 1100; i++) {
         const metricId = medicalPerformanceMonitor.startMeasurement(
@@ -361,17 +361,17 @@ describe('MedicalPerformanceMonitor', () => {
       expect(finalSize).toBeLessThanOrEqual(1000); // Max size limit
     });
 
-    test('should provide memory usage statistics', () => {
+    test("should provide memory usage statistics", () => {
       const memoryStats = medicalPerformanceMonitor.getMemoryUsage();
 
-      expect(memoryStats).toHaveProperty('metricsCount');
-      expect(memoryStats).toHaveProperty('estimatedMemoryUsage');
-      expect(memoryStats).toHaveProperty('averageMetricSize');
+      expect(memoryStats).toHaveProperty("metricsCount");
+      expect(memoryStats).toHaveProperty("estimatedMemoryUsage");
+      expect(memoryStats).toHaveProperty("averageMetricSize");
     });
   });
 
-  describe('Configuration and Customization', () => {
-    test('should update configuration', () => {
+  describe("Configuration and Customization", () => {
+    test("should update configuration", () => {
       const newConfig = {
         thresholds: {
           API_CALL: 3000, // 3 seconds
@@ -387,7 +387,7 @@ describe('MedicalPerformanceMonitor', () => {
       expect(config.maxMetrics).toBe(500);
     });
 
-    test('should validate configuration updates', () => {
+    test("should validate configuration updates", () => {
       const invalidConfig = {
         thresholds: {
           API_CALL: -1000, // Invalid negative threshold
@@ -400,39 +400,39 @@ describe('MedicalPerformanceMonitor', () => {
     });
   });
 
-  describe('Error Handling', () => {
-    test('should handle measurement errors gracefully', () => {
+  describe("Error Handling", () => {
+    test("should handle measurement errors gracefully", () => {
       // Mock performance.now to throw error
       performance.now.mockImplementation(() => {
-        throw new Error('Performance API error');
+        throw new Error("Performance API error");
       });
 
       expect(() => {
-        medicalPerformanceMonitor.startMeasurement('error-test', PerformanceMetricType.API_CALL);
+        medicalPerformanceMonitor.startMeasurement("error-test", PerformanceMetricType.API_CALL);
       }).not.toThrow();
 
       // Restore performance.now
       performance.now.mockImplementation(() => Date.now());
     });
 
-    test('should handle invalid measurement data', () => {
+    test("should handle invalid measurement data", () => {
       const result = medicalPerformanceMonitor.endMeasurement(null);
       expect(result).toBeNull();
 
-      const result2 = medicalPerformanceMonitor.endMeasurement('');
+      const result2 = medicalPerformanceMonitor.endMeasurement("");
       expect(result2).toBeNull();
     });
   });
 
-  describe('Integration with Medical Workflows', () => {
-    test('should track complete medical prediction workflow', () => {
-      const workflowId = 'medical-workflow-123';
+  describe("Integration with Medical Workflows", () => {
+    test("should track complete medical prediction workflow", () => {
+      const workflowId = "medical-workflow-123";
 
       // Start validation
       const validationId = medicalPerformanceMonitor.startMeasurement(
         `${workflowId}-validation`,
         PerformanceMetricType.VALIDATION,
-        { patientId: 'P123', module: 'coma' },
+        { patientId: "P123", module: "coma" },
       );
       performance.now.mockReturnValue(performance.now() + 100);
       medicalPerformanceMonitor.endMeasurement(validationId);
@@ -441,7 +441,7 @@ describe('MedicalPerformanceMonitor', () => {
       const apiId = medicalPerformanceMonitor.startMeasurement(
         `${workflowId}-api`,
         PerformanceMetricType.API_CALL,
-        { endpoint: '/predict_coma_ich' },
+        { endpoint: "/predict_coma_ich" },
       );
       performance.now.mockReturnValue(performance.now() + 2000);
       medicalPerformanceMonitor.endMeasurement(apiId);
@@ -450,7 +450,7 @@ describe('MedicalPerformanceMonitor', () => {
       const predictionId = medicalPerformanceMonitor.startMeasurement(
         `${workflowId}-prediction`,
         PerformanceMetricType.PREDICTION,
-        { algorithm: 'coma_ich_model' },
+        { algorithm: "coma_ich_model" },
       );
       performance.now.mockReturnValue(performance.now() + 1500);
       medicalPerformanceMonitor.endMeasurement(predictionId);
@@ -464,18 +464,18 @@ describe('MedicalPerformanceMonitor', () => {
   });
 });
 
-describe('PerformanceMetricType', () => {
-  test('should define all required metric types', () => {
-    expect(PerformanceMetricType.API_CALL).toBe('api_call');
-    expect(PerformanceMetricType.PREDICTION).toBe('prediction');
-    expect(PerformanceMetricType.VALIDATION).toBe('validation');
-    expect(PerformanceMetricType.CACHE).toBe('cache');
-    expect(PerformanceMetricType.RENDERING).toBe('rendering');
+describe("PerformanceMetricType", () => {
+  test("should define all required metric types", () => {
+    expect(PerformanceMetricType.API_CALL).toBe("api_call");
+    expect(PerformanceMetricType.PREDICTION).toBe("prediction");
+    expect(PerformanceMetricType.VALIDATION).toBe("validation");
+    expect(PerformanceMetricType.CACHE).toBe("cache");
+    expect(PerformanceMetricType.RENDERING).toBe("rendering");
   });
 });
 
-describe('PerformanceThreshold', () => {
-  test('should define medical-grade thresholds', () => {
+describe("PerformanceThreshold", () => {
+  test("should define medical-grade thresholds", () => {
     expect(PerformanceThreshold.API_CALL).toBe(5000); // 5 seconds
     expect(PerformanceThreshold.PREDICTION).toBe(3000); // 3 seconds
     expect(PerformanceThreshold.VALIDATION).toBe(1000); // 1 second
@@ -484,13 +484,13 @@ describe('PerformanceThreshold', () => {
   });
 });
 
-describe('MedicalPerformanceReport', () => {
-  test('should create comprehensive report', () => {
+describe("MedicalPerformanceReport", () => {
+  test("should create comprehensive report", () => {
     const reportData = {
       summary: { totalMeasurements: 10, averageDuration: 1500 },
       statistics: { API_CALL: { count: 5, average: 2000 } },
       slaCompliance: { compliancePercentage: 95 },
-      recommendations: ['Optimize API calls'],
+      recommendations: ["Optimize API calls"],
       alerts: [],
     };
 
@@ -502,7 +502,7 @@ describe('MedicalPerformanceReport', () => {
     expect(report.recommendations).toEqual(reportData.recommendations);
   });
 
-  test('should format report for export', () => {
+  test("should format report for export", () => {
     const reportData = {
       summary: { totalMeasurements: 5 },
       statistics: {},
@@ -514,8 +514,8 @@ describe('MedicalPerformanceReport', () => {
     const report = new MedicalPerformanceReport(reportData);
     const formatted = report.formatForExport();
 
-    expect(formatted).toHaveProperty('generatedAt');
-    expect(formatted).toHaveProperty('summary');
-    expect(formatted).toHaveProperty('slaCompliance');
+    expect(formatted).toHaveProperty("generatedAt");
+    expect(formatted).toHaveProperty("summary");
+    expect(formatted).toHaveProperty("slaCompliance");
   });
 });

@@ -203,23 +203,23 @@ export class MedicalServiceWorkerManager {
       const { type, data } = event.data;
 
       switch (type) {
-        case "SW_INSTALLED":
-          this.handleServiceWorkerInstalled(data);
-          break;
+      case "SW_INSTALLED":
+        this.handleServiceWorkerInstalled(data);
+        break;
 
-        case "SW_ACTIVATED":
-          this.handleServiceWorkerActivated(data);
-          break;
+      case "SW_ACTIVATED":
+        this.handleServiceWorkerActivated(data);
+        break;
 
-        case "SW_INSTALL_ERROR":
-          this.handleServiceWorkerError(data);
-          break;
+      case "SW_INSTALL_ERROR":
+        this.handleServiceWorkerError(data);
+        break;
 
-        case "MEDICAL_DATA_SYNCED":
-          this.handleMedicalDataSynced(data);
-          break;
+      case "MEDICAL_DATA_SYNCED":
+        this.handleMedicalDataSynced(data);
+        break;
 
-        default:
+      default:
         // ('Unknown service worker message:', type, data);
       }
     });

@@ -69,10 +69,10 @@ function logistic(x) {
 function validateInputs(gfap, fasted) {
   // Check for null/undefined
   if (gfap == null) {
-    throw new Error('gfap is required');
+    throw new Error("gfap is required");
   }
   if (fasted == null) {
-    throw new Error('fasted is required');
+    throw new Error("fasted is required");
   }
 
   // Convert to numbers
@@ -81,15 +81,15 @@ function validateInputs(gfap, fasted) {
 
   // Check for valid numbers
   if (!Number.isFinite(numGfap)) {
-    throw new Error('gfap must be a finite number');
+    throw new Error("gfap must be a finite number");
   }
   if (!Number.isFinite(numFasted)) {
-    throw new Error('fasted must be a finite number');
+    throw new Error("fasted must be a finite number");
   }
 
   // Check ranges
   if (numGfap < 0) {
-    throw new Error('GFAP value must be non-negative');
+    throw new Error("GFAP value must be non-negative");
   }
 
   return { gfap: numGfap, fasted: numFasted };
@@ -179,7 +179,7 @@ export function predictLVO(gfap, fasted) {
         calibratedLogit,
       },
       metadata: {
-        modelVersion: '2024.09.28-calibrated',
+        modelVersion: "2024.09.28-calibrated",
         threshold: FINAL_THRESHOLD,
         isValid,
         warnings,
@@ -201,7 +201,7 @@ export function predictLVO(gfap, fasted) {
         calibratedLogit: NaN,
       },
       metadata: {
-        modelVersion: '2024.09.28-calibrated',
+        modelVersion: "2024.09.28-calibrated",
         threshold: FINAL_THRESHOLD,
         isValid,
         warnings,

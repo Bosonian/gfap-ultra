@@ -201,14 +201,18 @@ async function main() {
         for (const reg of regs) {
           try {
             await reg.unregister();
-          } catch {}
+          } catch {
+            console.warn("[Main] Failed to unregister service worker:", reg);
+          }
         }
         // Also clear any pending beforeinstallprompt side-effects
         window.addEventListener("beforeinstallprompt", e => {
           e.preventDefault();
         });
       }
-    } catch {}
+    } catch {
+      console.warn("[Main] Service worker cleanup failed");
+    }
 
     // Setup global error handling
     setupGlobalErrorHandlers();

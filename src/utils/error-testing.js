@@ -9,17 +9,17 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { predictComaIch, predictLimitedIch, predictFullStroke } from '../api/client.js';
-import { authManager } from '../auth/authentication.js';
+import { predictComaIch, predictLimitedIch, predictFullStroke } from "../api/client.js";
+import { authManager } from "../auth/authentication.js";
 import {
   calculateICHVolume,
   calculateHemorrhageSizePercent,
   testVolumeCalculator,
-} from '../logic/ich-volume-calculator.js';
-import { medicalSyncManager } from '../sync/medical-sync-manager.js';
-import { medicalSWManager } from '../workers/sw-manager.js';
+} from "../logic/ich-volume-calculator.js";
+import { medicalSyncManager } from "../sync/medical-sync-manager.js";
+import { medicalSWManager } from "../workers/sw-manager.js";
 
-import { getErrorHandler } from './error-handler.js';
+import { getErrorHandler } from "./error-handler.js";
 
 /**
  * Global unhandled promise rejection tracker
@@ -32,23 +32,23 @@ class UnhandledPromiseTracker {
 
   setupTracking() {
     // Track unhandled promise rejections
-    window.addEventListener('unhandledrejection', event => {
+    window.addEventListener("unhandledrejection", event => {
       this.unhandledRejections.push({
         reason: event.reason,
         promise: event.promise,
         timestamp: new Date().toISOString(),
-        stack: event.reason?.stack || 'No stack trace available',
+        stack: event.reason?.stack || "No stack trace available",
       });
 
-      console.error('🔴 UNHANDLED PROMISE REJECTION DETECTED:', {
+      console.error("🔴 UNHANDLED PROMISE REJECTION DETECTED:", {
         reason: event.reason,
         timestamp: new Date().toISOString(),
       });
     });
 
     // Track handled rejections (for completeness)
-    window.addEventListener('rejectionhandled', event => {
-      console.info('✅ Promise rejection was handled:', event.reason);
+    window.addEventListener("rejectionhandled", event => {
+      console.info("✅ Promise rejection was handled:", event.reason);
     });
   }
 
@@ -84,7 +84,7 @@ export class ErrorHandlingTestSuite {
    * Run complete error handling test suite
    */
   async runCompleteTestSuite() {
-    console.info('🧪 Starting comprehensive error handling test suite...');
+    console.info("🧪 Starting comprehensive error handling test suite...");
 
     const startTime = Date.now();
     this.tracker.clearTracking();
@@ -123,19 +123,19 @@ export class ErrorHandlingTestSuite {
         unhandledRejectionDetails: this.tracker.getUnhandledRejections(),
       };
 
-      console.info('🏁 Error handling test suite completed:', summary);
+      console.info("🏁 Error handling test suite completed:", summary);
 
       if (summary.success) {
         console.info(
-          '✅ ALL TESTS PASSED - Application is bulletproof for investor demonstrations!'
+          "✅ ALL TESTS PASSED - Application is bulletproof for investor demonstrations!"
         );
       } else {
         console.error(
-          '❌ TESTS FAILED - Critical issues found that could cause crashes during demos!'
+          "❌ TESTS FAILED - Critical issues found that could cause crashes during demos!"
         );
         if (summary.unhandledRejections > 0) {
           console.error(
-            '🔴 UNHANDLED PROMISE REJECTIONS DETECTED:',
+            "🔴 UNHANDLED PROMISE REJECTIONS DETECTED:",
             summary.unhandledRejectionDetails
           );
         }
@@ -143,7 +143,7 @@ export class ErrorHandlingTestSuite {
 
       return summary;
     } catch (error) {
-      console.error('💥 Test suite itself failed:', error);
+      console.error("💥 Test suite itself failed:", error);
       return {
         ...this.testResults,
         duration: Date.now() - startTime,
@@ -157,32 +157,32 @@ export class ErrorHandlingTestSuite {
    * Test API error handling scenarios
    */
   async testAPIErrorHandling() {
-    console.info('🌐 Testing API error handling...');
+    console.info("🌐 Testing API error handling...");
 
     const tests = [
       {
-        name: 'API with invalid data',
+        name: "API with invalid data",
         test: async () => {
-          const result = await predictComaIch({ invalid: 'data' });
+          const result = await predictComaIch({ invalid: "data" });
           return result.fallbackUsed === true;
         },
       },
       {
-        name: 'API with null/undefined data',
+        name: "API with null/undefined data",
         test: async () => {
           const result = await predictComaIch(null);
           return result.fallbackUsed === true;
         },
       },
       {
-        name: 'Limited API with missing required fields',
+        name: "Limited API with missing required fields",
         test: async () => {
           const result = await predictLimitedIch({});
           return result.fallbackUsed === true;
         },
       },
       {
-        name: 'Full stroke API with invalid GFAP values',
+        name: "Full stroke API with invalid GFAP values",
         test: async () => {
           const result = await predictFullStroke({
             age_years: 50,
@@ -205,35 +205,35 @@ export class ErrorHandlingTestSuite {
    * Test authentication error handling
    */
   async testAuthenticationErrorHandling() {
-    console.info('🔐 Testing authentication error handling...');
+    console.info("🔐 Testing authentication error handling...");
 
     const tests = [
       {
-        name: 'Authentication with empty password',
+        name: "Authentication with empty password",
         test: async () => {
-          const result = await authManager.authenticate('');
-          return result.success === false && result.message.includes('required');
+          const result = await authManager.authenticate("");
+          return result.success === false && result.message.includes("required");
         },
       },
       {
-        name: 'Authentication with null password',
+        name: "Authentication with null password",
         test: async () => {
           const result = await authManager.authenticate(null);
           return result.success === false;
         },
       },
       {
-        name: 'Session validation when controller unavailable',
+        name: "Session validation when controller unavailable",
         test: async () => {
           const result = await authManager.validateSessionWithServer();
-          return typeof result === 'boolean'; // Should not throw
+          return typeof result === "boolean"; // Should not throw
         },
       },
       {
-        name: 'Password hashing with invalid input',
+        name: "Password hashing with invalid input",
         test: async () => {
           const result = await authManager.hashPassword(null);
-          return typeof result === 'string'; // Should return fallback hash
+          return typeof result === "string"; // Should return fallback hash
         },
       },
     ];
@@ -247,39 +247,39 @@ export class ErrorHandlingTestSuite {
    * Test medical calculation error handling
    */
   async testMedicalCalculationErrorHandling() {
-    console.info('🧮 Testing medical calculation error handling...');
+    console.info("🧮 Testing medical calculation error handling...");
 
     const tests = [
       {
-        name: 'ICH volume calculation with invalid GFAP',
+        name: "ICH volume calculation with invalid GFAP",
         test: async () => {
           const result = await calculateICHVolume(-999);
           return result.fallbackUsed === true || result.volume === 0;
         },
       },
       {
-        name: 'ICH volume calculation with NaN',
+        name: "ICH volume calculation with NaN",
         test: async () => {
           const result = await calculateICHVolume(NaN);
           return result.fallbackUsed === true || result.volume === 0;
         },
       },
       {
-        name: 'ICH volume calculation with extremely high value',
+        name: "ICH volume calculation with extremely high value",
         test: async () => {
           const result = await calculateICHVolume(999999);
           return result.warnings && result.warnings.length > 0;
         },
       },
       {
-        name: 'Hemorrhage size calculation with invalid volume',
+        name: "Hemorrhage size calculation with invalid volume",
         test: async () => {
           const result = await calculateHemorrhageSizePercent(-50);
           return result >= 0 && result <= 100; // Should return valid percentage
         },
       },
       {
-        name: 'Volume calculator test suite',
+        name: "Volume calculator test suite",
         test: async () => {
           const result = await testVolumeCalculator();
           return result.summary && result.summary.total > 0;
@@ -296,37 +296,37 @@ export class ErrorHandlingTestSuite {
    * Test sync manager error handling
    */
   async testSyncManagerErrorHandling() {
-    console.info('🔄 Testing sync manager error handling...');
+    console.info("🔄 Testing sync manager error handling...");
 
     const tests = [
       {
-        name: 'Sync manager initialization',
+        name: "Sync manager initialization",
         test: async () => {
           const result = await medicalSyncManager.initialize();
-          return typeof result === 'boolean';
+          return typeof result === "boolean";
         },
       },
       {
-        name: 'Sync with no pending operations',
+        name: "Sync with no pending operations",
         test: async () => {
           const result = await medicalSyncManager.performSync();
           return result.skipped === true || result.success !== undefined;
         },
       },
       {
-        name: 'Load pending operations with corrupted data',
+        name: "Load pending operations with corrupted data",
         test: async () => {
           // Temporarily corrupt localStorage
-          const original = localStorage.getItem('medical_sync_pending');
-          localStorage.setItem('medical_sync_pending', 'invalid json{');
+          const original = localStorage.getItem("medical_sync_pending");
+          localStorage.setItem("medical_sync_pending", "invalid json{");
 
           const result = await medicalSyncManager.loadPendingOperations();
 
           // Restore original data
           if (original) {
-            localStorage.setItem('medical_sync_pending', original);
+            localStorage.setItem("medical_sync_pending", original);
           } else {
-            localStorage.removeItem('medical_sync_pending');
+            localStorage.removeItem("medical_sync_pending");
           }
 
           return result.cleared === true || result.errors > 0;
@@ -343,28 +343,28 @@ export class ErrorHandlingTestSuite {
    * Test service worker error handling
    */
   async testServiceWorkerErrorHandling() {
-    console.info('⚙️ Testing service worker error handling...');
+    console.info("⚙️ Testing service worker error handling...");
 
     const tests = [
       {
-        name: 'Service worker initialization',
+        name: "Service worker initialization",
         test: async () => {
           const result = await medicalSWManager.initialize();
-          return typeof result === 'boolean';
+          return typeof result === "boolean";
         },
       },
       {
-        name: 'Cache status retrieval',
+        name: "Cache status retrieval",
         test: async () => {
           const result = await medicalSWManager.getCacheStatus();
           return result !== undefined; // Should not throw, even if it returns error object
         },
       },
       {
-        name: 'Service worker update check',
+        name: "Service worker update check",
         test: async () => {
           const result = await medicalSWManager.checkForUpdates();
-          return typeof result === 'boolean' || result === undefined;
+          return typeof result === "boolean" || result === undefined;
         },
       },
     ];
@@ -378,16 +378,16 @@ export class ErrorHandlingTestSuite {
    * Test UI error boundaries
    */
   async testUIErrorBoundaries() {
-    console.info('🖥️ Testing UI error boundaries...');
+    console.info("🖥️ Testing UI error boundaries...");
 
     const tests = [
       {
-        name: 'DOM manipulation with non-existent elements',
+        name: "DOM manipulation with non-existent elements",
         test: async () => {
           try {
-            const nonExistentElement = document.getElementById('non-existent-element');
+            const nonExistentElement = document.getElementById("non-existent-element");
             if (nonExistentElement) {
-              nonExistentElement.innerHTML = 'test';
+              nonExistentElement.innerHTML = "test";
             }
             return true; // Should not throw
           } catch (error) {
@@ -396,7 +396,7 @@ export class ErrorHandlingTestSuite {
         },
       },
       {
-        name: 'Event handler error boundaries',
+        name: "Event handler error boundaries",
         test: async () => {
           try {
             // Simulate event handler that might fail
@@ -424,7 +424,7 @@ export class ErrorHandlingTestSuite {
     try {
       const result = await Promise.race([
         testFn(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Test timeout')), 10000)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Test timeout")), 10000)),
       ]);
 
       if (result === true) {
@@ -466,13 +466,13 @@ export class ErrorHandlingTestSuite {
 
     if (this.testResults.failed > 0) {
       recommendations.push(
-        '🔴 CRITICAL: Fix failing error handling tests before investor demonstrations'
+        "🔴 CRITICAL: Fix failing error handling tests before investor demonstrations"
       );
     }
 
     if (this.tracker.hasUnhandledRejections()) {
       recommendations.push(
-        '🔴 CRITICAL: Unhandled promise rejections detected - these will cause crashes'
+        "🔴 CRITICAL: Unhandled promise rejections detected - these will cause crashes"
       );
     }
 
@@ -481,7 +481,7 @@ export class ErrorHandlingTestSuite {
       !this.tracker.hasUnhandledRejections()
     ) {
       recommendations.push(
-        '✅ EXCELLENT: All error handling tests passed - application is investor-ready'
+        "✅ EXCELLENT: All error handling tests passed - application is investor-ready"
       );
     }
 
@@ -493,16 +493,16 @@ export class ErrorHandlingTestSuite {
  * Quick error handling validation for development
  */
 export async function quickErrorCheck() {
-  console.info('🚀 Running quick error handling check...');
+  console.info("🚀 Running quick error handling check...");
 
   const suite = new ErrorHandlingTestSuite();
   const result = await suite.runCompleteTestSuite();
 
   if (result.success) {
-    console.info('✅ Quick check PASSED - No critical error handling issues detected');
+    console.info("✅ Quick check PASSED - No critical error handling issues detected");
   } else {
-    console.error('❌ Quick check FAILED - Critical error handling issues detected');
-    console.error('Details:', result);
+    console.error("❌ Quick check FAILED - Critical error handling issues detected");
+    console.error("Details:", result);
   }
 
   return result;
@@ -518,7 +518,7 @@ window.errorHandlingTest = {
 };
 
 // Auto-run basic check in development
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   setTimeout(() => {
     quickErrorCheck();
   }, 5000); // Run after app initialization

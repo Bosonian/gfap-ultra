@@ -8,16 +8,16 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { safeAsync, ERROR_CATEGORIES } from '../utils/error-handler.js';
+import { safeAsync, ERROR_CATEGORIES } from "../utils/error-handler.js";
 
 /**
  * Manages application themes and styling
  */
 export class ThemeManager {
   constructor() {
-    this.currentTheme = 'light';
+    this.currentTheme = "light";
     this.isInitialized = false;
-    this.storageKey = 'theme';
+    this.storageKey = "theme";
   }
 
   /**
@@ -36,16 +36,16 @@ export class ThemeManager {
     return safeAsync(
       async () => {
         const savedTheme = localStorage.getItem(this.storageKey);
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
         // Determine theme to use
         let themeToApply;
-        if (savedTheme === 'dark' || savedTheme === 'light') {
+        if (savedTheme === "dark" || savedTheme === "light") {
           themeToApply = savedTheme;
         } else if (prefersDark) {
-          themeToApply = 'dark';
+          themeToApply = "dark";
         } else {
-          themeToApply = 'light';
+          themeToApply = "light";
         }
 
         this.applyTheme(themeToApply);
@@ -55,13 +55,13 @@ export class ThemeManager {
       },
       error => {
         // Fallback to light theme
-        this.applyTheme('light');
+        this.applyTheme("light");
         this.updateThemeButton();
-        return 'light';
+        return "light";
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'load_saved_theme' },
+        context: { operation: "load_saved_theme" },
       }
     );
   }
@@ -71,13 +71,13 @@ export class ThemeManager {
    */
   setupThemeDetection() {
     // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleSystemThemeChange = e => {
       // Only auto-switch if user hasn't explicitly set a preference
       const savedTheme = localStorage.getItem(this.storageKey);
       if (!savedTheme) {
-        const newTheme = e.matches ? 'dark' : 'light';
+        const newTheme = e.matches ? "dark" : "light";
         this.applyTheme(newTheme);
         this.updateThemeButton();
       }
@@ -85,7 +85,7 @@ export class ThemeManager {
 
     // Use the newer addEventListener if available
     if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleSystemThemeChange);
+      mediaQuery.addEventListener("change", handleSystemThemeChange);
     } else {
       // Fallback for older browsers
       mediaQuery.addListener(handleSystemThemeChange);
@@ -97,17 +97,17 @@ export class ThemeManager {
    * @param {string} theme - Theme name ('light' or 'dark')
    */
   applyTheme(theme) {
-    if (theme !== 'light' && theme !== 'dark') {
-      theme = 'light';
+    if (theme !== "light" && theme !== "dark") {
+      theme = "light";
     }
 
     this.currentTheme = theme;
 
     // Apply theme class to body
-    if (theme === 'dark') {
-      document.body.classList.add('dark-mode');
+    if (theme === "dark") {
+      document.body.classList.add("dark-mode");
     } else {
-      document.body.classList.remove('dark-mode');
+      document.body.classList.remove("dark-mode");
     }
 
     // Update meta theme-color for mobile browsers
@@ -121,7 +121,7 @@ export class ThemeManager {
    * Toggle between light and dark themes
    */
   toggleTheme() {
-    const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+    const newTheme = this.currentTheme === "dark" ? "light" : "dark";
     this.setTheme(newTheme);
   }
 
@@ -142,7 +142,7 @@ export class ThemeManager {
         this.currentTheme,
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'set_theme', theme },
+        context: { operation: "set_theme", theme },
       }
     );
   }
@@ -163,14 +163,14 @@ export class ThemeManager {
    * Update theme toggle button
    */
   updateThemeButton() {
-    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeToggle = document.getElementById("darkModeToggle");
     if (darkModeToggle) {
-      const isDark = this.currentTheme === 'dark';
-      darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+      const isDark = this.currentTheme === "dark";
+      darkModeToggle.textContent = isDark ? "☀️" : "🌙";
 
       // Update aria-label for accessibility
-      const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
-      darkModeToggle.setAttribute('aria-label', label);
+      const label = isDark ? "Switch to light mode" : "Switch to dark mode";
+      darkModeToggle.setAttribute("aria-label", label);
       darkModeToggle.title = label;
     }
   }
@@ -180,18 +180,18 @@ export class ThemeManager {
    * @param {string} theme - Current theme
    */
   updateMetaThemeColor(theme) {
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    let metaThemeColor = document.querySelector("meta[name=\"theme-color\"]");
 
     if (!metaThemeColor) {
-      metaThemeColor = document.createElement('meta');
-      metaThemeColor.name = 'theme-color';
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.name = "theme-color";
       document.head.appendChild(metaThemeColor);
     }
 
     // Set appropriate theme color
     const themeColors = {
-      light: '#ffffff',
-      dark: '#1a1a1a',
+      light: "#ffffff",
+      dark: "#1a1a1a",
     };
 
     metaThemeColor.content = themeColors[theme] || themeColors.light;
@@ -203,7 +203,7 @@ export class ThemeManager {
    */
   dispatchThemeChangeEvent(theme) {
     try {
-      const event = new CustomEvent('themeChanged', {
+      const event = new CustomEvent("themeChanged", {
         detail: {
           theme,
           timestamp: Date.now(),
@@ -228,7 +228,7 @@ export class ThemeManager {
    * @returns {boolean} - True if dark mode is active
    */
   isDarkMode() {
-    return this.currentTheme === 'dark';
+    return this.currentTheme === "dark";
   }
 
   /**
@@ -237,10 +237,10 @@ export class ThemeManager {
    */
   getSystemPreferredTheme() {
     try {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return prefersDark ? 'dark' : 'light';
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      return prefersDark ? "dark" : "light";
     } catch (error) {
-      return 'light';
+      return "light";
     }
   }
 
