@@ -92,76 +92,74 @@ function renderRiskCard(type, data, results) {
   const titles = { ich: t("ichProbability"), lvo: t("lvoProbability") };
 
   const level = isCritical ? "critical" : isHigh ? "high" : "normal";
+
   return `
-    <div class="enhanced-risk-card ${type} ${level} bg-white dark:bg-gray-800 shadow-md rounded-2xl p-5 transition-all duration-300 hover:shadow-lg">
-  <!-- Header -->
-  <div class="risk-header flex items-center gap-3 border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
-    <div class="risk-icon text-3xl">${icons[type]}</div>
-    <div class="risk-title">
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${titles[type]}</h3>
-    </div>
-  </div>
-
-  <!-- Probability Section -->
-  <div class="risk-probability flex flex-col items-center">
-    <div class="circles-container flex flex-col items-center">
-      <div class="rings-row flex justify-center">
-        <div class="circle-item flex flex-col items-center">
-          <!-- React ring mount -->
-          <div
-            class="probability-circle w-28 h-28 relative flex items-center justify-center"
-            data-react-ring
-            data-percent="${percent}"
-            data-level="${level}"
-          >
-            <svg viewBox="0 0 120 120" class="probability-svg w-full h-full absolute top-0 left-0">
-              <circle
-                cx="60" cy="60" r="50"
-                fill="none"
-                stroke="rgba(255,255,255,0.2)"
-                stroke-width="8"
-              />
-              <circle
-                cx="60" cy="60" r="50"
-                fill="none"
-                stroke="${level === "critical" ? "#ff4444" : level === "high" ? "#ff8800" : "#0066cc"}"
-                stroke-width="8"
-                stroke-dasharray="${Math.PI * 100}"
-                stroke-dashoffset="${Math.PI * 100 * (1 - percent / 100)}"
-                stroke-linecap="round"
-                transform="rotate(-90 60 60)"
-              />
-              <text
-                x="60" y="60"
-                text-anchor="middle"
-                dominant-baseline="middle"
-                class="probability-text fill-white font-bold text-xl"
-              >
-                ${percent}%
-              </text>
-            </svg>
+   <div class="enhanced-risk-card ${type} ${level} bg-white dark:bg-gray-800 shadow-md rounded-2xl p-5 transition-all duration-300 hover:shadow-lg">
+      <!-- Header -->
+      <div class="risk-header flex items-center gap-3 border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
+          <div class="risk-icon text-3xl">${icons[type]}</div>
+          <div class="risk-title">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${titles[type]}</h3>
           </div>
-
-          <!-- Label -->
-          <div class="circle-label text-sm font-medium text-gray-700 dark:text-gray-300 mt-3">
-            ${type === "ich" ? "ICH Risk" : "LVO Risk"}
-          </div>
-        </div>
       </div>
-
-      <!-- Risk Level -->
-      <div class="risk-level ${level} text-center mt-4 px-3 py-1 rounded-full text-sm font-semibold
-        ${
-  level === "critical"
-    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-    : level === "high"
-      ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
-      : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-}">
-        ${riskLevel}
+      <!-- Probability Section -->
+      <div class="risk-probability flex flex-col items-center">
+          <div class="circles-container flex flex-col items-center">
+            <div class="rings-row flex justify-center">
+                <div class="circle-item flex flex-col items-center">
+                  <!-- React ring mount -->
+                  <div
+                      class="probability-circle w-28 h-28 relative flex items-center justify-center"
+                      data-react-ring
+                      data-percent="${percent}"
+                      data-level="${level}"
+                      >
+                      <svg viewBox="0 0 120 120" class="probability-svg w-full h-full absolute top-0 left-0">
+                        <circle
+                            cx="60" cy="60" r="50"
+                            fill="none"
+                            stroke="rgba(255,255,255,0.2)"
+                            stroke-width="8"
+                            />
+                        <circle
+                        cx="60" cy="60" r="50"
+                        fill="none"
+                        stroke="${level === "critical" ? "#ff4444" : level === "high" ? "#ff8800" : "#0066cc"}"
+                        stroke-width="8"
+                        stroke-dasharray="${Math.PI * 100}"
+                        stroke-dashoffset="${Math.PI * 100 * (1 - percent / 100)}"
+                        stroke-linecap="round"
+                        transform="rotate(-90 60 60)"
+                        />
+                        <text
+                            x="60" y="60"
+                            text-anchor="middle"
+                            dominant-baseline="middle"
+                            class="probability-text fill-white font-bold text-xl"
+                            >
+                            ${percent}%
+                        </text>
+                      </svg>
+                  </div>
+                  <!-- Label -->
+                  <div class="circle-label text-sm font-medium text-gray-700 dark:text-gray-300 mt-3">
+                      ${type === "ich" ? "ICH Risk" : "LVO Risk"}
+                  </div>
+                </div>
+            </div>
+            <!-- Risk Level -->
+            <div class="risk-level ${level} text-center mt-4 px-3 py-1 rounded-full text-sm font-semibold
+            ${
+              level === "critical"
+                ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                : level === "high"
+                  ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+            }">
+            ${riskLevel}
+          </div>
       </div>
     </div>
-  </div>
 </div>
   `;
 }
@@ -199,6 +197,25 @@ function getCurrentGfapValue() {
   }
 
   return 0;
+}
+
+function renderLVONotPossible() {
+  return `
+    <div class="enhanced-risk-card lvo not-possible">
+      <div class="risk-header">
+        <div class="risk-icon">🔍</div>
+        <div class="risk-title">
+          <h3>${t("lvoProbability")}</h3>
+          <span class="risk-module">${t("limitedAssessment")}</span>
+        </div>
+      </div>
+      
+      <div class="not-possible-content">
+        <p>${t("lvoNotPossible")}</p>
+        <p>${t("fullExamRequired")}</p>
+      </div>
+    </div>
+  `;
 }
 
 export function renderResults(results, startTime) {
@@ -327,14 +344,14 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
 
       <!-- ICH Volume (Coma only) -->
       ${
-  ich?.module === "Coma" && ichPercentLocal >= 50
-    ? `
+        ich?.module === "Coma" && ichPercentLocal >= 50
+          ? `
           <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 mb-6">
             ${renderVolumeCard(ich)}
           </div>
         `
-    : ""
-}
+          : ""
+      }
 
       <!-- Alternative Diagnoses (Coma) -->
       ${alternativeDiagnosesHtml ? `<div class="mb-6">${alternativeDiagnosesHtml}</div>` : ""}
@@ -347,8 +364,8 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
 
       <!-- ICH Drivers (non-Coma) -->
       ${
-  ich?.module !== "Coma"
-    ? `
+        ich?.module !== "Coma"
+          ? `
           <div class="alternative-diagnosis-card bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 my-6 transition-all duration-300 hover:shadow-lg">
           <div class="diagnosis-header flex items-center gap-3 border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
             <span class="text-3xl">⚡</span>
@@ -356,8 +373,8 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
           </div>
            ${renderICHDriversOnly(ich)}
         </div>`
-    : ""
-}
+          : ""
+      }
 
       <!-- Collapsible Sections -->
       <div class="space-y-4 mb-8">
@@ -599,6 +616,16 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   `;
 }
 
+function renderLVONotification() {
+  return `
+    <div class="secondary-notification">
+      <p class="lvo-possible">
+        ⚡ ${t("lvoMayBePossible") || "Großgefäßverschluss möglich / Large vessel occlusion possible"}
+      </p>
+    </div>
+  `;
+}
+
 function renderDominanceBanner(ichPercent, lvoPercent, ratio) {
   const dominant = ratio > 1 ? "LVO" : "ICH";
   const icon = dominant === "LVO" ? "🧠" : "🩸";
@@ -664,15 +691,15 @@ function renderICHDriversOnly(ich) {
         </div>
         <div class="compact-drivers p-4 space-y-2">
           ${
-  positive.length > 0
-    ? positive
-      .slice(0, 5)
-      .map(d => renderCompactDriver(d, "positive"))
-      .join("")
-    : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm"> 
+            positive.length > 0
+              ? positive
+                  .slice(0, 5)
+                  .map(d => renderCompactDriver(d, "positive"))
+                  .join("")
+              : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm"> 
                   ${t("noFactors") || "No factors"} 
                  </p>`
-}
+          }
         </div>
       </div>
 
@@ -686,15 +713,15 @@ function renderICHDriversOnly(ich) {
         </div>
         <div class="compact-drivers p-4 space-y-2">
           ${
-  negative.length > 0
-    ? negative
-      .slice(0, 5)
-      .map(d => renderCompactDriver(d, "negative"))
-      .join("")
-    : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm">
+            negative.length > 0
+              ? negative
+                  .slice(0, 5)
+                  .map(d => renderCompactDriver(d, "negative"))
+                  .join("")
+              : `<p class="no-factors text-gray-500 dark:text-gray-400 italic text-sm">
                   ${t("noFactors") || "No factors"}
                  </p>`
-}
+          }
         </div>
       </div>
     </div>

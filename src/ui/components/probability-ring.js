@@ -15,15 +15,16 @@ export function renderProbabilityRing(percent, level = "normal") {
 }
 
 export function initializeProbabilityRings(root = document) {
+  alert("sadasdasdasd");
   const canvases = root.querySelectorAll(".probability-canvas");
-  canvases.forEach((canvas) => {
+  canvases.forEach(canvas => {
     const container = canvas.closest(".probability-circle");
     if (!container) {
       return;
     }
     const percent = parseFloat(container.dataset.prob) || 0;
     const level = container.dataset.level || "normal";
-
+    alert("percent", percent, level);
     const dpr = window.devicePixelRatio || 1;
     const size = parseFloat(getComputedStyle(container).width) || 120;
     canvas.width = Math.max(1, Math.floor(size * dpr));
@@ -37,7 +38,7 @@ export function initializeProbabilityRings(root = document) {
     const height = size;
     const cx = width / 2;
     const cy = height / 2;
-    const radius = (size / 2) - 6; // padding for stroke
+    const radius = size / 2 - 6; // padding for stroke
 
     // Track style
     ctx.clearRect(0, 0, width, height);
@@ -59,7 +60,7 @@ export function initializeProbabilityRings(root = document) {
 
     // Progress arc (start at -90deg)
     const startAngle = -Math.PI / 2;
-    const endAngle = startAngle + (Math.PI * 2) * (percent / 100);
+    const endAngle = startAngle + Math.PI * 2 * (percent / 100);
     ctx.strokeStyle = stroke;
     ctx.lineWidth = level === "normal" ? 10 : 12;
     ctx.beginPath();
@@ -78,5 +79,5 @@ export function observeProbabilityRings(root = document) {
     resizeObserver.disconnect();
   }
   resizeObserver = new ResizeObserver(() => initializeProbabilityRings(root));
-  root.querySelectorAll(".probability-circle").forEach((el) => resizeObserver.observe(el));
+  root.querySelectorAll(".probability-circle").forEach(el => resizeObserver.observe(el));
 }

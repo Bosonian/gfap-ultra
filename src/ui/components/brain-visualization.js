@@ -54,8 +54,8 @@ export function renderBrainVisualization(volume, size = "compact") {
         
         <!-- 30ml reference indicator (detailed view only) -->
         ${
-  size === "detailed" && volume > 0
-    ? `
+          size === "detailed" && volume > 0
+            ? `
           <circle 
             cx="${hemorrhageX}" 
             cy="${hemorrhageY}" 
@@ -74,13 +74,13 @@ export function renderBrainVisualization(volume, size = "compact") {
             font-family="system-ui"
           >30ml</text>
         `
-    : ""
-}
+            : ""
+        }
         
         <!-- Hemorrhage visualization -->
         ${
-  volume > 0
-    ? `
+          volume > 0
+            ? `
           <circle 
             cx="${hemorrhageX}" 
             cy="${hemorrhageY}" 
@@ -97,8 +97,8 @@ export function renderBrainVisualization(volume, size = "compact") {
               repeatCount="indefinite"
             />
             ${
-  hemorrhageRadius > 15
-    ? `
+              hemorrhageRadius > 15
+                ? `
             <animate 
               attributeName="r" 
               values="${hemorrhageRadius * 0.95};${hemorrhageRadius};${hemorrhageRadius * 0.95}" 
@@ -106,14 +106,14 @@ export function renderBrainVisualization(volume, size = "compact") {
               repeatCount="indefinite"
             />
             `
-    : ""
-}
+                : ""
+            }
           </circle>
           
           <!-- Volume label (detailed view only) -->
           ${
-  size === "detailed"
-    ? `
+            size === "detailed"
+              ? `
             <text 
               x="${centerX}" 
               y="${dimensions.height - 10}" 
@@ -124,11 +124,11 @@ export function renderBrainVisualization(volume, size = "compact") {
               font-family="system-ui"
             >${volume < 1 ? "<1" : volume.toFixed(1)} ml</text>
           `
-    : ""
-}
+              : ""
+          }
         `
-    : ""
-}
+            : ""
+        }
         
         <style>
           .hemorrhage-circle {
@@ -175,8 +175,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
     
     <!-- Hemorrhage overlay in basal ganglia region -->
     ${
-  volume > 0
-    ? `
+      volume > 0
+        ? `
       <circle 
         cx="${hemorrhageX}" 
         cy="${hemorrhageY}" 
@@ -193,8 +193,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
           repeatCount="indefinite"
         />
         ${
-  hemorrhageRadius > 8
-    ? `
+          hemorrhageRadius > 8
+            ? `
         <animate 
           attributeName="r" 
           values="${hemorrhageRadius * 0.96};${hemorrhageRadius * 1.02};${hemorrhageRadius * 0.96}" 
@@ -202,8 +202,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
           repeatCount="indefinite"
         />
         `
-    : ""
-}
+            : ""
+        }
       </circle>
       
       <!-- Hemorrhage center highlight -->
@@ -216,8 +216,8 @@ function renderBrainOutlineWithHemorrhage(dimensions, volume) {
         class="hemorrhage-center"
       />
     `
-    : ""
-}
+        : ""
+    }
   `;
 }
 
@@ -285,8 +285,8 @@ export function renderCompactBrainIcon(volume, size = 24) {
       
       <!-- Hemorrhage indicator -->
       ${
-  volume > 0
-    ? `
+        volume > 0
+          ? `
         <circle 
           cx="${size / 2 + size * 0.1}" 
           cy="${size / 2}" 
@@ -295,8 +295,8 @@ export function renderCompactBrainIcon(volume, size = 24) {
           opacity="0.9"
         />
       `
-    : ""
-}
+          : ""
+      }
     </svg>
   `;
 }

@@ -12,20 +12,65 @@
  * Allowed HTML tags for medical content
  */
 const ALLOWED_TAGS = [
-  "p", "div", "span", "br", "strong", "b", "em", "i", "u",
-  "h1", "h2", "h3", "h4", "h5", "h6",
-  "ul", "ol", "li",
-  "table", "tr", "td", "th", "thead", "tbody",
-  "small", "sub", "sup",
-  "button", "input", "form", "label", "select", "option", "textarea",
-  "a", "img", "canvas", "svg", "path", "circle", "rect", "line", "g",
+  "p",
+  "div",
+  "span",
+  "br",
+  "strong",
+  "b",
+  "em",
+  "i",
+  "u",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "ul",
+  "ol",
+  "li",
+  "table",
+  "tr",
+  "td",
+  "th",
+  "thead",
+  "tbody",
+  "small",
+  "sub",
+  "sup",
+  "button",
+  "input",
+  "form",
+  "label",
+  "select",
+  "option",
+  "textarea",
+  "a",
+  "img",
+  "canvas",
+  "svg",
+  "path",
+  "circle",
+  "rect",
+  "line",
+  "g",
 ];
 
 /**
  * Allowed attributes for HTML tags
  */
 const ALLOWED_ATTRIBUTES = {
-  div: ["class", "id", "style", "data-id", "data-action", "data-value", "data-module", "data-target"],
+  div: [
+    "class",
+    "id",
+    "style",
+    "data-id",
+    "data-action",
+    "data-value",
+    "data-module",
+    "data-target",
+  ],
   span: ["class", "id", "style", "data-id"],
   p: ["class", "style"],
   strong: ["class"],
@@ -47,7 +92,23 @@ const ALLOWED_ATTRIBUTES = {
   h6: ["class"],
   small: ["class"],
   button: ["class", "id", "type", "data-action", "data-value", "data-target", "disabled"],
-  input: ["class", "id", "type", "name", "value", "placeholder", "required", "data-module", "autocomplete", "readonly", "checked", "min", "max", "step", "aria-describedby"],
+  input: [
+    "class",
+    "id",
+    "type",
+    "name",
+    "value",
+    "placeholder",
+    "required",
+    "data-module",
+    "autocomplete",
+    "readonly",
+    "checked",
+    "min",
+    "max",
+    "step",
+    "aria-describedby",
+  ],
   form: ["class", "id", "data-module", "action", "method"],
   label: ["class", "for"],
   select: ["class", "id", "name", "required"],
@@ -68,9 +129,17 @@ const ALLOWED_ATTRIBUTES = {
  * Allowed CSS properties for style attributes
  */
 const ALLOWED_STYLES = [
-  "color", "background-color", "font-size", "font-weight",
-  "text-align", "margin", "padding", "border",
-  "display", "visibility", "opacity",
+  "color",
+  "background-color",
+  "font-size",
+  "font-weight",
+  "text-align",
+  "margin",
+  "padding",
+  "border",
+  "display",
+  "visibility",
+  "opacity",
 ];
 
 /**
@@ -122,7 +191,7 @@ function containsXSSPatterns(html) {
     /<link\b(?![^>]*rel=["']manifest)/gi, // Allow manifest links
   ];
 
-  return xssPatterns.some((pattern) => pattern.test(html));
+  return xssPatterns.some(pattern => pattern.test(html));
 }
 
 /**
@@ -160,7 +229,7 @@ function sanitizeNode(node, options) {
   }
 
   // Remove flagged nodes
-  nodesToRemove.forEach((nodeToRemove) => {
+  nodesToRemove.forEach(nodeToRemove => {
     node.removeChild(nodeToRemove);
   });
 }
@@ -194,7 +263,7 @@ function sanitizeAttributes(element) {
   }
 
   // Remove disallowed attributes
-  attrsToRemove.forEach((attrName) => {
+  attrsToRemove.forEach(attrName => {
     element.removeAttribute(attrName);
   });
 }
@@ -212,8 +281,8 @@ function sanitizeStyleAttribute(styleValue) {
   const styles = styleValue.split(";");
   const sanitizedStyles = [];
 
-  styles.forEach((style) => {
-    const [property, value] = style.split(":").map((s) => s.trim());
+  styles.forEach(style => {
+    const [property, value] = style.split(":").map(s => s.trim());
 
     if (property && value && ALLOWED_STYLES.includes(property.toLowerCase())) {
       // Basic CSS injection prevention
@@ -278,6 +347,7 @@ export function safeSetInnerHTML(element, html, options = {}) {
     const sanitizedHTML = sanitizeHTML(html, options);
     element.innerHTML = sanitizedHTML;
   } catch (error) {
+    console.log("errro while setting html");
     // Fallback to text content on sanitization error
     element.textContent = html.replace(/<[^>]*>/g, "");
     throw new Error(`HTML sanitization failed: ${error.message}`);
@@ -298,7 +368,7 @@ export function createSafeHTML(template, data = {}) {
   // Basic template interpolation with escaping
   let html = template;
 
-  Object.keys(data).forEach((key) => {
+  Object.keys(data).forEach(key => {
     const placeholder = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, "g");
     const value = data[key];
 

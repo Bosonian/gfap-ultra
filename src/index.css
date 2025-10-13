@@ -44,10 +44,7 @@
 .animate-shake {
   animation: shake 0.4s ease-in-out;
 }
-[data-react-ring] {
-  width: 8rem;
-  height: 8rem;
-}
+
 .gauge-wrapper {
   width: 320px; /* or responsive constraints like w-80 in Tailwind */
   height: 200px; /* fixed height */

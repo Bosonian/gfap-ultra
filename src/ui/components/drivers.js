@@ -3,61 +3,45 @@ import { formatDriverName } from "../../utils/label-formatter.js";
 import { normalizeDrivers } from "../../logic/shap.js";
 
 export function renderDriversSection(ich, lvo) {
+  // ('=== DRIVER RENDERING SECTION ===');
+
   if (!ich?.drivers && !lvo?.drivers) {
+    // ('❌ No drivers available for rendering');
     return "";
   }
 
   let html = `
-    <section class="mt-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
-      <div class="p-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-xl">
-        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-          🎯 ${t("riskAnalysis")}
-        </h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          ${t("riskAnalysisSubtitle")}
-        </p>
+    <div class="drivers-section">
+      <div class="drivers-header">
+        <h3><span class="driver-header-icon">🎯</span> ${t("riskAnalysis")}</h3>
+        <p class="drivers-subtitle">${t("riskAnalysisSubtitle")}</p>
       </div>
-
-      <div class="grid md:grid-cols-2 gap-5 p-5">
+      <div class="enhanced-drivers-grid">
   `;
 
+  console.log("[Drivers] ICH has drivers:", !!ich?.drivers, ich?.drivers);
+  console.log(
+    "[Drivers] LVO has drivers:",
+    !!lvo?.drivers,
+    "notPossible:",
+    lvo?.notPossible,
+    lvo?.drivers
+  );
+
   if (ich?.drivers) {
-    html += `
-      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 p-4 transition hover:shadow-md">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="text-lg font-medium text-blue-700 dark:text-blue-400 flex items-center gap-2">
-            🧠 ICH ${t("drivers")}
-          </h4>
-          <span class="text-sm px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium">
-            ${Math.round((ich.probability || 0) * 100)}%
-          </span>
-        </div>
-        ${renderEnhancedDriversPanel(ich.drivers, "ICH", "ich", ich.probability)}
-      </div>
-    `;
+    console.log("🧠 Rendering ICH drivers panel");
+    html += renderEnhancedDriversPanel(ich.drivers, "ICH", "ich", ich.probability);
   }
 
   if (lvo?.drivers && !lvo.notPossible) {
-    html += `
-      <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 p-4 transition hover:shadow-md">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="text-lg font-medium text-red-700 dark:text-red-400 flex items-center gap-2">
-            🩸 LVO ${t("drivers")}
-          </h4>
-          <span class="text-sm px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-medium">
-            ${Math.round((lvo.probability || 0) * 100)}%
-          </span>
-        </div>
-        ${renderEnhancedDriversPanel(lvo.drivers, "LVO", "lvo", lvo.probability)}
-      </div>
-    `;
+    console.log("🩸 Rendering LVO drivers panel");
+    html += renderEnhancedDriversPanel(lvo.drivers, "LVO", "lvo", lvo.probability);
   }
 
   html += `
       </div>
-    </section>
+    </div>
   `;
-
   return html;
 }
 
@@ -182,26 +166,35 @@ export function renderDriversPanel(drivers, title, type) {
 export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   if (!drivers || Object.keys(drivers).length === 0) {
     return `
-      <div class="p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-center">
-        <div class="flex flex-col items-center gap-2">
-          <div class="text-3xl">${type === "ich" ? "🩸" : "🧠"}</div>
-          <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
-          <p class="text-sm text-gray-500 dark:text-gray-400">${t("driverInfoNotAvailable")}</p>
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="text-2xl ${type === "ich" ? "text-blue-600" : "text-red-600"}">
+            ${type === "ich" ? "🧠" : "🩸"}
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">${t("noDriverData")}</p>
+          </div>
         </div>
+        <p class="italic text-gray-500 dark:text-gray-400">${t("driverInfoNotAvailable")}</p>
       </div>
     `;
   }
 
   const driversViewModel = drivers;
-
   if (driversViewModel.kind === "unavailable") {
     return `
-      <div class="p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-center">
-        <div class="flex flex-col items-center gap-2">
-          <div class="text-3xl">${type === "ich" ? "🩸" : "🧠"}</div>
-          <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
-          <p class="text-sm text-gray-500 dark:text-gray-400">${t("driverAnalysisNotAvailable")}</p>
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="text-2xl ${type === "ich" ? "text-blue-600" : "text-red-600"}">
+            ${type === "ich" ? "🧠" : "🩸"}
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">${t("driverAnalysisUnavailable")}</p>
+          </div>
         </div>
+        <p class="italic text-gray-500 dark:text-gray-400">${t("driverAnalysisNotAvailable")}</p>
       </div>
     `;
   }
@@ -220,61 +213,97 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
     0.01
   );
 
-  const renderDriverBar = (driver, sign, colorFrom, colorTo) => {
-    const cleanLabel = formatDriverName(driver.label);
-    const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
-    const relativeImportance = barWidth.toFixed(0);
-
-    return `
-      <div class="mb-3">
-        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-300">
-          <span>${cleanLabel}</span>
-          <span class="font-medium">${sign}${relativeImportance}%</span>
+  let html = `
+    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="text-2xl ${type === "ich" ? "text-blue-600" : "text-red-600"}">
+          ${type === "ich" ? "🧠" : "🩸"}
         </div>
-        <div class="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800 mt-1">
-          <div class="h-2 rounded-full bg-gradient-to-r from-${colorFrom}-400 to-${colorTo}-600 dark:from-${colorFrom}-500 dark:to-${colorTo}-700" style="width: ${barWidth}%"></div>
-        </div>
-      </div>
-    `;
-  };
-
-  return `
-    <div class="p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 transition hover:shadow-md">
-      <div class="flex items-center gap-3 mb-5 border-b border-gray-100 dark:border-gray-700 pb-3">
-        <div class="text-3xl">${type === "ich" ? "🩸" : "🧠"}</div>
         <div>
           <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
           <p class="text-sm text-gray-500 dark:text-gray-400">${t("contributingFactors")}</p>
         </div>
       </div>
-
-      <div class="grid md:grid-cols-2 gap-6">
-        <!-- Increasing Risk -->
-        <div class="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800">
+      
+      <div class="grid md:grid-cols-2 gap-5">
+        <!-- Positive Drivers -->
+        <div>
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-red-600 dark:text-red-400 text-lg">↑</span>
-            <span class="font-semibold text-red-700 dark:text-red-300">${t("increaseRisk")}</span>
+            <span class="text-green-600 dark:text-green-400 text-lg">↑</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${t("increaseRisk")}</span>
           </div>
-          ${
-  positiveDrivers.length
-    ? positiveDrivers.map(d => renderDriverBar(d, "+", "red", "rose")).join("")
-    : `<p class="text-gray-500 italic">${t("noPositiveFactors")}</p>`
-}
+          <div class="space-y-2">
+  `;
+
+  const totalPositiveWeight = positiveDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+
+  if (positiveDrivers.length > 0) {
+    positiveDrivers.forEach(driver => {
+      const relativeImportance =
+        totalPositiveWeight > 0 ? (Math.abs(driver.weight) / totalPositiveWeight) * 100 : 0;
+      const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
+      const cleanLabel = formatDriverName(driver.label);
+
+      html += `
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
+            <span class="text-green-600 dark:text-green-400 font-medium">+${relativeImportance.toFixed(0)}%</span>
+          </div>
+          <div class="h-2 bg-green-100 dark:bg-green-900/40 rounded-full overflow-hidden">
+            <div class="h-2 bg-green-500 dark:bg-green-400 rounded-full" style="width: ${barWidth}%"></div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    html += `<p class="text-sm italic text-gray-500 dark:text-gray-400">${t("noPositiveFactors")}</p>`;
+  }
+
+  html += `
+          </div>
         </div>
 
-        <!-- Decreasing Risk -->
-        <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+        <!-- Negative Drivers -->
+        <div>
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-blue-600 dark:text-blue-400 text-lg">↓</span>
-            <span class="font-semibold text-blue-700 dark:text-blue-300">${t("decreaseRisk")}</span>
+            <span class="text-red-600 dark:text-red-400 text-lg">↓</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${t("decreaseRisk")}</span>
           </div>
-          ${
-  negativeDrivers.length
-    ? negativeDrivers.map(d => renderDriverBar(d, "-", "blue", "indigo")).join("")
-    : `<p class="text-gray-500 italic">${t("noNegativeFactors")}</p>`
-}
+          <div class="space-y-2">
+  `;
+
+  const totalNegativeWeight = negativeDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
+
+  if (negativeDrivers.length > 0) {
+    negativeDrivers.forEach(driver => {
+      const relativeImportance =
+        totalNegativeWeight > 0 ? (Math.abs(driver.weight) / totalNegativeWeight) * 100 : 0;
+      const barWidth = (Math.abs(driver.weight) / maxWeight) * 100;
+      const cleanLabel = formatDriverName(driver.label);
+
+      html += `
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
+            <span class="text-red-600 dark:text-red-400 font-medium">-${relativeImportance.toFixed(0)}%</span>
+          </div>
+          <div class="h-2 bg-red-100 dark:bg-red-900/40 rounded-full overflow-hidden">
+            <div class="h-2 bg-red-500 dark:bg-red-400 rounded-full" style="width: ${barWidth}%"></div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    html += `<p class="text-sm italic text-gray-500 dark:text-gray-400">${t("noNegativeFactors")}</p>`;
+  }
+
+  html += `
+          </div>
         </div>
       </div>
     </div>
   `;
+
+  return html;
 }
