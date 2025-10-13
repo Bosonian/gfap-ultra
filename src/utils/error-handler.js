@@ -47,7 +47,12 @@ export const MEDICAL_ERROR_CODES = {
  * Enhanced error class for medical applications
  */
 export class MedicalError extends Error {
-  constructor(message, code, category = ERROR_CATEGORIES.MEDICAL, severity = ERROR_SEVERITY.MEDIUM) {
+  constructor(
+    message,
+    code,
+    category = ERROR_CATEGORIES.MEDICAL,
+    severity = ERROR_SEVERITY.MEDIUM
+  ) {
     super(message);
     this.name = 'MedicalError';
     this.code = code;
@@ -101,13 +106,13 @@ class GlobalErrorHandler {
 
   setupGlobalHandlers() {
     // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.handleError(event.reason, ERROR_CATEGORIES.NETWORK, ERROR_SEVERITY.HIGH);
       event.preventDefault();
     });
 
     // Handle uncaught errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.handleError(event.error, ERROR_CATEGORIES.RENDERING, ERROR_SEVERITY.MEDIUM);
     });
   }
@@ -174,7 +179,7 @@ class GlobalErrorHandler {
   getErrorSummary() {
     return {
       totalErrors: this.errorQueue.length,
-      criticalErrors: this.errorQueue.filter((e) => e.severity === ERROR_SEVERITY.CRITICAL).length,
+      criticalErrors: this.errorQueue.filter(e => e.severity === ERROR_SEVERITY.CRITICAL).length,
       recentErrors: this.errorQueue.slice(-10),
     };
   }
@@ -218,7 +223,7 @@ export async function safeAsync(asyncFn, options = {}) {
 
       // If we have retries left, wait and retry
       if (attempt < retries) {
-        await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
         continue;
       }
 
@@ -232,7 +237,7 @@ export async function safeAsync(asyncFn, options = {}) {
         error.message || 'Operation failed',
         error.code || 'UNKNOWN',
         category,
-        severity,
+        severity
       ).withContext(context);
 
       throw enhancedError;
@@ -248,24 +253,21 @@ export async function safeAsync(asyncFn, options = {}) {
  * @returns {Promise} - Calculation result with error handling
  */
 export async function safeMedicalCalculation(calculationFn, inputs, options = {}) {
-  return safeAsync(
-    () => calculationFn(inputs),
-    {
-      category: ERROR_CATEGORIES.MEDICAL,
-      severity: ERROR_SEVERITY.HIGH,
-      fallback: () => ({
-        error: true,
-        message: 'Medical calculation unavailable',
-        fallbackUsed: true,
-      }),
-      context: {
-        operation: 'medical_calculation',
-        inputKeys: Object.keys(inputs || {}),
-        ...options.context,
-      },
-      ...options,
+  return safeAsync(() => calculationFn(inputs), {
+    category: ERROR_CATEGORIES.MEDICAL,
+    severity: ERROR_SEVERITY.HIGH,
+    fallback: () => ({
+      error: true,
+      message: 'Medical calculation unavailable',
+      fallbackUsed: true,
+    }),
+    context: {
+      operation: 'medical_calculation',
+      inputKeys: Object.keys(inputs || {}),
+      ...options.context,
     },
-  );
+    ...options,
+  });
 }
 
 /**
@@ -339,7 +341,7 @@ export function validateMedicalInputs(data, schema) {
   const errors = [];
   const warnings = [];
 
-  Object.keys(schema).forEach((key) => {
+  Object.keys(schema).forEach(key => {
     const rule = schema[key];
     const value = data[key];
 

@@ -97,7 +97,7 @@ export function formatDriverName(fieldName) {
   // Clean up and format - keep medical terminology consistent
   formatted = formatted
     .replace(/_/g, ' ') // Replace underscores with spaces
-    .replace(/\b\w/g, (l) => l.toUpperCase()) // Title case
+    .replace(/\b\w/g, l => l.toUpperCase()) // Title case
     .trim();
 
   return formatted;

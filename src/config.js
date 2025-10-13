@@ -2,12 +2,12 @@
 
 // Development mode detection (prefer Vite flag, fallback to hostname)
 // Only treat Vite dev server as development; preview uses production settings
-const isDevelopment = !!(import.meta && import.meta.env && import.meta.env.DEV);
+const isDevelopment = true;
 
 // Mock authentication for local development
 const MOCK_AUTH_SUCCESS = {
   success: true,
-  message: 'Development mode - authentication bypassed',
+  message: "Development mode - authentication bypassed",
   session_token: `dev-token-${Date.now()}`,
   expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
   session_duration: 1800,
@@ -58,28 +58,31 @@ const MOCK_API_RESPONSES = {
   },
   authenticate: {
     success: true,
-    message: 'Development mode - authentication bypassed',
+    message: "Development mode - authentication bypassed",
     session_token: `dev-token-${Date.now()}`,
     expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
     session_duration: 1800,
   },
 };
 
-export const API_URLS = isDevelopment ? {
-  // Development mode - use Vite proxy to bypass CORS
-  COMA_ICH: '/api/cloud-functions/predict_coma_ich',
-  LDM_ICH: '/api/cloud-functions/predict_limited_data_ich',
-  FULL_STROKE: '/api/cloud-functions/predict_full_stroke',
-  LVO_PREDICTION: '/api/cloud-functions/predict_lvo',
-  AUTHENTICATE: '/api/cloud-functions/authenticate-research-access',
-} : {
-  // Production mode - use direct endpoints
-  COMA_ICH: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich',
-  LDM_ICH: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich',
-  FULL_STROKE: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke',
-  LVO_PREDICTION: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo',
-  AUTHENTICATE: 'https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access',
-};
+export const API_URLS = isDevelopment
+  ? {
+      // Development mode - use Vite proxy to bypass CORS
+      COMA_ICH: "/api/cloud-functions/predict_coma_ich",
+      LDM_ICH: "/api/cloud-functions/predict_limited_data_ich",
+      FULL_STROKE: "/api/cloud-functions/predict_full_stroke",
+      LVO_PREDICTION: "/api/cloud-functions/predict_lvo",
+      AUTHENTICATE: "/api/cloud-functions/authenticate-research-access",
+    }
+  : {
+      // Production mode - use direct endpoints
+      COMA_ICH: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich",
+      LDM_ICH: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
+      FULL_STROKE: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
+      LVO_PREDICTION: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo",
+      AUTHENTICATE:
+        "https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access",
+    };
 
 export const DEV_CONFIG = {
   isDevelopment,
@@ -118,18 +121,19 @@ export const VALIDATION_RULES = {
     required: true,
     min: 0,
     max: 120,
-    type: 'integer',
-    medicalCheck: (value) => (value < 18 ? 'Emergency stroke assessment typically for adults (≥18 years)' : null),
+    type: "integer",
+    medicalCheck: value =>
+      value < 18 ? "Emergency stroke assessment typically for adults (≥18 years)" : null,
   },
   systolic_bp: {
     required: true,
     min: 60,
     max: 300,
-    type: 'number',
+    type: "number",
     medicalCheck: (value, formData) => {
       const diastolic = formData?.diastolic_bp;
       if (diastolic && value <= diastolic) {
-        return 'Systolic BP must be higher than diastolic BP';
+        return "Systolic BP must be higher than diastolic BP";
       }
       return null;
     },
@@ -138,11 +142,11 @@ export const VALIDATION_RULES = {
     required: true,
     min: 30,
     max: 200,
-    type: 'number',
+    type: "number",
     medicalCheck: (value, formData) => {
       const systolic = formData?.systolic_bp;
       if (systolic && value >= systolic) {
-        return 'Diastolic BP must be lower than systolic BP';
+        return "Diastolic BP must be lower than systolic BP";
       }
       return null;
     },
@@ -151,10 +155,10 @@ export const VALIDATION_RULES = {
     required: true,
     min: GFAP_RANGES.min,
     max: GFAP_RANGES.max,
-    type: 'number',
-    medicalCheck: (value) => {
+    type: "number",
+    medicalCheck: value => {
       if (value > 8000) {
-        return 'Warning: Extremely high GFAP value - please verify lab result (still valid)';
+        return "Warning: Extremely high GFAP value - please verify lab result (still valid)";
       }
       return null;
     },
@@ -163,14 +167,16 @@ export const VALIDATION_RULES = {
     required: true,
     min: 0,
     max: 9,
-    type: 'integer',
-    medicalCheck: (value) => (value >= 4 ? 'High FAST-ED score suggests LVO - consider urgent intervention' : null),
+    type: "integer",
+    medicalCheck: value =>
+      value >= 4 ? "High FAST-ED score suggests LVO - consider urgent intervention" : null,
   },
   gcs: {
     required: true,
     min: 3,
     max: 15,
-    type: 'integer',
-    medicalCheck: (value) => (value < 8 ? 'GCS < 8 indicates severe consciousness impairment - consider coma module' : null),
+    type: "integer",
+    medicalCheck: value =>
+      value < 8 ? "GCS < 8 indicates severe consciousness impairment - consider coma module" : null,
   },
 };

@@ -44,7 +44,7 @@ export class LegacyICHModel {
         probability: 0,
         confidence: 0,
         isValid: false,
-        reason: 'Invalid inputs: age and GFAP required',
+        reason: "Invalid inputs: age and GFAP required",
       };
     }
 
@@ -68,9 +68,10 @@ export class LegacyICHModel {
       const scaledGfap = (gfapValue - this.PARAMS.gfap.mean) / this.PARAMS.gfap.std;
 
       // Step 2: Calculate log-odds (logit)
-      const logit = this.PARAMS.coefficients.intercept
-                    + (this.PARAMS.coefficients.age * scaledAge)
-                    + (this.PARAMS.coefficients.gfap * scaledGfap);
+      const logit =
+        this.PARAMS.coefficients.intercept +
+        this.PARAMS.coefficients.age * scaledAge +
+        this.PARAMS.coefficients.gfap * scaledGfap;
 
       // Step 3: Convert to probability using sigmoid function
       const rawProbability = 1 / (1 + Math.exp(-logit));
@@ -94,7 +95,7 @@ export class LegacyICHModel {
         },
         rawInputs: { age, gfap: gfapValue },
         isValid: true,
-        calculationMethod: 'logistic_regression_age_gfap',
+        calculationMethod: "logistic_regression_age_gfap",
       };
     } catch (error) {
       // ('Legacy model calculation error:', error);
@@ -102,7 +103,7 @@ export class LegacyICHModel {
         probability: 0,
         confidence: 0,
         isValid: false,
-        reason: 'Calculation error',
+        reason: "Calculation error",
         error: error.message,
       };
     }
@@ -116,41 +117,41 @@ export class LegacyICHModel {
   static getRiskCategory(probability) {
     if (probability < 10) {
       return {
-        level: 'very_low',
-        color: '#10b981',
-        label: 'Very Low Risk',
-        description: 'Minimal ICH likelihood',
+        level: "very_low",
+        color: "#10b981",
+        label: "Very Low Risk",
+        description: "Minimal ICH likelihood",
       };
     }
     if (probability < 25) {
       return {
-        level: 'low',
-        color: '#84cc16',
-        label: 'Low Risk',
-        description: 'Below typical threshold',
+        level: "low",
+        color: "#84cc16",
+        label: "Low Risk",
+        description: "Below typical threshold",
       };
     }
     if (probability < 50) {
       return {
-        level: 'moderate',
-        color: '#f59e0b',
-        label: 'Moderate Risk',
-        description: 'Elevated concern',
+        level: "moderate",
+        color: "#f59e0b",
+        label: "Moderate Risk",
+        description: "Elevated concern",
       };
     }
     if (probability < 75) {
       return {
-        level: 'high',
-        color: '#f97316',
-        label: 'High Risk',
-        description: 'Significant likelihood',
+        level: "high",
+        color: "#f97316",
+        label: "High Risk",
+        description: "Significant likelihood",
       };
     }
     return {
-      level: 'very_high',
-      color: '#dc2626',
-      label: 'Very High Risk',
-      description: 'Critical ICH probability',
+      level: "very_high",
+      color: "#dc2626",
+      label: "Very High Risk",
+      description: "Critical ICH probability",
     };
   }
 
@@ -164,7 +165,7 @@ export class LegacyICHModel {
     if (!mainResults || !legacyResults || !legacyResults.isValid) {
       return {
         isValid: false,
-        reason: 'Invalid model results for comparison',
+        reason: "Invalid model results for comparison",
       };
     }
 
@@ -180,20 +181,20 @@ export class LegacyICHModel {
     const relativeDifference = legacyProb > 0 ? (absoluteDifference / legacyProb) * 100 : 0;
 
     // Determine which model suggests higher risk
-    const higherRiskModel = mainProb > legacyProb ? 'main'
-      : legacyProb > mainProb ? 'legacy' : 'equal';
+    const higherRiskModel =
+      mainProb > legacyProb ? "main" : legacyProb > mainProb ? "legacy" : "equal";
 
     // Assess agreement level
     let agreement;
     const absDiff = Math.abs(absoluteDifference);
     if (absDiff < 5) {
-      agreement = 'strong';
+      agreement = "strong";
     } else if (absDiff < 15) {
-      agreement = 'moderate';
+      agreement = "moderate";
     } else if (absDiff < 30) {
-      agreement = 'weak';
+      agreement = "weak";
     } else {
-      agreement = 'poor';
+      agreement = "poor";
     }
 
     return {
@@ -223,26 +224,26 @@ export class LegacyICHModel {
   static getComparisonInterpretation(difference, agreement) {
     const absDiff = Math.abs(difference);
 
-    if (agreement === 'strong') {
+    if (agreement === "strong") {
       return {
-        type: 'concordant',
-        message: 'Models show strong agreement',
-        implication: 'Age and GFAP are primary risk factors',
+        type: "concordant",
+        message: "Models show strong agreement",
+        implication: "Age and GFAP are primary risk factors",
       };
     }
 
     if (absDiff > 20) {
       return {
-        type: 'divergent',
-        message: 'Significant model disagreement',
-        implication: 'Complex model captures additional risk factors not in age/GFAP',
+        type: "divergent",
+        message: "Significant model disagreement",
+        implication: "Complex model captures additional risk factors not in age/GFAP",
       };
     }
 
     return {
-      type: 'moderate_difference',
-      message: 'Models show moderate difference',
-      implication: 'Additional factors provide incremental predictive value',
+      type: "moderate_difference",
+      message: "Models show moderate difference",
+      implication: "Additional factors provide incremental predictive value",
     };
   }
 
@@ -253,23 +254,38 @@ export class LegacyICHModel {
   static runValidationTests() {
     const testCases = [
       {
-        age: 65, gfap: 100, expected: 'low', description: 'Younger patient, low GFAP',
+        age: 65,
+        gfap: 100,
+        expected: "low",
+        description: "Younger patient, low GFAP",
       },
       {
-        age: 75, gfap: 500, expected: 'moderate', description: 'Average age, moderate GFAP',
+        age: 75,
+        gfap: 500,
+        expected: "moderate",
+        description: "Average age, moderate GFAP",
       },
       {
-        age: 85, gfap: 1000, expected: 'high', description: 'Older patient, high GFAP',
+        age: 85,
+        gfap: 1000,
+        expected: "high",
+        description: "Older patient, high GFAP",
       },
       {
-        age: 70, gfap: 2000, expected: 'very_high', description: 'High GFAP dominates',
+        age: 70,
+        gfap: 2000,
+        expected: "very_high",
+        description: "High GFAP dominates",
       },
       {
-        age: 90, gfap: 50, expected: 'very_low', description: 'Low GFAP despite age',
+        age: 90,
+        gfap: 50,
+        expected: "very_low",
+        description: "Low GFAP despite age",
       },
     ];
 
-    const results = testCases.map((testCase) => {
+    const results = testCases.map(testCase => {
       const result = this.calculateProbability(testCase.age, testCase.gfap);
       return {
         ...testCase,
@@ -278,7 +294,7 @@ export class LegacyICHModel {
       };
     });
 
-    const passedTests = results.filter((r) => r.passed).length;
+    const passedTests = results.filter(r => r.passed).length;
     const totalTests = results.length;
 
     return {
@@ -297,30 +313,30 @@ export class LegacyICHModel {
    */
   static getModelMetadata() {
     return {
-      name: 'Legacy ICH Model',
-      type: 'Logistic Regression',
-      version: '1.0.0',
-      features: ['age', 'gfap'],
+      name: "Legacy ICH Model",
+      type: "Logistic Regression",
+      version: "1.0.0",
+      features: ["age", "gfap"],
       performance: {
         rocAuc: 0.789,
-        recall: 0.40,
+        recall: 0.4,
         precision: 0.86,
         f1Score: 0.55,
         specificity: 0.94,
       },
       trainingData: {
-        samples: 'Historical cohort',
-        dateRange: 'Research study period',
-        validation: 'Cross-validation',
+        samples: "Historical cohort",
+        dateRange: "Research study period",
+        validation: "Cross-validation",
       },
       limitations: [
-        'Only uses age and GFAP - ignores clinical symptoms',
-        'Lower recall (40%) - misses some ICH cases',
-        'No time-to-onset consideration',
-        'No blood pressure or medication factors',
-        'Simplified feature set for baseline comparison',
+        "Only uses age and GFAP - ignores clinical symptoms",
+        "Lower recall (40%) - misses some ICH cases",
+        "No time-to-onset consideration",
+        "No blood pressure or medication factors",
+        "Simplified feature set for baseline comparison",
       ],
-      purpose: 'Research baseline for evaluating complex model improvements',
+      purpose: "Research baseline for evaluating complex model improvements",
     };
   }
 }
@@ -357,8 +373,8 @@ export function testLegacyModel() {
   // (`✅ Passed: ${testResults.summary.passed}/${testResults.summary.total} tests`);
   // (`📊 Pass Rate: ${testResults.summary.passRate}%`);
 
-  testResults.details.forEach((test) => {
-    const icon = test.passed ? '✅' : '❌';
+  testResults.details.forEach(test => {
+    const icon = test.passed ? "✅" : "❌";
     // (`${icon} ${test.description}: ${test.result.probability.toFixed(1)}% (${test.result.riskCategory.level})`);
   });
 

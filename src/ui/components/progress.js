@@ -5,19 +5,38 @@ export function renderProgressIndicator(currentStep) {
     { id: 3, label: 'Results' },
   ];
 
-  let html = '<div class="progress-indicator">';
+  let html = `
+    <div class="flex items-center justify-between mb-6 relative">
+  `;
+
   steps.forEach((step, index) => {
     const isActive = step.id === currentStep;
     const isCompleted = step.id < currentStep;
+
     html += `
-      <div class="progress-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}">
-        ${isCompleted ? '' : step.id}
+      <div class="flex-1 flex flex-col items-center text-center relative">
+        <!-- Step Circle -->
+        <div class="w-8 h-8 flex items-center justify-center rounded-full 
+                    ${isCompleted ? 'bg-green-500 text-white' : isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'} 
+                    font-bold z-10">
+          ${isCompleted ? '✓' : step.id}
+        </div>
+
+        <!-- Step Label -->
+        <span class="mt-2 text-xs ${isActive ? 'text-blue-500' : 'text-gray-500'}">
+          ${step.label}
+        </span>
+
+        <!-- Connector Line (except last step) -->
+        ${
+          index < steps.length - 1
+            ? `<div class="absolute top-4 left-1/2 w-full h-1 ${isCompleted ? 'bg-green-500' : 'bg-gray-300'} z-0"></div>`
+            : ''
+        }
       </div>
     `;
-    if (index < steps.length - 1) {
-      html += `<div class="progress-line ${isCompleted ? 'completed' : ''}"></div>`;
-    }
   });
+
   html += '</div>';
   return html;
 }

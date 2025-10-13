@@ -53,7 +53,7 @@ export class ThemeManager {
 
         return themeToApply;
       },
-      (error) => {
+      error => {
         // Fallback to light theme
         this.applyTheme('light');
         this.updateThemeButton();
@@ -62,7 +62,7 @@ export class ThemeManager {
       {
         category: ERROR_CATEGORIES.STORAGE,
         context: { operation: 'load_saved_theme' },
-      },
+      }
     );
   }
 
@@ -73,7 +73,7 @@ export class ThemeManager {
     // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-    const handleSystemThemeChange = (e) => {
+    const handleSystemThemeChange = e => {
       // Only auto-switch if user hasn't explicitly set a preference
       const savedTheme = localStorage.getItem(this.storageKey);
       if (!savedTheme) {
@@ -137,13 +137,13 @@ export class ThemeManager {
         this.updateThemeButton();
         return theme;
       },
-      (error) =>
+      error =>
         // Theme setting failed, keep current theme
         this.currentTheme,
       {
         category: ERROR_CATEGORIES.STORAGE,
         context: { operation: 'set_theme', theme },
-      },
+      }
     );
   }
 

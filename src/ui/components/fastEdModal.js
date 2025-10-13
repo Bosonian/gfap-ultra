@@ -27,122 +27,89 @@ export class FastEdCalculator {
     const riskLevel = this.getRiskLevel();
 
     return `
-      <div id="fastEdModal" class="modal" role="dialog" aria-labelledby="fastEdModalTitle" aria-hidden="true" style="display: none !important;">
-        <div class="modal-content fast-ed-modal">
-          <div class="modal-header">
-            <h2 id="fastEdModalTitle">${t('fastEdCalculatorTitle')}</h2>
-            <button class="modal-close" aria-label="Close">&times;</button>
+      <div id="fastEdModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden transition-all duration-300">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white">${t('fastEdCalculatorTitle')}</h2>
+            <button class="modal-close text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl leading-none">&times;</button>
           </div>
-          <div class="modal-body">
+
+          <!-- Body -->
+          <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
             
-            <!-- Facial Palsy -->
-            <div class="fast-ed-component">
-              <h3>${t('facialPalsyTitle')}</h3>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="facial_palsy" value="0" ${this.scores.facial_palsy === 0 ? 'checked' : ''}>
-                  <span class="radio-label">${t('facialPalsyNormal')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="facial_palsy" value="1" ${this.scores.facial_palsy === 1 ? 'checked' : ''}>
-                  <span class="radio-label">${t('facialPalsyMild')}</span>
-                </label>
-              </div>
-            </div>
+            ${this.renderSection('facial_palsy', t('facialPalsyTitle'), [
+              { label: t('facialPalsyNormal'), value: 0 },
+              { label: t('facialPalsyMild'), value: 1 },
+            ])}
 
-            <!-- Arm Weakness -->
-            <div class="fast-ed-component">
-              <h3>${t('armWeaknessTitle')}</h3>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="arm_weakness" value="0" ${this.scores.arm_weakness === 0 ? 'checked' : ''}>
-                  <span class="radio-label">${t('armWeaknessNormal')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="arm_weakness" value="1" ${this.scores.arm_weakness === 1 ? 'checked' : ''}>
-                  <span class="radio-label">${t('armWeaknessMild')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="arm_weakness" value="2" ${this.scores.arm_weakness === 2 ? 'checked' : ''}>
-                  <span class="radio-label">${t('armWeaknessSevere')}</span>
-                </label>
-              </div>
-            </div>
+            ${this.renderSection('arm_weakness', t('armWeaknessTitle'), [
+              { label: t('armWeaknessNormal'), value: 0 },
+              { label: t('armWeaknessMild'), value: 1 },
+              { label: t('armWeaknessSevere'), value: 2 },
+            ])}
 
-            <!-- Speech Changes -->
-            <div class="fast-ed-component">
-              <h3>${t('speechChangesTitle')}</h3>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="speech_changes" value="0" ${this.scores.speech_changes === 0 ? 'checked' : ''}>
-                  <span class="radio-label">${t('speechChangesNormal')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="speech_changes" value="1" ${this.scores.speech_changes === 1 ? 'checked' : ''}>
-                  <span class="radio-label">${t('speechChangesMild')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="speech_changes" value="2" ${this.scores.speech_changes === 2 ? 'checked' : ''}>
-                  <span class="radio-label">${t('speechChangesSevere')}</span>
-                </label>
-              </div>
-            </div>
+            ${this.renderSection('speech_changes', t('speechChangesTitle'), [
+              { label: t('speechChangesNormal'), value: 0 },
+              { label: t('speechChangesMild'), value: 1 },
+              { label: t('speechChangesSevere'), value: 2 },
+            ])}
 
-            <!-- Eye Deviation -->
-            <div class="fast-ed-component">
-              <h3>${t('eyeDeviationTitle')}</h3>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="eye_deviation" value="0" ${this.scores.eye_deviation === 0 ? 'checked' : ''}>
-                  <span class="radio-label">${t('eyeDeviationNormal')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="eye_deviation" value="1" ${this.scores.eye_deviation === 1 ? 'checked' : ''}>
-                  <span class="radio-label">${t('eyeDeviationPartial')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="eye_deviation" value="2" ${this.scores.eye_deviation === 2 ? 'checked' : ''}>
-                  <span class="radio-label">${t('eyeDeviationForced')}</span>
-                </label>
-              </div>
-            </div>
+            ${this.renderSection('eye_deviation', t('eyeDeviationTitle'), [
+              { label: t('eyeDeviationNormal'), value: 0 },
+              { label: t('eyeDeviationPartial'), value: 1 },
+              { label: t('eyeDeviationForced'), value: 2 },
+            ])}
 
-            <!-- Denial/Neglect -->
-            <div class="fast-ed-component">
-              <h3>${t('denialNeglectTitle')}</h3>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="denial_neglect" value="0" ${this.scores.denial_neglect === 0 ? 'checked' : ''}>
-                  <span class="radio-label">${t('denialNeglectNormal')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="denial_neglect" value="1" ${this.scores.denial_neglect === 1 ? 'checked' : ''}>
-                  <span class="radio-label">${t('denialNeglectPartial')}</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="denial_neglect" value="2" ${this.scores.denial_neglect === 2 ? 'checked' : ''}>
-                  <span class="radio-label">${t('denialNeglectComplete')}</span>
-                </label>
-              </div>
-            </div>
+            ${this.renderSection('denial_neglect', t('denialNeglectTitle'), [
+              { label: t('denialNeglectNormal'), value: 0 },
+              { label: t('denialNeglectPartial'), value: 1 },
+              { label: t('denialNeglectComplete'), value: 2 },
+            ])}
 
-            <!-- Total Score Display -->
-            <div class="fast-ed-total">
-              <div class="score-display">
-                <h3>${t('totalScoreTitle')}: <span class="total-score">${total}/9</span></h3>
-                <div class="risk-indicator ${riskLevel}">
-                  ${t('riskLevel')}: ${riskLevel === 'high' ? t('riskLevelHigh') : t('riskLevelLow')}
-                </div>
+            <!-- Total -->
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 flex flex-col items-center text-center">
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white">${t('totalScoreTitle')}: 
+                <span class="text-blue-600 dark:text-blue-400 font-bold text-xl total-score">${total}/9</span>
+              </h3>
+              <div class="risk-indicator mt-2 px-4 py-2 rounded-full font-medium 
+                ${
+                  riskLevel === 'high'
+                    ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                    : 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
+                }">
+                ${t('riskLevel')}: ${riskLevel === 'high' ? t('riskLevelHigh') : t('riskLevelLow')}
               </div>
-            </div>
-
-          </div>
-          <div class="modal-footer">
-            <div class="button-group">
-              <button class="secondary" data-action="cancel-fast-ed">${t('cancel')}</button>
-              <button class="primary" data-action="apply-fast-ed">${t('applyScore')}</button>
             </div>
           </div>
+
+          <!-- Footer -->
+          <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <button class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-semibold" data-action="cancel-fast-ed">${t('cancel')}</button>
+            <button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold" data-action="apply-fast-ed">${t('applyScore')}</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderSection(name, title, options) {
+    return `
+      <div class="space-y-2">
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">${title}</h3>
+        <div class="flex flex-wrap gap-3">
+          ${options
+            .map(
+              opt => `
+            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+              <input type="radio" name="${name}" value="${opt.value}" 
+                class="accent-blue-600 dark:accent-blue-500"
+                ${this.scores[name] === opt.value ? 'checked' : ''}>
+              <span>${opt.label}</span>
+            </label>`
+            )
+            .join('')}
         </div>
       </div>
     `;
@@ -150,99 +117,69 @@ export class FastEdCalculator {
 
   setupEventListeners() {
     this.modal = document.getElementById('fastEdModal');
-    if (!this.modal) {
-      return;
-    }
+    if (!this.modal) return;
 
-    // Radio button changes
-    this.modal.addEventListener('change', (e) => {
+    this.modal.addEventListener('change', e => {
       if (e.target.type === 'radio') {
-        const component = e.target.name;
-        const value = parseInt(e.target.value);
-        this.scores[component] = value;
+        this.scores[e.target.name] = parseInt(e.target.value);
         this.updateDisplay();
       }
     });
 
-    // Close button
-    const closeBtn = this.modal.querySelector('.modal-close');
-    closeBtn?.addEventListener('click', () => this.close());
+    this.modal.querySelector('.modal-close')?.addEventListener('click', () => this.close());
+    this.modal
+      .querySelector('[data-action="cancel-fast-ed"]')
+      ?.addEventListener('click', () => this.close());
+    this.modal
+      .querySelector('[data-action="apply-fast-ed"]')
+      ?.addEventListener('click', () => this.apply());
 
-    // Cancel button
-    const cancelBtn = this.modal.querySelector('[data-action="cancel-fast-ed"]');
-    cancelBtn?.addEventListener('click', () => this.close());
-
-    // Apply button
-    const applyBtn = this.modal.querySelector('[data-action="apply-fast-ed"]');
-    applyBtn?.addEventListener('click', () => this.apply());
-
-    // Disable backdrop click-to-close to prevent accidental dismissal
-    // Users must explicitly Cancel or Apply
-    this.modal.addEventListener('click', (e) => {
-      if (e.target === this.modal) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+    this.modal.addEventListener('click', e => {
+      if (e.target === this.modal) e.stopPropagation();
     });
 
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.modal?.classList.contains('show')) {
-        this.close();
-      }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && this.modal?.classList.contains('flex')) this.close();
     });
   }
 
   updateDisplay() {
     const totalElement = this.modal?.querySelector('.total-score');
     const riskElement = this.modal?.querySelector('.risk-indicator');
+    if (!totalElement || !riskElement) return;
 
-    if (totalElement) {
-      totalElement.textContent = `${this.getTotal()}/9`;
-    }
+    const total = this.getTotal();
+    const riskLevel = this.getRiskLevel();
 
-    if (riskElement) {
-      const riskLevel = this.getRiskLevel();
-      riskElement.className = `risk-indicator ${riskLevel}`;
-      riskElement.textContent = `${t('riskLevel')}: ${riskLevel === 'high' ? t('riskLevelHigh') : t('riskLevelLow')}`;
-    }
+    totalElement.textContent = `${total}/9`;
+    riskElement.className =
+      `risk-indicator mt-2 px-4 py-2 rounded-full font-medium ` +
+      (riskLevel === 'high'
+        ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+        : 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300');
+    riskElement.textContent = `${t('riskLevel')}: ${riskLevel === 'high' ? t('riskLevelHigh') : t('riskLevelLow')}`;
   }
 
   show(currentScore = 0, onApplyCallback = null) {
     this.onApply = onApplyCallback;
 
-    // If we have a current score, try to reverse engineer it (basic approximation)
-    if (currentScore > 0 && currentScore <= 9) {
-      this.approximateFromTotal(currentScore);
-    }
+    if (currentScore > 0 && currentScore <= 9) this.approximateFromTotal(currentScore);
 
-    // Inject modal HTML if not already present
-    if (!document.getElementById('fastEdModal')) {
-      document.body.insertAdjacentHTML('beforeend', this.render());
-    } else {
-      // Re-render the modal with current state
-      this.modal.remove();
-      document.body.insertAdjacentHTML('beforeend', this.render());
-      this.modal = document.getElementById('fastEdModal');
-    }
+    const existingModal = document.getElementById('fastEdModal');
+    if (existingModal) existingModal.remove();
 
+    document.body.insertAdjacentHTML('beforeend', this.render());
+    this.modal = document.getElementById('fastEdModal');
     this.setupEventListeners();
 
-    this.modal.setAttribute('aria-hidden', 'false');
-    this.modal.style.display = 'flex';
-    this.modal.classList.add('show');
-
-    // Focus first radio button
-    const firstRadio = this.modal.querySelector('input[type="radio"]');
-    firstRadio?.focus();
+    this.modal.classList.remove('hidden');
+    this.modal.classList.add('flex');
   }
 
   close() {
-    if (this.modal) {
-      this.modal.classList.remove('show');
-      this.modal.style.display = 'none';
-      this.modal.setAttribute('aria-hidden', 'true');
-    }
+    if (!this.modal) return;
+    this.modal.classList.remove('flex');
+    this.modal.classList.add('hidden');
   }
 
   apply() {
@@ -263,8 +200,6 @@ export class FastEdCalculator {
   }
 
   approximateFromTotal(total) {
-    // Simple approximation - distribute points across components
-    // This is basic but gives users a starting point
     this.scores = {
       facial_palsy: 0,
       arm_weakness: 0,
@@ -274,20 +209,14 @@ export class FastEdCalculator {
     };
 
     let remaining = total;
-    const components = Object.keys(this.scores);
-
-    for (const component of components) {
-      if (remaining <= 0) {
-        break;
-      }
-
-      const maxForComponent = (component === 'facial_palsy') ? 1 : 2;
-      const assignToThis = Math.min(remaining, maxForComponent);
-      this.scores[component] = assignToThis;
-      remaining -= assignToThis;
+    for (const component of Object.keys(this.scores)) {
+      if (remaining <= 0) break;
+      const max = component === 'facial_palsy' ? 1 : 2;
+      const assign = Math.min(remaining, max);
+      this.scores[component] = assign;
+      remaining -= assign;
     }
   }
 }
 
-// Create singleton instance
 export const fastEdCalculator = new FastEdCalculator();

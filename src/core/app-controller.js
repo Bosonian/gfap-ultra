@@ -52,7 +52,7 @@ export class AppController {
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
           medicalLogger.debug('Waiting for DOM ready', { category: LOG_CATEGORIES.SYSTEM });
-          return new Promise((resolve) => {
+          return new Promise(resolve => {
             document.addEventListener('DOMContentLoaded', () => resolve(this.init()));
           });
         }
@@ -121,7 +121,7 @@ export class AppController {
 
         return true;
       },
-      (error) => {
+      error => {
         medicalLogger.critical('Application initialization failed', {
           category: LOG_CATEGORIES.SYSTEM,
           error: error.message,
@@ -136,7 +136,7 @@ export class AppController {
         context: {
           operation: 'app_initialization',
         },
-      },
+      }
     );
   }
 
@@ -156,14 +156,14 @@ export class AppController {
         const results = await Promise.allSettled(coreInitTasks);
 
         // Check if any critical feature failed
-        const failures = results.filter((result) => result.status === 'rejected');
+        const failures = results.filter(result => result.status === 'rejected');
         if (failures.length > 0) {
           throw new Error(`${failures.length} core features failed to initialize`);
         }
 
         return true;
       },
-      (error) =>
+      error =>
         // Continue with degraded functionality on core feature failure
         false,
       {
@@ -172,7 +172,7 @@ export class AppController {
         context: {
           operation: 'core_features_init',
         },
-      },
+      }
     );
   }
 
@@ -186,7 +186,7 @@ export class AppController {
         await this.advancedFeaturesManager.initialize();
         return true;
       },
-      (error) =>
+      error =>
         // Advanced features failure doesn't block core functionality
         false,
       {
@@ -195,7 +195,7 @@ export class AppController {
         context: {
           operation: 'advanced_features_init',
         },
-      },
+      }
     );
   }
 

@@ -11,7 +11,11 @@
 
 import { predictComaIch, predictLimitedIch, predictFullStroke } from '../api/client.js';
 import { authManager } from '../auth/authentication.js';
-import { calculateICHVolume, calculateHemorrhageSizePercent, testVolumeCalculator } from '../logic/ich-volume-calculator.js';
+import {
+  calculateICHVolume,
+  calculateHemorrhageSizePercent,
+  testVolumeCalculator,
+} from '../logic/ich-volume-calculator.js';
 import { medicalSyncManager } from '../sync/medical-sync-manager.js';
 import { medicalSWManager } from '../workers/sw-manager.js';
 
@@ -28,7 +32,7 @@ class UnhandledPromiseTracker {
 
   setupTracking() {
     // Track unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.unhandledRejections.push({
         reason: event.reason,
         promise: event.promise,
@@ -43,7 +47,7 @@ class UnhandledPromiseTracker {
     });
 
     // Track handled rejections (for completeness)
-    window.addEventListener('rejectionhandled', (event) => {
+    window.addEventListener('rejectionhandled', event => {
       console.info('✅ Promise rejection was handled:', event.reason);
     });
   }
@@ -105,7 +109,7 @@ export class ErrorHandlingTestSuite {
       await this.testUIErrorBoundaries();
 
       // Wait for any pending promises to settle
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Check for unhandled rejections
       this.testResults.unhandledRejections = this.tracker.getUnhandledRejections().length;
@@ -122,11 +126,18 @@ export class ErrorHandlingTestSuite {
       console.info('🏁 Error handling test suite completed:', summary);
 
       if (summary.success) {
-        console.info('✅ ALL TESTS PASSED - Application is bulletproof for investor demonstrations!');
+        console.info(
+          '✅ ALL TESTS PASSED - Application is bulletproof for investor demonstrations!'
+        );
       } else {
-        console.error('❌ TESTS FAILED - Critical issues found that could cause crashes during demos!');
+        console.error(
+          '❌ TESTS FAILED - Critical issues found that could cause crashes during demos!'
+        );
         if (summary.unhandledRejections > 0) {
-          console.error('🔴 UNHANDLED PROMISE REJECTIONS DETECTED:', summary.unhandledRejectionDetails);
+          console.error(
+            '🔴 UNHANDLED PROMISE REJECTIONS DETECTED:',
+            summary.unhandledRejectionDetails
+          );
         }
       }
 
@@ -454,15 +465,24 @@ export class ErrorHandlingTestSuite {
     const recommendations = [];
 
     if (this.testResults.failed > 0) {
-      recommendations.push('🔴 CRITICAL: Fix failing error handling tests before investor demonstrations');
+      recommendations.push(
+        '🔴 CRITICAL: Fix failing error handling tests before investor demonstrations'
+      );
     }
 
     if (this.tracker.hasUnhandledRejections()) {
-      recommendations.push('🔴 CRITICAL: Unhandled promise rejections detected - these will cause crashes');
+      recommendations.push(
+        '🔴 CRITICAL: Unhandled promise rejections detected - these will cause crashes'
+      );
     }
 
-    if (this.testResults.passed === this.testResults.total && !this.tracker.hasUnhandledRejections()) {
-      recommendations.push('✅ EXCELLENT: All error handling tests passed - application is investor-ready');
+    if (
+      this.testResults.passed === this.testResults.total &&
+      !this.tracker.hasUnhandledRejections()
+    ) {
+      recommendations.push(
+        '✅ EXCELLENT: All error handling tests passed - application is investor-ready'
+      );
     }
 
     return recommendations;

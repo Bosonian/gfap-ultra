@@ -1,5 +1,7 @@
 // Localization messages for the Stroke Triage Assistant
 
+import { data } from 'autoprefixer';
+
 export const messages = {
   en: {
     // Header
@@ -213,9 +215,11 @@ export const messages = {
 
     // Disclaimer
     disclaimer: 'Clinical Disclaimer',
-    disclaimerText: 'This tool is for clinical decision support only. Always use clinical judgment and follow local protocols. Not a replacement for physician assessment.',
+    disclaimerText:
+      'This tool is for clinical decision support only. Always use clinical judgment and follow local protocols. Not a replacement for physician assessment.',
     importantNote: 'Important',
-    importantText: 'These results are for clinical decision support only. Always use clinical judgment and follow institutional protocols.',
+    importantText:
+      'These results are for clinical decision support only. Always use clinical judgment and follow institutional protocols.',
 
     // ICH Volume and Mortality
     predictedMortality: 'Predicted 30-day mortality',
@@ -232,8 +236,10 @@ export const messages = {
     versionLink: 'Version 2.1.0 - Research Preview',
 
     // Privacy and disclaimers
-    privacyPolicy: 'Privacy Policy: This tool processes data locally. No patient data is stored or transmitted.',
-    medicalDisclaimer: 'Medical Disclaimer: This tool is for clinical decision support only. Always use clinical judgment and follow local protocols.',
+    privacyPolicy:
+      'Privacy Policy: This tool processes data locally. No patient data is stored or transmitted.',
+    medicalDisclaimer:
+      'Medical Disclaimer: This tool is for clinical decision support only. Always use clinical judgment and follow local protocols.',
 
     // Error messages
     networkError: 'Network error - please check your connection and try again',
@@ -262,10 +268,13 @@ export const messages = {
     locationUnavailable: 'Location information is unavailable',
     locationTimeout: 'Location request timed out',
     geolocationNotSupported: 'Geolocation is not supported by this browser',
-    geocodingNotImplemented: 'Location search not available. Please use GPS or enter coordinates manually.',
+    geocodingNotImplemented:
+      'Location search not available. Please use GPS or enter coordinates manually.',
     tryManualEntry: 'Try entering your location manually or use GPS.',
-    distanceNote: 'Distances are calculated as straight-line distances. Actual travel times may vary.',
-    travelTimeNote: 'Travel times calculated for emergency vehicles with sirens and priority routing.',
+    distanceNote:
+      'Distances are calculated as straight-line distances. Actual travel times may vary.',
+    travelTimeNote:
+      'Travel times calculated for emergency vehicles with sirens and priority routing.',
     calculatingTravelTimes: 'Calculating travel times',
     minutes: 'min',
     poweredByOrs: 'Travel times powered by OpenRoute Service',
@@ -299,9 +308,30 @@ export const messages = {
     // Differential Diagnoses for Stroke Modules
     differentialDiagnoses: 'Differential Diagnoses',
     reconfirmTimeWindow: 'Please reconfirm time window!',
-    unclearTimeWindow: 'With unclear/extended time window, early demarcated brain infarction is also possible',
+    unclearTimeWindow:
+      'With unclear/extended time window, early demarcated brain infarction is also possible',
     rareDiagnoses: 'Rare diagnoses such as glioblastoma are also possible',
 
+    // login Screen
+    researchAccessRequired: 'Research Access Required',
+    researchrPreviewValidation:
+      'This is a research preview of the iGFAP Stroke Triage Assistant for clinical validation.',
+    importantNotice: 'Important Notice',
+    researchUseOnly: 'Research Use Only',
+    noClinicalDecision: ' Not for clinical decision making',
+    noDataStorage: 'No Patient Data Storage',
+    dataProcessedLocally: ' All data processed locally',
+    clinicalAdvisory: 'Clinical Advisory',
+    supervision: 'Under supervision of Prof. Christian Förch & Dr. Lovepreet Kalra',
+    contact: 'Contact',
+    accessCode: 'Research Access Code',
+    accessCodePlaceholder: 'Enter research access code',
+    accessResearchBtn: 'Access Research System',
+    regulatoryStatus: 'Regulatory Status',
+    protoTypeOnly: 'Research prototype - CE certification pending',
+    dataProtection: 'Data Protection',
+    gdprComplaint: 'GDPR compliant - local processing only',
+    clinicalOversight: 'Clinical Oversight',
   },
 
   de: {
@@ -516,9 +546,11 @@ export const messages = {
 
     // Disclaimer
     disclaimer: 'Klinischer Haftungsausschluss',
-    disclaimerText: 'Dieses Tool dient nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie lokale Protokolle. Kein Ersatz für ärztliche Beurteilung.',
+    disclaimerText:
+      'Dieses Tool dient nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie lokale Protokolle. Kein Ersatz für ärztliche Beurteilung.',
     importantNote: 'Wichtig',
-    importantText: 'Diese Ergebnisse dienen nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie institutionelle Protokolle.',
+    importantText:
+      'Diese Ergebnisse dienen nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie institutionelle Protokolle.',
 
     // ICH Volume and Mortality
     predictedMortality: 'Vorhergesagte 30-Tage-Mortalität',
@@ -535,11 +567,14 @@ export const messages = {
     versionLink: 'Version 2.1.0 - Research Preview',
 
     // Privacy and disclaimers
-    privacyPolicy: 'Datenschutzrichtlinie: Dieses Tool verarbeitet Daten lokal. Keine Patientendaten werden gespeichert oder übertragen.',
-    medicalDisclaimer: 'Medizinischer Haftungsausschluss: Dieses Tool dient nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie lokale Protokolle.',
+    privacyPolicy:
+      'Datenschutzrichtlinie: Dieses Tool verarbeitet Daten lokal. Keine Patientendaten werden gespeichert oder übertragen.',
+    medicalDisclaimer:
+      'Medizinischer Haftungsausschluss: Dieses Tool dient nur zur klinischen Entscheidungsunterstützung. Verwenden Sie immer klinisches Urteilsvermögen und befolgen Sie lokale Protokolle.',
 
     // Error messages
-    networkError: 'Netzwerkfehler - bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut',
+    networkError:
+      'Netzwerkfehler - bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut',
     requestTimeout: 'Anfrage-Timeout - bitte versuchen Sie es erneut',
     apiError: 'Ergebnisse konnten nicht abgerufen werden',
     validationError: 'Bitte überprüfen Sie Ihre Eingabewerte',
@@ -561,14 +596,18 @@ export const messages = {
     gettingLocation: 'Standort wird ermittelt',
     searchingLocation: 'Standort wird gesucht',
     locationError: 'Standort konnte nicht ermittelt werden',
-    locationPermissionDenied: 'Standortzugriff verweigert. Bitte erlauben Sie Standortzugriff und versuchen Sie es erneut.',
+    locationPermissionDenied:
+      'Standortzugriff verweigert. Bitte erlauben Sie Standortzugriff und versuchen Sie es erneut.',
     locationUnavailable: 'Standortinformationen sind nicht verfügbar',
     locationTimeout: 'Standortanfrage ist abgelaufen',
     geolocationNotSupported: 'Geolokalisierung wird von diesem Browser nicht unterstützt',
-    geocodingNotImplemented: 'Standortsuche nicht verfügbar. Bitte verwenden Sie GPS oder geben Sie Koordinaten manuell ein.',
+    geocodingNotImplemented:
+      'Standortsuche nicht verfügbar. Bitte verwenden Sie GPS oder geben Sie Koordinaten manuell ein.',
     tryManualEntry: 'Versuchen Sie, Ihren Standort manuell einzugeben oder GPS zu verwenden.',
-    distanceNote: 'Entfernungen werden als Luftlinie berechnet. Tatsächliche Fahrzeiten können variieren.',
-    travelTimeNote: 'Fahrzeiten berechnet für Rettungsfahrzeuge mit Sondersignalen und Vorfahrtsberechtigung.',
+    distanceNote:
+      'Entfernungen werden als Luftlinie berechnet. Tatsächliche Fahrzeiten können variieren.',
+    travelTimeNote:
+      'Fahrzeiten berechnet für Rettungsfahrzeuge mit Sondersignalen und Vorfahrtsberechtigung.',
     calculatingTravelTimes: 'Fahrzeiten werden berechnet',
     minutes: 'Min',
     poweredByOrs: 'Fahrzeiten bereitgestellt von OpenRoute Service',
@@ -602,8 +641,29 @@ export const messages = {
     // Differential Diagnoses for Stroke Modules
     differentialDiagnoses: 'Differentialdiagnosen',
     reconfirmTimeWindow: 'Bitte Zeitfenster rekonfirmieren!',
-    unclearTimeWindow: 'Bei unklarem/erweitertem Zeitfenster ist auch ein beginnend demarkierter Hirninfarkt möglich',
+    unclearTimeWindow:
+      'Bei unklarem/erweitertem Zeitfenster ist auch ein beginnend demarkierter Hirninfarkt möglich',
     rareDiagnoses: 'Seltene Diagnosen wie ein Glioblastom sind auch möglich',
 
+    // login Screen
+    researchAccessRequired: 'Forschungszugang erforderlich',
+    researchrPreviewValidation:
+      'Dies ist eine Forschungsvorschau des iGFAP Stroke Triage Assistant zur klinischen Validierung.',
+    importantNotice: 'Wichtiger Hinweis',
+    researchUseOnly: 'Nur für Forschungszwecke',
+    noClinicalDecision: ' Nicht für klinische Entscheidungen',
+    noDataStorage: 'Keine Speicherung von Patientendaten',
+    dataProcessedLocally: 'Alle Daten werden lokal verarbeitet',
+    clinicalAdvisory: 'Klinischer Hinweis',
+    supervision: 'Unter Aufsicht von Prof. Christian Förch und Dr. Lovepreet Kalra',
+    contact: 'Kontakt',
+    accessCode: 'Forschungszugangscode',
+    accessCodePlaceholder: 'Forschungszugangscode eingeben',
+    accessResearchBtn: 'Forschungssystem zugreifen',
+    regulatoryStatus: 'Regulatorischer Status',
+    protoTypeOnly: 'Research prototype - CE certification pending',
+    dataProtection: 'Daten- und Datenschutz',
+    gdprComplaint: 'DSGVO-konform - nur lokale Verarbeitung',
+    clinicalOversight: 'Klinische Aufsicht',
   },
 };

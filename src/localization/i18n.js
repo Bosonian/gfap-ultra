@@ -36,9 +36,11 @@ class I18n {
       localStorage.setItem('language', language);
 
       // Dispatch custom event for language change
-      window.dispatchEvent(new CustomEvent('languageChanged', {
-        detail: { language },
-      }));
+      window.dispatchEvent(
+        new CustomEvent('languageChanged', {
+          detail: { language },
+        })
+      );
 
       return true;
     }
@@ -103,4 +105,4 @@ const i18n = new I18n();
 export { i18n, I18n };
 
 // Export convenience function for translation
-export const t = (key) => i18n.t(key);
+export const t = key => i18n.t(key);
