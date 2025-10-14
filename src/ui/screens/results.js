@@ -504,7 +504,7 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       ? "risk-results-single"
       : cardCount === 2
         ? "risk-results-dual"
-        : "risk-results-triple space-y-3";
+        : "risk-results-triple";
 
   // Add differential diagnoses for stroke modules
   const strokeDifferentialHtml = renderStrokeDifferentialDiagnoses(ich.probability);
@@ -521,7 +521,7 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       ${criticalAlert}
       
       <!-- Risk Assessment Display -->
-      <div class="${layoutClass}">
+      <div class="${layoutClass} gap-3 flex flex-col mb-6">
         ${renderRiskCard("ich", ich, results)}
         ${showLVORiskCard ? renderRiskCard("lvo", lvo, results) : ""}
         ${showVolumeCard ? renderVolumeCard(ich) : ""}

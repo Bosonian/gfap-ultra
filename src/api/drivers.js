@@ -18,13 +18,11 @@ export function extractDriversFromResponse(response, predictionType) {
 
   // Convert flat dictionary to structured format
   const formattedDrivers = formatDriversFromDictionary(rawDrivers, predictionType);
-
   // Check for FAST-ED specifically
   const allFeatures = [...formattedDrivers.positive, ...formattedDrivers.negative];
-  const fastEdFeature = allFeatures.find((f) => f.label && (
-    f.label.toLowerCase().includes("fast")
-      || f.label.includes("fast_ed")
-  ));
+  const fastEdFeature = allFeatures.find(
+    f => f.label && (f.label.toLowerCase().includes("fast") || f.label.includes("fast_ed"))
+  );
 
   // FAST-ED feature detection for validation
 

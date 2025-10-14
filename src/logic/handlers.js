@@ -1,7 +1,5 @@
 import { store } from "../state/store.js";
-import {
-  predictComaIch, predictLimitedIch, predictFullStroke, APIError,
-} from "../api/client.js";
+import { predictComaIch, predictLimitedIch, predictFullStroke, APIError } from "../api/client.js";
 import { t } from "../localization/i18n.js";
 import { showPrerequisitesModal } from "../ui/components/prerequisites-modal.js";
 import { safeSetInnerHTML } from "../security/html-sanitizer.js";
@@ -95,7 +93,7 @@ export async function handleSubmit(e, container) {
   const inputs = {};
 
   // Process all form elements to ensure checkboxes are included
-  Array.from(form.elements).forEach((element) => {
+  Array.from(form.elements).forEach(element => {
     if (element.name) {
       if (element.type === "checkbox") {
         inputs[element.name] = element.checked;
@@ -138,56 +136,56 @@ export async function handleSubmit(e, container) {
     let results;
 
     switch (module) {
-    case "coma":
-      const comaResult = await predictComaIch(inputs);
-      results = {
-        ich: {
-          ...comaResult,
-          module: "Coma",
-        },
-        lvo: null,
-      };
-      break;
+      case "coma":
+        const comaResult = await predictComaIch(inputs);
+        results = {
+          ich: {
+            ...comaResult,
+            module: "Coma",
+          },
+          lvo: null,
+        };
+        break;
 
-    case "limited":
-      const limitedResult = await predictLimitedIch(inputs);
-      results = {
-        ich: {
-          ...limitedResult,
-          module: "Limited",
-        },
-        lvo: { notPossible: true },
-      };
-      break;
+      case "limited":
+        const limitedResult = await predictLimitedIch(inputs);
+        results = {
+          ich: {
+            ...limitedResult,
+            module: "Limited",
+          },
+          lvo: { notPossible: true },
+        };
+        break;
 
-    case "full":
-      results = await predictFullStroke(inputs);
-      console.log("[Submit] Full results:", {
-        ich: !!results?.ich,
-        lvo: !!results?.lvo,
-        ichP: results?.ich?.probability,
-        lvoP: results?.lvo?.probability,
-      });
-      // Validate results structure
-      if (!results || !results.ich) {
-        throw new Error("Invalid response structure from Full Stroke API");
-      }
-      // Fix ICH probability mapping for Full Stroke
-      if (results.ich && !results.ich.probability && results.ich.ich_probability !== undefined) {
-        results.ich.probability = results.ich.ich_probability;
-        console.log("[Submit] Fixed ICH probability for Full Stroke:", results.ich.probability);
-      }
-      // Ensure module property is set
-      if (results.ich && !results.ich.module) {
-        results.ich.module = "Full Stroke";
-      }
-      if (results.lvo && !results.lvo.module) {
-        results.lvo.module = "Full Stroke";
-      }
-      break;
+      case "full":
+        results = await predictFullStroke(inputs);
+        console.log("[Submit] Full results:", {
+          ich: !!results?.ich,
+          lvo: !!results?.lvo,
+          ichP: results?.ich?.probability,
+          lvoP: results?.lvo?.probability,
+        });
+        // Validate results structure
+        if (!results || !results.ich) {
+          throw new Error("Invalid response structure from Full Stroke API");
+        }
+        // Fix ICH probability mapping for Full Stroke
+        if (results.ich && !results.ich.probability && results.ich.ich_probability !== undefined) {
+          results.ich.probability = results.ich.ich_probability;
+          console.log("[Submit] Fixed ICH probability for Full Stroke:", results.ich.probability);
+        }
+        // Ensure module property is set
+        if (results.ich && !results.ich.module) {
+          results.ich.module = "Full Stroke";
+        }
+        if (results.lvo && !results.lvo.module) {
+          results.lvo.module = "Full Stroke";
+        }
+        break;
 
-    default:
-      throw new Error(`Unknown module: ${module}`);
+      default:
+        throw new Error(`Unknown module: ${module}`);
     }
 
     console.log("[Submit] Setting results in store:", results);
@@ -218,7 +216,9 @@ export async function handleSubmit(e, container) {
     }, 0);
   } catch (error) {
     // Error running models - handle gracefully, with Full module fallback in preview
-    const isLocalPreview = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+    const isLocalPreview =
+      ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) &&
+      !(import.meta && import.meta.env && import.meta.env.DEV);
     if (module === "full" && isLocalPreview) {
       try {
         const m = DEV_CONFIG.mockApiResponses.full_stroke;
@@ -270,7 +270,7 @@ export async function handleSubmit(e, container) {
 
 function showError(container, message) {
   // Remove existing error alerts
-  container.querySelectorAll(".critical-alert").forEach((alert) => {
+  container.querySelectorAll(".critical-alert").forEach(alert => {
     if (alert.querySelector("h4")?.textContent?.includes("Error")) {
       alert.remove();
     }

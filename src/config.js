@@ -2,7 +2,7 @@
 
 // Development mode detection (prefer Vite flag, fallback to hostname)
 // Only treat Vite dev server as development; preview uses production settings
-const isDevelopment = true;
+const isDevelopment = !!(import.meta && import.meta.env && import.meta.env.DEV);
 
 // Mock authentication for local development
 const MOCK_AUTH_SUCCESS = {

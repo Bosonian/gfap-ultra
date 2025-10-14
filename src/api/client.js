@@ -16,7 +16,11 @@
 import { API_URLS, APP_CONFIG, DEV_CONFIG } from "../config.js";
 import { lvoProbability, lvoClass } from "../lib/lvoModel.js";
 
-import { extractDriversFromResponse, extractProbabilityFromResponse, extractConfidenceFromResponse } from "./drivers.js";
+import {
+  extractDriversFromResponse,
+  extractProbabilityFromResponse,
+  extractConfidenceFromResponse,
+} from "./drivers.js";
 
 // APIError class for medical API errors
 export class APIError extends Error {
@@ -75,9 +79,9 @@ const clientHelpers = {
     return isNaN(parsed) ? defaultValue : parsed;
   },
 
-  normalizeBooleans: (payload) => {
+  normalizeBooleans: payload => {
     const normalized = { ...payload };
-    Object.keys(normalized).forEach((key) => {
+    Object.keys(normalized).forEach(key => {
       if (normalized[key] === "true" || normalized[key] === true) {
         normalized[key] = 1;
       } else if (normalized[key] === "false" || normalized[key] === false) {
@@ -116,7 +120,7 @@ const clientHelpers = {
         throw new MedicalAPIError(
           `API request failed: ${response.status} ${response.statusText} - ${errorText}`,
           response.status,
-          endpoint,
+          endpoint
         );
       }
 
@@ -131,7 +135,10 @@ const clientHelpers = {
       // Normalize response: some APIs return "ich_probability" instead of "probability"
       if (!result.probability && result.ich_probability !== undefined) {
         result.probability = result.ich_probability;
-        console.log(`[API] ${endpointType} normalized probability from ich_probability:`, result.probability);
+        console.log(
+          `[API] ${endpointType} normalized probability from ich_probability:`,
+          result.probability
+        );
       }
 
       return result;
@@ -146,11 +153,7 @@ const clientHelpers = {
       }
 
       console.error(`[API] ${endpointType} request failed:`, error);
-      throw new MedicalAPIError(
-        `Network error: ${error.message}`,
-        0,
-        endpoint,
-      );
+      throw new MedicalAPIError(`Network error: ${error.message}`, 0, endpoint);
     }
   },
 
@@ -190,7 +193,7 @@ export async function warmUpFunctions() {
   ];
 
   const warmUpPromises = prioritizedUrls.map(async (url, index) => {
-    await new Promise((resolve) => setTimeout(resolve, index * 200));
+    await new Promise(resolve => setTimeout(resolve, index * 200));
 
     try {
       const controller = new AbortController();
@@ -212,11 +215,13 @@ export async function warmUpFunctions() {
     }
   });
 
-  Promise.all(warmUpPromises).then(() => {
-    console.log("✅ Cloud Functions warm-up complete");
-  }).catch(() => {
-    // Silently handle errors
-  });
+  Promise.all(warmUpPromises)
+    .then(() => {
+      console.log("✅ Cloud Functions warm-up complete");
+    })
+    .catch(() => {
+      // Silently handle errors
+    });
 }
 
 /**
@@ -273,7 +278,7 @@ export async function predictLVO(payload, retryCount = 0) {
     throw new MedicalAPIError(
       "Missing required parameters: gfap_value and fast_ed_score",
       400,
-      API_URLS.LVO_PREDICTION,
+      API_URLS.LVO_PREDICTION
     );
   }
 
@@ -326,7 +331,7 @@ export async function predictLVO(payload, retryCount = 0) {
       throw new MedicalAPIError(
         `LVO prediction failed: ${error.message}`,
         error.status || 500,
-        API_URLS.LVO_PREDICTION,
+        API_URLS.LVO_PREDICTION
       );
     }
   }
@@ -352,36 +357,45 @@ export async function predictFullStroke(payload, retryCount = 0) {
     console.log("[API] Extracted ICH data:", ichResult);
 
     // Get LVO prediction using enhanced LVO function
-    let lvoResult = null;
-    try {
-      console.log("🔄 Using dedicated LVO prediction (cloud function + fallback)");
-      lvoResult = await predictLVO(payload);
-      console.log("✅ LVO prediction successful via dedicated function");
-    } catch (lvoError) {
-      console.warn("⚠️ Dedicated LVO prediction failed:", lvoError);
+    let lvoResult = fullStrokeResponse.lvo_prediction || {};
+    // try {
+    //   console.log("🔄 Using dedicated LVO prediction (cloud function + fallback)");
+    //   lvoResult = await predictLVO(payload);
+    //   console.log("✅ LVO prediction successful via dedicated function");
+    // } catch (lvoError) {
+    //   console.warn("⚠️ Dedicated LVO prediction failed:", lvoError);
 
-      // Fallback: try to extract LVO from full stroke response if available
-      if (ichResult.lvo_prediction) {
-        lvoResult = {
-          probability: ichResult.lvo_prediction.probability || 0,
-          drivers: ichResult.lvo_prediction.drivers || null,
-          confidence: ichResult.lvo_prediction.confidence || 0.8,
-          module: "Full Stroke (API Fallback)",
-        };
-      } else {
-        // Final fallback to local LVO model
-        lvoResult = await predictLVO(payload);
-      }
-    }
+    //   // Fallback: try to extract LVO from full stroke response if available
+    //   if (ichResult.lvo_prediction) {
+    //     lvoResult = {
+    //       probability: ichResult.lvo_prediction.probability || 0,
+    //       drivers: ichResult.lvo_prediction.drivers || null,
+    //       confidence: ichResult.lvo_prediction.confidence || 0.8,
+    //       module: "Full Stroke (API Fallback)",
+    //     };
+    //   } else {
+    //     // Final fallback to local LVO model
+    //     lvoResult = await predictLVO(payload);
+    //   }
+    // }
 
     return {
       ich: {
         probability: ichResult.probability,
-        drivers: ichResult.drivers ? formatDriversFromDict(ichResult.drivers, "ICH") : ichResult.drivers,
+        drivers: ichResult.drivers
+          ? formatDriversFromDict(ichResult.drivers, "ICH")
+          : ichResult.drivers,
         confidence: ichResult.confidence,
         module: ichResult.module,
       },
-      lvo: lvoResult,
+      lvo: {
+        probability: lvoResult.probability,
+        drivers: lvoResult.drivers
+          ? formatDriversFromDict(lvoResult.drivers, "LVO")
+          : lvoResult.drivers,
+        confidence: lvoResult.confidence,
+        module: lvoResult.module,
+      },
     };
   } catch (error) {
     console.error("Full Stroke prediction failed:", error);
@@ -416,7 +430,7 @@ export async function predictFullStroke(payload, retryCount = 0) {
     throw new MedicalAPIError(
       `Failed to get stroke predictions: ${error.message}`,
       error.status,
-      API_URLS.FULL_STROKE,
+      API_URLS.FULL_STROKE
     );
   }
 }
@@ -432,8 +446,9 @@ function isLocalPreview() {
 /**
  * Re-export utility functions for backward compatibility
  */
-export const normalizeBooleans = (payload) => clientHelpers.normalizeBooleans(payload);
-export const safeParseFloat = (value, defaultValue) => clientHelpers.safeParseFloat(value, defaultValue);
+export const normalizeBooleans = payload => clientHelpers.normalizeBooleans(payload);
+export const safeParseFloat = (value, defaultValue) =>
+  clientHelpers.safeParseFloat(value, defaultValue);
 
 /**
  * Get API client statistics for monitoring

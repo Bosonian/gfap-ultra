@@ -11,12 +11,19 @@ export function renderDriversSection(ich, lvo) {
   }
 
   let html = `
-    <div class="drivers-section">
-      <div class="drivers-header">
-        <h3><span class="driver-header-icon">🎯</span> ${t("riskAnalysis")}</h3>
-        <p class="drivers-subtitle">${t("riskAnalysisSubtitle")}</p>
+    <div class="drivers-section bg-white p-6 md:p-8 rounded-2xl shadow-sm drivers-section">
+      <div class="drivers-header flex flex-col md:flex-row md:items-center md:justify-between gap-3 drivers-header">
+        <div class="flex items-start md:items-center gap-3">
+          <h3 class="driver-title text-lg md:text-xl font-semibold leading-tight flex items-center gap-2">
+            <span class="driver-header-icon text-2xl">🎯</span>
+            ${t("riskAnalysis")}
+          </h3>
+          <p class="drivers-subtitle text-sm text-gray-500 mt-1 md:mt-0">${t("riskAnalysisSubtitle")}</p>
+        </div>
+        <!-- place for header actions (optional) -->
+        <div class="drivers-actions flex items-center gap-2"></div>
       </div>
-      <div class="enhanced-drivers-grid">
+      <div class="enhanced-drivers-grid grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-4 mt-6 enhanced-drivers-grid">
   `;
 
   console.log("[Drivers] ICH has drivers:", !!ich?.drivers, ich?.drivers);
