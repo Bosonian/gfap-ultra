@@ -307,14 +307,22 @@ export function renderCompactBrainIcon(volume, size = 24) {
  * @returns {string} HTML for circular brain display
  */
 export function renderCircularBrainDisplay(volume) {
+  if (!volume || volume <= 0) {
+    return `
+      <div class="volume-circle text-center" data-volume="0">
+        <div class="volume-number">0<span> ml</span></div>
+        <canvas class="volume-canvas" width="120" height="120"></canvas>
+      </div>
+    `;
+  }
+
   const formattedVolume = formatVolumeDisplay(volume);
   const canvasId = `volume-canvas-${Math.random().toString(36).substr(2, 9)}`;
 
   return `
-    <div class="volume-circle" data-volume="${volume}">
-      <div class="volume-number text-center">${formattedVolume}</div>
-      <canvas id="${canvasId}" class="volume-canvas"
-              width="120" height="120"
+    <div class="volume-circle text-center" data-volume="${volume}">
+      <div class="volume-number">${formattedVolume}</div>
+      <canvas id="${canvasId}" class="volume-canvas" 
               data-volume="${volume}" data-canvas-id="${canvasId}"></canvas>
     </div>
   `;
@@ -376,11 +384,8 @@ function drawVolumeFluid(canvas, volume) {
     // Calculate fill level based on volume
     const maxVolume = 80; // ml (practical maximum for visualization)
     const fillPercentage = Math.min(volume / maxVolume, 0.9);
-    const minFill = 8; // pixels above bottom so even small volumes show
-    const fillHeight = Math.max(minFill, fillPercentage * (radius * 1.8));
+    const fillHeight = fillPercentage * (radius * 1.8);
     const baseLevel = centerY + radius - 4 - fillHeight;
-    // const fillHeight = fillPercentage * (radius * 1.8);
-    // const baseLevel = centerY + radius - 4 - fillHeight;
 
     // Draw fluid fill with waves
     if (volume > 0) {
@@ -434,7 +439,7 @@ function drawVolumeFluid(canvas, volume) {
     ctx.globalAlpha = 1;
 
     // Draw volume progress ring (like ICH risk circle)
-    const volumePercent = Math.min(volume / maxVolume, 1); // Max 100ml = 100%
+    const volumePercent = Math.min(volume / 100, 1); // Max 100ml = 100%
     const circumference = 2 * Math.PI * radius;
     const progressOffset = circumference * (1 - volumePercent);
 
