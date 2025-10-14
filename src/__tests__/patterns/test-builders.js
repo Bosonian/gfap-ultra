@@ -5,9 +5,9 @@
  * Provides fluent builders for creating test data and scenarios
  */
 
-import { MedicalValidationFactory } from '../../patterns/validation-factory.js';
-import { PREDICTION_STRATEGIES } from '../../patterns/prediction-strategy.js';
-import { GFAP_RANGES } from '../../config.js';
+import { MedicalValidationFactory } from "../../patterns/validation-factory.js";
+import { PREDICTION_STRATEGIES } from "../../patterns/prediction-strategy.js";
+import { GFAP_RANGES } from "../../config.js";
 
 /**
  * Builder for creating medical patient test data
@@ -140,7 +140,7 @@ export class PatientDataBuilder {
    * @returns {PatientDataBuilder} Builder instance
    */
   asMale() {
-    return this.withGender('male');
+    return this.withGender("male");
   }
 
   /**
@@ -148,7 +148,7 @@ export class PatientDataBuilder {
    * @returns {PatientDataBuilder} Builder instance
    */
   asFemale() {
-    return this.withGender('female');
+    return this.withGender("female");
   }
 
   /**
@@ -272,14 +272,14 @@ export class PatientDataBuilder {
    */
   getStrategyForModule(moduleType) {
     switch (moduleType) {
-      case 'coma':
-        return PREDICTION_STRATEGIES.COMA_ICH;
-      case 'limited':
-        return PREDICTION_STRATEGIES.LIMITED_DATA_ICH;
-      case 'full':
-        return PREDICTION_STRATEGIES.FULL_STROKE;
-      default:
-        throw new Error(`Unknown module type: ${moduleType}`);
+    case "coma":
+      return PREDICTION_STRATEGIES.COMA_ICH;
+    case "limited":
+      return PREDICTION_STRATEGIES.LIMITED_DATA_ICH;
+    case "full":
+      return PREDICTION_STRATEGIES.FULL_STROKE;
+    default:
+      throw new Error(`Unknown module type: ${moduleType}`);
     }
   }
 
@@ -339,8 +339,8 @@ export class MedicalTestScenarioBuilder {
     this.scenarios = [];
     this.setup = null;
     this.teardown = null;
-    this.name = '';
-    this.description = '';
+    this.name = "";
+    this.description = "";
   }
 
   /**
@@ -349,7 +349,7 @@ export class MedicalTestScenarioBuilder {
    * @param {string} description - Scenario description
    * @returns {MedicalTestScenarioBuilder} Builder instance
    */
-  named(name, description = '') {
+  named(name, description = "") {
     this.name = name;
     this.description = description;
     return this;
@@ -394,7 +394,7 @@ export class MedicalTestScenarioBuilder {
    */
   addValidationTest(name, patientData, expectations) {
     return this.addTestCase({
-      type: 'validation',
+      type: "validation",
       name,
       patientData,
       expectations,
@@ -411,7 +411,7 @@ export class MedicalTestScenarioBuilder {
    */
   addPredictionTest(name, patientData, strategy, expectations) {
     return this.addTestCase({
-      type: 'prediction',
+      type: "prediction",
       name,
       patientData,
       strategy,
@@ -447,7 +447,7 @@ export class MedicalTestScenarioBuilder {
    */
   static validationScenario() {
     return new MedicalTestScenarioBuilder()
-      .named('Medical Validation Tests', 'Comprehensive validation testing for medical inputs');
+      .named("Medical Validation Tests", "Comprehensive validation testing for medical inputs");
   }
 
   /**
@@ -456,7 +456,7 @@ export class MedicalTestScenarioBuilder {
    */
   static predictionScenario() {
     return new MedicalTestScenarioBuilder()
-      .named('Medical Prediction Tests', 'End-to-end prediction testing for medical modules');
+      .named("Medical Prediction Tests", "End-to-end prediction testing for medical modules");
   }
 }
 
@@ -502,7 +502,7 @@ export class MockServiceBuilder {
       mockApi.predictFullStroke.mockResolvedValue(responses.full);
     }
 
-    return this.mockService('medical.api.client', mockApi);
+    return this.mockService("medical.api.client", mockApi);
   }
 
   /**
@@ -516,7 +516,7 @@ export class MockServiceBuilder {
       validateModule: jest.fn(),
     };
 
-    return this.mockService('medical.validation.factory', mockFactory);
+    return this.mockService("medical.validation.factory", mockFactory);
   }
 
   /**
@@ -531,7 +531,7 @@ export class MockServiceBuilder {
       clearAll: jest.fn(),
     };
 
-    return this.mockService('medical.event.observer', mockObserver);
+    return this.mockService("medical.event.observer", mockObserver);
   }
 
   /**
@@ -571,6 +571,6 @@ export const CommonTestData = {
   validAdultPatient: () => PatientDataBuilder.validAdultStrokePatient().build(),
   comatosePatient: () => PatientDataBuilder.comatosePatient().build(),
   pediatricPatient: () => PatientDataBuilder.pediatricPatient().build(),
-  invalidBloodPressure: () => PatientDataBuilder.create().withInvalidBloodPressure().shouldBeInvalid(['systolic_bp', 'diastolic_bp']).build(),
+  invalidBloodPressure: () => PatientDataBuilder.create().withInvalidBloodPressure().shouldBeInvalid(["systolic_bp", "diastolic_bp"]).build(),
   extremelyHighGfap: () => PatientDataBuilder.create().withExtremelyHighGfap().shouldBeValid().build(),
 };

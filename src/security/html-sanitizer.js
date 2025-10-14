@@ -12,65 +12,134 @@
  * Allowed HTML tags for medical content
  */
 const ALLOWED_TAGS = [
-  'p', 'div', 'span', 'br', 'strong', 'b', 'em', 'i', 'u',
-  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-  'ul', 'ol', 'li',
-  'table', 'tr', 'td', 'th', 'thead', 'tbody',
-  'small', 'sub', 'sup',
-  'button', 'input', 'form', 'label', 'select', 'option', 'textarea',
-  'a', 'img', 'canvas', 'svg', 'path', 'circle', 'rect', 'line', 'g',
+  "p",
+  "div",
+  "span",
+  "br",
+  "strong",
+  "b",
+  "em",
+  "i",
+  "u",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "ul",
+  "ol",
+  "li",
+  "table",
+  "tr",
+  "td",
+  "th",
+  "thead",
+  "tbody",
+  "small",
+  "sub",
+  "sup",
+  "button",
+  "input",
+  "form",
+  "label",
+  "select",
+  "option",
+  "textarea",
+  "a",
+  "img",
+  "canvas",
+  "svg",
+  "path",
+  "circle",
+  "rect",
+  "line",
+  "g",
 ];
 
 /**
  * Allowed attributes for HTML tags
  */
 const ALLOWED_ATTRIBUTES = {
-  div: ['class', 'id', 'style', 'data-id', 'data-action', 'data-value', 'data-module', 'data-target'],
-  span: ['class', 'id', 'style', 'data-id'],
-  p: ['class', 'style'],
-  strong: ['class'],
-  b: ['class'],
-  em: ['class'],
-  i: ['class'],
-  table: ['class'],
-  tr: ['class'],
-  td: ['class', 'colspan', 'rowspan'],
-  th: ['class', 'colspan', 'rowspan'],
-  ul: ['class'],
-  ol: ['class'],
-  li: ['class'],
-  h1: ['class'],
-  h2: ['class'],
-  h3: ['class'],
-  h4: ['class'],
-  h5: ['class'],
-  h6: ['class'],
-  small: ['class'],
-  button: ['class', 'id', 'type', 'data-action', 'data-value', 'data-target', 'disabled'],
-  input: ['class', 'id', 'type', 'name', 'value', 'placeholder', 'required', 'data-module', 'autocomplete', 'readonly', 'checked', 'min', 'max', 'step', 'aria-describedby'],
-  form: ['class', 'id', 'data-module', 'action', 'method'],
-  label: ['class', 'for'],
-  select: ['class', 'id', 'name', 'required'],
-  option: ['value', 'selected'],
-  textarea: ['class', 'id', 'name', 'placeholder', 'required', 'rows', 'cols'],
-  a: ['href', 'target', 'class', 'id'],
-  img: ['src', 'alt', 'class', 'id', 'width', 'height'],
-  canvas: ['class', 'id', 'width', 'height'],
-  svg: ['class', 'id', 'width', 'height', 'viewBox', 'xmlns'],
-  path: ['d', 'fill', 'stroke', 'stroke-width', 'class'],
-  circle: ['cx', 'cy', 'r', 'fill', 'stroke', 'stroke-width', 'class'],
-  rect: ['x', 'y', 'width', 'height', 'fill', 'stroke', 'stroke-width', 'class'],
-  line: ['x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'class'],
-  g: ['class', 'transform'],
+  div: [
+    "class",
+    "id",
+    "style",
+    "data-id",
+    "data-action",
+    "data-value",
+    "data-module",
+    "data-target",
+  ],
+  span: ["class", "id", "style", "data-id"],
+  p: ["class", "style"],
+  strong: ["class"],
+  b: ["class"],
+  em: ["class"],
+  i: ["class"],
+  table: ["class"],
+  tr: ["class"],
+  td: ["class", "colspan", "rowspan"],
+  th: ["class", "colspan", "rowspan"],
+  ul: ["class"],
+  ol: ["class"],
+  li: ["class"],
+  h1: ["class"],
+  h2: ["class"],
+  h3: ["class"],
+  h4: ["class"],
+  h5: ["class"],
+  h6: ["class"],
+  small: ["class"],
+  button: ["class", "id", "type", "data-action", "data-value", "data-target", "disabled"],
+  input: [
+    "class",
+    "id",
+    "type",
+    "name",
+    "value",
+    "placeholder",
+    "required",
+    "data-module",
+    "autocomplete",
+    "readonly",
+    "checked",
+    "min",
+    "max",
+    "step",
+    "aria-describedby",
+  ],
+  form: ["class", "id", "data-module", "action", "method"],
+  label: ["class", "for"],
+  select: ["class", "id", "name", "required"],
+  option: ["value", "selected"],
+  textarea: ["class", "id", "name", "placeholder", "required", "rows", "cols"],
+  a: ["href", "target", "class", "id"],
+  img: ["src", "alt", "class", "id", "width", "height"],
+  canvas: ["class", "id", "width", "height"],
+  svg: ["class", "id", "width", "height", "viewBox", "xmlns"],
+  path: ["d", "fill", "stroke", "stroke-width", "class"],
+  circle: ["cx", "cy", "r", "fill", "stroke", "stroke-width", "class"],
+  rect: ["x", "y", "width", "height", "fill", "stroke", "stroke-width", "class"],
+  line: ["x1", "y1", "x2", "y2", "stroke", "stroke-width", "class"],
+  g: ["class", "transform"],
 };
 
 /**
  * Allowed CSS properties for style attributes
  */
 const ALLOWED_STYLES = [
-  'color', 'background-color', 'font-size', 'font-weight',
-  'text-align', 'margin', 'padding', 'border',
-  'display', 'visibility', 'opacity',
+  "color",
+  "background-color",
+  "font-size",
+  "font-weight",
+  "text-align",
+  "margin",
+  "padding",
+  "border",
+  "display",
+  "visibility",
+  "opacity",
 ];
 
 /**
@@ -80,23 +149,23 @@ const ALLOWED_STYLES = [
  * @returns {string} - Sanitized HTML
  */
 export function sanitizeHTML(html, options = {}) {
-  if (typeof html !== 'string') {
-    return '';
+  if (typeof html !== "string") {
+    return "";
   }
 
   // Basic XSS pattern detection
   if (containsXSSPatterns(html)) {
-    throw new Error('Potentially malicious content detected');
+    throw new Error("Potentially malicious content detected");
   }
 
   // Use browser's DOMParser for parsing
   const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
+  const doc = parser.parseFromString(html, "text/html");
 
   // Check for parsing errors
-  const parserError = doc.querySelector('parsererror');
+  const parserError = doc.querySelector("parsererror");
   if (parserError) {
-    throw new Error('Invalid HTML content');
+    throw new Error("Invalid HTML content");
   }
 
   // Sanitize the document
@@ -122,7 +191,7 @@ function containsXSSPatterns(html) {
     /<link\b(?![^>]*rel=["']manifest)/gi, // Allow manifest links
   ];
 
-  return xssPatterns.some((pattern) => pattern.test(html));
+  return xssPatterns.some(pattern => pattern.test(html));
 }
 
 /**
@@ -160,7 +229,7 @@ function sanitizeNode(node, options) {
   }
 
   // Remove flagged nodes
-  nodesToRemove.forEach((nodeToRemove) => {
+  nodesToRemove.forEach(nodeToRemove => {
     node.removeChild(nodeToRemove);
   });
 }
@@ -180,13 +249,13 @@ function sanitizeAttributes(element) {
     const attrName = attr.name.toLowerCase();
 
     // Allow any data-* attribute for component islands and UI hooks
-    const isDataAttr = attrName.startsWith('data-');
+    const isDataAttr = attrName.startsWith("data-");
 
     if (!allowedAttrs.includes(attrName) && !isDataAttr) {
       attrsToRemove.push(attrName);
-    } else if (attrName === 'style') {
+    } else if (attrName === "style") {
       // Sanitize style attribute
-      element.setAttribute('style', sanitizeStyleAttribute(attr.value));
+      element.setAttribute("style", sanitizeStyleAttribute(attr.value));
     } else {
       // Escape attribute value
       element.setAttribute(attrName, escapeAttributeValue(attr.value));
@@ -194,7 +263,7 @@ function sanitizeAttributes(element) {
   }
 
   // Remove disallowed attributes
-  attrsToRemove.forEach((attrName) => {
+  attrsToRemove.forEach(attrName => {
     element.removeAttribute(attrName);
   });
 }
@@ -206,24 +275,24 @@ function sanitizeAttributes(element) {
  */
 function sanitizeStyleAttribute(styleValue) {
   if (!styleValue) {
-    return '';
+    return "";
   }
 
-  const styles = styleValue.split(';');
+  const styles = styleValue.split(";");
   const sanitizedStyles = [];
 
-  styles.forEach((style) => {
-    const [property, value] = style.split(':').map((s) => s.trim());
+  styles.forEach(style => {
+    const [property, value] = style.split(":").map(s => s.trim());
 
     if (property && value && ALLOWED_STYLES.includes(property.toLowerCase())) {
       // Basic CSS injection prevention
-      if (!value.includes('javascript:') && !value.includes('expression(')) {
+      if (!value.includes("javascript:") && !value.includes("expression(")) {
         sanitizedStyles.push(`${property}: ${value}`);
       }
     }
   });
 
-  return sanitizedStyles.join('; ');
+  return sanitizedStyles.join("; ");
 }
 
 /**
@@ -233,16 +302,16 @@ function sanitizeStyleAttribute(styleValue) {
  */
 function escapeTextContent(text) {
   if (!text) {
-    return '';
+    return "";
   }
 
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;");
 }
 
 /**
@@ -252,15 +321,15 @@ function escapeTextContent(text) {
  */
 function escapeAttributeValue(value) {
   if (!value) {
-    return '';
+    return "";
   }
 
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 /**
@@ -270,7 +339,7 @@ function escapeAttributeValue(value) {
  * @param {Object} options - Sanitization options
  */
 export function safeSetInnerHTML(element, html, options = {}) {
-  if (!element || typeof html !== 'string') {
+  if (!element || typeof html !== "string") {
     return;
   }
 
@@ -278,8 +347,9 @@ export function safeSetInnerHTML(element, html, options = {}) {
     const sanitizedHTML = sanitizeHTML(html, options);
     element.innerHTML = sanitizedHTML;
   } catch (error) {
+    console.log("errro while setting html");
     // Fallback to text content on sanitization error
-    element.textContent = html.replace(/<[^>]*>/g, '');
+    element.textContent = html.replace(/<[^>]*>/g, "");
     throw new Error(`HTML sanitization failed: ${error.message}`);
   }
 }
@@ -291,23 +361,23 @@ export function safeSetInnerHTML(element, html, options = {}) {
  * @returns {string} - Safe HTML string
  */
 export function createSafeHTML(template, data = {}) {
-  if (typeof template !== 'string') {
-    return '';
+  if (typeof template !== "string") {
+    return "";
   }
 
   // Basic template interpolation with escaping
   let html = template;
 
-  Object.keys(data).forEach((key) => {
-    const placeholder = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g');
+  Object.keys(data).forEach(key => {
+    const placeholder = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, "g");
     const value = data[key];
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       html = html.replace(placeholder, escapeTextContent(value));
-    } else if (typeof value === 'number') {
+    } else if (typeof value === "number") {
       html = html.replace(placeholder, value.toString());
     } else {
-      html = html.replace(placeholder, '');
+      html = html.replace(placeholder, "");
     }
   });
 

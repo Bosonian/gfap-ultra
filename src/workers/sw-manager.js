@@ -5,9 +5,12 @@
  * Manages service worker lifecycle and offline capabilities
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from '../patterns/observer.js';
-import { medicalPerformanceMonitor, PerformanceMetricType } from '../performance/medical-performance-monitor.js';
-import { safeSetInnerHTML } from '../security/html-sanitizer.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
+import {
+  medicalPerformanceMonitor,
+  PerformanceMetricType,
+} from "../performance/medical-performance-monitor.js";
+import { safeSetInnerHTML } from "../security/html-sanitizer.js";
 
 // Bulletproof error handling utilities
 import {
@@ -16,7 +19,7 @@ import {
   ERROR_CATEGORIES,
   ERROR_SEVERITY,
   MEDICAL_ERROR_CODES,
-} from '../utils/error-handler.js';
+} from "../utils/error-handler.js";
 
 /**
  * Service Worker Manager Class
@@ -40,41 +43,43 @@ export class MedicalServiceWorkerManager {
   async initialize() {
     return safeAsync(
       async () => {
-        if (!('serviceWorker' in navigator)) {
+        if (!("serviceWorker" in navigator)) {
           throw new MedicalError(
-            'Service Worker not supported in this browser',
-            'SW_NOT_SUPPORTED',
+            "Service Worker not supported in this browser",
+            "SW_NOT_SUPPORTED",
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.MEDIUM,
+            ERROR_SEVERITY.MEDIUM
           ).withContext({ userAgent: navigator.userAgent });
         }
 
         const metricId = medicalPerformanceMonitor.startMeasurement(
           PerformanceMetricType.USER_INTERACTION,
-          'service_worker_registration',
+          "service_worker_registration"
         );
 
         try {
           // Register service worker with timeout
           const registrationPromise = navigator.serviceWorker.register(
-            '/0925/src/workers/medical-service-worker.js',
+            "/0925/src/workers/medical-service-worker.js",
             {
-              scope: '/0925/',
-              updateViaCache: 'none',
-            },
+              scope: "/0925/",
+              updateViaCache: "none",
+            }
           );
 
           this.registration = await Promise.race([
             registrationPromise,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Service Worker registration timeout')), 30000)),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Service Worker registration timeout")), 30000)
+            ),
           ]);
 
           if (!this.registration) {
             throw new MedicalError(
-              'Service Worker registration returned null',
-              'SW_REGISTRATION_NULL',
+              "Service Worker registration returned null",
+              "SW_REGISTRATION_NULL",
               ERROR_CATEGORIES.STORAGE,
-              ERROR_SEVERITY.HIGH,
+              ERROR_SEVERITY.HIGH
             );
           }
 
@@ -82,15 +87,19 @@ export class MedicalServiceWorkerManager {
 
           // Setup components with error handling
           await Promise.allSettled([
-            safeAsync(() => this.setupUpdateDetection(), null, { operation: 'setup_update_detection' }),
-            safeAsync(() => this.setupMessageHandler(), null, { operation: 'setup_message_handler' }),
-            safeAsync(() => this.checkForUpdates(), null, { operation: 'initial_update_check' }),
+            safeAsync(() => this.setupUpdateDetection(), null, {
+              operation: "setup_update_detection",
+            }),
+            safeAsync(() => this.setupMessageHandler(), null, {
+              operation: "setup_message_handler",
+            }),
+            safeAsync(() => this.checkForUpdates(), null, { operation: "initial_update_check" }),
           ]);
 
           medicalPerformanceMonitor.endMeasurement(metricId, { success: true });
 
           medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-            action: 'sw_registered',
+            action: "sw_registered",
             scope: this.registration.scope,
           });
 
@@ -104,11 +113,11 @@ export class MedicalServiceWorkerManager {
           throw error;
         }
       },
-      (error) => {
-        console.error('Service Worker initialization failed:', error.message);
+      error => {
+        console.error("Service Worker initialization failed:", error.message);
 
         medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-          action: 'sw_registration_failed',
+          action: "sw_registration_failed",
           error: error.message,
           context: error.context || {},
         });
@@ -120,9 +129,9 @@ export class MedicalServiceWorkerManager {
         severity: ERROR_SEVERITY.MEDIUM,
         timeout: 35000,
         context: {
-          operation: 'service_worker_initialization',
+          operation: "service_worker_initialization",
         },
-      },
+      }
     );
   }
 
@@ -131,29 +140,32 @@ export class MedicalServiceWorkerManager {
    */
   setupEventListeners() {
     // Online/offline detection
-    window.addEventListener('online', () => {
+    window.addEventListener("online", () => {
       this.isOnline = true;
       this.handleOnlineStatusChange(true);
     });
 
-    window.addEventListener('offline', () => {
+    window.addEventListener("offline", () => {
       this.isOnline = false;
       this.handleOnlineStatusChange(false);
     });
 
     // Page visibility for update checks
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       if (!document.hidden && this.isUpdateCheckEnabled) {
         this.checkForUpdates();
       }
     });
 
     // Periodic update checks
-    setInterval(() => {
-      if (this.isUpdateCheckEnabled && this.isOnline) {
-        this.checkForUpdates();
-      }
-    }, 5 * 60 * 1000); // Check every 5 minutes
+    setInterval(
+      () => {
+        if (this.isUpdateCheckEnabled && this.isOnline) {
+          this.checkForUpdates();
+        }
+      },
+      5 * 60 * 1000
+    ); // Check every 5 minutes
   }
 
   /**
@@ -165,11 +177,11 @@ export class MedicalServiceWorkerManager {
     }
 
     // Listen for new service worker installing
-    this.registration.addEventListener('updatefound', () => {
+    this.registration.addEventListener("updatefound", () => {
       const newWorker = this.registration.installing;
 
-      newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
           // New update available
           this.updateAvailable = true;
           this.notifyUpdateAvailable();
@@ -178,7 +190,7 @@ export class MedicalServiceWorkerManager {
     });
 
     // Listen for service worker taking control
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
       window.location.reload();
     });
   }
@@ -187,28 +199,28 @@ export class MedicalServiceWorkerManager {
    * Setup message handler for service worker communication
    */
   setupMessageHandler() {
-    navigator.serviceWorker.addEventListener('message', (event) => {
+    navigator.serviceWorker.addEventListener("message", event => {
       const { type, data } = event.data;
 
       switch (type) {
-        case 'SW_INSTALLED':
-          this.handleServiceWorkerInstalled(data);
-          break;
+      case "SW_INSTALLED":
+        this.handleServiceWorkerInstalled(data);
+        break;
 
-        case 'SW_ACTIVATED':
-          this.handleServiceWorkerActivated(data);
-          break;
+      case "SW_ACTIVATED":
+        this.handleServiceWorkerActivated(data);
+        break;
 
-        case 'SW_INSTALL_ERROR':
-          this.handleServiceWorkerError(data);
-          break;
+      case "SW_INSTALL_ERROR":
+        this.handleServiceWorkerError(data);
+        break;
 
-        case 'MEDICAL_DATA_SYNCED':
-          this.handleMedicalDataSynced(data);
-          break;
+      case "MEDICAL_DATA_SYNCED":
+        this.handleMedicalDataSynced(data);
+        break;
 
-        default:
-          // ('Unknown service worker message:', type, data);
+      default:
+        // ('Unknown service worker message:', type, data);
       }
     });
   }
@@ -222,44 +234,42 @@ export class MedicalServiceWorkerManager {
         // (`🌐 Network status: ${isOnline ? 'Online' : 'Offline'}`);
 
         medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-          action: 'network_status_changed',
+          action: "network_status_changed",
           isOnline,
           timestamp: new Date().toISOString(),
         });
 
         // Show user notification with error handling
-        await safeAsync(
-          () => this.showNetworkStatusNotification(isOnline),
-          null,
-          { operation: 'show_network_notification' },
-        );
+        await safeAsync(() => this.showNetworkStatusNotification(isOnline), null, {
+          operation: "show_network_notification",
+        });
 
         // Trigger background sync when coming back online
-        if (isOnline && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        if (isOnline && "serviceWorker" in navigator && navigator.serviceWorker.controller) {
           await safeAsync(
             async () => {
               const registration = await navigator.serviceWorker.ready;
-              if ('sync' in registration) {
-                return registration.sync.register('medical-data-sync');
+              if ("sync" in registration) {
+                return registration.sync.register("medical-data-sync");
               }
             },
-            (error) => {
-              console.warn('Background sync registration failed:', error.message);
+            error => {
+              console.warn("Background sync registration failed:", error.message);
             },
             {
-              operation: 'background_sync_registration',
+              operation: "background_sync_registration",
               timeout: 5000,
-            },
+            }
           );
         }
       },
-      (error) => {
-        console.error('Error handling network status change:', error.message);
+      error => {
+        console.error("Error handling network status change:", error.message);
       },
       {
-        operation: 'handle_network_status_change',
+        operation: "handle_network_status_change",
         isOnline,
-      },
+      }
     );
   }
 
@@ -271,46 +281,52 @@ export class MedicalServiceWorkerManager {
       async () => {
         if (!document || !document.body) {
           throw new MedicalError(
-            'Document not available for notification',
-            'DOCUMENT_UNAVAILABLE',
+            "Document not available for notification",
+            "DOCUMENT_UNAVAILABLE",
             ERROR_CATEGORIES.RENDERING,
-            ERROR_SEVERITY.LOW,
+            ERROR_SEVERITY.LOW
           );
         }
 
-        const notification = document.createElement('div');
+        const notification = document.createElement("div");
         if (!notification) {
           throw new MedicalError(
-            'Failed to create notification element',
-            'ELEMENT_CREATION_FAILED',
+            "Failed to create notification element",
+            "ELEMENT_CREATION_FAILED",
             ERROR_CATEGORIES.RENDERING,
-            ERROR_SEVERITY.LOW,
+            ERROR_SEVERITY.LOW
           );
         }
 
-        notification.className = `network-notification ${isOnline ? 'online' : 'offline'}`;
+        notification.className = `network-notification ${isOnline ? "online" : "offline"}`;
 
         try {
-          safeSetInnerHTML(notification, `
+          safeSetInnerHTML(
+            notification,
+            `
             <div class="notification-content">
-              <span class="notification-icon">${isOnline ? '🌐' : '📴'}</span>
+              <span class="notification-icon">${isOnline ? "🌐" : "📴"}</span>
               <span class="notification-text">
-                ${isOnline ? 'Connection restored' : 'Working offline'}
+                ${isOnline ? "Connection restored" : "Working offline"}
               </span>
             </div>
-          `);
+          `
+          );
         } catch (htmlError) {
-          console.warn('Network notification sanitization failed, using fallback:', htmlError.message);
-          notification.textContent = isOnline ? '🌐 Connection restored' : '📴 Working offline';
+          console.warn(
+            "Network notification sanitization failed, using fallback:",
+            htmlError.message
+          );
+          notification.textContent = isOnline ? "🌐 Connection restored" : "📴 Working offline";
         }
 
         // Check if body is still available before appending
         if (!document.body) {
           throw new MedicalError(
-            'Document body not available when appending notification',
-            'BODY_UNAVAILABLE',
+            "Document body not available when appending notification",
+            "BODY_UNAVAILABLE",
             ERROR_CATEGORIES.RENDERING,
-            ERROR_SEVERITY.LOW,
+            ERROR_SEVERITY.LOW
           );
         }
 
@@ -325,18 +341,18 @@ export class MedicalServiceWorkerManager {
               }
             },
             null,
-            { operation: 'remove_notification' },
+            { operation: "remove_notification" }
           );
         }, 3000);
 
         return notification;
       },
-      (error) => {
-        console.warn('Failed to show network status notification:', error.message);
+      error => {
+        console.warn("Failed to show network status notification:", error.message);
         // Try simple fallback notification
         try {
           if (console && console.info) {
-            console.info(`Network status: ${isOnline ? 'Online' : 'Offline'}`);
+            console.info(`Network status: ${isOnline ? "Online" : "Offline"}`);
           }
         } catch (fallbackError) {
           // Even console failed, nothing more we can do
@@ -344,9 +360,9 @@ export class MedicalServiceWorkerManager {
         return null;
       },
       {
-        operation: 'show_network_notification',
+        operation: "show_network_notification",
         isOnline,
-      },
+      }
     );
   }
 
@@ -358,16 +374,18 @@ export class MedicalServiceWorkerManager {
       async () => {
         if (!this.registration) {
           throw new MedicalError(
-            'No service worker registration available for update check',
-            'NO_REGISTRATION',
+            "No service worker registration available for update check",
+            "NO_REGISTRATION",
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.LOW,
+            ERROR_SEVERITY.LOW
           );
         }
 
         // Add timeout to update check
         const updatePromise = this.registration.update();
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Update check timeout')), 10000));
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Update check timeout")), 10000)
+        );
 
         await Promise.race([updatePromise, timeoutPromise]);
 
@@ -376,8 +394,8 @@ export class MedicalServiceWorkerManager {
 
         return true;
       },
-      (error) => {
-        console.warn('Update check failed:', error.message);
+      error => {
+        console.warn("Update check failed:", error.message);
 
         this.retryCount++;
         if (this.retryCount < this.maxRetries) {
@@ -385,16 +403,15 @@ export class MedicalServiceWorkerManager {
           const retryDelay = Math.min(5000 * 2 ** (this.retryCount - 1), 30000);
 
           setTimeout(() => {
-            safeAsync(
-              () => this.checkForUpdates(),
-              null,
-              { operation: 'retry_update_check', retryCount: this.retryCount },
-            );
+            safeAsync(() => this.checkForUpdates(), null, {
+              operation: "retry_update_check",
+              retryCount: this.retryCount,
+            });
           }, retryDelay);
         } else {
           console.error(`Update check failed after ${this.maxRetries} retries`);
           medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-            action: 'sw_update_check_failed',
+            action: "sw_update_check_failed",
             retryCount: this.retryCount,
             error: error.message,
           });
@@ -403,9 +420,9 @@ export class MedicalServiceWorkerManager {
         return false;
       },
       {
-        operation: 'service_worker_update_check',
+        operation: "service_worker_update_check",
         retryCount: this.retryCount,
-      },
+      }
     );
   }
 
@@ -420,11 +437,11 @@ export class MedicalServiceWorkerManager {
     try {
       // Send message to service worker to skip waiting
       if (this.registration.waiting) {
-        this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        this.registration.waiting.postMessage({ type: "SKIP_WAITING" });
       }
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'sw_update_applied',
+        action: "sw_update_applied",
       });
     } catch (error) {
       // ('Failed to apply update:', error);
@@ -438,7 +455,7 @@ export class MedicalServiceWorkerManager {
     // ('📱 App update available');
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'sw_update_available',
+      action: "sw_update_available",
     });
 
     // Show update notification
@@ -449,10 +466,12 @@ export class MedicalServiceWorkerManager {
    * Show update notification to user
    */
   showUpdateNotification() {
-    const notification = document.createElement('div');
-    notification.className = 'update-notification';
+    const notification = document.createElement("div");
+    notification.className = "update-notification";
     try {
-      safeSetInnerHTML(notification, `
+      safeSetInnerHTML(
+        notification,
+        `
         <div class="notification-content">
           <span class="notification-icon">🔄</span>
           <span class="notification-text">App update available</span>
@@ -460,11 +479,12 @@ export class MedicalServiceWorkerManager {
             Update Now
           </button>
         </div>
-      `);
+      `
+      );
     } catch (error) {
-      console.error('Update notification sanitization failed:', error);
+      console.error("Update notification sanitization failed:", error);
       // Safe fallback using textContent only
-      notification.textContent = '🔄 App update available. Please refresh to update.';
+      notification.textContent = "🔄 App update available. Please refresh to update.";
     }
 
     document.body.appendChild(notification);
@@ -478,25 +498,25 @@ export class MedicalServiceWorkerManager {
       async () => {
         if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
           throw new MedicalError(
-            'Service worker controller not available',
-            'NO_SW_CONTROLLER',
+            "Service worker controller not available",
+            "NO_SW_CONTROLLER",
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.LOW,
+            ERROR_SEVERITY.LOW
           );
         }
 
         return new Promise((resolve, reject) => {
           const channel = new MessageChannel();
           const timeout = setTimeout(() => {
-            reject(new Error('Cache status request timeout'));
+            reject(new Error("Cache status request timeout"));
           }, 5000);
 
-          channel.port1.onmessage = (event) => {
+          channel.port1.onmessage = event => {
             clearTimeout(timeout);
             try {
               // Validate response structure
-              if (!event.data || typeof event.data !== 'object') {
-                throw new Error('Invalid cache status response format');
+              if (!event.data || typeof event.data !== "object") {
+                throw new Error("Invalid cache status response format");
               }
               resolve(event.data);
             } catch (error) {
@@ -504,24 +524,23 @@ export class MedicalServiceWorkerManager {
             }
           };
 
-          channel.port1.onerror = (error) => {
+          channel.port1.onerror = error => {
             clearTimeout(timeout);
-            reject(new Error(`Message channel error: ${error.message || 'Unknown error'}`));
+            reject(new Error(`Message channel error: ${error.message || "Unknown error"}`));
           };
 
           try {
-            navigator.serviceWorker.controller.postMessage(
-              { type: 'GET_CACHE_STATUS' },
-              [channel.port2],
-            );
+            navigator.serviceWorker.controller.postMessage({ type: "GET_CACHE_STATUS" }, [
+              channel.port2,
+            ]);
           } catch (postError) {
             clearTimeout(timeout);
             reject(new Error(`Failed to send cache status request: ${postError.message}`));
           }
         });
       },
-      (error) => {
-        console.warn('Failed to get cache status:', error.message);
+      error => {
+        console.warn("Failed to get cache status:", error.message);
         return {
           error: true,
           message: error.message,
@@ -529,8 +548,8 @@ export class MedicalServiceWorkerManager {
         };
       },
       {
-        operation: 'get_cache_status',
-      },
+        operation: "get_cache_status",
+      }
     );
   }
 
@@ -543,11 +562,11 @@ export class MedicalServiceWorkerManager {
     }
 
     navigator.serviceWorker.controller.postMessage({
-      type: 'CLEAR_CACHE',
+      type: "CLEAR_CACHE",
     });
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'sw_caches_cleared',
+      action: "sw_caches_cleared",
     });
   }
 
@@ -560,7 +579,7 @@ export class MedicalServiceWorkerManager {
     }
 
     navigator.serviceWorker.controller.postMessage({
-      type: 'PREFETCH_RESOURCES',
+      type: "PREFETCH_RESOURCES",
       data: { resources },
     });
   }
@@ -572,7 +591,7 @@ export class MedicalServiceWorkerManager {
     // ('✅ Service Worker installed:', data);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'sw_installed',
+      action: "sw_installed",
       cacheVersion: data.cacheVersion,
       criticalResourcesCount: data.criticalResourcesCount,
     });
@@ -585,7 +604,7 @@ export class MedicalServiceWorkerManager {
     // ('🚀 Service Worker activated:', data);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'sw_activated',
+      action: "sw_activated",
       cacheVersion: data.cacheVersion,
       cleanedCaches: data.cleanedCaches,
     });
@@ -598,7 +617,7 @@ export class MedicalServiceWorkerManager {
     // ('❌ Service Worker error:', data);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'sw_error',
+      action: "sw_error",
       error: data.error,
     });
   }
@@ -610,7 +629,7 @@ export class MedicalServiceWorkerManager {
     // ('🔄 Medical data synced:', data);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'medical_data_synced',
+      action: "medical_data_synced",
       timestamp: data.timestamp,
     });
   }
@@ -623,7 +642,7 @@ export class MedicalServiceWorkerManager {
       isOnline: this.isOnline,
       serviceWorkerActive: !!navigator.serviceWorker.controller,
       updateAvailable: this.updateAvailable,
-      cacheStatus: this.registration ? 'available' : 'unavailable',
+      cacheStatus: this.registration ? "available" : "unavailable",
     };
   }
 
@@ -634,7 +653,7 @@ export class MedicalServiceWorkerManager {
     this.isUpdateCheckEnabled = enabled;
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'sw_update_check_toggled',
+      action: "sw_update_check_toggled",
       enabled,
     });
   }
@@ -657,7 +676,7 @@ export class OfflineInstallPrompt {
    */
   setupInstallPrompt() {
     // Listen for install prompt
-    window.addEventListener('beforeinstallprompt', (event) => {
+    window.addEventListener("beforeinstallprompt", event => {
       event.preventDefault();
       this.installPromptEvent = event;
       this.isInstallable = true;
@@ -665,7 +684,7 @@ export class OfflineInstallPrompt {
       // ('📱 PWA install prompt available');
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'pwa_install_prompt_available',
+        action: "pwa_install_prompt_available",
       });
 
       // Show install banner after a delay
@@ -675,11 +694,11 @@ export class OfflineInstallPrompt {
     });
 
     // Listen for app installed
-    window.addEventListener('appinstalled', () => {
+    window.addEventListener("appinstalled", () => {
       // ('📱 PWA installed successfully');
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'pwa_installed',
+        action: "pwa_installed",
       });
 
       this.hideInstallBanner();
@@ -694,40 +713,40 @@ export class OfflineInstallPrompt {
       return;
     }
 
-    const banner = document.createElement('div');
-    banner.id = 'install-banner';
-    banner.className = 'install-banner';
+    const banner = document.createElement("div");
+    banner.id = "install-banner";
+    banner.className = "install-banner";
 
     // Create banner content manually to avoid HTML sanitization issues
-    const bannerContent = document.createElement('div');
-    bannerContent.className = 'banner-content';
+    const bannerContent = document.createElement("div");
+    bannerContent.className = "banner-content";
 
-    const bannerText = document.createElement('div');
-    bannerText.className = 'banner-text';
+    const bannerText = document.createElement("div");
+    bannerText.className = "banner-text";
 
-    const title = document.createElement('strong');
-    title.textContent = 'Install Stroke Triage Assistant';
+    const title = document.createElement("strong");
+    title.textContent = "Install Stroke Triage Assistant";
 
-    const description = document.createElement('p');
-    description.textContent = 'Get offline access and faster performance';
+    const description = document.createElement("p");
+    description.textContent = "Get offline access and faster performance";
 
     bannerText.appendChild(title);
     bannerText.appendChild(description);
 
-    const bannerActions = document.createElement('div');
-    bannerActions.className = 'banner-actions';
+    const bannerActions = document.createElement("div");
+    bannerActions.className = "banner-actions";
 
-    const installButton = document.createElement('button');
-    installButton.className = 'install-button';
-    installButton.textContent = 'Install';
-    installButton.addEventListener('click', () => {
+    const installButton = document.createElement("button");
+    installButton.className = "install-button";
+    installButton.textContent = "Install";
+    installButton.addEventListener("click", () => {
       this.promptInstall();
     });
 
-    const dismissButton = document.createElement('button');
-    dismissButton.className = 'dismiss-button';
-    dismissButton.textContent = '×';
-    dismissButton.addEventListener('click', () => {
+    const dismissButton = document.createElement("button");
+    dismissButton.className = "dismiss-button";
+    dismissButton.textContent = "×";
+    dismissButton.addEventListener("click", () => {
       this.hideInstallBanner();
     });
 
@@ -745,7 +764,7 @@ export class OfflineInstallPrompt {
    * Hide install banner
    */
   hideInstallBanner() {
-    const banner = document.getElementById('install-banner');
+    const banner = document.getElementById("install-banner");
     if (banner) {
       banner.remove();
     }
@@ -763,7 +782,7 @@ export class OfflineInstallPrompt {
       const result = await this.installPromptEvent.prompt();
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'pwa_install_prompted',
+        action: "pwa_install_prompted",
         outcome: result.outcome,
       });
 

@@ -3,7 +3,7 @@
 class Store {
   constructor() {
     this.state = {
-      currentScreen: 'login',
+      currentScreen: "login",
       results: null,
       sessionId: null,
       startTime: null,
@@ -25,12 +25,12 @@ class Store {
     const timestamp = Date.now();
     try {
       // Use cryptographically secure random values when available
-      if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      if (typeof crypto !== "undefined" && crypto.getRandomValues) {
         const randomBytes = new Uint8Array(8);
         crypto.getRandomValues(randomBytes);
         const randomHex = Array.from(randomBytes)
-          .map((b) => b.toString(16).padStart(2, '0'))
-          .join('');
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
         return `session_${timestamp}_${randomHex}`;
       }
     } catch {}
@@ -77,9 +77,9 @@ class Store {
       screenHistory: history,
     };
 
-    console.log('[Store] Setting new navigation state:', newState);
+    console.log("[Store] Setting new navigation state:", newState);
     this.setState(newState);
-    console.log('[Store] State after navigation:', this.state.currentScreen);
+    console.log("[Store] State after navigation:", this.state.currentScreen);
   }
 
   // Navigate back to previous screen
@@ -102,7 +102,7 @@ class Store {
   // Navigate to home screen
   goHome() {
     this.setState({
-      currentScreen: 'triage1',
+      currentScreen: "triage1",
       screenHistory: [],
     });
   }
@@ -142,7 +142,7 @@ class Store {
   // Reset to initial state
   reset() {
     const newState = {
-      currentScreen: 'triage1',
+      currentScreen: "triage1",
       results: null,
       sessionId: this.generateSessionId(),
       startTime: Date.now(),

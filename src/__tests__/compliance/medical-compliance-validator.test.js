@@ -9,20 +9,20 @@ import {
   ComplianceStatus,
   ViolationSeverity,
   ComplianceValidationError,
-} from '../../compliance/medical-compliance-validator.js';
+} from "../../compliance/medical-compliance-validator.js";
 
 // Mock dependencies
-jest.mock('../../security/environment.js', () => ({
+jest.mock("../../security/environment.js", () => ({
   EnvironmentConfig: {
     getInstance: jest.fn(() => ({
-      environment: 'test',
+      environment: "test",
       getSecurityConfig: jest.fn(() => ({
-        level: 'HIGH',
+        level: "HIGH",
         auditLogging: true,
         sessionTimeout: 3600000,
         maxLoginAttempts: 5,
         encryptionRequired: true,
-        encryptionKey: 'test_encryption_key_32_chars_long',
+        encryptionKey: "test_encryption_key_32_chars_long",
       })),
       getMedicalConfig: jest.fn(() => ({
         hipaaCompliance: true,
@@ -34,7 +34,7 @@ jest.mock('../../security/environment.js', () => ({
   },
 }));
 
-jest.mock('../../analytics/audit-trail.js', () => ({
+jest.mock("../../analytics/audit-trail.js", () => ({
   ClinicalAuditTrail: jest.fn().mockImplementation(() => ({
     logComplianceEvent: jest.fn(),
     logPatientDataAccess: jest.fn(),
@@ -53,7 +53,7 @@ jest.mock('../../analytics/audit-trail.js', () => ({
   })),
 }));
 
-describe('MedicalComplianceValidator', () => {
+describe("MedicalComplianceValidator", () => {
   let validator;
   let mockAuditTrail;
 
@@ -82,8 +82,8 @@ describe('MedicalComplianceValidator', () => {
     });
   });
 
-  describe('Initialization', () => {
-    test('should initialize with default configuration', () => {
+  describe("Initialization", () => {
+    test("should initialize with default configuration", () => {
       const defaultValidator = new MedicalComplianceValidator();
 
       expect(defaultValidator.config.enabledStandards).toContain(ComplianceStandard.HIPAA);
@@ -92,41 +92,41 @@ describe('MedicalComplianceValidator', () => {
       expect(defaultValidator.config.strictMode).toBe(true);
     });
 
-    test('should initialize with custom configuration', () => {
+    test("should initialize with custom configuration", () => {
       expect(validator.config.enabledStandards.length).toBe(3);
       expect(validator.config.auditTrail).toBe(mockAuditTrail);
       expect(validator.config.strictMode).toBe(true);
     });
 
-    test('should initialize compliance rule engines', () => {
+    test("should initialize compliance rule engines", () => {
       expect(validator.complianceRules[ComplianceStandard.HIPAA]).toBeDefined();
       expect(validator.complianceRules[ComplianceStandard.FDA_21CFR11]).toBeDefined();
       expect(validator.complianceRules[ComplianceStandard.GDPR]).toBeDefined();
     });
   });
 
-  describe('System Compliance Validation', () => {
-    test('should validate overall system compliance', async () => {
+  describe("System Compliance Validation", () => {
+    test("should validate overall system compliance", async () => {
       const result = await validator.validateSystemCompliance();
 
-      expect(result).toHaveProperty('timestamp');
-      expect(result).toHaveProperty('standards');
-      expect(result).toHaveProperty('overall');
-      expect(result).toHaveProperty('nextValidationDue');
+      expect(result).toHaveProperty("timestamp");
+      expect(result).toHaveProperty("standards");
+      expect(result).toHaveProperty("overall");
+      expect(result).toHaveProperty("nextValidationDue");
 
       expect(result.standards[ComplianceStandard.HIPAA]).toBeDefined();
       expect(result.standards[ComplianceStandard.FDA_21CFR11]).toBeDefined();
       expect(result.standards[ComplianceStandard.GDPR]).toBeDefined();
 
-      expect(result.overall).toHaveProperty('compliant');
-      expect(result.overall).toHaveProperty('violations');
-      expect(result.overall).toHaveProperty('warnings');
-      expect(result.overall).toHaveProperty('recommendations');
+      expect(result.overall).toHaveProperty("compliant");
+      expect(result.overall).toHaveProperty("violations");
+      expect(result.overall).toHaveProperty("warnings");
+      expect(result.overall).toHaveProperty("recommendations");
     });
 
-    test('should handle compliance validation errors gracefully', async () => {
+    test("should handle compliance validation errors gracefully", async () => {
       // Mock a validation error
-      validator.complianceRules[ComplianceStandard.HIPAA].validateDataProtection = jest.fn().mockRejectedValue(new Error('Validation service unavailable'));
+      validator.complianceRules[ComplianceStandard.HIPAA].validateDataProtection = jest.fn().mockRejectedValue(new Error("Validation service unavailable"));
 
       const result = await validator.validateSystemCompliance();
 
@@ -134,26 +134,26 @@ describe('MedicalComplianceValidator', () => {
       expect(result.overall.violations.length).toBeGreaterThan(0);
 
       const validationError = result.overall.violations.find(
-        v => v.type === 'validation_failure',
+        v => v.type === "validation_failure",
       );
       expect(validationError).toBeDefined();
       expect(validationError.standard).toBe(ComplianceStandard.HIPAA);
     });
 
-    test('should log compliance validation events', async () => {
+    test("should log compliance validation events", async () => {
       await validator.validateSystemCompliance();
 
       expect(mockAuditTrail.logComplianceEvent).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: 'system_compliance_validation',
+          type: "system_compliance_validation",
           standards: validator.config.enabledStandards,
         }),
       );
     });
   });
 
-  describe('Standard-Specific Validation', () => {
-    test('should validate individual compliance standards', async () => {
+  describe("Standard-Specific Validation", () => {
+    test("should validate individual compliance standards", async () => {
       const result = await validator.validateStandard(ComplianceStandard.HIPAA);
 
       expect(result.standard).toBe(ComplianceStandard.HIPAA);
@@ -162,16 +162,16 @@ describe('MedicalComplianceValidator', () => {
       expect(result.warnings).toBeDefined();
       expect(result.recommendations).toBeDefined();
       expect(result.validatedAt).toBeInstanceOf(Date);
-      expect(result.validatedBy).toBe('automated_compliance_validator');
+      expect(result.validatedBy).toBe("automated_compliance_validator");
     });
 
-    test('should throw error for unknown compliance standard', async () => {
+    test("should throw error for unknown compliance standard", async () => {
       await expect(
-        validator.validateStandard('UNKNOWN_STANDARD'),
+        validator.validateStandard("UNKNOWN_STANDARD"),
       ).rejects.toThrow(ComplianceValidationError);
     });
 
-    test('should cache validation results', async () => {
+    test("should cache validation results", async () => {
       await validator.validateStandard(ComplianceStandard.HIPAA);
       await validator.validateStandard(ComplianceStandard.FDA_21CFR11);
 
@@ -179,103 +179,103 @@ describe('MedicalComplianceValidator', () => {
     });
   });
 
-  describe('Patient Data Handling Validation', () => {
+  describe("Patient Data Handling Validation", () => {
     let mockPatientData;
     let mockUser;
 
     beforeEach(() => {
       mockPatientData = {
-        patientId: 'PT12345',
+        patientId: "PT12345",
         demographics: {
           age: 65,
-          gender: 'M',
+          gender: "M",
         },
         strokeAssessment: {
           nihssScore: 8,
           gfapLevel: 150.5,
         },
         sensitiveData: {
-          ssn: '123-45-6789',
-          insuranceNumber: 'INS987654',
+          ssn: "123-45-6789",
+          insuranceNumber: "INS987654",
         },
       };
 
       mockUser = {
-        userId: 'physician123',
-        role: 'physician',
-        department: 'neurology',
-        permissions: ['view_patient_data', 'create_assessments'],
+        userId: "physician123",
+        role: "physician",
+        department: "neurology",
+        permissions: ["view_patient_data", "create_assessments"],
       };
     });
 
-    test('should validate HIPAA minimum necessary compliance', async () => {
+    test("should validate HIPAA minimum necessary compliance", async () => {
       const result = await validator.validatePatientDataHandling(
         mockPatientData,
-        'view_assessment',
+        "view_assessment",
         mockUser,
       );
 
-      expect(result).toHaveProperty('compliant');
-      expect(result).toHaveProperty('violations');
-      expect(result).toHaveProperty('warnings');
-      expect(result).toHaveProperty('recommendations');
+      expect(result).toHaveProperty("compliant");
+      expect(result).toHaveProperty("violations");
+      expect(result).toHaveProperty("warnings");
+      expect(result).toHaveProperty("recommendations");
 
       expect(mockAuditTrail.logPatientDataAccess).toHaveBeenCalledWith(
         mockUser,
         mockPatientData.patientId,
         expect.objectContaining({
-          operation: 'view_assessment',
+          operation: "view_assessment",
           dataElements: Object.keys(mockPatientData),
         }),
       );
     });
 
-    test('should detect excessive data access violations', async () => {
+    test("should detect excessive data access violations", async () => {
       // Access more data than necessary for the operation
       const excessiveData = {
         ...mockPatientData,
-        fullMedicalHistory: 'extensive_history',
-        financialInformation: 'billing_data',
+        fullMedicalHistory: "extensive_history",
+        financialInformation: "billing_data",
       };
 
       const result = await validator.validatePatientDataHandling(
         excessiveData,
-        'view_assessment', // Should only need basic assessment data
+        "view_assessment", // Should only need basic assessment data
         mockUser,
       );
 
       const excessiveAccessViolation = result.violations.find(
-        v => v.type === 'excessive_data_access',
+        v => v.type === "excessive_data_access",
       );
       expect(excessiveAccessViolation).toBeDefined();
       expect(excessiveAccessViolation.standard).toBe(ComplianceStandard.HIPAA);
       expect(excessiveAccessViolation.severity).toBe(ViolationSeverity.MEDIUM);
     });
 
-    test('should validate user authorization for data access', async () => {
+    test("should validate user authorization for data access", async () => {
       const unauthorizedUser = {
-        userId: 'clerk123',
-        role: 'clerk',
-        permissions: ['view_basic_info'], // Limited permissions
+        userId: "clerk123",
+        role: "clerk",
+        permissions: ["view_basic_info"], // Limited permissions
       };
 
       const result = await validator.validatePatientDataHandling(
         mockPatientData,
-        'create_assessment', // Requires higher permissions
+        "create_assessment", // Requires higher permissions
         unauthorizedUser,
       );
 
       const authViolation = result.violations.find(
-        v => v.type === 'unauthorized_access',
+        v => v.type === "unauthorized_access",
       );
       expect(authViolation).toBeDefined();
       expect(authViolation.severity).toBe(ViolationSeverity.HIGH);
     });
 
-    test('should validate GDPR data minimization', async () => {
+    test("should validate GDPR data minimization", async () => {
       const result = await validator.validatePatientDataHandling(
         mockPatientData,
-        'research_analysis',
+        "research_analysis",
         mockUser,
       );
 
@@ -285,28 +285,28 @@ describe('MedicalComplianceValidator', () => {
       );
 
       if (gdprViolation) {
-        expect(gdprViolation.type).toBe('data_minimization_violation');
-        expect(gdprViolation.article).toBe('Article 5(1)(c)');
+        expect(gdprViolation.type).toBe("data_minimization_violation");
+        expect(gdprViolation.article).toBe("Article 5(1)(c)");
       }
     });
   });
 
-  describe('Clinical Decision Compliance Validation', () => {
+  describe("Clinical Decision Compliance Validation", () => {
     let mockDecision;
     let mockEvidence;
     let mockUser;
 
     beforeEach(() => {
       mockDecision = {
-        id: 'decision123',
-        type: 'treatment_recommendation',
-        recommendation: 'thrombolysis',
+        id: "decision123",
+        type: "treatment_recommendation",
+        recommendation: "thrombolysis",
         aiAssisted: true,
         electronicSignature: {
-          userId: 'physician123',
+          userId: "physician123",
           timestamp: new Date(),
-          hash: 'signature_hash_123',
-          biometricData: 'fingerprint_hash',
+          hash: "signature_hash_123",
+          biometricData: "fingerprint_hash",
         },
       };
 
@@ -319,30 +319,30 @@ describe('MedicalComplianceValidator', () => {
         },
         riskAnalysis: {
           completed: true,
-          riskLevel: 'medium',
-          mitigations: ['human_oversight', 'audit_trail'],
+          riskLevel: "medium",
+          mitigations: ["human_oversight", "audit_trail"],
         },
-        clinicalGuidelines: ['stroke_guidelines_2025'],
+        clinicalGuidelines: ["stroke_guidelines_2025"],
       };
 
       mockUser = {
-        userId: 'physician123',
-        role: 'physician',
-        department: 'neurology',
+        userId: "physician123",
+        role: "physician",
+        department: "neurology",
       };
     });
 
-    test('should validate FDA 21CFR11 electronic signature compliance', async () => {
+    test("should validate FDA 21CFR11 electronic signature compliance", async () => {
       const result = await validator.validateClinicalDecisionCompliance(
         mockDecision,
         mockEvidence,
         mockUser,
       );
 
-      expect(result).toHaveProperty('compliant');
-      expect(result).toHaveProperty('violations');
-      expect(result).toHaveProperty('warnings');
-      expect(result).toHaveProperty('decisionId');
+      expect(result).toHaveProperty("compliant");
+      expect(result).toHaveProperty("violations");
+      expect(result).toHaveProperty("warnings");
+      expect(result).toHaveProperty("decisionId");
 
       expect(mockAuditTrail.logClinicalDecision).toHaveBeenCalledWith(
         mockUser,
@@ -354,7 +354,7 @@ describe('MedicalComplianceValidator', () => {
       );
     });
 
-    test('should detect missing electronic signature violations', async () => {
+    test("should detect missing electronic signature violations", async () => {
       const decisionWithoutSignature = {
         ...mockDecision,
         electronicSignature: null,
@@ -367,15 +367,15 @@ describe('MedicalComplianceValidator', () => {
       );
 
       const signatureViolation = result.violations.find(
-        v => v.type === 'missing_electronic_signature',
+        v => v.type === "missing_electronic_signature",
       );
       expect(signatureViolation).toBeDefined();
       expect(signatureViolation.standard).toBe(ComplianceStandard.FDA_21CFR11);
       expect(signatureViolation.severity).toBe(ViolationSeverity.HIGH);
-      expect(signatureViolation.section).toBe('21CFR11.100');
+      expect(signatureViolation.section).toBe("21CFR11.100");
     });
 
-    test('should validate IEC 62304 algorithm validation requirements', async () => {
+    test("should validate IEC 62304 algorithm validation requirements", async () => {
       const insufficientEvidence = {
         ...mockEvidence,
         algorithmValidation: null,
@@ -389,20 +389,20 @@ describe('MedicalComplianceValidator', () => {
       );
 
       const algorithmViolation = result.violations.find(
-        v => v.type === 'insufficient_algorithm_validation',
+        v => v.type === "insufficient_algorithm_validation",
       );
       expect(algorithmViolation).toBeDefined();
       expect(algorithmViolation.standard).toBe(ComplianceStandard.IEC_62304);
-      expect(algorithmViolation.section).toBe('5.1.1');
+      expect(algorithmViolation.section).toBe("5.1.1");
     });
 
-    test('should validate electronic signature integrity', () => {
+    test("should validate electronic signature integrity", () => {
       const validSignature = mockDecision.electronicSignature;
       const isValid = validator.validateElectronicSignature(validSignature);
       expect(isValid).toBe(true);
 
       const invalidSignature = {
-        userId: 'physician123',
+        userId: "physician123",
         timestamp: new Date(),
         // Missing hash and biometric data
       };
@@ -411,43 +411,43 @@ describe('MedicalComplianceValidator', () => {
     });
   });
 
-  describe('Security Compliance Validation', () => {
-    test('should validate encryption compliance', async () => {
+  describe("Security Compliance Validation", () => {
+    test("should validate encryption compliance", async () => {
       const result = await validator.validateSecurityCompliance();
 
-      expect(result).toHaveProperty('compliant');
-      expect(result).toHaveProperty('violations');
-      expect(result).toHaveProperty('warnings');
-      expect(result).toHaveProperty('securityScore');
+      expect(result).toHaveProperty("compliant");
+      expect(result).toHaveProperty("violations");
+      expect(result).toHaveProperty("warnings");
+      expect(result).toHaveProperty("securityScore");
 
-      expect(typeof result.securityScore).toBe('number');
+      expect(typeof result.securityScore).toBe("number");
       expect(result.securityScore).toBeGreaterThanOrEqual(0);
       expect(result.securityScore).toBeLessThanOrEqual(100);
     });
 
-    test('should detect encryption compliance violations', async () => {
+    test("should detect encryption compliance violations", async () => {
       // Mock weak encryption configuration
       validator.environmentConfig.getSecurityConfig = jest.fn(() => ({
         encryptionRequired: false,
-        encryptionKey: 'short_key', // Too short
+        encryptionKey: "short_key", // Too short
       }));
 
       const result = await validator.validateSecurityCompliance();
 
       const encryptionViolation = result.violations.find(
-        v => v.type === 'encryption_at_rest_disabled',
+        v => v.type === "encryption_at_rest_disabled",
       );
       expect(encryptionViolation).toBeDefined();
       expect(encryptionViolation.severity).toBe(ViolationSeverity.CRITICAL);
 
       const weakKeyViolation = result.violations.find(
-        v => v.type === 'weak_encryption_key',
+        v => v.type === "weak_encryption_key",
       );
       expect(weakKeyViolation).toBeDefined();
       expect(weakKeyViolation.severity).toBe(ViolationSeverity.HIGH);
     });
 
-    test('should validate access control compliance', async () => {
+    test("should validate access control compliance", async () => {
       // Mock long session timeout
       validator.environmentConfig.getSecurityConfig = jest.fn(() => ({
         sessionTimeout: 7200000, // 2 hours - exceeds recommendation
@@ -457,17 +457,17 @@ describe('MedicalComplianceValidator', () => {
       const result = await validator.validateSecurityCompliance();
 
       const sessionWarning = result.warnings.find(
-        w => w.type === 'long_session_timeout',
+        w => w.type === "long_session_timeout",
       );
       expect(sessionWarning).toBeDefined();
 
       const loginWarning = result.warnings.find(
-        w => w.type === 'high_login_attempts',
+        w => w.type === "high_login_attempts",
       );
       expect(loginWarning).toBeDefined();
     });
 
-    test('should validate audit logging compliance', async () => {
+    test("should validate audit logging compliance", async () => {
       // Mock disabled audit trail
       mockAuditTrail.getStatus.mockResolvedValue({
         enabled: false,
@@ -476,13 +476,13 @@ describe('MedicalComplianceValidator', () => {
       const result = await validator.validateSecurityCompliance();
 
       const auditViolation = result.violations.find(
-        v => v.type === 'audit_trail_disabled',
+        v => v.type === "audit_trail_disabled",
       );
       expect(auditViolation).toBeDefined();
       expect(auditViolation.severity).toBe(ViolationSeverity.CRITICAL);
     });
 
-    test('should detect audit integrity issues', async () => {
+    test("should detect audit integrity issues", async () => {
       // Mock compromised audit integrity
       mockAuditTrail.verifyIntegrity.mockResolvedValue({
         integrityScore: 0.85, // Below 0.95 threshold
@@ -491,25 +491,25 @@ describe('MedicalComplianceValidator', () => {
       const result = await validator.validateSecurityCompliance();
 
       const integrityViolation = result.violations.find(
-        v => v.type === 'audit_integrity_compromised',
+        v => v.type === "audit_integrity_compromised",
       );
       expect(integrityViolation).toBeDefined();
       expect(integrityViolation.severity).toBe(ViolationSeverity.HIGH);
     });
   });
 
-  describe('Data Retention Compliance Validation', () => {
-    test('should validate data retention compliance', async () => {
+  describe("Data Retention Compliance Validation", () => {
+    test("should validate data retention compliance", async () => {
       const result = await validator.validateDataRetentionCompliance();
 
-      expect(result).toHaveProperty('compliant');
-      expect(result).toHaveProperty('violations');
-      expect(result).toHaveProperty('warnings');
-      expect(result).toHaveProperty('retentionPeriod');
-      expect(result).toHaveProperty('nextArchivalDue');
+      expect(result).toHaveProperty("compliant");
+      expect(result).toHaveProperty("violations");
+      expect(result).toHaveProperty("warnings");
+      expect(result).toHaveProperty("retentionPeriod");
+      expect(result).toHaveProperty("nextArchivalDue");
     });
 
-    test('should detect insufficient retention period', async () => {
+    test("should detect insufficient retention period", async () => {
       // Mock short retention period
       validator.environmentConfig.getMedicalConfig = jest.fn(() => ({
         dataRetentionDays: 365, // 1 year - insufficient for medical data
@@ -518,14 +518,14 @@ describe('MedicalComplianceValidator', () => {
       const result = await validator.validateDataRetentionCompliance();
 
       const retentionViolation = result.violations.find(
-        v => v.type === 'insufficient_retention_period',
+        v => v.type === "insufficient_retention_period",
       );
       expect(retentionViolation).toBeDefined();
       expect(retentionViolation.severity).toBe(ViolationSeverity.HIGH);
       expect(retentionViolation.standards).toContain(ComplianceStandard.HIPAA);
     });
 
-    test('should validate secure deletion procedures', async () => {
+    test("should validate secure deletion procedures", async () => {
       // Mock validateArchivalPolicy to return missing secure deletion
       validator.validateArchivalPolicy = jest.fn().mockResolvedValue({
         secureDeleteionImplemented: false,
@@ -534,35 +534,35 @@ describe('MedicalComplianceValidator', () => {
       const result = await validator.validateDataRetentionCompliance();
 
       const deletionViolation = result.violations.find(
-        v => v.type === 'missing_secure_deletion',
+        v => v.type === "missing_secure_deletion",
       );
       expect(deletionViolation).toBeDefined();
       expect(deletionViolation.severity).toBe(ViolationSeverity.MEDIUM);
     });
   });
 
-  describe('Compliance Reporting', () => {
-    test('should generate comprehensive compliance report', async () => {
+  describe("Compliance Reporting", () => {
+    test("should generate comprehensive compliance report", async () => {
       const report = await validator.generateComplianceReport();
 
-      expect(report).toHaveProperty('generatedAt');
-      expect(report).toHaveProperty('generatedBy');
-      expect(report).toHaveProperty('version');
-      expect(report).toHaveProperty('standards');
-      expect(report).toHaveProperty('summary');
-      expect(report).toHaveProperty('recommendations');
-      expect(report).toHaveProperty('remediationPlan');
+      expect(report).toHaveProperty("generatedAt");
+      expect(report).toHaveProperty("generatedBy");
+      expect(report).toHaveProperty("version");
+      expect(report).toHaveProperty("standards");
+      expect(report).toHaveProperty("summary");
+      expect(report).toHaveProperty("recommendations");
+      expect(report).toHaveProperty("remediationPlan");
 
-      expect(report.summary).toHaveProperty('overallCompliant');
-      expect(report.summary).toHaveProperty('totalViolations');
-      expect(report.summary).toHaveProperty('criticalViolations');
-      expect(report.summary).toHaveProperty('standardsEvaluated');
+      expect(report.summary).toHaveProperty("overallCompliant");
+      expect(report.summary).toHaveProperty("totalViolations");
+      expect(report.summary).toHaveProperty("criticalViolations");
+      expect(report.summary).toHaveProperty("standardsEvaluated");
 
       expect(Array.isArray(report.recommendations)).toBe(true);
       expect(Array.isArray(report.remediationPlan)).toBe(true);
     });
 
-    test('should generate report for specific standards', async () => {
+    test("should generate report for specific standards", async () => {
       const customStandards = [ComplianceStandard.HIPAA, ComplianceStandard.GDPR];
       const report = await validator.generateComplianceReport(customStandards);
 
@@ -570,19 +570,19 @@ describe('MedicalComplianceValidator', () => {
       expect(report.summary.standardsEvaluated).toBe(2);
     });
 
-    test('should log compliance report generation', async () => {
+    test("should log compliance report generation", async () => {
       await validator.generateComplianceReport();
 
       expect(mockAuditTrail.logComplianceEvent).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: 'compliance_report_generated',
+          type: "compliance_report_generated",
         }),
       );
     });
   });
 
-  describe('Real-time Compliance Monitoring', () => {
-    test('should start compliance monitoring', () => {
+  describe("Real-time Compliance Monitoring", () => {
+    test("should start compliance monitoring", () => {
       const monitoringOptions = {
         interval: 60000, // 1 minute
         alertThreshold: ViolationSeverity.HIGH,
@@ -591,13 +591,13 @@ describe('MedicalComplianceValidator', () => {
       const monitorId = validator.startComplianceMonitoring(monitoringOptions);
 
       expect(validator.complianceMonitor).toBeDefined();
-      expect(typeof validator.complianceMonitor).toBe('object');
+      expect(typeof validator.complianceMonitor).toBe("object");
 
       // Clean up
       validator.stopComplianceMonitoring();
     });
 
-    test('should stop compliance monitoring', () => {
+    test("should stop compliance monitoring", () => {
       validator.startComplianceMonitoring();
       expect(validator.complianceMonitor).toBeDefined();
 
@@ -605,10 +605,10 @@ describe('MedicalComplianceValidator', () => {
       expect(validator.complianceMonitor).toBeNull();
     });
 
-    test('should handle monitoring errors gracefully', async () => {
+    test("should handle monitoring errors gracefully", async () => {
       // Mock monitoring error
       validator.performQuickComplianceCheck = jest.fn().mockRejectedValue(
-        new Error('Monitoring service unavailable'),
+        new Error("Monitoring service unavailable"),
       );
 
       validator.startComplianceMonitoring({ interval: 100 });
@@ -618,8 +618,8 @@ describe('MedicalComplianceValidator', () => {
 
       expect(mockAuditTrail.logComplianceEvent).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: 'monitoring_error',
-          error: 'Monitoring service unavailable',
+          type: "monitoring_error",
+          error: "Monitoring service unavailable",
         }),
       );
 
@@ -627,8 +627,8 @@ describe('MedicalComplianceValidator', () => {
     });
   });
 
-  describe('Security Score Calculation', () => {
-    test('should calculate security score correctly', () => {
+  describe("Security Score Calculation", () => {
+    test("should calculate security score correctly", () => {
       const violations = [
         { severity: ViolationSeverity.CRITICAL },
         { severity: ViolationSeverity.HIGH },
@@ -648,7 +648,7 @@ describe('MedicalComplianceValidator', () => {
       expect(score).toBe(46);
     });
 
-    test('should not return negative security scores', () => {
+    test("should not return negative security scores", () => {
       const manyViolations = Array(10).fill({ severity: ViolationSeverity.CRITICAL });
       const score = validator.calculateSecurityScore(manyViolations, []);
 
@@ -656,12 +656,12 @@ describe('MedicalComplianceValidator', () => {
     });
   });
 
-  describe('Recommendations Generation', () => {
-    test('should generate recommendations for violations', () => {
+  describe("Recommendations Generation", () => {
+    test("should generate recommendations for violations", () => {
       const violations = [
-        { type: 'excessive_data_access' },
-        { type: 'missing_electronic_signature' },
-        { type: 'weak_encryption_key' },
+        { type: "excessive_data_access" },
+        { type: "missing_electronic_signature" },
+        { type: "weak_encryption_key" },
       ];
 
       const recommendations = validator.generateRecommendations(violations, []);
@@ -670,42 +670,42 @@ describe('MedicalComplianceValidator', () => {
       expect(recommendations.length).toBeGreaterThan(0);
 
       const accessRecommendation = recommendations.find(
-        r => r.action.includes('role-based data access'),
+        r => r.action.includes("role-based data access"),
       );
       expect(accessRecommendation).toBeDefined();
-      expect(accessRecommendation.priority).toBe('high');
+      expect(accessRecommendation.priority).toBe("high");
 
       const signatureRecommendation = recommendations.find(
-        r => r.action.includes('electronic signature'),
+        r => r.action.includes("electronic signature"),
       );
       expect(signatureRecommendation).toBeDefined();
 
       const encryptionRecommendation = recommendations.find(
-        r => r.action.includes('encryption key'),
+        r => r.action.includes("encryption key"),
       );
       expect(encryptionRecommendation).toBeDefined();
-      expect(encryptionRecommendation.priority).toBe('critical');
+      expect(encryptionRecommendation.priority).toBe("critical");
     });
   });
 
-  describe('Remediation Plan Generation', () => {
-    test('should generate remediation plan from standards results', async () => {
+  describe("Remediation Plan Generation", () => {
+    test("should generate remediation plan from standards results", async () => {
       const standardsResults = {
         [ComplianceStandard.HIPAA]: {
           violations: [
             {
-              type: 'excessive_data_access',
+              type: "excessive_data_access",
               severity: ViolationSeverity.HIGH,
-              message: 'Test violation',
+              message: "Test violation",
             },
           ],
         },
         [ComplianceStandard.FDA_21CFR11]: {
           violations: [
             {
-              type: 'missing_electronic_signature',
+              type: "missing_electronic_signature",
               severity: ViolationSeverity.CRITICAL,
-              message: 'Critical violation',
+              message: "Critical violation",
             },
           ],
         },
@@ -722,22 +722,22 @@ describe('MedicalComplianceValidator', () => {
 
       // Check structure
       remediationPlan.forEach(item => {
-        expect(item).toHaveProperty('id');
-        expect(item).toHaveProperty('standard');
-        expect(item).toHaveProperty('violation');
-        expect(item).toHaveProperty('severity');
-        expect(item).toHaveProperty('description');
-        expect(item).toHaveProperty('timeline');
-        expect(item).toHaveProperty('status');
+        expect(item).toHaveProperty("id");
+        expect(item).toHaveProperty("standard");
+        expect(item).toHaveProperty("violation");
+        expect(item).toHaveProperty("severity");
+        expect(item).toHaveProperty("description");
+        expect(item).toHaveProperty("timeline");
+        expect(item).toHaveProperty("status");
       });
     });
   });
 
-  describe('Validation Context Building', () => {
-    test('should build comprehensive validation context', async () => {
+  describe("Validation Context Building", () => {
+    test("should build comprehensive validation context", async () => {
       // Mock additional context methods
       validator.getSystemMetadata = jest.fn().mockResolvedValue({
-        version: '2.1.0',
+        version: "2.1.0",
         deploymentDate: new Date(),
       });
       validator.getActiveUserSessions = jest.fn().mockResolvedValue([]);
@@ -748,18 +748,18 @@ describe('MedicalComplianceValidator', () => {
 
       const context = await validator.buildValidationContext(ComplianceStandard.HIPAA);
 
-      expect(context).toHaveProperty('environment');
-      expect(context).toHaveProperty('securityConfig');
-      expect(context).toHaveProperty('medicalConfig');
-      expect(context).toHaveProperty('systemMetadata');
-      expect(context).toHaveProperty('auditTrailStatus');
-      expect(context).toHaveProperty('userSessions');
-      expect(context).toHaveProperty('dataInventory');
+      expect(context).toHaveProperty("environment");
+      expect(context).toHaveProperty("securityConfig");
+      expect(context).toHaveProperty("medicalConfig");
+      expect(context).toHaveProperty("systemMetadata");
+      expect(context).toHaveProperty("auditTrailStatus");
+      expect(context).toHaveProperty("userSessions");
+      expect(context).toHaveProperty("dataInventory");
     });
   });
 
-  describe('Next Validation Date Calculation', () => {
-    test('should calculate next validation date', () => {
+  describe("Next Validation Date Calculation", () => {
+    test("should calculate next validation date", () => {
       const nextValidation = validator.calculateNextValidationDate();
 
       expect(nextValidation).toBeInstanceOf(Date);
@@ -775,77 +775,77 @@ describe('MedicalComplianceValidator', () => {
   });
 });
 
-describe('ComplianceValidationError', () => {
-  test('should create compliance validation error', () => {
+describe("ComplianceValidationError", () => {
+  test("should create compliance validation error", () => {
     const error = new ComplianceValidationError(
-      'Test violation',
+      "Test violation",
       ComplianceStandard.HIPAA,
-      'test_violation',
+      "test_violation",
       ViolationSeverity.HIGH,
     );
 
-    expect(error.name).toBe('ComplianceValidationError');
-    expect(error.message).toBe('Test violation');
+    expect(error.name).toBe("ComplianceValidationError");
+    expect(error.message).toBe("Test violation");
     expect(error.standard).toBe(ComplianceStandard.HIPAA);
-    expect(error.violationType).toBe('test_violation');
+    expect(error.violationType).toBe("test_violation");
     expect(error.severity).toBe(ViolationSeverity.HIGH);
     expect(error).toBeInstanceOf(Error);
   });
 
-  test('should use default severity if not provided', () => {
+  test("should use default severity if not provided", () => {
     const error = new ComplianceValidationError(
-      'Test violation',
+      "Test violation",
       ComplianceStandard.GDPR,
-      'test_violation',
+      "test_violation",
     );
 
     expect(error.severity).toBe(ViolationSeverity.MEDIUM);
   });
 });
 
-describe('Compliance Standards and Constants', () => {
-  test('should define all required compliance standards', () => {
+describe("Compliance Standards and Constants", () => {
+  test("should define all required compliance standards", () => {
     const requiredStandards = [
-      'HIPAA',
-      'FDA_21CFR11',
-      'IEC_62304',
-      'GDPR',
-      'ISO_14155',
-      'ISO_27001',
+      "HIPAA",
+      "FDA_21CFR11",
+      "IEC_62304",
+      "GDPR",
+      "ISO_14155",
+      "ISO_27001",
     ];
 
     requiredStandards.forEach(standard => {
       expect(ComplianceStandard[standard]).toBeDefined();
-      expect(typeof ComplianceStandard[standard]).toBe('string');
+      expect(typeof ComplianceStandard[standard]).toBe("string");
     });
   });
 
-  test('should define compliance status values', () => {
+  test("should define compliance status values", () => {
     const requiredStatuses = [
-      'COMPLIANT',
-      'NON_COMPLIANT',
-      'NEEDS_REVIEW',
-      'PENDING_VALIDATION',
+      "COMPLIANT",
+      "NON_COMPLIANT",
+      "NEEDS_REVIEW",
+      "PENDING_VALIDATION",
     ];
 
     requiredStatuses.forEach(status => {
       expect(ComplianceStatus[status]).toBeDefined();
-      expect(typeof ComplianceStatus[status]).toBe('string');
+      expect(typeof ComplianceStatus[status]).toBe("string");
     });
   });
 
-  test('should define violation severity levels', () => {
+  test("should define violation severity levels", () => {
     const requiredSeverities = [
-      'CRITICAL',
-      'HIGH',
-      'MEDIUM',
-      'LOW',
-      'INFORMATIONAL',
+      "CRITICAL",
+      "HIGH",
+      "MEDIUM",
+      "LOW",
+      "INFORMATIONAL",
     ];
 
     requiredSeverities.forEach(severity => {
       expect(ViolationSeverity[severity]).toBeDefined();
-      expect(typeof ViolationSeverity[severity]).toBe('string');
+      expect(typeof ViolationSeverity[severity]).toBe("string");
     });
   });
 });

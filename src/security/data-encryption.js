@@ -9,8 +9,8 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from '../utils/error-handler.js';
-import { medicalLogger, LOG_CATEGORIES } from '../utils/medical-logger.js';
+import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from "../utils/error-handler.js";
+import { medicalLogger, LOG_CATEGORIES } from "../utils/medical-logger.js";
 
 /**
  * @typedef {Object} EncryptedData
@@ -25,17 +25,17 @@ import { medicalLogger, LOG_CATEGORIES } from '../utils/medical-logger.js';
  */
 export class MedicalDataEncryption {
   constructor() {
-    this.algorithm = 'AES-GCM';
+    this.algorithm = "AES-GCM";
     this.keyLength = 256;
     this.ivLength = 12; // 96 bits for AES-GCM
-    this.version = '1.0';
+    this.version = "1.0";
     this.encryptionKey = null;
     this.isSupported = this.checkWebCryptoSupport();
 
     if (this.isSupported) {
       this.initializeEncryption();
     } else {
-      medicalLogger.warn('Web Crypto API not supported, falling back to unencrypted storage', {
+      medicalLogger.warn("Web Crypto API not supported, falling back to unencrypted storage", {
         category: LOG_CATEGORIES.SECURITY,
       });
     }
@@ -45,10 +45,10 @@ export class MedicalDataEncryption {
    * Check if Web Crypto API is supported
    */
   checkWebCryptoSupport() {
-    return typeof window !== 'undefined'
+    return typeof window !== "undefined"
            && window.crypto
            && window.crypto.subtle
-           && typeof window.crypto.subtle.encrypt === 'function';
+           && typeof window.crypto.subtle.encrypt === "function";
   }
 
   /**
@@ -63,10 +63,10 @@ export class MedicalDataEncryption {
         // Derive encryption key from key material
         this.encryptionKey = await window.crypto.subtle.deriveKey(
           {
-            name: 'PBKDF2',
-            salt: new TextEncoder().encode('iGFAP-Medical-2024'), // Static salt for session consistency
+            name: "PBKDF2",
+            salt: new TextEncoder().encode("iGFAP-Medical-2024"), // Static salt for session consistency
             iterations: 100000,
-            hash: 'SHA-256',
+            hash: "SHA-256",
           },
           keyMaterial,
           {
@@ -74,10 +74,10 @@ export class MedicalDataEncryption {
             length: this.keyLength,
           },
           false, // Not extractable for security
-          ['encrypt', 'decrypt'],
+          ["encrypt", "decrypt"],
         );
 
-        medicalLogger.info('Medical data encryption initialized', {
+        medicalLogger.info("Medical data encryption initialized", {
           category: LOG_CATEGORIES.SECURITY,
           algorithm: this.algorithm,
           keyLength: this.keyLength,
@@ -88,7 +88,7 @@ export class MedicalDataEncryption {
       {
         category: ERROR_CATEGORIES.SECURITY,
         severity: ERROR_SEVERITY.HIGH,
-        context: { operation: 'encryption_initialization' },
+        context: { operation: "encryption_initialization" },
       },
     );
   }
@@ -100,15 +100,15 @@ export class MedicalDataEncryption {
     return safeAsync(
       async () => {
         // Try to get existing key material from session
-        let keyData = sessionStorage.getItem('_medical_km');
+        let keyData = sessionStorage.getItem("_medical_km");
 
         if (!keyData) {
           // Generate new key material for this session
           const randomBytes = window.crypto.getRandomValues(new Uint8Array(32));
-          keyData = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
-          sessionStorage.setItem('_medical_km', keyData);
+          keyData = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+          sessionStorage.setItem("_medical_km", keyData);
 
-          medicalLogger.debug('Generated new encryption key material', {
+          medicalLogger.debug("Generated new encryption key material", {
             category: LOG_CATEGORIES.SECURITY,
           });
         }
@@ -118,16 +118,16 @@ export class MedicalDataEncryption {
 
         // Import key material
         return await window.crypto.subtle.importKey(
-          'raw',
+          "raw",
           keyBytes,
-          'PBKDF2',
+          "PBKDF2",
           false,
-          ['deriveKey'],
+          ["deriveKey"],
         );
       },
       {
         category: ERROR_CATEGORIES.SECURITY,
-        context: { operation: 'key_material_generation' },
+        context: { operation: "key_material_generation" },
       },
     );
   }
@@ -139,7 +139,7 @@ export class MedicalDataEncryption {
    */
   async encryptData(data) {
     if (!this.isSupported || !this.encryptionKey) {
-      medicalLogger.warn('Encryption not available, storing data unencrypted', {
+      medicalLogger.warn("Encryption not available, storing data unencrypted", {
         category: LOG_CATEGORIES.SECURITY,
       });
       return JSON.stringify(data);
@@ -176,7 +176,7 @@ export class MedicalDataEncryption {
           timestamp: Date.now(),
         };
 
-        medicalLogger.debug('Data encrypted successfully', {
+        medicalLogger.debug("Data encrypted successfully", {
           category: LOG_CATEGORIES.SECURITY,
           dataSize: jsonString.length,
         });
@@ -187,12 +187,12 @@ export class MedicalDataEncryption {
         category: ERROR_CATEGORIES.SECURITY,
         severity: ERROR_SEVERITY.MEDIUM,
         fallback: () => {
-          medicalLogger.warn('Encryption failed, storing data unencrypted', {
+          medicalLogger.warn("Encryption failed, storing data unencrypted", {
             category: LOG_CATEGORIES.SECURITY,
           });
           return JSON.stringify(data);
         },
-        context: { operation: 'data_encryption' },
+        context: { operation: "data_encryption" },
       },
     );
   }
@@ -214,7 +214,7 @@ export class MedicalDataEncryption {
           encryptedData = JSON.parse(encryptedDataString);
         } catch (parseError) {
           // Might be unencrypted legacy data
-          medicalLogger.debug('Data appears to be unencrypted legacy format', {
+          medicalLogger.debug("Data appears to be unencrypted legacy format", {
             category: LOG_CATEGORIES.SECURITY,
           });
           return JSON.parse(encryptedDataString);
@@ -227,7 +227,7 @@ export class MedicalDataEncryption {
         }
 
         if (!this.isSupported || !this.encryptionKey) {
-          medicalLogger.warn('Cannot decrypt data: encryption not available', {
+          medicalLogger.warn("Cannot decrypt data: encryption not available", {
             category: LOG_CATEGORIES.SECURITY,
           });
           return null;
@@ -236,13 +236,13 @@ export class MedicalDataEncryption {
         // Convert base64 back to Uint8Array
         const encryptedBytes = new Uint8Array(
           atob(encryptedData.encrypted)
-            .split('')
+            .split("")
             .map((char) => char.charCodeAt(0)),
         );
 
         const iv = new Uint8Array(
           atob(encryptedData.iv)
-            .split('')
+            .split("")
             .map((char) => char.charCodeAt(0)),
         );
 
@@ -260,7 +260,7 @@ export class MedicalDataEncryption {
         const decryptedString = new TextDecoder().decode(decryptedBuffer);
         const decryptedData = JSON.parse(decryptedString);
 
-        medicalLogger.debug('Data decrypted successfully', {
+        medicalLogger.debug("Data decrypted successfully", {
           category: LOG_CATEGORIES.SECURITY,
           dataSize: decryptedString.length,
         });
@@ -271,12 +271,12 @@ export class MedicalDataEncryption {
         category: ERROR_CATEGORIES.SECURITY,
         severity: ERROR_SEVERITY.MEDIUM,
         fallback: () => {
-          medicalLogger.warn('Decryption failed, returning null', {
+          medicalLogger.warn("Decryption failed, returning null", {
             category: LOG_CATEGORIES.SECURITY,
           });
           return null;
         },
-        context: { operation: 'data_decryption' },
+        context: { operation: "data_decryption" },
       },
     );
   }
@@ -299,17 +299,17 @@ export class MedicalDataEncryption {
         const storageKey = `_enc_${key}`;
         storage.setItem(storageKey, encryptedData);
 
-        medicalLogger.debug('Data stored securely', {
+        medicalLogger.debug("Data stored securely", {
           category: LOG_CATEGORIES.SECURITY,
           key: storageKey,
-          storage: useSessionStorage ? 'session' : 'local',
+          storage: useSessionStorage ? "session" : "local",
         });
 
         return true;
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'secure_store', key },
+        context: { operation: "secure_store", key },
       },
     );
   }
@@ -331,7 +331,7 @@ export class MedicalDataEncryption {
           // Try legacy unencrypted key
           const legacyData = storage.getItem(key);
           if (legacyData) {
-            medicalLogger.debug('Retrieved legacy unencrypted data', {
+            medicalLogger.debug("Retrieved legacy unencrypted data", {
               category: LOG_CATEGORIES.SECURITY,
               key,
             });
@@ -347,10 +347,10 @@ export class MedicalDataEncryption {
         // Decrypt the data
         const decryptedData = await this.decryptData(encryptedData);
 
-        medicalLogger.debug('Data retrieved securely', {
+        medicalLogger.debug("Data retrieved securely", {
           category: LOG_CATEGORIES.SECURITY,
           key: storageKey,
-          storage: useSessionStorage ? 'session' : 'local',
+          storage: useSessionStorage ? "session" : "local",
           hasData: !!decryptedData,
         });
 
@@ -358,7 +358,7 @@ export class MedicalDataEncryption {
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'secure_retrieve', key },
+        context: { operation: "secure_retrieve", key },
       },
     );
   }
@@ -378,17 +378,17 @@ export class MedicalDataEncryption {
         storage.removeItem(storageKey);
         storage.removeItem(key);
 
-        medicalLogger.debug('Data removed securely', {
+        medicalLogger.debug("Data removed securely", {
           category: LOG_CATEGORIES.SECURITY,
           key: storageKey,
-          storage: useSessionStorage ? 'session' : 'local',
+          storage: useSessionStorage ? "session" : "local",
         });
 
         return true;
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'secure_remove', key },
+        context: { operation: "secure_remove", key },
       },
     );
   }
@@ -419,7 +419,7 @@ export class MedicalDataEncryption {
         const legacyData = storage.getItem(key);
 
         if (legacyData && !this.isDataEncrypted(legacyData)) {
-          medicalLogger.info('Migrating legacy unencrypted data', {
+          medicalLogger.info("Migrating legacy unencrypted data", {
             category: LOG_CATEGORIES.SECURITY,
             key,
           });
@@ -433,12 +433,12 @@ export class MedicalDataEncryption {
           }
 
           // Store encrypted version
-          await this.secureStore(key.replace('_enc_', ''), parsedData, useSessionStorage);
+          await this.secureStore(key.replace("_enc_", ""), parsedData, useSessionStorage);
 
           // Remove legacy version
           storage.removeItem(key);
 
-          medicalLogger.info('Legacy data migration completed', {
+          medicalLogger.info("Legacy data migration completed", {
             category: LOG_CATEGORIES.SECURITY,
             key,
           });
@@ -450,7 +450,7 @@ export class MedicalDataEncryption {
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'migrate_legacy_data', key },
+        context: { operation: "migrate_legacy_data", key },
       },
     );
   }
@@ -460,14 +460,14 @@ export class MedicalDataEncryption {
    */
   clearEncryptionKeys() {
     try {
-      sessionStorage.removeItem('_medical_km');
+      sessionStorage.removeItem("_medical_km");
       this.encryptionKey = null;
 
-      medicalLogger.info('Encryption keys cleared', {
+      medicalLogger.info("Encryption keys cleared", {
         category: LOG_CATEGORIES.SECURITY,
       });
     } catch (error) {
-      medicalLogger.warn('Failed to clear encryption keys', {
+      medicalLogger.warn("Failed to clear encryption keys", {
         category: LOG_CATEGORIES.SECURITY,
         error: error.message,
       });

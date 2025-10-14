@@ -4,10 +4,10 @@
  * All data stays local - no external transmission
  */
 
-import { LegacyICHModel } from './legacy-ich-model.js';
+import { LegacyICHModel } from "./legacy-ich-model.js";
 
 export class ResearchDataLogger {
-  static STORAGE_KEY = 'igfap_research_data';
+  static STORAGE_KEY = "igfap_research_data";
 
   static MAX_ENTRIES = 1000; // Prevent unlimited storage growth
 
@@ -77,15 +77,15 @@ export class ResearchDataLogger {
    */
   static createEmptyDataset() {
     return {
-      version: '1.0.0',
+      version: "1.0.0",
       created: new Date().toISOString(),
       lastUpdated: null,
       totalComparisons: 0,
       entries: [],
       metadata: {
-        app: 'iGFAP Stroke Triage',
-        purpose: 'Model comparison research',
-        dataRetention: 'Local storage only',
+        app: "iGFAP Stroke Triage",
+        purpose: "Model comparison research",
+        dataRetention: "Local storage only",
       },
     };
   }
@@ -98,43 +98,45 @@ export class ResearchDataLogger {
     const data = this.getStoredData();
 
     if (!data.entries || data.entries.length === 0) {
-      return 'No research data available for export';
+      return "No research data available for export";
     }
 
     // CSV headers
     const headers = [
-      'timestamp',
-      'session_id',
-      'age',
-      'gfap_value',
-      'main_model_probability',
-      'main_model_module',
-      'legacy_model_probability',
-      'legacy_model_confidence',
-      'absolute_difference',
-      'relative_difference',
-      'agreement_level',
-      'higher_risk_model',
+      "timestamp",
+      "session_id",
+      "age",
+      "gfap_value",
+      "main_model_probability",
+      "main_model_module",
+      "legacy_model_probability",
+      "legacy_model_confidence",
+      "absolute_difference",
+      "relative_difference",
+      "agreement_level",
+      "higher_risk_model",
     ];
 
     // Convert entries to CSV rows
-    const rows = data.entries.map((entry) => [
-      entry.timestamp,
-      entry.sessionId,
-      entry.inputs?.age || '',
-      entry.inputs?.gfap || '',
-      entry.main?.probability || '',
-      entry.main?.module || '',
-      entry.legacy?.probability || '',
-      entry.legacy?.confidence || '',
-      entry.comparison?.differences?.absolute || '',
-      entry.comparison?.differences?.relative || '',
-      entry.comparison?.agreement?.level || '',
-      entry.comparison?.agreement?.higherRiskModel || '',
-    ].join(','));
+    const rows = data.entries.map(entry =>
+      [
+        entry.timestamp,
+        entry.sessionId,
+        entry.inputs?.age || "",
+        entry.inputs?.gfap || "",
+        entry.main?.probability || "",
+        entry.main?.module || "",
+        entry.legacy?.probability || "",
+        entry.legacy?.confidence || "",
+        entry.comparison?.differences?.absolute || "",
+        entry.comparison?.differences?.relative || "",
+        entry.comparison?.agreement?.level || "",
+        entry.comparison?.agreement?.higherRiskModel || "",
+      ].join(",")
+    );
 
     // Combine headers and rows
-    const csv = [headers.join(','), ...rows].join('\n');
+    const csv = [headers.join(","), ...rows].join("\n");
     return csv;
   }
 
@@ -151,17 +153,17 @@ export class ResearchDataLogger {
    * Download research data as file
    * @param {string} format - 'csv' or 'json'
    */
-  static downloadData(format = 'csv') {
+  static downloadData(format = "csv") {
     try {
-      const data = format === 'csv' ? this.exportAsCSV() : this.exportAsJSON();
+      const data = format === "csv" ? this.exportAsCSV() : this.exportAsJSON();
       const filename = `igfap-research-${Date.now()}.${format}`;
 
       const blob = new Blob([data], {
-        type: format === 'csv' ? 'text/csv' : 'application/json',
+        type: format === "csv" ? "text/csv" : "application/json",
       });
 
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
@@ -208,11 +210,13 @@ export class ResearchDataLogger {
 
     const { entries } = data;
     const differences = entries
-      .map((e) => e.comparison?.differences?.absolute)
-      .filter((d) => d !== undefined && d !== null);
+      .map(e => e.comparison?.differences?.absolute)
+      .filter(d => d !== undefined && d !== null);
 
-    const avgDifference = differences.length > 0
-      ? differences.reduce((sum, d) => sum + Math.abs(d), 0) / differences.length : 0;
+    const avgDifference =
+      differences.length > 0
+        ? differences.reduce((sum, d) => sum + Math.abs(d), 0) / differences.length
+        : 0;
 
     return {
       totalEntries: entries.length,
@@ -231,10 +235,10 @@ export class ResearchDataLogger {
   }
 
   static getSessionId() {
-    let sessionId = sessionStorage.getItem('research_session_id');
+    let sessionId = sessionStorage.getItem("research_session_id");
     if (!sessionId) {
       sessionId = `session_${Date.now().toString(36)}`;
-      sessionStorage.setItem('research_session_id', sessionId);
+      sessionStorage.setItem("research_session_id", sessionId);
     }
     return sessionId;
   }
@@ -257,7 +261,7 @@ export function safeLogResearchData(mainResults, legacyResults, inputs) {
       inputs: {
         age: inputs.age_years || inputs.age,
         gfap: inputs.gfap_value || inputs.gfap,
-        module: mainResults.module || 'unknown',
+        module: mainResults.module || "unknown",
       },
       main: {
         probability: mainResults.probability,
@@ -265,8 +269,7 @@ export function safeLogResearchData(mainResults, legacyResults, inputs) {
         confidence: mainResults.confidence,
       },
       legacy: legacyResults,
-      comparison: legacyResults
-        ? LegacyICHModel.compareModels(mainResults, legacyResults) : null,
+      comparison: legacyResults ? LegacyICHModel.compareModels(mainResults, legacyResults) : null,
     };
 
     ResearchDataLogger.logComparison(comparisonData);
@@ -283,19 +286,19 @@ export function safeLogResearchData(mainResults, legacyResults, inputs) {
  */
 export function isResearchModeEnabled(module = null) {
   // Never enable research mode for coma module
-  if (module === 'coma') {
+  if (module === "coma") {
     return false;
   }
 
   // Always enable for stroke modules (limited/full)
-  if (module === 'limited' || module === 'full') {
+  if (module === "limited" || module === "full") {
     return true;
   }
 
   // Fallback: check if any stroke module data exists
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     try {
-      const store = window.store || require('../state/store.js')?.store;
+      const store = window.store || require("../state/store.js")?.store;
       if (store) {
         const { formData } = store.getState();
         const hasStrokeData = formData.limited || formData.full;
@@ -316,20 +319,20 @@ export function isResearchModeEnabled(module = null) {
 export function setResearchMode(enabled) {
   try {
     if (enabled) {
-      localStorage.setItem('research_mode', 'true');
+      localStorage.setItem("research_mode", "true");
       // ('🔬 Research mode enabled');
     } else {
-      localStorage.removeItem('research_mode');
+      localStorage.removeItem("research_mode");
       // ('🔬 Research mode disabled');
     }
 
     // Trigger page refresh to apply changes
-    if (window.location.search.includes('research=')) {
+    if (window.location.search.includes("research=")) {
       // Remove research param from URL if disabling
       if (!enabled) {
         const url = new URL(window.location);
-        url.searchParams.delete('research');
-        window.history.replaceState({}, '', url);
+        url.searchParams.delete("research");
+        window.history.replaceState({}, "", url);
       }
     }
 
