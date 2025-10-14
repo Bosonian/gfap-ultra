@@ -521,7 +521,7 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       ${criticalAlert}
       
       <!-- Risk Assessment Display -->
-      <div class="${layoutClass} gap-3 flex flex-col mb-6">
+      <div class="${layoutClass} gap-1 flex flex-col flex-wrap justify-center items-stretch mb-6">
         ${renderRiskCard("ich", ich, results)}
         ${showLVORiskCard ? renderRiskCard("lvo", lvo, results) : ""}
         ${showVolumeCard ? renderVolumeCard(ich) : ""}
@@ -729,15 +729,28 @@ function renderICHDriversOnly(ich) {
 }
 
 function renderCompactDriver(driver, type) {
-  // Driver object has 'label' and 'weight' properties
-  const percentage = Math.abs(driver.weight * 100);
-  const width = Math.min(percentage * 2, 100); // Scale for display
+  const percentage = Math.abs(driver.weight * 100).toFixed(1);
+  const isPositive = type === "positive";
+
+  const textColor = isPositive
+    ? "text-green-700 dark:text-green-300"
+    : "text-blue-700 dark:text-blue-300";
+
+  const borderColor = isPositive
+    ? "border-green-300 dark:border-green-600"
+    : "border-blue-300 dark:border-blue-600";
+
+  const bgColor = isPositive
+    ? "bg-green-50 dark:bg-green-950/40"
+    : "bg-blue-50 dark:bg-blue-950/40";
 
   return `
-    <div class="compact-driver-item">
-      <div class="compact-driver-label">${formatDriverName(driver.label)}</div>
-      <div class="compact-driver-bar ${type}" style="width: ${width}%;">
-        <span class="compact-driver-value">${percentage.toFixed(1)}%</span>
+    <div class="compact-driver-item flex justify-between items-center ${bgColor} border ${borderColor} rounded-lg px-3 py-2 shadow-sm hover:shadow-md transition-all duration-300">
+      <div class="compact-driver-label text-sm font-medium ${textColor}">
+        ${formatDriverName(driver.label)}
+      </div>
+      <div class="compact-driver-value text-sm font-semibold ${textColor}">
+        ${percentage}%
       </div>
     </div>
   `;

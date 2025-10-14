@@ -51,7 +51,10 @@ async function initializeApplication() {
         },
       });
       document.dispatchEvent(startupEvent);
-
+      document.querySelectorAll(".bar-fill").forEach(el => {
+        const targetWidth = el.getAttribute("data-width");
+        el.style.width = `${targetWidth}%`;
+      });
       return app;
     },
     error => {

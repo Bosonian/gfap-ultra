@@ -23,7 +23,7 @@ export function renderDriversSection(ich, lvo) {
         <!-- place for header actions (optional) -->
         <div class="drivers-actions flex items-center gap-2"></div>
       </div>
-      <div class="enhanced-drivers-grid grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-4 mt-6 enhanced-drivers-grid">
+      <div class="enhanced-drivers-grid flex flex-col gap-4 mt-6 enhanced-drivers-grid">
   `;
 
   console.log("[Drivers] ICH has drivers:", !!ich?.drivers, ich?.drivers);
@@ -173,17 +173,15 @@ export function renderDriversPanel(drivers, title, type) {
 export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   if (!drivers || Object.keys(drivers).length === 0) {
     return `
-      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-5">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="text-2xl ${type === "ich" ? "text-blue-600" : "text-red-600"}">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 text-center shadow-sm">
+        <div class="flex flex-col items-center justify-center gap-2">
+          <div class="text-3xl ${type === "ich" ? "text-blue-500" : "text-red-500"}">
             ${type === "ich" ? "🧠" : "🩸"}
           </div>
-          <div>
-            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
-            <p class="text-sm text-gray-500 dark:text-gray-400">${t("noDriverData")}</p>
-          </div>
+          <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
+          <p class="text-sm text-gray-500 dark:text-gray-400">${t("noDriverData")}</p>
+          <p class="italic text-gray-400">${t("driverInfoNotAvailable")}</p>
         </div>
-        <p class="italic text-gray-500 dark:text-gray-400">${t("driverInfoNotAvailable")}</p>
       </div>
     `;
   }
@@ -191,17 +189,15 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   const driversViewModel = drivers;
   if (driversViewModel.kind === "unavailable") {
     return `
-      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-5">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="text-2xl ${type === "ich" ? "text-blue-600" : "text-red-600"}">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 text-center shadow-sm">
+        <div class="flex flex-col items-center justify-center gap-2">
+          <div class="text-3xl ${type === "ich" ? "text-blue-500" : "text-red-500"}">
             ${type === "ich" ? "🧠" : "🩸"}
           </div>
-          <div>
-            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
-            <p class="text-sm text-gray-500 dark:text-gray-400">${t("driverAnalysisUnavailable")}</p>
-          </div>
+          <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${title} ${t("riskFactors")}</h4>
+          <p class="text-sm text-gray-500 dark:text-gray-400">${t("driverAnalysisUnavailable")}</p>
+          <p class="italic text-gray-400">${t("driverAnalysisNotAvailable")}</p>
         </div>
-        <p class="italic text-gray-500 dark:text-gray-400">${t("driverAnalysisNotAvailable")}</p>
       </div>
     `;
   }
@@ -221,9 +217,9 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   );
 
   let html = `
-    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-5">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="text-2xl ${type === "ich" ? "text-blue-600" : "text-red-600"}">
+    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-6">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="text-3xl ${type === "ich" ? "text-blue-500" : "text-red-500"}">
           ${type === "ich" ? "🧠" : "🩸"}
         </div>
         <div>
@@ -231,15 +227,18 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
           <p class="text-sm text-gray-500 dark:text-gray-400">${t("contributingFactors")}</p>
         </div>
       </div>
-      
-      <div class="grid md:grid-cols-2 gap-5">
-        <!-- Positive Drivers -->
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-green-600 dark:text-green-400 text-lg">↑</span>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${t("increaseRisk")}</span>
-          </div>
-          <div class="space-y-2">
+
+      <div class="grid md:grid-cols-2 gap-6">
+  `;
+
+  // ✅ Positive Drivers
+  html += `
+    <div class="rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-700 p-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-green-600 dark:text-green-400 text-lg">⬆</span>
+        <span class="text-sm font-semibold text-green-700 dark:text-green-300">${t("increaseRisk")}</span>
+      </div>
+      <div class="space-y-3">
   `;
 
   const totalPositiveWeight = positiveDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
@@ -252,14 +251,9 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
       const cleanLabel = formatDriverName(driver.label);
 
       html += `
-        <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
-            <span class="text-green-600 dark:text-green-400 font-medium">+${relativeImportance.toFixed(0)}%</span>
-          </div>
-          <div class="h-2 bg-green-100 dark:bg-green-900/40 rounded-full overflow-hidden">
-            <div class="h-2 bg-green-500 dark:bg-green-400 rounded-full" style="width: ${barWidth}%"></div>
-          </div>
+        <div class="flex justify-between items-center text-sm bg-white dark:bg-gray-800 rounded-md px-3 py-2 shadow-sm border border-green-100 dark:border-green-800">
+          <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
+          <span class="text-green-600 dark:text-green-400 font-semibold">+${relativeImportance.toFixed(0)}%</span>
         </div>
       `;
     });
@@ -268,16 +262,18 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   }
 
   html += `
-          </div>
-        </div>
+      </div>
+    </div>
+  `;
 
-        <!-- Negative Drivers -->
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-red-600 dark:text-red-400 text-lg">↓</span>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${t("decreaseRisk")}</span>
-          </div>
-          <div class="space-y-2">
+  // ✅ Negative Drivers
+  html += `
+    <div class="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-700 p-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-red-600 dark:text-red-400 text-lg">⬇</span>
+        <span class="text-sm font-semibold text-red-700 dark:text-red-300">${t("decreaseRisk")}</span>
+      </div>
+      <div class="space-y-3">
   `;
 
   const totalNegativeWeight = negativeDrivers.reduce((sum, d) => sum + Math.abs(d.weight), 0);
@@ -290,14 +286,9 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
       const cleanLabel = formatDriverName(driver.label);
 
       html += `
-        <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
-            <span class="text-red-600 dark:text-red-400 font-medium">-${relativeImportance.toFixed(0)}%</span>
-          </div>
-          <div class="h-2 bg-red-100 dark:bg-red-900/40 rounded-full overflow-hidden">
-            <div class="h-2 bg-red-500 dark:bg-red-400 rounded-full" style="width: ${barWidth}%"></div>
-          </div>
+        <div class="flex justify-between items-center text-sm bg-white dark:bg-gray-800 rounded-md px-3 py-2 shadow-sm border border-red-100 dark:border-red-800">
+          <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
+          <span class="text-red-600 dark:text-red-400 font-semibold">-${relativeImportance.toFixed(0)}%</span>
         </div>
       `;
     });
@@ -306,11 +297,11 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
   }
 
   html += `
-          </div>
-        </div>
       </div>
     </div>
-  `;
+  </div>
+</div>
+`;
 
   return html;
 }
