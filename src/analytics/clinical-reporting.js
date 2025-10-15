@@ -5,42 +5,42 @@
  * Generates comprehensive clinical reports with AI insights and analytics
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from '../patterns/observer.js';
-import { medicalPerformanceMonitor, PerformanceMetricType } from '../performance/medical-performance-monitor.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
+import { medicalPerformanceMonitor, PerformanceMetricType } from "../performance/medical-performance-monitor.js";
 
 /**
  * Report types and templates
  */
 export const ReportTypes = {
-  CLINICAL_SUMMARY: 'clinical_summary',
-  OUTCOME_PREDICTION: 'outcome_prediction',
-  RISK_ASSESSMENT: 'risk_assessment',
-  DECISION_SUPPORT: 'decision_support',
-  QUALITY_METRICS: 'quality_metrics',
-  RESEARCH_ANALYTICS: 'research_analytics',
-  COMPREHENSIVE: 'comprehensive',
+  CLINICAL_SUMMARY: "clinical_summary",
+  OUTCOME_PREDICTION: "outcome_prediction",
+  RISK_ASSESSMENT: "risk_assessment",
+  DECISION_SUPPORT: "decision_support",
+  QUALITY_METRICS: "quality_metrics",
+  RESEARCH_ANALYTICS: "research_analytics",
+  COMPREHENSIVE: "comprehensive",
 };
 
 /**
  * Report formats
  */
 export const ReportFormats = {
-  PDF: 'pdf',
-  HTML: 'html',
-  JSON: 'json',
-  CSV: 'csv',
-  DICOM_SR: 'dicom_sr',
+  PDF: "pdf",
+  HTML: "html",
+  JSON: "json",
+  CSV: "csv",
+  DICOM_SR: "dicom_sr",
 };
 
 /**
  * Report delivery methods
  */
 export const DeliveryMethods = {
-  DOWNLOAD: 'download',
-  EMAIL: 'email',
-  EHR_INTEGRATION: 'ehr_integration',
-  PACS: 'pacs',
-  API: 'api',
+  DOWNLOAD: "download",
+  EMAIL: "email",
+  EHR_INTEGRATION: "ehr_integration",
+  PACS: "pacs",
+  API: "api",
 };
 
 /**
@@ -62,94 +62,94 @@ class ClinicalReportGenerator {
   initializeTemplates() {
     // Clinical Summary Template
     this.templates.set(ReportTypes.CLINICAL_SUMMARY, {
-      name: 'Clinical Summary Report',
+      name: "Clinical Summary Report",
       sections: [
-        'patient_demographics',
-        'clinical_presentation',
-        'assessment_findings',
-        'risk_stratification',
-        'treatment_recommendations',
-        'disposition',
+        "patient_demographics",
+        "clinical_presentation",
+        "assessment_findings",
+        "risk_stratification",
+        "treatment_recommendations",
+        "disposition",
       ],
-      requiredData: ['patientData', 'predictions'],
-      format: 'structured',
+      requiredData: ["patientData", "predictions"],
+      format: "structured",
     });
 
     // Outcome Prediction Template
     this.templates.set(ReportTypes.OUTCOME_PREDICTION, {
-      name: 'Outcome Prediction Report',
+      name: "Outcome Prediction Report",
       sections: [
-        'prediction_overview',
-        'mortality_risk',
-        'functional_outcome',
-        'complications_risk',
-        'model_performance',
-        'confidence_metrics',
+        "prediction_overview",
+        "mortality_risk",
+        "functional_outcome",
+        "complications_risk",
+        "model_performance",
+        "confidence_metrics",
       ],
-      requiredData: ['predictions', 'mlResults'],
-      format: 'analytical',
+      requiredData: ["predictions", "mlResults"],
+      format: "analytical",
     });
 
     // Risk Assessment Template
     this.templates.set(ReportTypes.RISK_ASSESSMENT, {
-      name: 'Risk Assessment Report',
+      name: "Risk Assessment Report",
       sections: [
-        'risk_profile',
-        'hemorrhagic_risk',
-        'procedural_risks',
-        'contraindications',
-        'monitoring_requirements',
-        'escalation_criteria',
+        "risk_profile",
+        "hemorrhagic_risk",
+        "procedural_risks",
+        "contraindications",
+        "monitoring_requirements",
+        "escalation_criteria",
       ],
-      requiredData: ['patientData', 'predictions', 'alerts'],
-      format: 'clinical',
+      requiredData: ["patientData", "predictions", "alerts"],
+      format: "clinical",
     });
 
     // Decision Support Template
     this.templates.set(ReportTypes.DECISION_SUPPORT, {
-      name: 'Clinical Decision Support Report',
+      name: "Clinical Decision Support Report",
       sections: [
-        'treatment_options',
-        'evidence_summary',
-        'guideline_recommendations',
-        'clinical_alerts',
-        'action_plan',
-        'follow_up',
+        "treatment_options",
+        "evidence_summary",
+        "guideline_recommendations",
+        "clinical_alerts",
+        "action_plan",
+        "follow_up",
       ],
-      requiredData: ['patientData', 'predictions', 'recommendations'],
-      format: 'actionable',
+      requiredData: ["patientData", "predictions", "recommendations"],
+      format: "actionable",
     });
 
     // Quality Metrics Template
     this.templates.set(ReportTypes.QUALITY_METRICS, {
-      name: 'Quality Metrics Report',
+      name: "Quality Metrics Report",
       sections: [
-        'performance_indicators',
-        'process_metrics',
-        'outcome_measures',
-        'benchmarking',
-        'improvement_opportunities',
-        'action_items',
+        "performance_indicators",
+        "process_metrics",
+        "outcome_measures",
+        "benchmarking",
+        "improvement_opportunities",
+        "action_items",
       ],
-      requiredData: ['qualityMetrics', 'benchmarks'],
-      format: 'dashboard',
+      requiredData: ["qualityMetrics", "benchmarks"],
+      format: "dashboard",
     });
 
     // Comprehensive Template
     this.templates.set(ReportTypes.COMPREHENSIVE, {
-      name: 'Comprehensive Clinical Report',
+      name: "Comprehensive Clinical Report",
       sections: [
-        'executive_summary',
-        'clinical_summary',
-        'risk_assessment',
-        'outcome_predictions',
-        'decision_support',
-        'quality_metrics',
-        'research_insights',
-        'appendices',
+        "executive_summary",
+        "clinical_summary",
+        "risk_assessment",
+        "outcome_predictions",
+        "decision_support",
+        "quality_metrics",
+        "research_insights",
+        "appendices",
       ],
-      requiredData: ['all'],
-      format: 'comprehensive',
+      requiredData: ["all"],
+      format: "comprehensive",
     });
   }
 
@@ -183,9 +183,9 @@ class ClinicalReportGenerator {
         type: reportType,
         format: options.format || ReportFormats.HTML,
         generated: new Date().toISOString(),
-        generator: 'ClinicalReportGenerator',
-        version: '1.0',
-        patient: data.patientData?.id || 'unknown',
+        generator: "ClinicalReportGenerator",
+        version: "1.0",
+        patient: data.patientData?.id || "unknown",
         size: formattedReport.length,
       };
 
@@ -198,7 +198,7 @@ class ClinicalReportGenerator {
       medicalPerformanceMonitor.endMeasurement(metricId, { success: true });
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'clinical_report_generated',
+        action: "clinical_report_generated",
         reportType,
         reportId: reportMetadata.id,
         patient: reportMetadata.patient,
@@ -228,7 +228,7 @@ class ClinicalReportGenerator {
     const missingData = [];
 
     for (const requirement of template.requiredData) {
-      if (requirement === 'all') {
+      if (requirement === "all") {
         continue;
       } // Special case for comprehensive reports
 
@@ -238,7 +238,7 @@ class ClinicalReportGenerator {
     }
 
     if (missingData.length > 0) {
-      throw new Error(`Missing required data: ${missingData.join(', ')}`);
+      throw new Error(`Missing required data: ${missingData.join(", ")}`);
     }
   }
 
@@ -283,89 +283,89 @@ class ClinicalReportGenerator {
    */
   async generateSection(sectionName, data, options) {
     switch (sectionName) {
-      case 'patient_demographics':
-        return this.generatePatientDemographics(data.patientData);
+    case "patient_demographics":
+      return this.generatePatientDemographics(data.patientData);
 
-      case 'clinical_presentation':
-        return this.generateClinicalPresentation(data.patientData);
+    case "clinical_presentation":
+      return this.generateClinicalPresentation(data.patientData);
 
-      case 'assessment_findings':
-        return this.generateAssessmentFindings(data.patientData, data.predictions);
+    case "assessment_findings":
+      return this.generateAssessmentFindings(data.patientData, data.predictions);
 
-      case 'risk_stratification':
-        return this.generateRiskStratification(data.predictions);
+    case "risk_stratification":
+      return this.generateRiskStratification(data.predictions);
 
-      case 'treatment_recommendations':
-        return this.generateTreatmentRecommendations(data.recommendations || data.predictions?.recommendations);
+    case "treatment_recommendations":
+      return this.generateTreatmentRecommendations(data.recommendations || data.predictions?.recommendations);
 
-      case 'disposition':
-        return this.generateDisposition(data.predictions);
+    case "disposition":
+      return this.generateDisposition(data.predictions);
 
-      case 'prediction_overview':
-        return this.generatePredictionOverview(data.predictions);
+    case "prediction_overview":
+      return this.generatePredictionOverview(data.predictions);
 
-      case 'mortality_risk':
-        return this.generateMortalityRisk(data.predictions?.mortality);
+    case "mortality_risk":
+      return this.generateMortalityRisk(data.predictions?.mortality);
 
-      case 'functional_outcome':
-        return this.generateFunctionalOutcome(data.predictions?.functionalOutcome);
+    case "functional_outcome":
+      return this.generateFunctionalOutcome(data.predictions?.functionalOutcome);
 
-      case 'complications_risk':
-        return this.generateComplicationsRisk(data.predictions?.complications);
+    case "complications_risk":
+      return this.generateComplicationsRisk(data.predictions?.complications);
 
-      case 'model_performance':
-        return this.generateModelPerformance(data.mlResults);
+    case "model_performance":
+      return this.generateModelPerformance(data.mlResults);
 
-      case 'confidence_metrics':
-        return this.generateConfidenceMetrics(data.predictions);
+    case "confidence_metrics":
+      return this.generateConfidenceMetrics(data.predictions);
 
-      case 'risk_profile':
-        return this.generateRiskProfile(data.patientData, data.predictions);
+    case "risk_profile":
+      return this.generateRiskProfile(data.patientData, data.predictions);
 
-      case 'hemorrhagic_risk':
-        return this.generateHemorrhagicRisk(data.predictions?.hemorrhagicRisk);
+    case "hemorrhagic_risk":
+      return this.generateHemorrhagicRisk(data.predictions?.hemorrhagicRisk);
 
-      case 'procedural_risks':
-        return this.generateProceduralRisks(data.patientData);
+    case "procedural_risks":
+      return this.generateProceduralRisks(data.patientData);
 
-      case 'contraindications':
-        return this.generateContraindications(data.patientData);
+    case "contraindications":
+      return this.generateContraindications(data.patientData);
 
-      case 'monitoring_requirements':
-        return this.generateMonitoringRequirements(data.predictions);
+    case "monitoring_requirements":
+      return this.generateMonitoringRequirements(data.predictions);
 
-      case 'escalation_criteria':
-        return this.generateEscalationCriteria(data.predictions);
+    case "escalation_criteria":
+      return this.generateEscalationCriteria(data.predictions);
 
-      case 'treatment_options':
-        return this.generateTreatmentOptions(data.patientData, data.predictions);
+    case "treatment_options":
+      return this.generateTreatmentOptions(data.patientData, data.predictions);
 
-      case 'evidence_summary':
-        return this.generateEvidenceSummary(data.patientData);
+    case "evidence_summary":
+      return this.generateEvidenceSummary(data.patientData);
 
-      case 'guideline_recommendations':
-        return this.generateGuidelineRecommendations(data.patientData);
+    case "guideline_recommendations":
+      return this.generateGuidelineRecommendations(data.patientData);
 
-      case 'clinical_alerts':
-        return this.generateClinicalAlerts(data.alerts);
+    case "clinical_alerts":
+      return this.generateClinicalAlerts(data.alerts);
 
-      case 'action_plan':
-        return this.generateActionPlan(data.recommendations);
+    case "action_plan":
+      return this.generateActionPlan(data.recommendations);
 
-      case 'follow_up':
-        return this.generateFollowUp(data.predictions);
+    case "follow_up":
+      return this.generateFollowUp(data.predictions);
 
-      case 'executive_summary':
-        return this.generateExecutiveSummary(data);
+    case "executive_summary":
+      return this.generateExecutiveSummary(data);
 
-      case 'research_insights':
-        return this.generateResearchInsights(data);
+    case "research_insights":
+      return this.generateResearchInsights(data);
 
-      case 'appendices':
-        return this.generateAppendices(data);
+    case "appendices":
+      return this.generateAppendices(data);
 
-      default:
-        throw new Error(`Unknown section: ${sectionName}`);
+    default:
+      throw new Error(`Unknown section: ${sectionName}`);
     }
   }
 
@@ -392,9 +392,9 @@ class ClinicalReportGenerator {
     }
 
     return {
-      title: 'Patient Demographics',
-      content: demographics.join('; '),
-      quality: this.assessDataQuality(['age', 'gender'], patientData),
+      title: "Patient Demographics",
+      content: demographics.join("; "),
+      quality: this.assessDataQuality(["age", "gender"], patientData),
     };
   }
 
@@ -421,9 +421,9 @@ class ClinicalReportGenerator {
     }
 
     return {
-      title: 'Clinical Presentation',
-      content: presentation.join('<br>'),
-      quality: this.assessDataQuality(['symptom_onset', 'gcs_score', 'systolic_bp'], patientData),
+      title: "Clinical Presentation",
+      content: presentation.join("<br>"),
+      quality: this.assessDataQuality(["symptom_onset", "gcs_score", "systolic_bp"], patientData),
     };
   }
 
@@ -435,7 +435,7 @@ class ClinicalReportGenerator {
 
     if (patientData.gfap_value) {
       const gfap = parseFloat(patientData.gfap_value);
-      findings.push(`GFAP Biomarker: ${gfap.toLocaleString()} pg/mL${gfap > 5000 ? ' (Elevated)' : ''}`);
+      findings.push(`GFAP Biomarker: ${gfap.toLocaleString()} pg/mL${gfap > 5000 ? " (Elevated)" : ""}`);
     }
 
     if (patientData.ich_volume) {
@@ -447,9 +447,9 @@ class ClinicalReportGenerator {
     }
 
     return {
-      title: 'Assessment Findings',
-      content: findings.join('<br>'),
-      quality: this.assessDataQuality(['gfap_value'], patientData),
+      title: "Assessment Findings",
+      content: findings.join("<br>"),
+      quality: this.assessDataQuality(["gfap_value"], patientData),
     };
   }
 
@@ -461,26 +461,26 @@ class ClinicalReportGenerator {
 
     if (predictions?.mortality) {
       const { risk } = predictions.mortality;
-      const level = predictions.mortality.riskLevel?.level || 'unknown';
+      const level = predictions.mortality.riskLevel?.level || "unknown";
       risks.push(`<strong>Mortality Risk:</strong> ${risk}% (${level})`);
     }
 
     if (predictions?.hemorrhagicRisk) {
       const { risk } = predictions.hemorrhagicRisk;
-      const level = predictions.hemorrhagicRisk.riskLevel?.level || 'unknown';
+      const level = predictions.hemorrhagicRisk.riskLevel?.level || "unknown";
       risks.push(`<strong>Hemorrhagic Risk:</strong> ${risk}% (${level})`);
     }
 
     if (predictions?.compositeRisk) {
       const { score } = predictions.compositeRisk;
-      const level = predictions.compositeRisk.riskLevel?.level || 'unknown';
+      const level = predictions.compositeRisk.riskLevel?.level || "unknown";
       risks.push(`<strong>Composite Risk:</strong> ${score}% (${level})`);
     }
 
     return {
-      title: 'Risk Stratification',
-      content: risks.join('<br>'),
-      quality: { score: predictions ? 95 : 0, issues: predictions ? [] : ['No predictions available'] },
+      title: "Risk Stratification",
+      content: risks.join("<br>"),
+      quality: { score: predictions ? 95 : 0, issues: predictions ? [] : ["No predictions available"] },
     };
   }
 
@@ -490,31 +490,31 @@ class ClinicalReportGenerator {
   generateTreatmentRecommendations(recommendations) {
     if (!recommendations) {
       return {
-        title: 'Treatment Recommendations',
-        content: 'No recommendations available',
-        quality: { score: 0, issues: ['No recommendations data'] },
+        title: "Treatment Recommendations",
+        content: "No recommendations available",
+        quality: { score: 0, issues: ["No recommendations data"] },
       };
     }
 
     const recs = [];
 
     if (recommendations.priority && recommendations.priority.length > 0) {
-      recs.push('<strong>Priority Actions:</strong>');
+      recs.push("<strong>Priority Actions:</strong>");
       recommendations.priority.forEach((rec) => {
         recs.push(`• ${rec.action} (${rec.rationale})`);
       });
     }
 
     if (recommendations.standard && recommendations.standard.length > 0) {
-      recs.push('<br><strong>Standard Care:</strong>');
+      recs.push("<br><strong>Standard Care:</strong>");
       recommendations.standard.forEach((rec) => {
         recs.push(`• ${rec.action} (${rec.rationale})`);
       });
     }
 
     return {
-      title: 'Treatment Recommendations',
-      content: recs.join('<br>'),
+      title: "Treatment Recommendations",
+      content: recs.join("<br>"),
       quality: { score: 90, issues: [] },
     };
   }
@@ -523,20 +523,20 @@ class ClinicalReportGenerator {
    * Generate disposition section
    */
   generateDisposition(predictions) {
-    let disposition = 'Standard stroke unit care';
+    let disposition = "Standard stroke unit care";
 
     if (predictions?.mortality?.risk > 50) {
-      disposition = 'ICU admission recommended due to high mortality risk';
+      disposition = "ICU admission recommended due to high mortality risk";
     } else if (predictions?.hemorrhagicRisk?.risk > 40) {
-      disposition = 'Enhanced monitoring unit due to hemorrhagic transformation risk';
+      disposition = "Enhanced monitoring unit due to hemorrhagic transformation risk";
     } else if (predictions?.compositeRisk?.score > 60) {
-      disposition = 'Stroke unit with close monitoring';
+      disposition = "Stroke unit with close monitoring";
     }
 
     return {
-      title: 'Disposition',
+      title: "Disposition",
       content: disposition,
-      quality: { score: predictions ? 85 : 0, issues: predictions ? [] : ['No predictions for disposition'] },
+      quality: { score: predictions ? 85 : 0, issues: predictions ? [] : ["No predictions for disposition"] },
     };
   }
 
@@ -546,34 +546,34 @@ class ClinicalReportGenerator {
   generatePredictionOverview(predictions) {
     if (!predictions) {
       return {
-        title: 'Prediction Overview',
-        content: 'No predictions available',
-        quality: { score: 0, issues: ['No predictions data'] },
+        title: "Prediction Overview",
+        content: "No predictions available",
+        quality: { score: 0, issues: ["No predictions data"] },
       };
     }
 
     const overview = [
-      '<table class="prediction-table">',
-      '<tr><th>Outcome</th><th>Prediction</th><th>Confidence</th></tr>',
+      "<table class=\"prediction-table\">",
+      "<tr><th>Outcome</th><th>Prediction</th><th>Confidence</th></tr>",
     ];
 
     if (predictions.mortality) {
-      overview.push(`<tr><td>30-Day Mortality</td><td>${predictions.mortality.risk}%</td><td>${predictions.mortality.confidence?.level || 'N/A'}</td></tr>`);
+      overview.push(`<tr><td>30-Day Mortality</td><td>${predictions.mortality.risk}%</td><td>${predictions.mortality.confidence?.level || "N/A"}</td></tr>`);
     }
 
     if (predictions.functionalOutcome) {
-      overview.push(`<tr><td>Good Functional Outcome</td><td>${predictions.functionalOutcome.probability}%</td><td>${predictions.functionalOutcome.confidence?.level || 'N/A'}</td></tr>`);
+      overview.push(`<tr><td>Good Functional Outcome</td><td>${predictions.functionalOutcome.probability}%</td><td>${predictions.functionalOutcome.confidence?.level || "N/A"}</td></tr>`);
     }
 
     if (predictions.hemorrhagicRisk) {
       overview.push(`<tr><td>Hemorrhagic Transformation</td><td>${predictions.hemorrhagicRisk.risk}%</td><td>High</td></tr>`);
     }
 
-    overview.push('</table>');
+    overview.push("</table>");
 
     return {
-      title: 'Prediction Overview',
-      content: overview.join(''),
+      title: "Prediction Overview",
+      content: overview.join(""),
       quality: { score: 95, issues: [] },
     };
   }
@@ -584,16 +584,16 @@ class ClinicalReportGenerator {
   generateMortalityRisk(mortalityData) {
     if (!mortalityData) {
       return {
-        title: 'Mortality Risk',
-        content: 'Mortality risk assessment not available',
-        quality: { score: 0, issues: ['No mortality data'] },
+        title: "Mortality Risk",
+        content: "Mortality risk assessment not available",
+        quality: { score: 0, issues: ["No mortality data"] },
       };
     }
 
     const content = [
       `<p><strong>30-Day Mortality Risk:</strong> ${mortalityData.risk}%</p>`,
-      `<p><strong>Risk Level:</strong> ${mortalityData.riskLevel?.label || 'Unknown'}</p>`,
-      `<p><strong>Confidence:</strong> ${mortalityData.confidence?.level || 'Unknown'} (${mortalityData.confidence?.percent || 0}%)</p>`,
+      `<p><strong>Risk Level:</strong> ${mortalityData.riskLevel?.label || "Unknown"}</p>`,
+      `<p><strong>Confidence:</strong> ${mortalityData.confidence?.level || "Unknown"} (${mortalityData.confidence?.percent || 0}%)</p>`,
     ];
 
     if (mortalityData.explanation) {
@@ -601,17 +601,17 @@ class ClinicalReportGenerator {
     }
 
     if (mortalityData.factors && mortalityData.factors.length > 0) {
-      content.push('<p><strong>Contributing Factors:</strong></p>');
-      content.push('<ul>');
+      content.push("<p><strong>Contributing Factors:</strong></p>");
+      content.push("<ul>");
       mortalityData.factors.forEach((factor) => {
         content.push(`<li>${factor.name}: ${factor.impact} impact (weight: ${Math.round((factor.weight || 0) * 100)}%)</li>`);
       });
-      content.push('</ul>');
+      content.push("</ul>");
     }
 
     return {
-      title: 'Mortality Risk Analysis',
-      content: content.join(''),
+      title: "Mortality Risk Analysis",
+      content: content.join(""),
       quality: { score: 95, issues: [] },
     };
   }
@@ -622,30 +622,30 @@ class ClinicalReportGenerator {
   generateFunctionalOutcome(functionalData) {
     if (!functionalData) {
       return {
-        title: 'Functional Outcome',
-        content: 'Functional outcome prediction not available',
-        quality: { score: 0, issues: ['No functional outcome data'] },
+        title: "Functional Outcome",
+        content: "Functional outcome prediction not available",
+        quality: { score: 0, issues: ["No functional outcome data"] },
       };
     }
 
     const content = [
       `<p><strong>Probability of Good Outcome (mRS 0-2):</strong> ${functionalData.probability}%</p>`,
       `<p><strong>Predicted Outcome:</strong> ${functionalData.outcome}</p>`,
-      `<p><strong>Confidence:</strong> ${functionalData.confidence?.level || 'Unknown'}</p>`,
+      `<p><strong>Confidence:</strong> ${functionalData.confidence?.level || "Unknown"}</p>`,
     ];
 
     if (functionalData.factors && functionalData.factors.length > 0) {
-      content.push('<p><strong>Influencing Factors:</strong></p>');
-      content.push('<ul>');
+      content.push("<p><strong>Influencing Factors:</strong></p>");
+      content.push("<ul>");
       functionalData.factors.forEach((factor) => {
         content.push(`<li>${factor.name}: ${factor.impact} impact - ${factor.description}</li>`);
       });
-      content.push('</ul>');
+      content.push("</ul>");
     }
 
     return {
-      title: 'Functional Outcome Prediction',
-      content: content.join(''),
+      title: "Functional Outcome Prediction",
+      content: content.join(""),
       quality: { score: 90, issues: [] },
     };
   }
@@ -664,13 +664,13 @@ class ClinicalReportGenerator {
     // Key findings
     if (data.patientData?.gfap_value) {
       const gfap = parseFloat(data.patientData.gfap_value);
-      summary.push(`GFAP level: ${gfap.toLocaleString()} pg/mL${gfap > 5000 ? ' (significantly elevated)' : ''}.`);
+      summary.push(`GFAP level: ${gfap.toLocaleString()} pg/mL${gfap > 5000 ? " (significantly elevated)" : ""}.`);
     }
 
     // Risk assessment
     if (data.predictions?.compositeRisk) {
       const risk = data.predictions.compositeRisk.score;
-      const level = data.predictions.compositeRisk.riskLevel?.level || 'unknown';
+      const level = data.predictions.compositeRisk.riskLevel?.level || "unknown";
       summary.push(`Overall risk assessment: ${risk}% (${level} risk).`);
     }
 
@@ -680,8 +680,8 @@ class ClinicalReportGenerator {
     }
 
     return {
-      title: 'Executive Summary',
-      content: summary.join(' '),
+      title: "Executive Summary",
+      content: summary.join(" "),
       quality: { score: 85, issues: [] },
     };
   }
@@ -690,14 +690,14 @@ class ClinicalReportGenerator {
    * Assess data quality for a section
    */
   assessDataQuality(requiredFields, data) {
-    const availableFields = requiredFields.filter((field) => data[field] !== undefined && data[field] !== null && data[field] !== '');
+    const availableFields = requiredFields.filter((field) => data[field] !== undefined && data[field] !== null && data[field] !== "");
 
     const score = (availableFields.length / requiredFields.length) * 100;
     const missingFields = requiredFields.filter((field) => !availableFields.includes(field));
 
     return {
       score: Math.round(score),
-      issues: missingFields.length > 0 ? [`Missing data: ${missingFields.join(', ')}`] : [],
+      issues: missingFields.length > 0 ? [`Missing data: ${missingFields.join(", ")}`] : [],
     };
   }
 
@@ -706,22 +706,22 @@ class ClinicalReportGenerator {
    */
   getSectionTitle(sectionName) {
     const titles = {
-      patient_demographics: 'Patient Demographics',
-      clinical_presentation: 'Clinical Presentation',
-      assessment_findings: 'Assessment Findings',
-      risk_stratification: 'Risk Stratification',
-      treatment_recommendations: 'Treatment Recommendations',
-      disposition: 'Disposition',
-      prediction_overview: 'Prediction Overview',
-      mortality_risk: 'Mortality Risk',
-      functional_outcome: 'Functional Outcome',
-      complications_risk: 'Complications Risk',
-      model_performance: 'Model Performance',
-      confidence_metrics: 'Confidence Metrics',
-      executive_summary: 'Executive Summary',
+      patient_demographics: "Patient Demographics",
+      clinical_presentation: "Clinical Presentation",
+      assessment_findings: "Assessment Findings",
+      risk_stratification: "Risk Stratification",
+      treatment_recommendations: "Treatment Recommendations",
+      disposition: "Disposition",
+      prediction_overview: "Prediction Overview",
+      mortality_risk: "Mortality Risk",
+      functional_outcome: "Functional Outcome",
+      complications_risk: "Complications Risk",
+      model_performance: "Model Performance",
+      confidence_metrics: "Confidence Metrics",
+      executive_summary: "Executive Summary",
     };
 
-    return titles[sectionName] || sectionName.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+    return titles[sectionName] || sectionName.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   }
 
   /**
@@ -729,20 +729,20 @@ class ClinicalReportGenerator {
    */
   async formatReport(reportContent, format) {
     switch (format) {
-      case ReportFormats.HTML:
-        return this.formatAsHTML(reportContent);
+    case ReportFormats.HTML:
+      return this.formatAsHTML(reportContent);
 
-      case ReportFormats.PDF:
-        return this.formatAsPDF(reportContent);
+    case ReportFormats.PDF:
+      return this.formatAsPDF(reportContent);
 
-      case ReportFormats.JSON:
-        return JSON.stringify(reportContent, null, 2);
+    case ReportFormats.JSON:
+      return JSON.stringify(reportContent, null, 2);
 
-      case ReportFormats.CSV:
-        return this.formatAsCSV(reportContent);
+    case ReportFormats.CSV:
+      return this.formatAsCSV(reportContent);
 
-      default:
-        return this.formatAsHTML(reportContent);
+    default:
+      return this.formatAsHTML(reportContent);
     }
   }
 
@@ -751,24 +751,24 @@ class ClinicalReportGenerator {
    */
   formatAsHTML(reportContent) {
     const html = [
-      '<!DOCTYPE html>',
-      '<html lang="en">',
-      '<head>',
-      '<meta charset="UTF-8">',
-      '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+      "<!DOCTYPE html>",
+      "<html lang=\"en\">",
+      "<head>",
+      "<meta charset=\"UTF-8\">",
+      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
       `<title>${reportContent.template}</title>`,
-      '<style>',
+      "<style>",
       this.getReportCSS(),
-      '</style>',
-      '</head>',
-      '<body>',
-      '<div class="report-container">',
-      '<header class="report-header">',
+      "</style>",
+      "</head>",
+      "<body>",
+      "<div class=\"report-container\">",
+      "<header class=\"report-header\">",
       `<h1>${reportContent.template}</h1>`,
       `<div class="report-meta">Generated: ${reportContent.generated}</div>`,
       `<div class="data-quality">Data Quality: ${reportContent.dataQuality.score}%</div>`,
-      '</header>',
-      '<main class="report-content">',
+      "</header>",
+      "<main class=\"report-content\">",
     ];
 
     // Add sections
@@ -779,15 +779,15 @@ class ClinicalReportGenerator {
       if (section.quality && section.quality.score < 100) {
         html.push(`<div class="quality-indicator">Quality: ${section.quality.score}%</div>`);
       }
-      html.push('</section>');
+      html.push("</section>");
     });
 
-    html.push('</main>');
-    html.push('</div>');
-    html.push('</body>');
-    html.push('</html>');
+    html.push("</main>");
+    html.push("</div>");
+    html.push("</body>");
+    html.push("</html>");
 
-    return html.join('\n');
+    return html.join("\n");
   }
 
   /**
@@ -946,8 +946,8 @@ class ClinicalReportGenerator {
   generateClinicalAlerts(alerts) {
     if (!alerts || alerts.length === 0) {
       return {
-        title: 'Clinical Alerts',
-        content: 'No active alerts',
+        title: "Clinical Alerts",
+        content: "No active alerts",
         quality: { score: 100, issues: [] },
       };
     }
@@ -956,10 +956,10 @@ class ClinicalReportGenerator {
         <strong>${alert.title}</strong><br>
         ${alert.message}<br>
         <em>Recommendation: ${alert.recommendation}</em>
-      </div>`).join('');
+      </div>`).join("");
 
     return {
-      title: 'Clinical Alerts',
+      title: "Clinical Alerts",
       content: alertsHtml,
       quality: { score: 95, issues: [] },
     };
@@ -968,46 +968,46 @@ class ClinicalReportGenerator {
   generateHemorrhagicRisk(hemorrhagicData) {
     if (!hemorrhagicData) {
       return {
-        title: 'Hemorrhagic Risk',
-        content: 'Hemorrhagic risk assessment not available',
-        quality: { score: 0, issues: ['No hemorrhagic risk data'] },
+        title: "Hemorrhagic Risk",
+        content: "Hemorrhagic risk assessment not available",
+        quality: { score: 0, issues: ["No hemorrhagic risk data"] },
       };
     }
 
     const content = [
       `<p><strong>Hemorrhagic Transformation Risk:</strong> ${hemorrhagicData.risk}%</p>`,
-      `<p><strong>Risk Level:</strong> ${hemorrhagicData.riskLevel?.label || 'Unknown'}</p>`,
+      `<p><strong>Risk Level:</strong> ${hemorrhagicData.riskLevel?.label || "Unknown"}</p>`,
       `<p><strong>Recommendation:</strong> ${hemorrhagicData.recommendation}</p>`,
     ];
 
     if (hemorrhagicData.activeFactors && hemorrhagicData.activeFactors.length > 0) {
-      content.push('<p><strong>Active Risk Factors:</strong></p>');
-      content.push('<ul>');
+      content.push("<p><strong>Active Risk Factors:</strong></p>");
+      content.push("<ul>");
       hemorrhagicData.activeFactors.forEach((factor) => {
         content.push(`<li>${factor.factor}: ${factor.contribution}% contribution</li>`);
       });
-      content.push('</ul>');
+      content.push("</ul>");
     }
 
     return {
-      title: 'Hemorrhagic Transformation Risk',
-      content: content.join(''),
+      title: "Hemorrhagic Transformation Risk",
+      content: content.join(""),
       quality: { score: 90, issues: [] },
     };
   }
 
   generateResearchInsights(data) {
     return {
-      title: 'Research Insights',
-      content: 'Research analytics and population-based insights would be generated here based on anonymized data comparisons.',
-      quality: { score: 70, issues: ['Research module not fully implemented'] },
+      title: "Research Insights",
+      content: "Research analytics and population-based insights would be generated here based on anonymized data comparisons.",
+      quality: { score: 70, issues: ["Research module not fully implemented"] },
     };
   }
 
   generateAppendices(data) {
     return {
-      title: 'Appendices',
-      content: 'Technical details, model specifications, and additional data would be included in appendices.',
+      title: "Appendices",
+      content: "Technical details, model specifications, and additional data would be included in appendices.",
       quality: { score: 80, issues: [] },
     };
   }
@@ -1015,96 +1015,96 @@ class ClinicalReportGenerator {
   // Additional simplified generators for remaining sections
   generateModelPerformance(mlResults) {
     return {
-      title: 'Model Performance',
-      content: mlResults ? 'Model performance metrics and validation results.' : 'No ML results available.',
-      quality: { score: mlResults ? 85 : 0, issues: mlResults ? [] : ['No ML results'] },
+      title: "Model Performance",
+      content: mlResults ? "Model performance metrics and validation results." : "No ML results available.",
+      quality: { score: mlResults ? 85 : 0, issues: mlResults ? [] : ["No ML results"] },
     };
   }
 
   generateConfidenceMetrics(predictions) {
     return {
-      title: 'Confidence Metrics',
-      content: predictions ? 'Prediction confidence analysis and reliability metrics.' : 'No predictions available.',
-      quality: { score: predictions ? 90 : 0, issues: predictions ? [] : ['No predictions'] },
+      title: "Confidence Metrics",
+      content: predictions ? "Prediction confidence analysis and reliability metrics." : "No predictions available.",
+      quality: { score: predictions ? 90 : 0, issues: predictions ? [] : ["No predictions"] },
     };
   }
 
   generateRiskProfile(patientData, predictions) {
     return {
-      title: 'Risk Profile',
-      content: 'Comprehensive risk profile based on clinical and predictive factors.',
+      title: "Risk Profile",
+      content: "Comprehensive risk profile based on clinical and predictive factors.",
       quality: { score: 85, issues: [] },
     };
   }
 
   generateProceduralRisks(patientData) {
     return {
-      title: 'Procedural Risks',
-      content: 'Assessment of risks associated with potential interventions.',
+      title: "Procedural Risks",
+      content: "Assessment of risks associated with potential interventions.",
       quality: { score: 80, issues: [] },
     };
   }
 
   generateContraindications(patientData) {
     return {
-      title: 'Contraindications',
-      content: 'Analysis of contraindications for various treatment options.',
+      title: "Contraindications",
+      content: "Analysis of contraindications for various treatment options.",
       quality: { score: 85, issues: [] },
     };
   }
 
   generateMonitoringRequirements(predictions) {
     return {
-      title: 'Monitoring Requirements',
-      content: 'Recommended monitoring protocols based on risk assessment.',
+      title: "Monitoring Requirements",
+      content: "Recommended monitoring protocols based on risk assessment.",
       quality: { score: 90, issues: [] },
     };
   }
 
   generateEscalationCriteria(predictions) {
     return {
-      title: 'Escalation Criteria',
-      content: 'Criteria for escalating care based on clinical deterioration.',
+      title: "Escalation Criteria",
+      content: "Criteria for escalating care based on clinical deterioration.",
       quality: { score: 85, issues: [] },
     };
   }
 
   generateTreatmentOptions(patientData, predictions) {
     return {
-      title: 'Treatment Options',
-      content: 'Available treatment options with risk-benefit analysis.',
+      title: "Treatment Options",
+      content: "Available treatment options with risk-benefit analysis.",
       quality: { score: 88, issues: [] },
     };
   }
 
   generateEvidenceSummary(patientData) {
     return {
-      title: 'Evidence Summary',
-      content: 'Summary of relevant clinical evidence and guidelines.',
+      title: "Evidence Summary",
+      content: "Summary of relevant clinical evidence and guidelines.",
       quality: { score: 75, issues: [] },
     };
   }
 
   generateGuidelineRecommendations(patientData) {
     return {
-      title: 'Guideline Recommendations',
-      content: 'Relevant clinical guideline recommendations.',
+      title: "Guideline Recommendations",
+      content: "Relevant clinical guideline recommendations.",
       quality: { score: 85, issues: [] },
     };
   }
 
   generateActionPlan(recommendations) {
     return {
-      title: 'Action Plan',
-      content: recommendations ? 'Structured action plan based on recommendations.' : 'No recommendations available.',
-      quality: { score: recommendations ? 90 : 0, issues: recommendations ? [] : ['No recommendations'] },
+      title: "Action Plan",
+      content: recommendations ? "Structured action plan based on recommendations." : "No recommendations available.",
+      quality: { score: recommendations ? 90 : 0, issues: recommendations ? [] : ["No recommendations"] },
     };
   }
 
   generateFollowUp(predictions) {
     return {
-      title: 'Follow-up',
-      content: 'Recommended follow-up schedule and monitoring plan.',
+      title: "Follow-up",
+      content: "Recommended follow-up schedule and monitoring plan.",
       quality: { score: 85, issues: [] },
     };
   }
@@ -1112,26 +1112,26 @@ class ClinicalReportGenerator {
   generateComplicationsRisk(complicationsData) {
     if (!complicationsData) {
       return {
-        title: 'Complications Risk',
-        content: 'Complications risk assessment not available',
-        quality: { score: 0, issues: ['No complications data'] },
+        title: "Complications Risk",
+        content: "Complications risk assessment not available",
+        quality: { score: 0, issues: ["No complications data"] },
       };
     }
 
     const content = [`<p><strong>Overall Complications Risk:</strong> ${complicationsData.totalRisk}%</p>`];
 
     if (complicationsData.complications && complicationsData.complications.length > 0) {
-      content.push('<p><strong>Specific Complications:</strong></p>');
-      content.push('<ul>');
+      content.push("<p><strong>Specific Complications:</strong></p>");
+      content.push("<ul>");
       complicationsData.complications.forEach((comp) => {
         content.push(`<li>${comp.type}: ${comp.risk}% risk</li>`);
       });
-      content.push('</ul>');
+      content.push("</ul>");
     }
 
     return {
-      title: 'Complications Risk Assessment',
-      content: content.join(''),
+      title: "Complications Risk Assessment",
+      content: content.join(""),
       quality: { score: 90, issues: [] },
     };
   }
@@ -1156,7 +1156,7 @@ export class ClinicalReportingSystem {
     this.processDeliveryQueue();
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'clinical_reporting_system_started',
+      action: "clinical_reporting_system_started",
     });
   }
 
@@ -1189,7 +1189,7 @@ export class ClinicalReportingSystem {
     });
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'report_scheduled',
+      action: "report_scheduled",
       scheduleId,
       reportType: schedule.reportType,
     });
@@ -1250,28 +1250,28 @@ export class ClinicalReportingSystem {
     const { report, deliveryMethod, deliveryOptions } = deliveryItem;
 
     switch (deliveryMethod) {
-      case DeliveryMethods.DOWNLOAD:
-        this.triggerDownload(report);
-        break;
+    case DeliveryMethods.DOWNLOAD:
+      this.triggerDownload(report);
+      break;
 
-      case DeliveryMethods.EMAIL:
-        await this.emailReport(report, deliveryOptions);
-        break;
+    case DeliveryMethods.EMAIL:
+      await this.emailReport(report, deliveryOptions);
+      break;
 
-      case DeliveryMethods.EHR_INTEGRATION:
-        await this.integrateWithEHR(report, deliveryOptions);
-        break;
+    case DeliveryMethods.EHR_INTEGRATION:
+      await this.integrateWithEHR(report, deliveryOptions);
+      break;
 
-      case DeliveryMethods.API:
-        await this.sendToAPI(report, deliveryOptions);
-        break;
+    case DeliveryMethods.API:
+      await this.sendToAPI(report, deliveryOptions);
+      break;
 
-      default:
-        throw new Error(`Unknown delivery method: ${deliveryMethod}`);
+    default:
+      throw new Error(`Unknown delivery method: ${deliveryMethod}`);
     }
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'report_delivered',
+      action: "report_delivered",
       reportId: report.metadata.id,
       deliveryMethod,
     });
@@ -1281,10 +1281,10 @@ export class ClinicalReportingSystem {
    * Trigger report download
    */
   triggerDownload(report) {
-    const blob = new Blob([report.content], { type: 'text/html' });
+    const blob = new Blob([report.content], { type: "text/html" });
     const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = `clinical-report-${report.metadata.id}.html`;
     link.click();
@@ -1322,14 +1322,14 @@ export class ClinicalReportingSystem {
   calculateNextGeneration(frequency) {
     const now = new Date();
     switch (frequency) {
-      case 'daily':
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
-      case 'weekly':
-        return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
-      case 'monthly':
-        return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      default:
-        return null;
+    case "daily":
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+    case "weekly":
+      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    case "monthly":
+      return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    default:
+      return null;
     }
   }
 
@@ -1359,7 +1359,7 @@ export class ClinicalReportingSystem {
 
     return {
       totalReports: history.length,
-      reportsByType: this.groupBy(history, 'type'),
+      reportsByType: this.groupBy(history, "type"),
       averageDataQuality: this.calculateAverageDataQuality(history),
       reportingTrends: this.calculateReportingTrends(history),
       scheduledReports: this.scheduledReports.size,
@@ -1372,7 +1372,7 @@ export class ClinicalReportingSystem {
    */
   groupBy(array, key) {
     return array.reduce((result, item) => {
-      const group = item[key] || 'unknown';
+      const group = item[key] || "unknown";
       result[group] = (result[group] || 0) + 1;
       return result;
     }, {});
@@ -1408,7 +1408,7 @@ export class ClinicalReportingSystem {
     this.isActive = false;
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'clinical_reporting_system_stopped',
+      action: "clinical_reporting_system_stopped",
     });
   }
 }

@@ -5,12 +5,12 @@
  * Provides comprehensive integration testing patterns for medical workflows
  */
 
-import { MedicalValidationFactory } from '../../patterns/validation-factory.js';
-import { predictionContext } from '../../patterns/prediction-strategy.js';
-import { medicalCommandInvoker, SubmitFormCommand } from '../../patterns/command.js';
-import { medicalEventObserver } from '../../patterns/observer.js';
+import { MedicalValidationFactory } from "../../patterns/validation-factory.js";
+import { predictionContext } from "../../patterns/prediction-strategy.js";
+import { medicalCommandInvoker, SubmitFormCommand } from "../../patterns/command.js";
+import { medicalEventObserver } from "../../patterns/observer.js";
 
-import { PatientDataBuilder, MedicalTestScenarioBuilder, MockServiceBuilder } from './test-builders.js';
+import { PatientDataBuilder, MedicalTestScenarioBuilder, MockServiceBuilder } from "./test-builders.js";
 
 /**
  * Integration test harness for medical workflows
@@ -139,10 +139,10 @@ export class MedicalIntegrationTestHarness {
       }
 
       // Apply mock
-      if (typeof global !== 'undefined') {
+      if (typeof global !== "undefined") {
         global[key] = mock;
       }
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         window[key] = mock;
       }
     });
@@ -154,10 +154,10 @@ export class MedicalIntegrationTestHarness {
   cleanupMocks() {
     if (this.originalImplementations) {
       this.originalImplementations.forEach((original, key) => {
-        if (typeof global !== 'undefined') {
+        if (typeof global !== "undefined") {
           global[key] = original;
         }
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           window[key] = original;
         }
       });
@@ -165,7 +165,7 @@ export class MedicalIntegrationTestHarness {
 
     // Clear Jest mocks
     this.mocks.forEach((mock) => {
-      if (mock && typeof mock.mockClear === 'function') {
+      if (mock && typeof mock.mockClear === "function") {
         mock.mockClear();
       }
     });
@@ -215,9 +215,9 @@ export class MedicalTestUtils {
       const result = await medicalCommandInvoker.executeCommand(command);
 
       // Validate result structure
-      expect(result).toHaveProperty('strategy');
-      expect(result).toHaveProperty('timestamp');
-      expect(result).toHaveProperty('inputSummary');
+      expect(result).toHaveProperty("strategy");
+      expect(result).toHaveProperty("timestamp");
+      expect(result).toHaveProperty("inputSummary");
 
       // Validate specific expectations
       if (expectedResult.ich_probability !== undefined) {
@@ -407,32 +407,32 @@ export class MedicalIntegrationScenarios {
   static strokeTriageWorkflow() {
     return MedicalTestScenarioBuilder
       .create()
-      .named('Complete Stroke Triage Workflow', 'End-to-end test of stroke triage process')
+      .named("Complete Stroke Triage Workflow", "End-to-end test of stroke triage process")
       .withSetup(async () => {
         // Setup clean state
         medicalCommandInvoker.clearHistory();
         medicalEventObserver.clearAll();
       })
       .addTestCase({
-        name: 'Adult patient with stroke presentation',
+        name: "Adult patient with stroke presentation",
         test: MedicalTestUtils.createFormSubmissionTest(
-          'full',
+          "full",
           PatientDataBuilder.validAdultStrokePatient().build().data,
           { ich_probability: 0.6, confidence: 0.8 },
         ),
       })
       .addTestCase({
-        name: 'Comatose patient assessment',
+        name: "Comatose patient assessment",
         test: MedicalTestUtils.createFormSubmissionTest(
-          'coma',
+          "coma",
           PatientDataBuilder.comatosePatient().build().data,
           { ich_probability: 0.7, confidence: 0.85 },
         ),
       })
       .addTestCase({
-        name: 'Limited data assessment',
+        name: "Limited data assessment",
         test: MedicalTestUtils.createFormSubmissionTest(
-          'limited',
+          "limited",
           PatientDataBuilder.create()
             .asAdult(55)
             .withElevatedGfap()
@@ -456,29 +456,29 @@ export class MedicalIntegrationScenarios {
   static validationEdgeCases() {
     return MedicalTestScenarioBuilder
       .create()
-      .named('Medical Validation Edge Cases', 'Test validation with edge cases and boundary values')
+      .named("Medical Validation Edge Cases", "Test validation with edge cases and boundary values")
       .addTestCase({
-        name: 'Pediatric patient warning',
+        name: "Pediatric patient warning",
         test: MedicalTestUtils.createValidationTest(
-          'limited',
+          "limited",
           PatientDataBuilder.pediatricPatient().build().data,
           true, // Valid but with warnings
           [],
         ),
       })
       .addTestCase({
-        name: 'Invalid blood pressure',
+        name: "Invalid blood pressure",
         test: MedicalTestUtils.createValidationTest(
-          'limited',
+          "limited",
           PatientDataBuilder.create().withInvalidBloodPressure().build().data,
           false,
-          ['systolic_bp', 'diastolic_bp'],
+          ["systolic_bp", "diastolic_bp"],
         ),
       })
       .addTestCase({
-        name: 'Extremely high GFAP',
+        name: "Extremely high GFAP",
         test: MedicalTestUtils.createValidationTest(
-          'limited',
+          "limited",
           PatientDataBuilder.create().withExtremelyHighGfap().asAdult().withNormalBloodPressure()
             .build().data,
           true, // Valid but with medical warning
@@ -495,33 +495,33 @@ export class MedicalIntegrationScenarios {
   static performanceAndReliability() {
     return MedicalTestScenarioBuilder
       .create()
-      .named('Performance and Reliability', 'Test system performance and reliability under load')
+      .named("Performance and Reliability", "Test system performance and reliability under load")
       .addTestCase({
-        name: 'Validation performance',
+        name: "Validation performance",
         test: MedicalTestUtils.createPerformanceTest(
           () => MedicalValidationFactory.validateModule(
             PatientDataBuilder.validAdultStrokePatient().build().data,
-            'FULL',
+            "FULL",
           ),
           100, // Max 100ms
         ),
       })
       .addTestCase({
-        name: 'Concurrent validation',
+        name: "Concurrent validation",
         test: MedicalTestUtils.createConcurrencyTest(
           () => MedicalValidationFactory.validateModule(
             PatientDataBuilder.validAdultStrokePatient().build().data,
-            'LIMITED',
+            "LIMITED",
           ),
           20, // 20 concurrent validations
         ),
       })
       .addTestCase({
-        name: 'Memory leak prevention',
+        name: "Memory leak prevention",
         test: MedicalTestUtils.createMemoryLeakTest(
           () => {
             const { data } = PatientDataBuilder.create().asAdult().withNormalGfap().build();
-            return MedicalValidationFactory.validateModule(data, 'LIMITED');
+            return MedicalValidationFactory.validateModule(data, "LIMITED");
           },
           50, // 50 iterations
         ),

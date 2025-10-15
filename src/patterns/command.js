@@ -5,7 +5,7 @@
  * Provides reversible medical actions with comprehensive audit logging
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from './observer.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "./observer.js";
 
 /**
  * Abstract base command for medical actions
@@ -34,7 +34,7 @@ class MedicalCommand {
 
     try {
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'command_execute_start',
+        action: "command_execute_start",
         command: this.name,
         commandId: this.metadata.id,
       });
@@ -45,7 +45,7 @@ class MedicalCommand {
       this.undone = false;
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'command_execute_success',
+        action: "command_execute_success",
         command: this.name,
         commandId: this.metadata.id,
       });
@@ -53,7 +53,7 @@ class MedicalCommand {
       return result;
     } catch (error) {
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'command_execute_error',
+        action: "command_execute_error",
         command: this.name,
         commandId: this.metadata.id,
         error: error.message,
@@ -73,7 +73,7 @@ class MedicalCommand {
 
     try {
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'command_undo_start',
+        action: "command_undo_start",
         command: this.name,
         commandId: this.metadata.id,
       });
@@ -83,7 +83,7 @@ class MedicalCommand {
       this.undone = true;
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'command_undo_success',
+        action: "command_undo_success",
         command: this.name,
         commandId: this.metadata.id,
       });
@@ -91,7 +91,7 @@ class MedicalCommand {
       return result;
     } catch (error) {
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'command_undo_error',
+        action: "command_undo_error",
         command: this.name,
         commandId: this.metadata.id,
         error: error.message,
@@ -105,7 +105,7 @@ class MedicalCommand {
    * Must be overridden by concrete commands
    */
   async doExecute() {
-    throw new Error('doExecute() must be implemented by concrete command');
+    throw new Error("doExecute() must be implemented by concrete command");
   }
 
   /**
@@ -113,7 +113,7 @@ class MedicalCommand {
    * Must be overridden by concrete commands
    */
   async doUndo() {
-    throw new Error('doUndo() must be implemented by concrete command');
+    throw new Error("doUndo() must be implemented by concrete command");
   }
 
   /**
@@ -144,7 +144,7 @@ class MedicalCommand {
 class UpdatePatientDataCommand extends MedicalCommand {
   constructor(fieldName, newValue, previousValue, store) {
     super(
-      'UPDATE_PATIENT_DATA',
+      "UPDATE_PATIENT_DATA",
       `Update ${fieldName} from ${previousValue} to ${newValue}`,
       { fieldName, newValue, previousValue },
     );
@@ -156,9 +156,9 @@ class UpdatePatientDataCommand extends MedicalCommand {
 
   async doExecute() {
     // Update the patient data in store
-    const currentData = this.store.getFormData('current') || {};
+    const currentData = this.store.getFormData("current") || {};
     currentData[this.fieldName] = this.newValue;
-    this.store.setFormData('current', currentData);
+    this.store.setFormData("current", currentData);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.PATIENT_DATA_UPDATED, {
       field: this.fieldName,
@@ -171,19 +171,19 @@ class UpdatePatientDataCommand extends MedicalCommand {
 
   async doUndo() {
     // Restore the previous value
-    const currentData = this.store.getFormData('current') || {};
+    const currentData = this.store.getFormData("current") || {};
     if (this.previousValue === null || this.previousValue === undefined) {
       delete currentData[this.fieldName];
     } else {
       currentData[this.fieldName] = this.previousValue;
     }
-    this.store.setFormData('current', currentData);
+    this.store.setFormData("current", currentData);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.PATIENT_DATA_UPDATED, {
       field: this.fieldName,
       newValue: this.previousValue,
       previousValue: this.newValue,
-      action: 'undo',
+      action: "undo",
     });
 
     return { field: this.fieldName, value: this.previousValue };
@@ -196,7 +196,7 @@ class UpdatePatientDataCommand extends MedicalCommand {
 class NavigationCommand extends MedicalCommand {
   constructor(targetScreen, sourceScreen, store) {
     super(
-      'NAVIGATE',
+      "NAVIGATE",
       `Navigate from ${sourceScreen} to ${targetScreen}`,
       { targetScreen, sourceScreen },
     );
@@ -222,7 +222,7 @@ class NavigationCommand extends MedicalCommand {
     medicalEventObserver.publish(MEDICAL_EVENTS.NAVIGATION_CHANGED, {
       from: this.targetScreen,
       to: this.sourceScreen,
-      action: 'undo',
+      action: "undo",
     });
 
     return { from: this.targetScreen, to: this.sourceScreen };
@@ -235,7 +235,7 @@ class NavigationCommand extends MedicalCommand {
 class SubmitFormCommand extends MedicalCommand {
   constructor(formData, moduleType, predictionStrategy) {
     super(
-      'SUBMIT_FORM',
+      "SUBMIT_FORM",
       `Submit ${moduleType} form for prediction`,
       { moduleType, formFields: Object.keys(formData) },
     );
@@ -267,7 +267,7 @@ class SubmitFormCommand extends MedicalCommand {
 
     medicalEventObserver.publish(MEDICAL_EVENTS.FORM_SUBMITTED, {
       moduleType: this.moduleType,
-      action: 'undo',
+      action: "undo",
     });
 
     return null;
@@ -275,14 +275,14 @@ class SubmitFormCommand extends MedicalCommand {
 
   getStrategyName() {
     switch (this.moduleType) {
-      case 'coma':
-        return 'COMA_ICH';
-      case 'limited':
-        return 'LIMITED_DATA_ICH';
-      case 'full':
-        return 'FULL_STROKE';
-      default:
-        throw new Error(`Unknown module type: ${this.moduleType}`);
+    case "coma":
+      return "COMA_ICH";
+    case "limited":
+      return "LIMITED_DATA_ICH";
+    case "full":
+      return "FULL_STROKE";
+    default:
+      throw new Error(`Unknown module type: ${this.moduleType}`);
     }
   }
 }
@@ -293,7 +293,7 @@ class SubmitFormCommand extends MedicalCommand {
 class ClearDataCommand extends MedicalCommand {
   constructor(dataType, store) {
     super(
-      'CLEAR_DATA',
+      "CLEAR_DATA",
       `Clear ${dataType} data for privacy compliance`,
       { dataType },
     );
@@ -308,21 +308,21 @@ class ClearDataCommand extends MedicalCommand {
 
     // Clear the specified data
     switch (this.dataType) {
-      case 'all':
-        this.store.reset();
-        break;
-      case 'forms':
-        this.store.clearFormData();
-        break;
-      case 'results':
-        this.store.clearResults();
-        break;
-      default:
-        throw new Error(`Unknown data type: ${this.dataType}`);
+    case "all":
+      this.store.reset();
+      break;
+    case "forms":
+      this.store.clearFormData();
+      break;
+    case "results":
+      this.store.clearResults();
+      break;
+    default:
+      throw new Error(`Unknown data type: ${this.dataType}`);
     }
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'data_cleared',
+      action: "data_cleared",
       dataType: this.dataType,
     });
 
@@ -335,14 +335,14 @@ class ClearDataCommand extends MedicalCommand {
       this.store.setState(this.backupData);
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'data_restored',
+        action: "data_restored",
         dataType: this.dataType,
       });
 
       return { dataType: this.dataType, restored: true };
     }
 
-    throw new Error('Cannot undo data clear: backup not available');
+    throw new Error("Cannot undo data clear: backup not available");
   }
 }
 
@@ -363,7 +363,7 @@ export class MedicalCommandInvoker {
    */
   async executeCommand(command) {
     if (!(command instanceof MedicalCommand)) {
-      throw new Error('Command must extend MedicalCommand');
+      throw new Error("Command must extend MedicalCommand");
     }
 
     const result = await command.execute();
@@ -388,7 +388,7 @@ export class MedicalCommandInvoker {
    */
   async undo() {
     if (this.currentIndex < 0) {
-      throw new Error('No commands to undo');
+      throw new Error("No commands to undo");
     }
 
     const command = this.commandHistory[this.currentIndex];
@@ -408,7 +408,7 @@ export class MedicalCommandInvoker {
    */
   async redo() {
     if (this.currentIndex >= this.commandHistory.length - 1) {
-      throw new Error('No commands to redo');
+      throw new Error("No commands to redo");
     }
 
     this.currentIndex += 1;

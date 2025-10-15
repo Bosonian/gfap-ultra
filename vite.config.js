@@ -1,18 +1,9 @@
 import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  base: '/0925/',
-  plugins: [
-    {
-      name: 'replace-base-url',
-      transformIndexHtml: {
-        order: 'post',
-        handler(html) {
-          return html.replace(/%BASE_URL%/g, '/0925/');
-        },
-      },
-    },
-  ],
+  base: '/0925/', // ✅ THIS must match your repo name, not "./"
+  plugins: [tailwindcss()],
   server: {
     host: true,
     port: 5173,

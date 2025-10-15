@@ -8,12 +8,12 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { store } from '../state/store.js';
-import { APP_CONFIG } from '../config.js';
-import { authManager } from '../auth/authentication.js';
-import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from '../utils/error-handler.js';
-import { secureStore, secureRetrieve, secureRemove } from '../security/data-encryption.js';
-import { medicalLogger, LOG_CATEGORIES } from '../utils/medical-logger.js';
+import { store } from "../state/store.js";
+import { APP_CONFIG } from "../config.js";
+import { authManager } from "../auth/authentication.js";
+import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from "../utils/error-handler.js";
+import { secureStore, secureRetrieve, secureRemove } from "../security/data-encryption.js";
+import { medicalLogger, LOG_CATEGORIES } from "../utils/medical-logger.js";
 
 /**
  * Manages session lifecycle and data persistence
@@ -61,7 +61,7 @@ export class SessionManager {
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
         severity: ERROR_SEVERITY.MEDIUM,
-        context: { operation: 'validate_stored_session' },
+        context: { operation: "validate_stored_session" },
       },
     );
   }
@@ -85,12 +85,12 @@ export class SessionManager {
   async performAutoSave() {
     return safeAsync(
       async () => {
-        const container = document.getElementById('appContainer');
+        const container = document.getElementById("appContainer");
         if (!container) {
           return false;
         }
 
-        const forms = container.querySelectorAll('form[data-module]');
+        const forms = container.querySelectorAll("form[data-module]");
         let savedCount = 0;
 
         for (const form of forms) {
@@ -119,7 +119,7 @@ export class SessionManager {
       {
         category: ERROR_CATEGORIES.STORAGE,
         severity: ERROR_SEVERITY.LOW,
-        context: { operation: 'auto_save' },
+        context: { operation: "auto_save" },
       },
     );
   }
@@ -136,9 +136,9 @@ export class SessionManager {
     formData.forEach((value, key) => {
       const element = form.elements[key];
       if (element) {
-        if (element.type === 'checkbox') {
+        if (element.type === "checkbox") {
           data[key] = element.checked;
-        } else if (element.type === 'number') {
+        } else if (element.type === "number") {
           const numValue = parseFloat(value);
           data[key] = isNaN(numValue) ? value : numValue;
         } else {
@@ -172,12 +172,12 @@ export class SessionManager {
   restoreFormData() {
     safeAsync(
       async () => {
-        const container = document.getElementById('appContainer');
+        const container = document.getElementById("appContainer");
         if (!container) {
           return;
         }
 
-        const forms = container.querySelectorAll('form[data-module]');
+        const forms = container.querySelectorAll("form[data-module]");
 
         forms.forEach((form) => {
           try {
@@ -198,7 +198,7 @@ export class SessionManager {
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
-        context: { operation: 'restore_form_data' },
+        context: { operation: "restore_form_data" },
       },
     );
   }
@@ -213,9 +213,9 @@ export class SessionManager {
       const element = form.elements[key];
       if (element) {
         try {
-          if (element.type === 'checkbox') {
+          if (element.type === "checkbox") {
             element.checked = Boolean(value);
-          } else if (element.type === 'radio') {
+          } else if (element.type === "radio") {
             if (element.value === value) {
               element.checked = true;
             }
@@ -224,7 +224,7 @@ export class SessionManager {
           }
 
           // Trigger input event for any listeners
-          element.dispatchEvent(new Event('input', { bubbles: true }));
+          element.dispatchEvent(new Event("input", { bubbles: true }));
         } catch (error) {
           // Skip this field if population fails
         }
@@ -277,7 +277,7 @@ export class SessionManager {
         authManager.isValidSession(),
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
-        context: { operation: 'validate_current_session' },
+        context: { operation: "validate_current_session" },
       },
     );
   }
@@ -289,7 +289,7 @@ export class SessionManager {
     safeAsync(
       async () => {
         const shouldContinue = confirm(
-          'Your session will expire in 1 minute. Would you like to continue?',
+          "Your session will expire in 1 minute. Would you like to continue?",
         );
 
         if (shouldContinue) {
@@ -307,7 +307,7 @@ export class SessionManager {
       },
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
-        context: { operation: 'session_timeout_warning' },
+        context: { operation: "session_timeout_warning" },
       },
     );
   }
@@ -317,7 +317,7 @@ export class SessionManager {
    */
   handleSessionExpiry() {
     this.clearSessionData();
-    store.navigate('login');
+    store.navigate("login");
 
     // Show expiry message
     this.showSessionExpiredMessage();
@@ -328,7 +328,7 @@ export class SessionManager {
    */
   showSessionExpiredMessage() {
     // Create a temporary message
-    const message = document.createElement('div');
+    const message = document.createElement("div");
     message.style.cssText = `
       position: fixed;
       top: 20px;
@@ -341,7 +341,7 @@ export class SessionManager {
       z-index: 10000;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     `;
-    message.textContent = '⏰ Session expired. Please log in again.';
+    message.textContent = "⏰ Session expired. Please log in again.";
 
     document.body.appendChild(message);
 
@@ -359,7 +359,7 @@ export class SessionManager {
     authManager.logout();
     this.clearSessionData();
     store.reset();
-    store.navigate('login');
+    store.navigate("login");
   }
 
   /**
@@ -367,7 +367,7 @@ export class SessionManager {
    */
   async clearSessionData() {
     try {
-      medicalLogger.info('Clearing session data', {
+      medicalLogger.info("Clearing session data", {
         category: LOG_CATEGORIES.SECURITY,
       });
 
@@ -375,18 +375,18 @@ export class SessionManager {
       store.clearAllFormData();
 
       // Clear encrypted temporary data
-      await secureRemove('temp_data', true); // Use sessionStorage
-      await secureRemove('research_data', true);
+      await secureRemove("temp_data", true); // Use sessionStorage
+      await secureRemove("research_data", true);
 
       // Clear any legacy unencrypted data
-      sessionStorage.removeItem('temp_data');
-      sessionStorage.removeItem('research_data');
+      sessionStorage.removeItem("temp_data");
+      sessionStorage.removeItem("research_data");
 
-      medicalLogger.info('Session data cleared successfully', {
+      medicalLogger.info("Session data cleared successfully", {
         category: LOG_CATEGORIES.SECURITY,
       });
     } catch (error) {
-      medicalLogger.warn('Failed to clear some session data', {
+      medicalLogger.warn("Failed to clear some session data", {
         category: LOG_CATEGORIES.SECURITY,
         error: error.message,
       });

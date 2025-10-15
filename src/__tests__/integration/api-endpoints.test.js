@@ -3,34 +3,34 @@
  * Testing Real GCP Cloud Function Endpoints with Medical Data
  */
 
-import { BasePredictionClient } from '../../api/base-prediction-client.js';
-import { MedicalCacheFactory } from '../../performance/medical-cache.js';
+import { BasePredictionClient } from "../../api/base-prediction-client.js";
+import { MedicalCacheFactory } from "../../performance/medical-cache.js";
 
 // Mock the performance monitor for integration tests
-jest.mock('../../performance/medical-performance-monitor.js', () => ({
+jest.mock("../../performance/medical-performance-monitor.js", () => ({
   medicalPerformanceMonitor: {
     isMonitoring: true,
-    startMeasurement: jest.fn(() => 'test-metric-id'),
+    startMeasurement: jest.fn(() => "test-metric-id"),
     endMeasurement: jest.fn(),
   },
   PerformanceMetricType: {
-    API_CALL: 'api_call',
-    VALIDATION: 'validation',
-    PREDICTION: 'prediction',
+    API_CALL: "api_call",
+    VALIDATION: "validation",
+    PREDICTION: "prediction",
   },
 }));
 
 // Mock observer for audit trail
-jest.mock('../../patterns/observer.js', () => ({
+jest.mock("../../patterns/observer.js", () => ({
   medicalEventObserver: {
     publish: jest.fn(),
   },
   MEDICAL_EVENTS: {
-    AUDIT_EVENT: 'audit_event',
+    AUDIT_EVENT: "audit_event",
   },
 }));
 
-describe('API Endpoints Integration Tests', () => {
+describe("API Endpoints Integration Tests", () => {
   let predictionClient;
   let mockFetch;
 
@@ -47,7 +47,7 @@ describe('API Endpoints Integration Tests', () => {
     predictionClient = new BasePredictionClient();
 
     // Mock online status
-    Object.defineProperty(predictionClient, 'isOnline', {
+    Object.defineProperty(predictionClient, "isOnline", {
       value: true,
       writable: true,
     });
@@ -59,8 +59,8 @@ describe('API Endpoints Integration Tests', () => {
     delete global.fetch;
   });
 
-  describe('Coma ICH Prediction Endpoint', () => {
-    test('should successfully call coma_ich endpoint with valid data', async () => {
+  describe("Coma ICH Prediction Endpoint", () => {
+    test("should successfully call coma_ich endpoint with valid data", async () => {
       const patientData = {
         age_years: 72,
         gcs: 6,
@@ -72,27 +72,27 @@ describe('API Endpoints Integration Tests', () => {
       const expectedResponse = {
         probability: 0.78,
         confidence: 0.85,
-        drivers: ['Low GCS (6)', 'Elevated GFAP (450.0)', 'Age factor'],
-        model_version: 'coma_ich_v2.1',
-        timestamp: '2025-01-15T10:30:00Z',
+        drivers: ["Low GCS (6)", "Elevated GFAP (450.0)", "Age factor"],
+        model_version: "coma_ich_v2.1",
+        timestamp: "2025-01-15T10:30:00Z",
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
+        headers: new Map([["content-type", "application/json"]]),
         json: () => Promise.resolve(expectedResponse),
       });
 
-      const result = await predictionClient.predict('coma_ich', patientData);
+      const result = await predictionClient.predict("coma_ich", patientData);
 
       // Verify API call was made correctly
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const [url, options] = mockFetch.mock.calls[0];
 
-      expect(url).toContain('predict_coma_ich');
-      expect(options.method).toBe('POST');
-      expect(options.headers['Content-Type']).toBe('application/json');
+      expect(url).toContain("predict_coma_ich");
+      expect(options.method).toBe("POST");
+      expect(options.headers["Content-Type"]).toBe("application/json");
 
       const requestBody = JSON.parse(options.body);
       expect(requestBody.age_years).toBe(72);
@@ -103,29 +103,29 @@ describe('API Endpoints Integration Tests', () => {
       expect(result).toMatchObject({
         probability: 0.78,
         confidence: 0.85,
-        module: 'Coma',
+        module: "Coma",
         timestamp: expect.any(String),
       });
 
-      expect(result.drivers).toContain('Low GCS (6)');
-      expect(result.drivers).toContain('Elevated GFAP (450.0)');
+      expect(result.drivers).toContain("Low GCS (6)");
+      expect(result.drivers).toContain("Elevated GFAP (450.0)");
     });
 
-    test('should handle coma_ich endpoint validation errors', async () => {
+    test("should handle coma_ich endpoint validation errors", async () => {
       const invalidPatientData = {
         age_years: -5, // Invalid age
         gcs: 20, // Invalid GCS
         gfap_value: -100, // Invalid GFAP
       };
 
-      await expect(predictionClient.predict('coma_ich', invalidPatientData))
-        .rejects.toThrow('Medical parameter validation failed');
+      await expect(predictionClient.predict("coma_ich", invalidPatientData))
+        .rejects.toThrow("Medical parameter validation failed");
 
       // Should not make API call if validation fails
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    test('should handle coma_ich endpoint server errors', async () => {
+    test("should handle coma_ich endpoint server errors", async () => {
       const patientData = {
         age_years: 65,
         gcs: 8,
@@ -135,23 +135,23 @@ describe('API Endpoints Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error',
+        statusText: "Internal Server Error",
         json: () => Promise.resolve({
-          error: 'Model prediction service temporarily unavailable',
-          code: 'MODEL_SERVICE_ERROR',
+          error: "Model prediction service temporarily unavailable",
+          code: "MODEL_SERVICE_ERROR",
         }),
         headers: new Map(),
       });
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('Model prediction service temporarily unavailable');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("Model prediction service temporarily unavailable");
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('Limited Data ICH Prediction Endpoint', () => {
-    test('should successfully call limited_ich endpoint with valid data', async () => {
+  describe("Limited Data ICH Prediction Endpoint", () => {
+    test("should successfully call limited_ich endpoint with valid data", async () => {
       const patientData = {
         age_years: 68,
         systolic_bp: 170,
@@ -163,18 +163,18 @@ describe('API Endpoints Integration Tests', () => {
       const expectedResponse = {
         probability: 0.65,
         confidence: 0.72,
-        drivers: ['Hypertension', 'Moderate GFAP elevation', 'Consciousness impairment'],
-        model_version: 'limited_data_v1.8',
+        drivers: ["Hypertension", "Moderate GFAP elevation", "Consciousness impairment"],
+        model_version: "limited_data_v1.8",
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
+        headers: new Map([["content-type", "application/json"]]),
         json: () => Promise.resolve(expectedResponse),
       });
 
-      const result = await predictionClient.predict('limited_ich', patientData);
+      const result = await predictionClient.predict("limited_ich", patientData);
 
       // Verify boolean normalization
       const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -184,13 +184,13 @@ describe('API Endpoints Integration Tests', () => {
       expect(result).toMatchObject({
         probability: 0.65,
         confidence: 0.72,
-        module: 'Limited Data',
+        module: "Limited Data",
       });
 
-      expect(result.drivers).toContain('Hypertension');
+      expect(result.drivers).toContain("Hypertension");
     });
 
-    test('should handle limited_ich endpoint timeout', async () => {
+    test("should handle limited_ich endpoint timeout", async () => {
       const patientData = {
         age_years: 65,
         gfap_value: 150,
@@ -200,17 +200,17 @@ describe('API Endpoints Integration Tests', () => {
       };
 
       // Mock timeout error
-      const timeoutError = new Error('Request timeout');
-      timeoutError.name = 'AbortError';
+      const timeoutError = new Error("Request timeout");
+      timeoutError.name = "AbortError";
       mockFetch.mockRejectedValueOnce(timeoutError);
 
-      await expect(predictionClient.predict('limited_ich', patientData))
-        .rejects.toThrow('Request timeout');
+      await expect(predictionClient.predict("limited_ich", patientData))
+        .rejects.toThrow("Request timeout");
     });
   });
 
-  describe('Full Stroke Prediction Endpoint', () => {
-    test('should successfully call full_stroke endpoint with complete data', async () => {
+  describe("Full Stroke Prediction Endpoint", () => {
+    test("should successfully call full_stroke endpoint with complete data", async () => {
       const patientData = {
         age_years: 74,
         systolic_bp: 180,
@@ -231,29 +231,29 @@ describe('API Endpoints Integration Tests', () => {
         probability: 0.89,
         confidence: 0.94,
         drivers: [
-          'High FAST-ED score (7)',
-          'Elevated GFAP (650.0)',
-          'Atrial fibrillation',
-          'Arm paresis',
-          'Eye deviation',
-          'Severe hypertension',
+          "High FAST-ED score (7)",
+          "Elevated GFAP (650.0)",
+          "Atrial fibrillation",
+          "Arm paresis",
+          "Eye deviation",
+          "Severe hypertension",
         ],
         risk_stratification: {
           lvo_probability: 0.82,
-          hemorrhage_risk: 'moderate',
-          treatment_urgency: 'high',
+          hemorrhage_risk: "moderate",
+          treatment_urgency: "high",
         },
-        model_version: 'full_stroke_v3.2',
+        model_version: "full_stroke_v3.2",
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
+        headers: new Map([["content-type", "application/json"]]),
         json: () => Promise.resolve(expectedResponse),
       });
 
-      const result = await predictionClient.predict('full_stroke', patientData);
+      const result = await predictionClient.predict("full_stroke", patientData);
 
       // Verify all 13 clinical variables are included
       const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -273,15 +273,15 @@ describe('API Endpoints Integration Tests', () => {
       expect(result).toMatchObject({
         probability: 0.89,
         confidence: 0.94,
-        module: 'Full Stroke',
+        module: "Full Stroke",
       });
 
-      expect(result.drivers).toContain('High FAST-ED score (7)');
-      expect(result.drivers).toContain('Elevated GFAP (650.0)');
+      expect(result.drivers).toContain("High FAST-ED score (7)");
+      expect(result.drivers).toContain("Elevated GFAP (650.0)");
       expect(result.riskStratification.lvo_probability).toBe(0.82);
     });
 
-    test('should validate all required fields for full_stroke endpoint', async () => {
+    test("should validate all required fields for full_stroke endpoint", async () => {
       const incompleteData = {
         age_years: 70,
         gfap_value: 300,
@@ -289,13 +289,13 @@ describe('API Endpoints Integration Tests', () => {
         // Missing 10 other required fields
       };
 
-      await expect(predictionClient.predict('full_stroke', incompleteData))
-        .rejects.toThrow('Medical parameter validation failed');
+      await expect(predictionClient.predict("full_stroke", incompleteData))
+        .rejects.toThrow("Medical parameter validation failed");
     });
   });
 
-  describe('LVO Prediction Endpoint', () => {
-    test('should successfully call lvo endpoint with valid data', async () => {
+  describe("LVO Prediction Endpoint", () => {
+    test("should successfully call lvo endpoint with valid data", async () => {
       const patientData = {
         gfap_value: 425.5,
         fast_ed_score: 8,
@@ -304,20 +304,20 @@ describe('API Endpoints Integration Tests', () => {
       const expectedResponse = {
         lvo_probability: 0.84,
         confidence: 0.88,
-        interpretation: 'High probability of large vessel occlusion',
-        urgency_level: 'critical',
-        recommended_action: 'immediate_intervention',
-        model_version: 'lvo_v2.0',
+        interpretation: "High probability of large vessel occlusion",
+        urgency_level: "critical",
+        recommended_action: "immediate_intervention",
+        model_version: "lvo_v2.0",
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
+        headers: new Map([["content-type", "application/json"]]),
         json: () => Promise.resolve(expectedResponse),
       });
 
-      const result = await predictionClient.predict('lvo', patientData);
+      const result = await predictionClient.predict("lvo", patientData);
 
       // Verify minimal required data
       const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -328,14 +328,14 @@ describe('API Endpoints Integration Tests', () => {
       expect(result).toMatchObject({
         probability: 0.84, // Mapped from lvo_probability
         confidence: 0.88,
-        module: 'LVO',
+        module: "LVO",
       });
 
-      expect(result.interpretation).toBe('High probability of large vessel occlusion');
-      expect(result.urgencyLevel).toBe('critical');
+      expect(result.interpretation).toBe("High probability of large vessel occlusion");
+      expect(result.urgencyLevel).toBe("critical");
     });
 
-    test('should handle lvo endpoint with low probability response', async () => {
+    test("should handle lvo endpoint with low probability response", async () => {
       const patientData = {
         gfap_value: 75.0,
         fast_ed_score: 2,
@@ -344,32 +344,32 @@ describe('API Endpoints Integration Tests', () => {
       const expectedResponse = {
         lvo_probability: 0.18,
         confidence: 0.65,
-        interpretation: 'Low probability of large vessel occlusion',
-        urgency_level: 'routine',
-        recommended_action: 'standard_workflow',
+        interpretation: "Low probability of large vessel occlusion",
+        urgency_level: "routine",
+        recommended_action: "standard_workflow",
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
+        headers: new Map([["content-type", "application/json"]]),
         json: () => Promise.resolve(expectedResponse),
       });
 
-      const result = await predictionClient.predict('lvo', patientData);
+      const result = await predictionClient.predict("lvo", patientData);
 
       expect(result.probability).toBe(0.18);
-      expect(result.urgencyLevel).toBe('routine');
-      expect(result.interpretation).toBe('Low probability of large vessel occlusion');
+      expect(result.urgencyLevel).toBe("routine");
+      expect(result.interpretation).toBe("Low probability of large vessel occlusion");
     });
   });
 
-  describe('Cross-Endpoint Performance Tests', () => {
-    test('should handle concurrent API calls efficiently', async () => {
+  describe("Cross-Endpoint Performance Tests", () => {
+    test("should handle concurrent API calls efficiently", async () => {
       const testData = [
-        { endpoint: 'coma_ich', data: { age_years: 65, gcs: 8, gfap_value: 200 } },
-        { endpoint: 'limited_ich', data: { age_years: 70, gfap_value: 300, systolic_bp: 160, diastolic_bp: 90, vigilanzminderung: true } },
-        { endpoint: 'lvo', data: { gfap_value: 400, fast_ed_score: 6 } },
+        { endpoint: "coma_ich", data: { age_years: 65, gcs: 8, gfap_value: 200 } },
+        { endpoint: "limited_ich", data: { age_years: 70, gfap_value: 300, systolic_bp: 160, diastolic_bp: 90, vigilanzminderung: true } },
+        { endpoint: "lvo", data: { gfap_value: 400, fast_ed_score: 6 } },
       ];
 
       // Mock responses for all endpoints
@@ -377,7 +377,7 @@ describe('API Endpoints Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
           status: 200,
-          headers: new Map([['content-type', 'application/json']]),
+          headers: new Map([["content-type", "application/json"]]),
           json: () => Promise.resolve({
             probability: 0.5 + (index * 0.1),
             confidence: 0.8,
@@ -394,31 +394,31 @@ describe('API Endpoints Integration Tests', () => {
       expect(mockFetch).toHaveBeenCalledTimes(3);
 
       // Verify each result has the expected module
-      expect(results[0].module).toBe('Coma');
-      expect(results[1].module).toBe('Limited Data');
-      expect(results[2].module).toBe('LVO');
+      expect(results[0].module).toBe("Coma");
+      expect(results[1].module).toBe("Limited Data");
+      expect(results[2].module).toBe("LVO");
     });
 
-    test('should handle mixed success and failure responses', async () => {
+    test("should handle mixed success and failure responses", async () => {
       const testCases = [
         {
-          endpoint: 'coma_ich',
+          endpoint: "coma_ich",
           data: { age_years: 65, gcs: 8, gfap_value: 200 },
           mockResponse: {
             ok: true,
             status: 200,
-            headers: new Map([['content-type', 'application/json']]),
+            headers: new Map([["content-type", "application/json"]]),
             json: () => Promise.resolve({ probability: 0.6, confidence: 0.8 }),
           },
         },
         {
-          endpoint: 'limited_ich',
+          endpoint: "limited_ich",
           data: { age_years: 70, gfap_value: 300, systolic_bp: 160, diastolic_bp: 90, vigilanzminderung: false },
           mockResponse: {
             ok: false,
             status: 503,
-            statusText: 'Service Unavailable',
-            json: () => Promise.resolve({ error: 'Model temporarily unavailable' }),
+            statusText: "Service Unavailable",
+            json: () => Promise.resolve({ error: "Model temporarily unavailable" }),
             headers: new Map(),
           },
         },
@@ -433,16 +433,16 @@ describe('API Endpoints Integration Tests', () => {
         predictionClient.predict(testCases[1].endpoint, testCases[1].data),
       ]);
 
-      expect(results[0].status).toBe('fulfilled');
+      expect(results[0].status).toBe("fulfilled");
       expect(results[0].value.probability).toBe(0.6);
 
-      expect(results[1].status).toBe('rejected');
-      expect(results[1].reason.message).toContain('Model temporarily unavailable');
+      expect(results[1].status).toBe("rejected");
+      expect(results[1].reason.message).toContain("Model temporarily unavailable");
     });
   });
 
-  describe('API Response Format Validation', () => {
-    test('should handle malformed JSON responses', async () => {
+  describe("API Response Format Validation", () => {
+    test("should handle malformed JSON responses", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
@@ -452,15 +452,15 @@ describe('API Endpoints Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
-        json: () => Promise.reject(new Error('Unexpected token in JSON')),
+        headers: new Map([["content-type", "application/json"]]),
+        json: () => Promise.reject(new Error("Unexpected token in JSON")),
       });
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('Unexpected token in JSON');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("Unexpected token in JSON");
     });
 
-    test('should handle non-JSON content type responses', async () => {
+    test("should handle non-JSON content type responses", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
@@ -470,15 +470,15 @@ describe('API Endpoints Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'text/html']]),
-        text: () => Promise.resolve('<html><body>Service temporarily unavailable</body></html>'),
+        headers: new Map([["content-type", "text/html"]]),
+        text: () => Promise.resolve("<html><body>Service temporarily unavailable</body></html>"),
       });
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('Expected JSON response');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("Expected JSON response");
     });
 
-    test('should validate required response fields', async () => {
+    test("should validate required response fields", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
@@ -488,54 +488,54 @@ describe('API Endpoints Integration Tests', () => {
       // Missing required probability field
       const invalidResponse = {
         confidence: 0.8,
-        drivers: ['Age factor'],
+        drivers: ["Age factor"],
         // Missing probability field
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
+        headers: new Map([["content-type", "application/json"]]),
         json: () => Promise.resolve(invalidResponse),
       });
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('Invalid response format');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("Invalid response format");
     });
   });
 
-  describe('Network Error Handling', () => {
-    test('should handle network connection errors', async () => {
+  describe("Network Error Handling", () => {
+    test("should handle network connection errors", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
         gfap_value: 150,
       };
 
-      mockFetch.mockRejectedValueOnce(new Error('Network connection failed'));
+      mockFetch.mockRejectedValueOnce(new Error("Network connection failed"));
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('Network connection failed');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("Network connection failed");
     });
 
-    test('should handle DNS resolution errors', async () => {
+    test("should handle DNS resolution errors", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
         gfap_value: 150,
       };
 
-      const dnsError = new Error('getaddrinfo ENOTFOUND');
-      dnsError.code = 'ENOTFOUND';
+      const dnsError = new Error("getaddrinfo ENOTFOUND");
+      dnsError.code = "ENOTFOUND";
       mockFetch.mockRejectedValueOnce(dnsError);
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('getaddrinfo ENOTFOUND');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("getaddrinfo ENOTFOUND");
     });
   });
 
-  describe('Authentication and Security Headers', () => {
-    test('should include proper security headers in requests', async () => {
+  describe("Authentication and Security Headers", () => {
+    test("should include proper security headers in requests", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
@@ -545,26 +545,26 @@ describe('API Endpoints Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: new Map([['content-type', 'application/json']]),
+        headers: new Map([["content-type", "application/json"]]),
         json: () => Promise.resolve({ probability: 0.5, confidence: 0.8 }),
       });
 
-      await predictionClient.predict('coma_ich', patientData);
+      await predictionClient.predict("coma_ich", patientData);
 
       const [, options] = mockFetch.mock.calls[0];
 
       expect(options.headers).toMatchObject({
-        'Content-Type': 'application/json',
-        'X-Request-ID': expect.any(String),
-        'User-Agent': expect.stringContaining('iGFAP-Medical'),
+        "Content-Type": "application/json",
+        "X-Request-ID": expect.any(String),
+        "User-Agent": expect.stringContaining("iGFAP-Medical"),
       });
 
       // Verify request has proper structure
-      expect(options.method).toBe('POST');
+      expect(options.method).toBe("POST");
       expect(options.signal).toBeInstanceOf(AbortSignal);
     });
 
-    test('should handle authentication errors appropriately', async () => {
+    test("should handle authentication errors appropriately", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
@@ -574,21 +574,21 @@ describe('API Endpoints Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
-        statusText: 'Unauthorized',
+        statusText: "Unauthorized",
         json: () => Promise.resolve({
-          error: 'Invalid API credentials',
-          code: 'AUTHENTICATION_FAILED',
+          error: "Invalid API credentials",
+          code: "AUTHENTICATION_FAILED",
         }),
         headers: new Map(),
       });
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('Invalid API credentials');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("Invalid API credentials");
     });
   });
 
-  describe('Rate Limiting and Throttling', () => {
-    test('should handle rate limiting responses', async () => {
+  describe("Rate Limiting and Throttling", () => {
+    test("should handle rate limiting responses", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
@@ -598,22 +598,22 @@ describe('API Endpoints Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 429,
-        statusText: 'Too Many Requests',
+        statusText: "Too Many Requests",
         headers: new Map([
-          ['retry-after', '60'],
-          ['x-ratelimit-remaining', '0'],
+          ["retry-after", "60"],
+          ["x-ratelimit-remaining", "0"],
         ]),
         json: () => Promise.resolve({
-          error: 'Rate limit exceeded',
+          error: "Rate limit exceeded",
           retry_after: 60,
         }),
       });
 
-      await expect(predictionClient.predict('coma_ich', patientData))
-        .rejects.toThrow('Rate limit exceeded');
+      await expect(predictionClient.predict("coma_ich", patientData))
+        .rejects.toThrow("Rate limit exceeded");
     });
 
-    test('should respect retry-after headers', async () => {
+    test("should respect retry-after headers", async () => {
       const patientData = {
         age_years: 65,
         gcs: 10,
@@ -624,14 +624,14 @@ describe('API Endpoints Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 429,
-        headers: new Map([['retry-after', '1']]),
-        json: () => Promise.resolve({ error: 'Rate limit exceeded', retry_after: 1 }),
+        headers: new Map([["retry-after", "1"]]),
+        json: () => Promise.resolve({ error: "Rate limit exceeded", retry_after: 1 }),
       });
 
       try {
-        await predictionClient.predict('coma_ich', patientData);
+        await predictionClient.predict("coma_ich", patientData);
       } catch (error) {
-        expect(error.message).toContain('Rate limit exceeded');
+        expect(error.message).toContain("Rate limit exceeded");
         expect(error.retryAfter).toBe(1);
       }
     });

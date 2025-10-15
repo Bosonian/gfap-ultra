@@ -8,17 +8,17 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { store } from '../state/store.js';
-import { render } from '../ui/render.js';
-import { authManager } from '../auth/authentication.js';
-import { warmUpFunctions } from '../api/client.js';
-import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from '../utils/error-handler.js';
-import { medicalLogger, LOG_CATEGORIES } from '../utils/medical-logger.js';
+import { store } from "../state/store.js";
+import { render } from "../ui/render.js";
+import { authManager } from "../auth/authentication.js";
+import { warmUpFunctions } from "../api/client.js";
+import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from "../utils/error-handler.js";
+import { medicalLogger, LOG_CATEGORIES } from "../utils/medical-logger.js";
 
-import { UIManager } from './ui-manager.js';
-import { ThemeManager } from './theme-manager.js';
-import { SessionManager } from './session-manager.js';
-import { AdvancedFeaturesManager } from './advanced-features-manager.js';
+import { UIManager } from "./ui-manager.js";
+import { ThemeManager } from "./theme-manager.js";
+import { SessionManager } from "./session-manager.js";
+import { AdvancedFeaturesManager } from "./advanced-features-manager.js";
 
 /**
  * Main application controller - coordinates all subsystems
@@ -43,46 +43,46 @@ export class AppController {
   async init() {
     return safeAsync(
       async () => {
-        medicalLogger.info('Application initialization started', {
+        medicalLogger.info("Application initialization started", {
           category: LOG_CATEGORIES.SYSTEM,
-          version: '2.1.0',
+          version: "2.1.0",
           userAgent: navigator.userAgent.substring(0, 100),
         });
 
         // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-          medicalLogger.debug('Waiting for DOM ready', { category: LOG_CATEGORIES.SYSTEM });
-          return new Promise((resolve) => {
-            document.addEventListener('DOMContentLoaded', () => resolve(this.init()));
+        if (document.readyState === "loading") {
+          medicalLogger.debug("Waiting for DOM ready", { category: LOG_CATEGORIES.SYSTEM });
+          return new Promise(resolve => {
+            document.addEventListener("DOMContentLoaded", () => resolve(this.init()));
           });
         }
 
         // Find app container
-        this.container = document.getElementById('appContainer');
+        this.container = document.getElementById("appContainer");
         if (!this.container) {
-          medicalLogger.critical('App container not found', {
+          medicalLogger.critical("App container not found", {
             category: LOG_CATEGORIES.SYSTEM,
-            containerId: 'appContainer',
+            containerId: "appContainer",
           });
-          throw new Error('Critical initialization failure: App container not found');
+          throw new Error("Critical initialization failure: App container not found");
         }
 
-        medicalLogger.debug('App container found', { category: LOG_CATEGORIES.SYSTEM });
+        medicalLogger.debug("App container found", { category: LOG_CATEGORIES.SYSTEM });
 
         // Check authentication before proceeding
         if (!authManager.isValidSession()) {
-          medicalLogger.info('No valid session, redirecting to login', {
+          medicalLogger.info("No valid session, redirecting to login", {
             category: LOG_CATEGORIES.AUTHENTICATION,
           });
-          store.navigate('login');
+          store.navigate("login");
         }
 
         // Initialize core systems
-        medicalLogger.info('Initializing core features', { category: LOG_CATEGORIES.SYSTEM });
+        medicalLogger.info("Initializing core features", { category: LOG_CATEGORIES.SYSTEM });
         await this.initializeCoreFeatures();
 
         // Advanced features disabled to prevent sync manager errors
-        medicalLogger.info('Skipping advanced features initialization', {
+        medicalLogger.info("Skipping advanced features initialization", {
           category: LOG_CATEGORIES.SYSTEM,
         });
         // this.initializeAdvancedFeatures();
@@ -91,20 +91,20 @@ export class AppController {
         this.setupRenderingSystem();
 
         // Initialize UI components
-        medicalLogger.debug('Initializing UI manager', { category: LOG_CATEGORIES.SYSTEM });
+        medicalLogger.debug("Initializing UI manager", { category: LOG_CATEGORIES.SYSTEM });
         this.uiManager.initialize(this.container);
 
         // Initialize theme system
-        medicalLogger.debug('Initializing theme manager', { category: LOG_CATEGORIES.SYSTEM });
+        medicalLogger.debug("Initializing theme manager", { category: LOG_CATEGORIES.SYSTEM });
         this.themeManager.initialize();
 
         // Setup session management
-        medicalLogger.debug('Initializing session manager', { category: LOG_CATEGORIES.SYSTEM });
+        medicalLogger.debug("Initializing session manager", { category: LOG_CATEGORIES.SYSTEM });
         this.sessionManager.initialize();
 
         // Warm up Cloud Functions in background (dev only)
         if (import.meta && import.meta.env && import.meta.env.DEV) {
-          medicalLogger.info('Starting Cloud Functions warm-up (dev only)', {
+          medicalLogger.info("Starting Cloud Functions warm-up (dev only)", {
             category: LOG_CATEGORIES.NETWORK,
           });
           warmUpFunctions();
@@ -114,15 +114,15 @@ export class AppController {
         render(this.container);
 
         this.isInitialized = true;
-        medicalLogger.info('Application initialization completed successfully', {
+        medicalLogger.info("Application initialization completed successfully", {
           category: LOG_CATEGORIES.SYSTEM,
           initializationTime: performance.now(),
         });
 
         return true;
       },
-      (error) => {
-        medicalLogger.critical('Application initialization failed', {
+      error => {
+        medicalLogger.critical("Application initialization failed", {
           category: LOG_CATEGORIES.SYSTEM,
           error: error.message,
           stack: error.stack,
@@ -134,9 +134,9 @@ export class AppController {
         severity: ERROR_SEVERITY.CRITICAL,
         timeout: 30000,
         context: {
-          operation: 'app_initialization',
+          operation: "app_initialization",
         },
-      },
+      }
     );
   }
 
@@ -156,23 +156,23 @@ export class AppController {
         const results = await Promise.allSettled(coreInitTasks);
 
         // Check if any critical feature failed
-        const failures = results.filter((result) => result.status === 'rejected');
+        const failures = results.filter(result => result.status === "rejected");
         if (failures.length > 0) {
           throw new Error(`${failures.length} core features failed to initialize`);
         }
 
         return true;
       },
-      (error) =>
+      error =>
         // Continue with degraded functionality on core feature failure
         false,
       {
         category: ERROR_CATEGORIES.RENDERING,
         severity: ERROR_SEVERITY.HIGH,
         context: {
-          operation: 'core_features_init',
+          operation: "core_features_init",
         },
-      },
+      }
     );
   }
 
@@ -186,16 +186,16 @@ export class AppController {
         await this.advancedFeaturesManager.initialize();
         return true;
       },
-      (error) =>
+      error =>
         // Advanced features failure doesn't block core functionality
         false,
       {
         category: ERROR_CATEGORIES.RENDERING,
         severity: ERROR_SEVERITY.MEDIUM,
         context: {
-          operation: 'advanced_features_init',
+          operation: "advanced_features_init",
         },
-      },
+      }
     );
   }
 
@@ -211,7 +211,7 @@ export class AppController {
     });
 
     // Subscribe to language changes
-    window.addEventListener('languageChanged', () => {
+    window.addEventListener("languageChanged", () => {
       this.uiManager.updateLanguage();
       render(this.container);
     });

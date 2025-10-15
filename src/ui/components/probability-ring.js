@@ -4,7 +4,7 @@ function getCSSVar(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-export function renderProbabilityRing(percent, level = 'normal') {
+export function renderProbabilityRing(percent, level = "normal") {
   const clamped = Math.max(0, Math.min(100, percent || 0));
   return `
     <div class="probability-circle" data-prob="${clamped}" data-level="${level}">
@@ -15,21 +15,22 @@ export function renderProbabilityRing(percent, level = 'normal') {
 }
 
 export function initializeProbabilityRings(root = document) {
-  const canvases = root.querySelectorAll('.probability-canvas');
-  canvases.forEach((canvas) => {
-    const container = canvas.closest('.probability-circle');
+  alert("sadasdasdasd");
+  const canvases = root.querySelectorAll(".probability-canvas");
+  canvases.forEach(canvas => {
+    const container = canvas.closest(".probability-circle");
     if (!container) {
       return;
     }
     const percent = parseFloat(container.dataset.prob) || 0;
-    const level = container.dataset.level || 'normal';
-
+    const level = container.dataset.level || "normal";
+    alert("percent", percent, level);
     const dpr = window.devicePixelRatio || 1;
     const size = parseFloat(getComputedStyle(container).width) || 120;
     canvas.width = Math.max(1, Math.floor(size * dpr));
     canvas.height = Math.max(1, Math.floor(size * dpr));
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 
@@ -37,31 +38,31 @@ export function initializeProbabilityRings(root = document) {
     const height = size;
     const cx = width / 2;
     const cy = height / 2;
-    const radius = (size / 2) - 6; // padding for stroke
+    const radius = size / 2 - 6; // padding for stroke
 
     // Track style
     ctx.clearRect(0, 0, width, height);
-    ctx.strokeStyle = 'rgba(128, 128, 128, 0.25)';
+    ctx.strokeStyle = "rgba(128, 128, 128, 0.25)";
     ctx.lineWidth = 10;
-    ctx.lineCap = 'round';
+    ctx.lineCap = "round";
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.stroke();
 
     // Progress color by level
-    let stroke = getCSSVar('--primary-color');
-    if (level === 'high') {
-      stroke = getCSSVar('--warning-color') || '#ff9800';
+    let stroke = getCSSVar("--primary-color");
+    if (level === "high") {
+      stroke = getCSSVar("--warning-color") || "#ff9800";
     }
-    if (level === 'critical') {
-      stroke = getCSSVar('--danger-color') || '#DC143C';
+    if (level === "critical") {
+      stroke = getCSSVar("--danger-color") || "#DC143C";
     }
 
     // Progress arc (start at -90deg)
     const startAngle = -Math.PI / 2;
-    const endAngle = startAngle + (Math.PI * 2) * (percent / 100);
+    const endAngle = startAngle + Math.PI * 2 * (percent / 100);
     ctx.strokeStyle = stroke;
-    ctx.lineWidth = level === 'normal' ? 10 : 12;
+    ctx.lineWidth = level === "normal" ? 10 : 12;
     ctx.beginPath();
     ctx.arc(cx, cy, radius, startAngle, endAngle, false);
     ctx.stroke();
@@ -71,12 +72,12 @@ export function initializeProbabilityRings(root = document) {
 // Optional: re-render on resize for crispness
 let resizeObserver;
 export function observeProbabilityRings(root = document) {
-  if (typeof ResizeObserver === 'undefined') {
+  if (typeof ResizeObserver === "undefined") {
     return;
   }
   if (resizeObserver) {
     resizeObserver.disconnect();
   }
   resizeObserver = new ResizeObserver(() => initializeProbabilityRings(root));
-  root.querySelectorAll('.probability-circle').forEach((el) => resizeObserver.observe(el));
+  root.querySelectorAll(".probability-circle").forEach(el => resizeObserver.observe(el));
 }

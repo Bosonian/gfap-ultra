@@ -2,18 +2,15 @@
  * Research Comparison UI Components
  * Hidden by default, activated only for research purposes
  */
-
-import { t } from '../localization/i18n.js';
-
-import { LegacyICHModel } from './legacy-ich-model.js';
-import { ResearchDataLogger, isResearchModeEnabled } from './data-logger.js';
+import { LegacyICHModel } from "./legacy-ich-model.js";
+import { ResearchDataLogger } from "./data-logger.js";
 
 /**
  * Render research toggle button (no longer used - header button handles this)
  * @returns {string} - Empty string (header button replaces this)
  */
 export function renderResearchToggle() {
-  return ''; // Header button now handles research panel toggling
+  return ""; // Header button now handles research panel toggling
 }
 
 /**
@@ -35,7 +32,7 @@ export function renderModelComparison(mainResults, legacyResults, inputs) {
         </div>
         <div class="research-error">
           <p>⚠️ Legacy model calculation failed</p>
-          <small>Debug: ${legacyResults?.reason || 'Unknown error'}</small>
+          <small>Debug: ${legacyResults?.reason || "Unknown error"}</small>
         </div>
       </div>
     `;
@@ -93,7 +90,7 @@ function renderProbabilityBars(mainResults, legacyResults) {
   return `
     <div class="probability-comparison">
       <div class="bar-group">
-        <label class="bar-label">Main Model (Complex) - ${mainResults.module || 'Unknown'}</label>
+        <label class="bar-label">Main Model (Complex) - ${mainResults.module || "Unknown"}</label>
         <div class="probability-bar">
           <div class="bar-fill main-model" style="width: ${Math.max(10, Math.min(mainProb, 100))}%">
             <span class="bar-value">${mainProb.toFixed(1)}%</span>
@@ -120,7 +117,7 @@ function renderProbabilityBars(mainResults, legacyResults) {
  */
 function renderDifferenceAnalysis(comparison) {
   if (!comparison.isValid) {
-    return '<div class="comparison-error">Unable to compare models</div>';
+    return "<div class=\"comparison-error\">Unable to compare models</div>";
   }
 
   const { differences, agreement } = comparison;
@@ -130,8 +127,8 @@ function renderDifferenceAnalysis(comparison) {
     <div class="difference-analysis">
       <div class="difference-metric">
         <span class="metric-label">Difference:</span>
-        <span class="metric-value ${isMainHigher ? 'higher' : 'lower'}">
-          ${differences.absolute > 0 ? '+' : ''}${differences.absolute}%
+        <span class="metric-value ${isMainHigher ? "higher" : "lower"}">
+          ${differences.absolute > 0 ? "+" : ""}${differences.absolute}%
         </span>
       </div>
       
@@ -211,47 +208,47 @@ function renderModelMetrics() {
  */
 export function initializeResearchMode() {
   // Always initialize if research panel exists
-  const researchPanel = document.getElementById('researchPanel');
+  const researchPanel = document.getElementById("researchPanel");
   if (!researchPanel) {
     return;
   }
 
   // Close research panel
-  const closeResearch = document.getElementById('closeResearch');
+  const closeResearch = document.getElementById("closeResearch");
   if (closeResearch) {
-    closeResearch.addEventListener('click', () => {
-      const panel = document.getElementById('researchPanel');
+    closeResearch.addEventListener("click", () => {
+      const panel = document.getElementById("researchPanel");
       if (panel) {
-        panel.style.display = 'none';
+        panel.style.display = "none";
       }
     });
   }
 
   // Export data button
-  const exportButton = document.getElementById('exportResearchData');
+  const exportButton = document.getElementById("exportResearchData");
   if (exportButton) {
-    exportButton.addEventListener('click', () => {
-      ResearchDataLogger.downloadData('csv');
+    exportButton.addEventListener("click", () => {
+      ResearchDataLogger.downloadData("csv");
     });
   }
 
   // Toggle calculation details
-  const detailsToggle = document.getElementById('toggleCalculationDetails');
+  const detailsToggle = document.getElementById("toggleCalculationDetails");
   if (detailsToggle) {
-    detailsToggle.addEventListener('click', () => {
-      const details = document.getElementById('calculationDetails');
+    detailsToggle.addEventListener("click", () => {
+      const details = document.getElementById("calculationDetails");
       if (details) {
-        details.style.display = details.style.display === 'none' ? 'block' : 'none';
-        detailsToggle.textContent = details.style.display === 'none' ? '🧮 Details' : '🧮 Hide';
+        details.style.display = details.style.display === "none" ? "block" : "none";
+        detailsToggle.textContent = details.style.display === "none" ? "🧮 Details" : "🧮 Hide";
       }
     });
   }
 
   // Clear data button
-  const clearButton = document.getElementById('clearResearchData');
+  const clearButton = document.getElementById("clearResearchData");
   if (clearButton) {
-    clearButton.addEventListener('click', () => {
-      if (confirm('Clear all research data? This cannot be undone.')) {
+    clearButton.addEventListener("click", () => {
+      if (confirm("Clear all research data? This cannot be undone.")) {
         ResearchDataLogger.clearData();
 
         // Update display

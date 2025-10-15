@@ -1,164 +1,143 @@
 /**
  * Login Screen for Research Preview Access
- * iGFAP Stroke Triage Assistant
+ * iGFAP Stroke Triage Assistant (Tailwind version)
  */
 
-import { t } from '../../localization/i18n.js';
-import { authManager } from '../../auth/authentication.js';
-import { store } from '../../state/store.js';
+import { authManager } from "../../auth/authentication.js";
+import { store } from "../../state/store.js";
+import { t } from "../../localization/i18n.js";
 
 export function renderLoginScreen() {
   return `
-    <div class="login-container">
-      <div class="login-card">
-        <div class="login-header">
-          <div class="app-logo">
-            <div class="logo-icon">🧠</div>
-            <h1>iGFAP Stroke Triage</h1>
-            <div class="version-badge">Research Preview v2.1</div>
-          </div>
-        </div>
-
-        <div class="login-content">
-          <div class="access-notice">
-            <h2>🔬 Research Access Required</h2>
-            <p>This is a research preview of the iGFAP Stroke Triage Assistant for clinical validation.</p>
-
-            <div class="research-disclaimer">
-              <h3>⚠️ Important Notice</h3>
-              <ul>
-                <li><strong>Research Use Only</strong> - Not for clinical decision making</li>
-                <li><strong>No Patient Data Storage</strong> - All data processed locally</li>
-                <li><strong>Clinical Advisory</strong> - Under supervision of Prof. Christian Förch & Dr. Lovepreet Kalra</li>
-                <li><strong>Contact:</strong> Deepak Bos (bosdeepak@gmail.com)</li>
-              </ul>
-            </div>
-          </div>
-
-          <form id="loginForm" class="login-form">
-            <div class="form-group">
-              <label for="researchPassword">Research Access Code</label>
-              <input
-                type="password"
-                id="researchPassword"
-                name="password"
-                required
-                autocomplete="off"
-                placeholder="Enter research access code"
-                class="password-input"
-              >
-            </div>
-
-            <div id="loginError" class="error-message" style="display: none;"></div>
-
-            <button type="submit" class="login-button primary">
-              <span class="button-text">Access Research System</span>
-              <span class="loading-spinner" style="display: none;">⏳</span>
-            </button>
-          </form>
-
-          <div class="login-footer">
-            <div class="regulatory-notice">
-              <p><strong>Regulatory Status:</strong> Research prototype - CE certification pending</p>
-              <p><strong>Data Protection:</strong> GDPR compliant - local processing only</p>
-              <p><strong>Clinical Oversight:</strong> RKH Klinikum Ludwigsburg, Neurologie</p>
-            </div>
-          </div>
-        </div>
+   <div class="">
+  <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl w-full max-w-xl p-8">
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <div class="flex justify-center items-center space-x-2">
+        <div class="text-3xl">🧠</div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">iGFAP Stroke Triage</h1>
+      </div>
+      <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">Research Preview v2.1</div>
+    </div>
+    <!-- Research Access Notice -->
+    <div class="mb-6 p-4 bg-yellow-50 dark:bg-gray-700 border-l-4 border-yellow-400 rounded">
+      <h2 class="font-semibold text-lg mb-1 text-gray-900 dark:text-yellow-300">🔬 ${t("researchAccessRequired")}
+      <p class="text-gray-700 dark:text-gray-200 text-sm mb-2">
+        ${t("researchrPreviewValidation")}
+      </p>
+      <div class="bg-yellow-100 dark:bg-gray-800 p-2 rounded border border-yellow-200 dark:border-yellow-600 text-sm text-gray-800 dark:text-gray-100">
+        <h3 class="font-semibold mb-1 text-yellow-600 dark:text-yellow-400">⚠️ ${t("importantNotice")}</h3>
+        <ul class="list-disc ml-5 space-y-1">
+          <li><span class="font-semibold">${t("researchUseOnly")}</span> - ${t("noClinicalDecision")}</li>
+          <li><span class="font-semibold">${t("noDataStorage")}</span> - ${t("dataProcessedLocally")}</li>
+          <li><span class="font-semibold">${t("clinicalAdvisory")}</span> - ${t("supervision")}</li>
+          <li><span class="font-semibold">${t("contact")}:</span> Deepak Bos (bosdeepak@gmail.com)</li>
+        </ul>
       </div>
     </div>
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label for="researchPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${t("accessCode")}</label>
+        <input
+          type="password"
+          id="researchPassword"
+          name="password"
+          required
+          autocomplete="off"
+          placeholder="${t("accessCodePlaceholder")}"
+          class="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+        >
+      </div>
+      <div id="loginError" class="text-red-600 dark:text-red-400 text-sm hidden"></div>
+      <button type="submit" class="w-full bg-blue-600 dark:bg-blue-800 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center disabled:opacity-50 login-button">
+        <span class="button-text">${t("accessResearchBtn")}</span>
+        <span class="loading-spinner ml-2 hidden">⏳</span>
+      </button>
+    </form>
+    <!-- Footer -->
+    <div class="mt-6 text-gray-500 dark:text-gray-400 text-xs space-y-1">
+      <p><strong class="text-gray-700 dark:text-gray-200">${t("regulatoryStatus")}:</strong> ${t("protoTypeOnly")}</p>
+      <p><strong class="text-gray-700 dark:text-gray-200">${t("dataProtection")}:</strong> ${t("gdprComplaint")}</p>
+      <p><strong class="text-gray-700 dark:text-gray-200">${t("clinicalOversight")}:</strong> RKH Klinikum Ludwigsburg, Neurologie</p>
+    </div>
+  </div>
+</div>
   `;
 }
 
 export function initializeLoginScreen() {
-  const loginForm = document.getElementById('loginForm');
+  const loginForm = document.getElementById("loginForm");
 
-  if (!loginForm) {
-    return;
-  }
+  if (!loginForm) return;
 
-  const passwordInput = document.getElementById('researchPassword');
-  const loginError = document.getElementById('loginError');
-  const loginButton = loginForm.querySelector('.login-button');
+  const passwordInput = document.getElementById("researchPassword");
+  const loginError = document.getElementById("loginError");
+  const loginButton = loginForm.querySelector(".login-button");
 
-  // Focus password input on load
   passwordInput.focus();
 
-  loginForm.addEventListener('submit', async (e) => {
+  loginForm.addEventListener("submit", async e => {
     e.preventDefault();
-
     const password = passwordInput.value.trim();
 
     if (!password) {
-      showLoginError('Please enter the research access code');
+      showLoginError("Please enter the research access code");
       return;
     }
 
-    // Show loading state
     setLoginLoading(true);
     hideLoginError();
 
     try {
       const authResult = await authManager.authenticate(password);
-
+      console.log(authResult);
       if (authResult.success) {
-        // Log successful authentication
-        store.logEvent('auth_success', {
+        store.logEvent("auth_success", {
           timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent.substring(0, 100), // Limited info
+          userAgent: navigator.userAgent.substring(0, 100),
         });
-
-        // Navigate to main application
-        store.navigate('triage1');
+        store.navigate("triage1");
       } else {
-        // Handle authentication failure
-        const errorMessage = authResult.message;
-
-        showLoginError(errorMessage);
-        passwordInput.value = '';
+        showLoginError(authResult.message);
+        passwordInput.value = "";
         passwordInput.focus();
-
-        // Log failed attempt (no sensitive data)
-        store.logEvent('auth_failed', {
+        store.logEvent("auth_failed", {
           timestamp: new Date().toISOString(),
           errorCode: authResult.errorCode,
         });
       }
     } catch (error) {
-      showLoginError('Authentication system error. Please try again.');
-      // Remove // for production
+      showLoginError("Authentication system error. Please try again.");
     } finally {
       setLoginLoading(false);
     }
   });
 
-  // Hide error on input
-  passwordInput.addEventListener('input', () => {
-    hideLoginError();
-  });
+  passwordInput.addEventListener("input", hideLoginError);
 
   function showLoginError(message) {
     loginError.textContent = message;
-    loginError.style.display = 'block';
-    passwordInput.classList.add('error');
+    loginError.classList.remove("hidden");
+    passwordInput.classList.add("border-red-500");
   }
 
   function hideLoginError() {
-    loginError.style.display = 'none';
-    passwordInput.classList.remove('error');
+    loginError.classList.add("hidden");
+    passwordInput.classList.remove("border-red-500");
   }
 
   function setLoginLoading(isLoading) {
-    const buttonText = loginButton.querySelector('.button-text');
-    const loadingSpinner = loginButton.querySelector('.loading-spinner');
+    const buttonText = loginButton.querySelector(".button-text");
+    const loadingSpinner = loginButton.querySelector(".loading-spinner");
 
     if (isLoading) {
-      buttonText.style.display = 'none';
-      loadingSpinner.style.display = 'inline';
+      buttonText.classList.add("hidden");
+      loadingSpinner.classList.remove("hidden");
       loginButton.disabled = true;
     } else {
-      buttonText.style.display = 'inline';
-      loadingSpinner.style.display = 'none';
+      buttonText.classList.remove("hidden");
+      loadingSpinner.classList.add("hidden");
       loginButton.disabled = false;
     }
   }

@@ -3,18 +3,18 @@
  */
 
 export function announceScreenChange(screen) {
-  const announcement = document.createElement('div');
-  announcement.className = 'sr-only';
-  announcement.setAttribute('role', 'status');
-  announcement.setAttribute('aria-live', 'polite');
+  const announcement = document.createElement("div");
+  announcement.className = "sr-only";
+  announcement.setAttribute("role", "status");
+  announcement.setAttribute("aria-live", "polite");
 
   const screenNames = {
-    triage1: 'Coma assessment',
-    triage2: 'Examination capability assessment',
-    coma: 'Coma module',
-    limited: 'Limited data module',
-    full: 'Full stroke assessment',
-    results: 'Assessment results',
+    triage1: "Coma assessment",
+    triage2: "Examination capability assessment",
+    coma: "Coma module",
+    limited: "Limited data module",
+    full: "Full stroke assessment",
+    results: "Assessment results",
   };
 
   announcement.textContent = `Navigated to ${screenNames[screen] || screen}`;
@@ -24,14 +24,14 @@ export function announceScreenChange(screen) {
 }
 
 export function setPageTitle(screen) {
-  const appName = 'iGFAP';
+  const appName = "iGFAP";
   const titles = {
-    triage1: 'Initial Assessment',
-    triage2: 'Examination Capability',
-    coma: 'Coma Module',
-    limited: 'Limited Data Module',
-    full: 'Full Stroke Module',
-    results: 'Assessment Results',
+    triage1: "Initial Assessment",
+    triage2: "Examination Capability",
+    coma: "Coma Module",
+    limited: "Limited Data Module",
+    full: "Full Stroke Module",
+    results: "Assessment Results",
   };
 
   const section = titles[screen];
@@ -42,12 +42,12 @@ export function setPageTitle(screen) {
 export function focusMainHeading() {
   // Focus on the main heading for screen readers
   setTimeout(() => {
-    const heading = document.querySelector('h2');
+    const heading = document.querySelector("h2");
     if (heading) {
-      heading.setAttribute('tabindex', '-1');
+      heading.setAttribute("tabindex", "-1");
       heading.focus();
       // Remove tabindex after focus for proper tab order
-      setTimeout(() => heading.removeAttribute('tabindex'), 100);
+      setTimeout(() => heading.removeAttribute("tabindex"), 100);
     }
   }, 100);
 }

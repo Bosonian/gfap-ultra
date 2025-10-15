@@ -13,7 +13,7 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { safeAsync, ERROR_CATEGORIES } from './error-handler.js';
+import { safeAsync, ERROR_CATEGORIES } from "./error-handler.js";
 
 /**
  * @typedef {Object} LogEntry
@@ -32,27 +32,27 @@ import { safeAsync, ERROR_CATEGORIES } from './error-handler.js';
  * Log levels with priority ordering
  */
 export const LOG_LEVELS = {
-  DEBUG: { level: 0, name: 'DEBUG', color: '#6366f1' },
-  INFO: { level: 1, name: 'INFO', color: '#10b981' },
-  WARN: { level: 2, name: 'WARN', color: '#f59e0b' },
-  ERROR: { level: 3, name: 'ERROR', color: '#ef4444' },
-  CRITICAL: { level: 4, name: 'CRITICAL', color: '#dc2626' },
+  DEBUG: { level: 0, name: "DEBUG", color: "#6366f1" },
+  INFO: { level: 1, name: "INFO", color: "#10b981" },
+  WARN: { level: 2, name: "WARN", color: "#f59e0b" },
+  ERROR: { level: 3, name: "ERROR", color: "#ef4444" },
+  CRITICAL: { level: 4, name: "CRITICAL", color: "#dc2626" },
 };
 
 /**
  * Log categories for medical application
  */
 export const LOG_CATEGORIES = {
-  AUTHENTICATION: 'AUTH',
-  MEDICAL_CALCULATION: 'MEDICAL',
-  NETWORK: 'NETWORK',
-  PERFORMANCE: 'PERF',
-  SECURITY: 'SECURITY',
-  USER_INTERACTION: 'UI',
-  DATA_VALIDATION: 'VALIDATION',
-  AUDIT: 'AUDIT',
-  SYSTEM: 'SYSTEM',
-  ERROR: 'ERROR',
+  AUTHENTICATION: "AUTH",
+  MEDICAL_CALCULATION: "MEDICAL",
+  NETWORK: "NETWORK",
+  PERFORMANCE: "PERF",
+  SECURITY: "SECURITY",
+  USER_INTERACTION: "UI",
+  DATA_VALIDATION: "VALIDATION",
+  AUDIT: "AUDIT",
+  SYSTEM: "SYSTEM",
+  ERROR: "ERROR",
 };
 
 /**
@@ -64,7 +64,8 @@ export class MedicalLogger {
     this.sessionId = this.generateSessionId();
     this.logBuffer = [];
     this.maxBufferSize = 1000;
-    this.isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    this.isProduction =
+      window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
     this.enableConsole = !this.isProduction;
     this.enableStorage = true;
     this.enableNetwork = false; // Would send to logging service in production
@@ -78,7 +79,7 @@ export class MedicalLogger {
    */
   getLogLevel() {
     try {
-      const stored = localStorage.getItem('medicalLogLevel');
+      const stored = localStorage.getItem("medicalLogLevel");
       if (stored && LOG_LEVELS[stored.toUpperCase()]) {
         return LOG_LEVELS[stored.toUpperCase()].level;
       }
@@ -104,9 +105,9 @@ export class MedicalLogger {
    */
   setupErrorHandlers() {
     // Capture unhandled errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener("error", event => {
       try {
-        this.critical('Unhandled JavaScript Error', {
+        this.critical("Unhandled JavaScript Error", {
           category: LOG_CATEGORIES.ERROR,
           message: event.message,
           filename: event.filename,
@@ -116,23 +117,23 @@ export class MedicalLogger {
         });
       } catch (loggingError) {
         // Fallback to console if logging fails
-        console.error('Logging failed:', loggingError);
-        console.error('Original error:', event.error);
+        console.error("Logging failed:", loggingError);
+        console.error("Original error:", event.error);
       }
     });
 
     // Capture unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener("unhandledrejection", event => {
       try {
-        this.critical('Unhandled Promise Rejection', {
+        this.critical("Unhandled Promise Rejection", {
           category: LOG_CATEGORIES.ERROR,
-          reason: event.reason?.message || String(event.reason) || 'Unknown rejection',
+          reason: event.reason?.message || String(event.reason) || "Unknown rejection",
           stack: event.reason?.stack,
         });
       } catch (loggingError) {
         // Fallback to console if logging fails
-        console.error('Logging failed:', loggingError);
-        console.error('Original rejection:', event.reason);
+        console.error("Logging failed:", loggingError);
+        console.error("Original rejection:", event.reason);
       }
     });
   }
@@ -142,7 +143,7 @@ export class MedicalLogger {
    */
   createLogEntry(level, message, context = {}) {
     // Ensure context is always an object
-    const safeContext = context && typeof context === 'object' ? context : {};
+    const safeContext = context && typeof context === "object" ? context : {};
 
     const entry = {
       timestamp: new Date().toISOString(),
@@ -155,7 +156,7 @@ export class MedicalLogger {
     };
 
     // Add stack trace for errors
-    if (level === 'ERROR' || level === 'CRITICAL') {
+    if (level === "ERROR" || level === "CRITICAL") {
       entry.stackTrace = new Error().stack;
     }
 
@@ -172,16 +173,16 @@ export class MedicalLogger {
    * Sanitize message to remove PHI
    */
   sanitizeMessage(message) {
-    if (typeof message !== 'string') {
+    if (typeof message !== "string") {
       message = String(message);
     }
 
     // Remove potential PHI patterns
     const sanitized = message
-      .replace(/\b\d{3}-\d{2}-\d{4}\b/g, '***-**-****') // SSN
-      .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '***@***.***') // Email
-      .replace(/\b\d{10,}\b/g, '**********') // Phone numbers
-      .replace(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, '[NAME]'); // Names
+      .replace(/\b\d{3}-\d{2}-\d{4}\b/g, "***-**-****") // SSN
+      .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, "***@***.***") // Email
+      .replace(/\b\d{10,}\b/g, "**********") // Phone numbers
+      .replace(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, "[NAME]"); // Names
 
     return sanitized;
   }
@@ -191,7 +192,7 @@ export class MedicalLogger {
    */
   sanitizeContext(context) {
     // Handle null or non-object inputs
-    if (!context || typeof context !== 'object') {
+    if (!context || typeof context !== "object") {
       return {};
     }
 
@@ -199,13 +200,24 @@ export class MedicalLogger {
 
     // Remove sensitive fields
     const sensitiveFields = [
-      'password', 'token', 'sessionToken', 'authToken',
-      'patientName', 'firstName', 'lastName', 'fullName',
-      'email', 'phone', 'ssn', 'mrn', 'dob', 'dateOfBirth',
+      "password",
+      "token",
+      "sessionToken",
+      "authToken",
+      "patientName",
+      "firstName",
+      "lastName",
+      "fullName",
+      "email",
+      "phone",
+      "ssn",
+      "mrn",
+      "dob",
+      "dateOfBirth",
     ];
 
-    const removeSensitiveData = (obj) => {
-      if (!obj || typeof obj !== 'object') {
+    const removeSensitiveData = obj => {
+      if (!obj || typeof obj !== "object") {
         return obj;
       }
 
@@ -214,9 +226,9 @@ export class MedicalLogger {
       for (const [key, value] of Object.entries(obj)) {
         const lowerKey = key.toLowerCase();
 
-        if (sensitiveFields.some((field) => lowerKey.includes(field))) {
-          cleaned[key] = '[REDACTED]';
-        } else if (typeof value === 'object' && value !== null) {
+        if (sensitiveFields.some(field => lowerKey.includes(field))) {
+          cleaned[key] = "[REDACTED]";
+        } else if (typeof value === "object" && value !== null) {
           cleaned[key] = removeSensitiveData(value);
         } else {
           cleaned[key] = value;
@@ -235,7 +247,7 @@ export class MedicalLogger {
   getAnonymizedUserId() {
     try {
       // Use a hash of session info, not actual user data
-      const sessionData = sessionStorage.getItem('session_hash');
+      const sessionData = sessionStorage.getItem("session_hash");
       if (sessionData) {
         return `user_${sessionData.substring(0, 8)}`;
       }
@@ -250,12 +262,13 @@ export class MedicalLogger {
    */
   getPerformanceMetrics() {
     try {
-      if ('performance' in window) {
-        const navigation = performance.getEntriesByType('navigation')[0];
+      if ("performance" in window) {
+        const navigation = performance.getEntriesByType("navigation")[0];
         return {
           memoryUsed: performance.memory?.usedJSHeapSize || 0,
           loadTime: navigation?.loadEventEnd - navigation?.loadEventStart || 0,
-          domReady: navigation?.domContentLoadedEventEnd - navigation?.domContentLoadedEventStart || 0,
+          domReady:
+            navigation?.domContentLoadedEventEnd - navigation?.domContentLoadedEventStart || 0,
         };
       }
     } catch (error) {
@@ -302,8 +315,8 @@ export class MedicalLogger {
       },
       {
         category: ERROR_CATEGORIES.SYSTEM,
-        context: { operation: 'logging', level, message: message.substring(0, 100) },
-      },
+        context: { operation: "logging", level, message: message.substring(0, 100) },
+      }
     );
   }
 
@@ -324,29 +337,33 @@ export class MedicalLogger {
    */
   outputToConsole(entry) {
     const levelInfo = LOG_LEVELS[entry.level];
-    const color = levelInfo?.color || '#666666';
+    const color = levelInfo?.color || "#666666";
 
     const style = `color: ${color}; font-weight: bold;`;
     const timestamp = new Date(entry.timestamp).toLocaleTimeString();
 
-    const consoleMethod = entry.level === 'ERROR' || entry.level === 'CRITICAL' ? 'error'
-      : entry.level === 'WARN' ? 'warn' : 'log';
+    const consoleMethod =
+      entry.level === "ERROR" || entry.level === "CRITICAL"
+        ? "error"
+        : entry.level === "WARN"
+          ? "warn"
+          : "log";
 
     console.groupCollapsed(
       `%c[${entry.level}] ${timestamp} [${entry.category}] ${entry.message}`,
-      style,
+      style
     );
 
     if (entry.context && Object.keys(entry.context).length > 0) {
-      console.log('Context:', entry.context);
+      console.log("Context:", entry.context);
     }
 
     if (entry.performance) {
-      console.log('Performance:', entry.performance);
+      console.log("Performance:", entry.performance);
     }
 
-    if (entry.stackTrace && (entry.level === 'ERROR' || entry.level === 'CRITICAL')) {
-      console.log('Stack Trace:', entry.stackTrace);
+    if (entry.stackTrace && (entry.level === "ERROR" || entry.level === "CRITICAL")) {
+      console.log("Stack Trace:", entry.stackTrace);
     }
 
     console.groupEnd();
@@ -376,13 +393,13 @@ export class MedicalLogger {
   cleanOldEntries() {
     try {
       const keys = Object.keys(sessionStorage)
-        .filter((key) => key.startsWith('medicalLog_'))
+        .filter(key => key.startsWith("medicalLog_"))
         .sort()
         .reverse();
 
       // Keep only the last 100 entries
       if (keys.length > 100) {
-        keys.slice(100).forEach((key) => {
+        keys.slice(100).forEach(key => {
           sessionStorage.removeItem(key);
         });
       }
@@ -423,7 +440,7 @@ export class MedicalLogger {
     }
 
     // In production, this would batch-send logs to service
-    this.info('Log buffer flushed', {
+    this.info("Log buffer flushed", {
       category: LOG_CATEGORIES.SYSTEM,
       entriesCount: this.logBuffer.length,
     });
@@ -433,23 +450,23 @@ export class MedicalLogger {
    * Convenience methods for different log levels
    */
   debug(message, context = {}) {
-    return this.log('DEBUG', message, context);
+    return this.log("DEBUG", message, context);
   }
 
   info(message, context = {}) {
-    return this.log('INFO', message, context);
+    return this.log("INFO", message, context);
   }
 
   warn(message, context = {}) {
-    return this.log('WARN', message, context);
+    return this.log("WARN", message, context);
   }
 
   error(message, context = {}) {
-    return this.log('ERROR', message, context);
+    return this.log("ERROR", message, context);
   }
 
   critical(message, context = {}) {
-    return this.log('CRITICAL', message, context);
+    return this.log("CRITICAL", message, context);
   }
 
   /**
@@ -482,7 +499,7 @@ export class MedicalLogger {
   }
 
   networkRequest(url, method, status, context = {}) {
-    const level = status >= 400 ? 'ERROR' : status >= 300 ? 'WARN' : 'DEBUG';
+    const level = status >= 400 ? "ERROR" : status >= 300 ? "WARN" : "DEBUG";
     return this.log(level, `Network request: ${method} ${url}`, {
       category: LOG_CATEGORIES.NETWORK,
       method,
@@ -515,11 +532,11 @@ export class MedicalLogger {
   sanitizeUrl(url) {
     try {
       const urlObj = new URL(url);
-      const sensitiveParams = ['token', 'auth', 'key', 'secret'];
+      const sensitiveParams = ["token", "auth", "key", "secret"];
 
-      sensitiveParams.forEach((param) => {
+      sensitiveParams.forEach(param => {
         if (urlObj.searchParams.has(param)) {
-          urlObj.searchParams.set(param, '[REDACTED]');
+          urlObj.searchParams.set(param, "[REDACTED]");
         }
       });
 
@@ -538,13 +555,13 @@ export class MedicalLogger {
     // Add logs from storage
     try {
       const keys = Object.keys(sessionStorage)
-        .filter((key) => key.startsWith('medicalLog_'))
+        .filter(key => key.startsWith("medicalLog_"))
         .sort();
 
-      keys.forEach((key) => {
+      keys.forEach(key => {
         try {
           const entry = JSON.parse(sessionStorage.getItem(key));
-          if (entry && !allLogs.find((log) => log.timestamp === entry.timestamp)) {
+          if (entry && !allLogs.find(log => log.timestamp === entry.timestamp)) {
             allLogs.push(entry);
           }
         } catch (error) {
@@ -560,19 +577,19 @@ export class MedicalLogger {
 
     if (filters.level) {
       const minLevel = LOG_LEVELS[filters.level.toUpperCase()]?.level || 0;
-      filtered = filtered.filter((log) => {
+      filtered = filtered.filter(log => {
         const logLevel = LOG_LEVELS[log.level]?.level || 0;
         return logLevel >= minLevel;
       });
     }
 
     if (filters.category) {
-      filtered = filtered.filter((log) => log.category === filters.category);
+      filtered = filtered.filter(log => log.category === filters.category);
     }
 
     if (filters.since) {
       const sinceDate = new Date(filters.since);
-      filtered = filtered.filter((log) => new Date(log.timestamp) >= sinceDate);
+      filtered = filtered.filter(log => new Date(log.timestamp) >= sinceDate);
     }
 
     if (filters.limit) {
@@ -585,10 +602,10 @@ export class MedicalLogger {
   /**
    * Export logs for debugging or compliance
    */
-  exportLogs(format = 'json') {
+  exportLogs(format = "json") {
     const logs = this.getLogs();
 
-    if (format === 'csv') {
+    if (format === "csv") {
       return this.logsToCSV(logs);
     }
 
@@ -600,19 +617,19 @@ export class MedicalLogger {
    */
   logsToCSV(logs) {
     if (logs.length === 0) {
-      return '';
+      return "";
     }
 
-    const headers = ['timestamp', 'level', 'category', 'message', 'sessionId'];
-    const rows = logs.map((log) => [
+    const headers = ["timestamp", "level", "category", "message", "sessionId"];
+    const rows = logs.map(log => [
       log.timestamp,
       log.level,
       log.category,
-      `"${log.message.replace(/"/g, '""')}"`,
+      `"${log.message.replace(/"/g, "\"\"")}"`,
       log.sessionId,
     ]);
 
-    return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+    return [headers.join(","), ...rows.map(row => row.join(","))].join("\n");
   }
 
   /**
@@ -622,15 +639,14 @@ export class MedicalLogger {
     this.logBuffer = [];
 
     try {
-      const keys = Object.keys(sessionStorage)
-        .filter((key) => key.startsWith('medicalLog_'));
+      const keys = Object.keys(sessionStorage).filter(key => key.startsWith("medicalLog_"));
 
-      keys.forEach((key) => sessionStorage.removeItem(key));
+      keys.forEach(key => sessionStorage.removeItem(key));
     } catch (error) {
       // Storage cleanup failed
     }
 
-    this.info('Log storage cleared', {
+    this.info("Log storage cleared", {
       category: LOG_CATEGORIES.SYSTEM,
     });
   }

@@ -6,9 +6,9 @@
 export function extractDriversFromResponse(response, predictionType) {
   let rawDrivers = null;
 
-  if (predictionType === 'ICH') {
+  if (predictionType === "ICH") {
     rawDrivers = response.ich_prediction?.drivers || null;
-  } else if (predictionType === 'LVO') {
+  } else if (predictionType === "LVO") {
     rawDrivers = response.lvo_prediction?.drivers || null;
   }
 
@@ -18,13 +18,11 @@ export function extractDriversFromResponse(response, predictionType) {
 
   // Convert flat dictionary to structured format
   const formattedDrivers = formatDriversFromDictionary(rawDrivers, predictionType);
-
   // Check for FAST-ED specifically
   const allFeatures = [...formattedDrivers.positive, ...formattedDrivers.negative];
-  const fastEdFeature = allFeatures.find((f) => f.label && (
-    f.label.toLowerCase().includes('fast')
-      || f.label.includes('fast_ed')
-  ));
+  const fastEdFeature = allFeatures.find(
+    f => f.label && (f.label.toLowerCase().includes("fast") || f.label.includes("fast_ed"))
+  );
 
   // FAST-ED feature detection for validation
 
@@ -39,7 +37,7 @@ function formatDriversFromDictionary(drivers, predictionType) {
   const negative = [];
 
   Object.entries(drivers).forEach(([label, weight]) => {
-    if (typeof weight === 'number') {
+    if (typeof weight === "number") {
       if (weight > 0) {
         positive.push({ label, weight });
       } else if (weight < 0) {
@@ -54,8 +52,8 @@ function formatDriversFromDictionary(drivers, predictionType) {
   negative.sort((a, b) => b.weight - a.weight);
 
   return {
-    kind: 'flat_dictionary',
-    units: 'logit',
+    kind: "flat_dictionary",
+    units: "logit",
     positive,
     negative,
     meta: {},
@@ -68,9 +66,9 @@ function formatDriversFromDictionary(drivers, predictionType) {
 export function extractProbabilityFromResponse(response, predictionType) {
   let probability = 0;
 
-  if (predictionType === 'ICH') {
+  if (predictionType === "ICH") {
     probability = response.ich_prediction?.probability || 0;
-  } else if (predictionType === 'LVO') {
+  } else if (predictionType === "LVO") {
     probability = response.lvo_prediction?.probability || 0;
   }
 
@@ -83,9 +81,9 @@ export function extractProbabilityFromResponse(response, predictionType) {
 export function extractConfidenceFromResponse(response, predictionType) {
   let confidence = 0.85; // default
 
-  if (predictionType === 'ICH') {
+  if (predictionType === "ICH") {
     confidence = response.ich_prediction?.confidence || 0.85;
-  } else if (predictionType === 'LVO') {
+  } else if (predictionType === "LVO") {
     confidence = response.lvo_prediction?.confidence || 0.85;
   }
 

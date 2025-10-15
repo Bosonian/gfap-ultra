@@ -15,7 +15,7 @@
 
 import {
   getResearchPassword, getSessionConfig, getSecurityConfig, isDevelopment,
-} from './environment.js';
+} from "./environment.js";
 
 // Mock bcrypt implementation for browser environment
 const mockBcrypt = {
@@ -24,13 +24,13 @@ const mockBcrypt = {
     // For now, provide a mock that maintains the interface
     const salt = this.generateSalt(saltRounds);
     const hash = await this.hashWithSalt(password, salt);
-    return `$2b$${saltRounds.toString().padStart(2, '0')}$${salt}${hash}`;
+    return `$2b$${saltRounds.toString().padStart(2, "0")}$${salt}${hash}`;
   },
 
   async compare(password, hash) {
     try {
-      const parts = hash.split('$');
-      if (parts.length !== 4 || parts[0] !== '' || parts[1] !== '2b') {
+      const parts = hash.split("$");
+      if (parts.length !== 4 || parts[0] !== "" || parts[1] !== "2b") {
         return false;
       }
 
@@ -42,17 +42,17 @@ const mockBcrypt = {
       const computedHash = await this.hashWithSalt(password, salt);
       return computedHash === originalHash;
     } catch (error) {
-      console.warn('BCrypt compare failed:', error.message);
+      console.warn("BCrypt compare failed:", error.message);
       return false;
     }
   },
 
   generateSalt(rounds) {
     // Generate cryptographically secure salt
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./';
-    let salt = '';
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./";
+    let salt = "";
 
-    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
       const array = new Uint8Array(22);
       crypto.getRandomValues(array);
       for (let i = 0; i < 22; i++) {
@@ -69,12 +69,12 @@ const mockBcrypt = {
   },
 
   async hashWithSalt(password, salt) {
-    if (typeof crypto !== 'undefined' && crypto.subtle) {
+    if (typeof crypto !== "undefined" && crypto.subtle) {
       const encoder = new TextEncoder();
       const data = encoder.encode(password + salt);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').substring(0, 31);
+      return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("").substring(0, 31);
     }
     // Fallback hash for environments without WebCrypto
     let hash = 0;
@@ -84,14 +84,14 @@ const mockBcrypt = {
       hash = ((hash << 5) - hash) + char;
       hash &= hash; // Convert to 32bit integer
     }
-    return Math.abs(hash).toString(16).padStart(31, '0').substring(0, 31);
+    return Math.abs(hash).toString(16).padStart(31, "0").substring(0, 31);
   },
 };
 
 // Mock JWT implementation for browser environment
 const mockJwt = {
   sign(payload, secret, options = {}) {
-    const header = { alg: 'HS256', typ: 'JWT' };
+    const header = { alg: "HS256", typ: "JWT" };
     const now = Math.floor(Date.now() / 1000);
 
     const jwtPayload = {
@@ -109,23 +109,23 @@ const mockJwt = {
 
   verify(token, secret) {
     try {
-      const parts = token.split('.');
+      const parts = token.split(".");
       if (parts.length !== 3) {
-        throw new Error('Invalid token format');
+        throw new Error("Invalid token format");
       }
 
       const [headerEncoded, payloadEncoded, signature] = parts;
       const expectedSignature = this.createSignature(`${headerEncoded}.${payloadEncoded}`, secret);
 
       if (signature !== expectedSignature) {
-        throw new Error('Invalid signature');
+        throw new Error("Invalid signature");
       }
 
       const payload = JSON.parse(this.base64UrlDecode(payloadEncoded));
       const now = Math.floor(Date.now() / 1000);
 
       if (payload.exp && payload.exp < now) {
-        throw new Error('Token expired');
+        throw new Error("Token expired");
       }
 
       return payload;
@@ -136,28 +136,28 @@ const mockJwt = {
 
   base64UrlEncode(str) {
     const base64 = btoa(str);
-    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
   },
 
   base64UrlDecode(str) {
-    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
     while (base64.length % 4) {
-      base64 += '=';
+      base64 += "=";
     }
     return atob(base64);
   },
 
   async createSignature(data, secret) {
-    if (typeof crypto !== 'undefined' && crypto.subtle) {
+    if (typeof crypto !== "undefined" && crypto.subtle) {
       const encoder = new TextEncoder();
       const key = await crypto.subtle.importKey(
-        'raw',
+        "raw",
         encoder.encode(secret),
-        { name: 'HMAC', hash: 'SHA-256' },
+        { name: "HMAC", hash: "SHA-256" },
         false,
-        ['sign'],
+        ["sign"],
       );
-      const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
+      const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
       const hashArray = Array.from(new Uint8Array(signature));
       return this.base64UrlEncode(String.fromCharCode.apply(null, hashArray));
     }
@@ -190,10 +190,10 @@ export class SecureAuthenticationManager {
       // Initialize with hashed research password
       this.hashedPassword = await this.hashPassword(getResearchPassword());
       this.isInitialized = true;
-      this.logAuditEvent('system', 'AUTH_SYSTEM_INITIALIZED', { success: true });
+      this.logAuditEvent("system", "AUTH_SYSTEM_INITIALIZED", { success: true });
     } catch (error) {
-      console.error('Failed to initialize secure authentication:', error);
-      this.logAuditEvent('system', 'AUTH_SYSTEM_INIT_FAILED', { error: error.message });
+      console.error("Failed to initialize secure authentication:", error);
+      this.logAuditEvent("system", "AUTH_SYSTEM_INIT_FAILED", { error: error.message });
     }
   }
 
@@ -203,14 +203,14 @@ export class SecureAuthenticationManager {
    * @param {string} clientIp - Client IP address for rate limiting
    * @returns {Promise<Object>} Authentication result with JWT token
    */
-  async authenticate(password, clientIp = 'unknown') {
+  async authenticate(password, clientIp = "unknown") {
     const startTime = Date.now();
 
     try {
       // Check if IP is temporarily blocked
       if (this.isIpBlocked(clientIp)) {
         const blockInfo = this.blockedIPs.get(clientIp);
-        this.logAuditEvent('auth', 'AUTH_BLOCKED_IP', {
+        this.logAuditEvent("auth", "AUTH_BLOCKED_IP", {
           clientIp,
           blockExpiresAt: blockInfo.expiresAt,
           attemptCount: blockInfo.attemptCount,
@@ -225,7 +225,7 @@ export class SecureAuthenticationManager {
         const timeSinceLastAttempt = Date.now() - attempts.lastAttempt;
         if (timeSinceLastAttempt < this.sessionConfig.rateLimitWindow) {
           this.blockIp(clientIp);
-          throw new Error('Too many failed attempts. IP temporarily blocked.');
+          throw new Error("Too many failed attempts. IP temporarily blocked.");
         } else {
           // Reset attempts after rate limit window
           this.failedAttempts.delete(clientIp);
@@ -242,24 +242,24 @@ export class SecureAuthenticationManager {
 
       if (!isValidPassword) {
         this.recordFailedAttempt(clientIp);
-        this.logAuditEvent('auth', 'AUTH_FAILED', {
+        this.logAuditEvent("auth", "AUTH_FAILED", {
           clientIp,
-          reason: 'invalid_password',
+          reason: "invalid_password",
           attemptCount: this.getFailedAttemptCount(clientIp),
           duration: Date.now() - startTime,
         });
 
         // Add delay to prevent timing attacks
         await this.secureDelay();
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
       // Generate JWT token
       const tokenPayload = {
-        sub: 'research_user',
-        role: 'researcher',
-        permissions: ['read_data', 'analyze_results'],
-        clientIp: isDevelopment() ? clientIp : 'masked',
+        sub: "research_user",
+        role: "researcher",
+        permissions: ["read_data", "analyze_results"],
+        clientIp: isDevelopment() ? clientIp : "masked",
       };
 
       const token = mockJwt.sign(
@@ -279,7 +279,7 @@ export class SecureAuthenticationManager {
         sessionId: this.generateSessionId(),
       };
 
-      this.logAuditEvent('auth', 'AUTH_SUCCESS', {
+      this.logAuditEvent("auth", "AUTH_SUCCESS", {
         clientIp,
         sessionId: authResult.sessionId,
         duration: Date.now() - startTime,
@@ -288,7 +288,7 @@ export class SecureAuthenticationManager {
 
       return authResult;
     } catch (error) {
-      this.logAuditEvent('auth', 'AUTH_ERROR', {
+      this.logAuditEvent("auth", "AUTH_ERROR", {
         clientIp,
         error: error.message,
         duration: Date.now() - startTime,
@@ -311,9 +311,9 @@ export class SecureAuthenticationManager {
     try {
       const payload = mockJwt.verify(token, this.sessionConfig.secretKey);
 
-      this.logAuditEvent('auth', 'TOKEN_VERIFIED', {
+      this.logAuditEvent("auth", "TOKEN_VERIFIED", {
         sub: payload.sub,
-        sessionId: payload.sessionId || 'unknown',
+        sessionId: payload.sessionId || "unknown",
         expiresAt: new Date(payload.exp * 1000).toISOString(),
       });
 
@@ -323,9 +323,9 @@ export class SecureAuthenticationManager {
         expiresAt: new Date(payload.exp * 1000),
       };
     } catch (error) {
-      this.logAuditEvent('auth', 'TOKEN_INVALID', {
+      this.logAuditEvent("auth", "TOKEN_INVALID", {
         error: error.message,
-        tokenPrefix: token ? `${token.substring(0, 20)}...` : 'null',
+        tokenPrefix: token ? `${token.substring(0, 20)}...` : "null",
       });
 
       return {
@@ -379,7 +379,7 @@ export class SecureAuthenticationManager {
       blockedAt: Date.now(),
     });
 
-    this.logAuditEvent('security', 'IP_BLOCKED', {
+    this.logAuditEvent("security", "IP_BLOCKED", {
       clientIp,
       blockDuration,
       attemptCount: attempts.count,
@@ -426,8 +426,8 @@ export class SecureAuthenticationManager {
   generateSessionId() {
     const timestamp = Date.now().toString(36);
     const randomBytes = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
     return `${timestamp}-${randomBytes}`;
   }
 
@@ -453,8 +453,8 @@ export class SecureAuthenticationManager {
       action,
       details: {
         ...details,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
-        environment: isDevelopment() ? 'development' : 'production',
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "unknown",
+        environment: isDevelopment() ? "development" : "production",
       },
     };
 
@@ -467,7 +467,7 @@ export class SecureAuthenticationManager {
 
     // In production, this should be sent to a secure audit logging service
     if (isDevelopment()) {
-      console.log('🔐 Audit Log:', auditEntry);
+      console.log("🔐 Audit Log:", auditEntry);
     }
   }
 
@@ -508,23 +508,23 @@ export class SecureAuthenticationManager {
     const lastHour = now - (60 * 60 * 1000);
 
     const recent24h = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > last24Hours
-      && entry.category === 'auth');
+      && entry.category === "auth");
 
     const recentHour = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > lastHour
-      && entry.category === 'auth');
+      && entry.category === "auth");
 
     return {
       totalAttempts24h: recent24h.length,
-      successfulLogins24h: recent24h.filter((e) => e.action === 'AUTH_SUCCESS').length,
-      failedAttempts24h: recent24h.filter((e) => e.action === 'AUTH_FAILED').length,
-      blockedIPs24h: recent24h.filter((e) => e.action === 'IP_BLOCKED').length,
+      successfulLogins24h: recent24h.filter((e) => e.action === "AUTH_SUCCESS").length,
+      failedAttempts24h: recent24h.filter((e) => e.action === "AUTH_FAILED").length,
+      blockedIPs24h: recent24h.filter((e) => e.action === "IP_BLOCKED").length,
 
       totalAttemptsLastHour: recentHour.length,
-      successfulLoginsLastHour: recentHour.filter((e) => e.action === 'AUTH_SUCCESS').length,
-      failedAttemptsLastHour: recentHour.filter((e) => e.action === 'AUTH_FAILED').length,
+      successfulLoginsLastHour: recentHour.filter((e) => e.action === "AUTH_SUCCESS").length,
+      failedAttemptsLastHour: recentHour.filter((e) => e.action === "AUTH_FAILED").length,
 
       currentlyBlockedIPs: Array.from(this.blockedIPs.keys()).filter((ip) => this.isIpBlocked(ip)).length,
-      systemUptime: now - (this.auditLog.find((e) => e.action === 'AUTH_SYSTEM_INITIALIZED')?.timestamp || now),
+      systemUptime: now - (this.auditLog.find((e) => e.action === "AUTH_SYSTEM_INITIALIZED")?.timestamp || now),
     };
   }
 
@@ -552,7 +552,7 @@ export class SecureAuthenticationManager {
     const weekAgo = now - (7 * 24 * 60 * 60 * 1000);
     this.auditLog = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > weekAgo);
 
-    this.logAuditEvent('system', 'MAINTENANCE_CLEANUP', {
+    this.logAuditEvent("system", "MAINTENANCE_CLEANUP", {
       cleanedBlocks: this.blockedIPs.size,
       cleanedAttempts: this.failedAttempts.size,
       auditLogSize: this.auditLog.length,
@@ -564,7 +564,7 @@ export class SecureAuthenticationManager {
 export const secureAuthManager = new SecureAuthenticationManager();
 
 // Set up automatic maintenance cleanup
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   setInterval(() => {
     secureAuthManager.performMaintenanceCleanup();
   }, 60 * 60 * 1000); // Every hour

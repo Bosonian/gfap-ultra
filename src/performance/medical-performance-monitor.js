@@ -5,20 +5,20 @@
  * Provides comprehensive performance monitoring for medical software compliance
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from '../patterns/observer.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
 
 /**
  * Performance metric types for medical applications
  */
 export const PerformanceMetricType = {
-  API_CALL: 'api_call',
-  VALIDATION: 'validation',
-  PREDICTION: 'prediction',
-  RENDER: 'render',
-  USER_INTERACTION: 'user_interaction',
-  MEMORY: 'memory',
-  NETWORK: 'network',
-  CACHE: 'cache',
+  API_CALL: "api_call",
+  VALIDATION: "validation",
+  PREDICTION: "prediction",
+  RENDER: "render",
+  USER_INTERACTION: "user_interaction",
+  MEMORY: "memory",
+  NETWORK: "network",
+  CACHE: "cache",
 };
 
 /**
@@ -78,18 +78,18 @@ class PerformanceMetric {
    */
   getThresholdKey() {
     switch (this.type) {
-      case PerformanceMetricType.API_CALL:
-        return this.metadata.critical ? 'CRITICAL_API_RESPONSE' : 'PREDICTION_RESPONSE';
-      case PerformanceMetricType.VALIDATION:
-        return 'VALIDATION_RESPONSE';
-      case PerformanceMetricType.PREDICTION:
-        return 'PREDICTION_RESPONSE';
-      case PerformanceMetricType.RENDER:
-        return 'UI_RENDER';
-      case PerformanceMetricType.USER_INTERACTION:
-        return 'USER_INTERACTION';
-      default:
-        return null;
+    case PerformanceMetricType.API_CALL:
+      return this.metadata.critical ? "CRITICAL_API_RESPONSE" : "PREDICTION_RESPONSE";
+    case PerformanceMetricType.VALIDATION:
+      return "VALIDATION_RESPONSE";
+    case PerformanceMetricType.PREDICTION:
+      return "PREDICTION_RESPONSE";
+    case PerformanceMetricType.RENDER:
+      return "UI_RENDER";
+    case PerformanceMetricType.USER_INTERACTION:
+      return "USER_INTERACTION";
+    default:
+      return null;
     }
   }
 
@@ -99,23 +99,23 @@ class PerformanceMetric {
   getPerformanceGrade() {
     const threshold = MedicalPerformanceThresholds[this.getThresholdKey()];
     if (!threshold) {
-      return 'N/A';
+      return "N/A";
     }
 
     const ratio = this.duration / threshold;
     if (ratio <= 0.5) {
-      return 'EXCELLENT';
+      return "EXCELLENT";
     }
     if (ratio <= 0.75) {
-      return 'GOOD';
+      return "GOOD";
     }
     if (ratio <= 1.0) {
-      return 'ACCEPTABLE';
+      return "ACCEPTABLE";
     }
     if (ratio <= 1.5) {
-      return 'WARNING';
+      return "WARNING";
     }
-    return 'CRITICAL';
+    return "CRITICAL";
   }
 }
 
@@ -161,7 +161,7 @@ export class MedicalPerformanceMonitor {
     }, this.config.reportingIntervalMs);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'performance_monitoring_started',
+      action: "performance_monitoring_started",
       memoryBaseline: this.memoryBaseline,
     });
   }
@@ -187,7 +187,7 @@ export class MedicalPerformanceMonitor {
     }
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'performance_monitoring_stopped',
+      action: "performance_monitoring_stopped",
       totalMetrics: this.metrics.size,
     });
   }
@@ -204,7 +204,7 @@ export class MedicalPerformanceMonitor {
       });
 
       // Observe different types of performance entries
-      this.performanceObserver.observe({ entryTypes: ['measure', 'navigation', 'resource'] });
+      this.performanceObserver.observe({ entryTypes: ["measure", "navigation", "resource"] });
     } catch (error) {
       // ('Performance Observer not supported:', error.message);
     }
@@ -219,22 +219,22 @@ export class MedicalPerformanceMonitor {
 
     // Categorize based on entry type
     switch (entry.entryType) {
-      case 'navigation':
-        metricType = PerformanceMetricType.RENDER;
-        name = 'page_load';
-        break;
-      case 'resource':
-        metricType = entry.name.includes('/api/') ? PerformanceMetricType.API_CALL : PerformanceMetricType.NETWORK;
-        break;
-      case 'measure':
-        metricType = this.categorizeUserMeasure(entry.name);
-        break;
+    case "navigation":
+      metricType = PerformanceMetricType.RENDER;
+      name = "page_load";
+      break;
+    case "resource":
+      metricType = entry.name.includes("/api/") ? PerformanceMetricType.API_CALL : PerformanceMetricType.NETWORK;
+      break;
+    case "measure":
+      metricType = this.categorizeUserMeasure(entry.name);
+      break;
     }
 
     const metric = new PerformanceMetric(metricType, name, entry.startTime);
     metric.end();
     metric.duration = entry.duration;
-    metric.addMetadata('entryType', entry.entryType);
+    metric.addMetadata("entryType", entry.entryType);
 
     this.storeMetric(metric);
   }
@@ -243,16 +243,16 @@ export class MedicalPerformanceMonitor {
    * Categorize user-defined measures
    */
   categorizeUserMeasure(name) {
-    if (name.includes('validation')) {
+    if (name.includes("validation")) {
       return PerformanceMetricType.VALIDATION;
     }
-    if (name.includes('prediction')) {
+    if (name.includes("prediction")) {
       return PerformanceMetricType.PREDICTION;
     }
-    if (name.includes('render')) {
+    if (name.includes("render")) {
       return PerformanceMetricType.RENDER;
     }
-    if (name.includes('api')) {
+    if (name.includes("api")) {
       return PerformanceMetricType.API_CALL;
     }
     return PerformanceMetricType.USER_INTERACTION;
@@ -359,7 +359,7 @@ export class MedicalPerformanceMonitor {
     medicalEventObserver.publish(MEDICAL_EVENTS.PERFORMANCE_VIOLATION, violation);
 
     // Log critical violations
-    if (metric.getPerformanceGrade() === 'CRITICAL') {
+    if (metric.getPerformanceGrade() === "CRITICAL") {
       // ('CRITICAL PERFORMANCE VIOLATION:', violation);
     }
   }
@@ -397,7 +397,7 @@ export class MedicalPerformanceMonitor {
 
     if (isLeak) {
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'memory_leak_detected',
+        action: "memory_leak_detected",
         memoryIncrease,
         baseline: this.memoryBaseline.usedJSHeapSize,
         current: currentMemory.usedJSHeapSize,
@@ -435,7 +435,7 @@ export class MedicalPerformanceMonitor {
     // Calculate statistics
     const report = {
       timestamp: new Date().toISOString(),
-      timeframe: 'last_hour',
+      timeframe: "last_hour",
       totalMetrics: recentMetrics.length,
       memoryStatus: this.checkMemoryLeaks(),
       metricsByType: {},
@@ -535,7 +535,7 @@ export class MedicalPerformanceMonitor {
     this.activeMetrics.clear();
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'performance_metrics_cleared',
+      action: "performance_metrics_cleared",
     });
   }
 

@@ -5,38 +5,38 @@
  * Comprehensive quality metrics and performance tracking for clinical outcomes
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from '../patterns/observer.js';
-import { medicalPerformanceMonitor, PerformanceMetricType } from '../performance/medical-performance-monitor.js';
-import { predictionCache } from '../performance/medical-cache.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
+import { medicalPerformanceMonitor, PerformanceMetricType } from "../performance/medical-performance-monitor.js";
+import { predictionCache } from "../performance/medical-cache.js";
 
 /**
  * Quality metric categories
  */
 export const QualityCategories = {
-  PROCESS: 'process',
-  OUTCOME: 'outcome',
-  STRUCTURE: 'structure',
-  SAFETY: 'safety',
-  EFFICIENCY: 'efficiency',
-  PATIENT_EXPERIENCE: 'patient_experience',
+  PROCESS: "process",
+  OUTCOME: "outcome",
+  STRUCTURE: "structure",
+  SAFETY: "safety",
+  EFFICIENCY: "efficiency",
+  PATIENT_EXPERIENCE: "patient_experience",
 };
 
 /**
  * Clinical quality indicators
  */
 export const ClinicalIndicators = {
-  DOOR_TO_NEEDLE_TIME: 'door_to_needle_time',
-  DOOR_TO_IMAGING_TIME: 'door_to_imaging_time',
-  IMAGING_TO_DECISION_TIME: 'imaging_to_decision_time',
-  MORTALITY_RATE_30D: 'mortality_rate_30d',
-  FUNCTIONAL_INDEPENDENCE_90D: 'functional_independence_90d',
-  HEMORRHAGIC_TRANSFORMATION_RATE: 'hemorrhagic_transformation_rate',
-  THROMBOLYSIS_RATE: 'thrombolysis_rate',
-  MECHANICAL_THROMBECTOMY_RATE: 'mechanical_thrombectomy_rate',
-  PREDICTION_ACCURACY: 'prediction_accuracy',
-  MODEL_CALIBRATION: 'model_calibration',
-  ALERT_APPROPRIATENESS: 'alert_appropriateness',
-  GUIDELINE_ADHERENCE: 'guideline_adherence',
+  DOOR_TO_NEEDLE_TIME: "door_to_needle_time",
+  DOOR_TO_IMAGING_TIME: "door_to_imaging_time",
+  IMAGING_TO_DECISION_TIME: "imaging_to_decision_time",
+  MORTALITY_RATE_30D: "mortality_rate_30d",
+  FUNCTIONAL_INDEPENDENCE_90D: "functional_independence_90d",
+  HEMORRHAGIC_TRANSFORMATION_RATE: "hemorrhagic_transformation_rate",
+  THROMBOLYSIS_RATE: "thrombolysis_rate",
+  MECHANICAL_THROMBECTOMY_RATE: "mechanical_thrombectomy_rate",
+  PREDICTION_ACCURACY: "prediction_accuracy",
+  MODEL_CALIBRATION: "model_calibration",
+  ALERT_APPROPRIATENESS: "alert_appropriateness",
+  GUIDELINE_ADHERENCE: "guideline_adherence",
 };
 
 /**
@@ -48,42 +48,42 @@ export const QualityBenchmarks = {
     excellent: 45,
     good: 60,
     acceptable: 90,
-    unit: 'minutes',
+    unit: "minutes",
   },
   [ClinicalIndicators.DOOR_TO_IMAGING_TIME]: {
     target: 25, // minutes
     excellent: 20,
     good: 25,
     acceptable: 45,
-    unit: 'minutes',
+    unit: "minutes",
   },
   [ClinicalIndicators.MORTALITY_RATE_30D]: {
     target: 15, // percentage
     excellent: 10,
     good: 15,
     acceptable: 20,
-    unit: 'percentage',
+    unit: "percentage",
   },
   [ClinicalIndicators.FUNCTIONAL_INDEPENDENCE_90D]: {
     target: 50, // percentage
     excellent: 60,
     good: 50,
     acceptable: 40,
-    unit: 'percentage',
+    unit: "percentage",
   },
   [ClinicalIndicators.THROMBOLYSIS_RATE]: {
     target: 15, // percentage of eligible patients
     excellent: 20,
     good: 15,
     acceptable: 10,
-    unit: 'percentage',
+    unit: "percentage",
   },
   [ClinicalIndicators.PREDICTION_ACCURACY]: {
     target: 85, // percentage
     excellent: 90,
     good: 85,
     acceptable: 80,
-    unit: 'percentage',
+    unit: "percentage",
   },
 };
 
@@ -106,44 +106,44 @@ class QualityMetric {
    */
   calculatePerformance() {
     if (!this.benchmark) {
-      return { level: 'unknown', score: null };
+      return { level: "unknown", score: null };
     }
 
     const { excellent, good, acceptable } = this.benchmark;
 
     // For metrics where lower is better (e.g., time metrics)
-    const isLowerBetter = this.indicator.includes('time') || this.indicator.includes('mortality');
+    const isLowerBetter = this.indicator.includes("time") || this.indicator.includes("mortality");
 
     let level; let
       score;
 
     if (isLowerBetter) {
       if (this.value <= excellent) {
-        level = 'excellent';
+        level = "excellent";
         score = 100;
       } else if (this.value <= good) {
-        level = 'good';
+        level = "good";
         score = 85;
       } else if (this.value <= acceptable) {
-        level = 'acceptable';
+        level = "acceptable";
         score = 70;
       } else {
-        level = 'needs_improvement';
+        level = "needs_improvement";
         score = Math.max(0, 50 - ((this.value - acceptable) / acceptable) * 25);
       }
     } else {
       // For metrics where higher is better (e.g., rates, accuracy)
       if (this.value >= excellent) {
-        level = 'excellent';
+        level = "excellent";
         score = 100;
       } else if (this.value >= good) {
-        level = 'good';
+        level = "good";
         score = 85;
       } else if (this.value >= acceptable) {
-        level = 'acceptable';
+        level = "acceptable";
         score = 70;
       } else {
-        level = 'needs_improvement';
+        level = "needs_improvement";
         score = Math.max(0, (this.value / acceptable) * 70);
       }
     }
@@ -399,21 +399,21 @@ class QualityDashboard {
    */
   getIndicatorName(indicator) {
     const names = {
-      [ClinicalIndicators.DOOR_TO_NEEDLE_TIME]: 'Door-to-Needle Time',
-      [ClinicalIndicators.DOOR_TO_IMAGING_TIME]: 'Door-to-Imaging Time',
-      [ClinicalIndicators.IMAGING_TO_DECISION_TIME]: 'Imaging-to-Decision Time',
-      [ClinicalIndicators.MORTALITY_RATE_30D]: '30-Day Mortality Rate',
-      [ClinicalIndicators.FUNCTIONAL_INDEPENDENCE_90D]: '90-Day Functional Independence',
-      [ClinicalIndicators.HEMORRHAGIC_TRANSFORMATION_RATE]: 'Hemorrhagic Transformation Rate',
-      [ClinicalIndicators.THROMBOLYSIS_RATE]: 'Thrombolysis Rate',
-      [ClinicalIndicators.MECHANICAL_THROMBECTOMY_RATE]: 'Mechanical Thrombectomy Rate',
-      [ClinicalIndicators.PREDICTION_ACCURACY]: 'Prediction Accuracy',
-      [ClinicalIndicators.MODEL_CALIBRATION]: 'Model Calibration',
-      [ClinicalIndicators.ALERT_APPROPRIATENESS]: 'Alert Appropriateness',
-      [ClinicalIndicators.GUIDELINE_ADHERENCE]: 'Guideline Adherence',
+      [ClinicalIndicators.DOOR_TO_NEEDLE_TIME]: "Door-to-Needle Time",
+      [ClinicalIndicators.DOOR_TO_IMAGING_TIME]: "Door-to-Imaging Time",
+      [ClinicalIndicators.IMAGING_TO_DECISION_TIME]: "Imaging-to-Decision Time",
+      [ClinicalIndicators.MORTALITY_RATE_30D]: "30-Day Mortality Rate",
+      [ClinicalIndicators.FUNCTIONAL_INDEPENDENCE_90D]: "90-Day Functional Independence",
+      [ClinicalIndicators.HEMORRHAGIC_TRANSFORMATION_RATE]: "Hemorrhagic Transformation Rate",
+      [ClinicalIndicators.THROMBOLYSIS_RATE]: "Thrombolysis Rate",
+      [ClinicalIndicators.MECHANICAL_THROMBECTOMY_RATE]: "Mechanical Thrombectomy Rate",
+      [ClinicalIndicators.PREDICTION_ACCURACY]: "Prediction Accuracy",
+      [ClinicalIndicators.MODEL_CALIBRATION]: "Model Calibration",
+      [ClinicalIndicators.ALERT_APPROPRIATENESS]: "Alert Appropriateness",
+      [ClinicalIndicators.GUIDELINE_ADHERENCE]: "Guideline Adherence",
     };
 
-    return names[indicator] || indicator.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+    return names[indicator] || indicator.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   }
 
   /**
@@ -451,12 +451,12 @@ class QualityDashboard {
    */
   calculateTrendDirection(trends) {
     if (!trends || trends.length < 2) {
-      return { direction: 'stable', change: 0 };
+      return { direction: "stable", change: 0 };
     }
 
     const validTrends = trends.filter((t) => t.average !== null);
     if (validTrends.length < 2) {
-      return { direction: 'stable', change: 0 };
+      return { direction: "stable", change: 0 };
     }
 
     const recent = validTrends[validTrends.length - 1].average;
@@ -465,11 +465,11 @@ class QualityDashboard {
 
     let direction;
     if (Math.abs(change) < 5) {
-      direction = 'stable';
+      direction = "stable";
     } else if (change > 0) {
-      direction = 'improving';
+      direction = "improving";
     } else {
-      direction = 'declining';
+      direction = "declining";
     }
 
     return { direction, change: Math.round(change * 10) / 10 };
@@ -482,24 +482,24 @@ class QualityDashboard {
     const { performance, trend, indicator } = indicatorData;
 
     // Performance-based alerts
-    if (performance.level === 'needs_improvement') {
+    if (performance.level === "needs_improvement") {
       return {
-        type: 'performance',
-        severity: 'high',
+        type: "performance",
+        severity: "high",
         indicator,
         message: `${indicatorData.name} performance is below acceptable threshold`,
-        recommendation: 'Review processes and implement improvement measures',
+        recommendation: "Review processes and implement improvement measures",
       };
     }
 
     // Trend-based alerts
-    if (trend.direction === 'declining' && Math.abs(trend.change) > 15) {
+    if (trend.direction === "declining" && Math.abs(trend.change) > 15) {
       return {
-        type: 'trend',
-        severity: 'medium',
+        type: "trend",
+        severity: "medium",
         indicator,
         message: `${indicatorData.name} showing declining trend (${trend.change}%)`,
-        recommendation: 'Monitor closely and identify contributing factors',
+        recommendation: "Monitor closely and identify contributing factors",
       };
     }
 
@@ -547,7 +547,7 @@ class QualityDashboard {
       slope: regression.slope,
       correlation: regression.correlation,
       significance,
-      trend: regression.slope > 0 ? 'improving' : regression.slope < 0 ? 'declining' : 'stable',
+      trend: regression.slope > 0 ? "improving" : regression.slope < 0 ? "declining" : "stable",
       dataPoints: validTrends.length,
     };
   }
@@ -579,15 +579,15 @@ class QualityDashboard {
    */
   getQualityLevel(score) {
     if (score >= 90) {
-      return 'excellent';
+      return "excellent";
     }
     if (score >= 85) {
-      return 'good';
+      return "good";
     }
     if (score >= 70) {
-      return 'acceptable';
+      return "acceptable";
     }
-    return 'needs_improvement';
+    return "needs_improvement";
   }
 }
 
@@ -609,7 +609,7 @@ export class QualityMetricsTracker {
   async initialize() {
     const metricId = medicalPerformanceMonitor.startMeasurement(
       PerformanceMetricType.SYSTEM_STARTUP,
-      'quality_metrics_init',
+      "quality_metrics_init",
     );
 
     try {
@@ -627,7 +627,7 @@ export class QualityMetricsTracker {
       medicalPerformanceMonitor.endMeasurement(metricId, { success: true });
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'quality_metrics_tracker_initialized',
+        action: "quality_metrics_tracker_initialized",
         collectors: Array.from(this.collectors.keys()),
       });
     } catch (error) {
@@ -646,33 +646,33 @@ export class QualityMetricsTracker {
    */
   registerMetricCollectors() {
     // Process time collectors
-    this.collectors.set('door_to_needle_collector', {
+    this.collectors.set("door_to_needle_collector", {
       indicator: ClinicalIndicators.DOOR_TO_NEEDLE_TIME,
       category: QualityCategories.PROCESS,
       collect: this.collectDoorToNeedleTime.bind(this),
     });
 
-    this.collectors.set('door_to_imaging_collector', {
+    this.collectors.set("door_to_imaging_collector", {
       indicator: ClinicalIndicators.DOOR_TO_IMAGING_TIME,
       category: QualityCategories.PROCESS,
       collect: this.collectDoorToImagingTime.bind(this),
     });
 
     // Outcome collectors
-    this.collectors.set('prediction_accuracy_collector', {
+    this.collectors.set("prediction_accuracy_collector", {
       indicator: ClinicalIndicators.PREDICTION_ACCURACY,
       category: QualityCategories.EFFICIENCY,
       collect: this.collectPredictionAccuracy.bind(this),
     });
 
-    this.collectors.set('alert_appropriateness_collector', {
+    this.collectors.set("alert_appropriateness_collector", {
       indicator: ClinicalIndicators.ALERT_APPROPRIATENESS,
       category: QualityCategories.EFFICIENCY,
       collect: this.collectAlertAppropriateness.bind(this),
     });
 
     // Treatment rate collectors
-    this.collectors.set('thrombolysis_rate_collector', {
+    this.collectors.set("thrombolysis_rate_collector", {
       indicator: ClinicalIndicators.THROMBOLYSIS_RATE,
       category: QualityCategories.PROCESS,
       collect: this.collectThrombolysisRate.bind(this),
@@ -720,7 +720,7 @@ export class QualityMetricsTracker {
   async collectAllMetrics() {
     const metricId = medicalPerformanceMonitor.startMeasurement(
       PerformanceMetricType.DATA_PROCESSING,
-      'collect_all_metrics',
+      "collect_all_metrics",
     );
 
     try {
@@ -745,7 +745,7 @@ export class QualityMetricsTracker {
       });
 
       const results = await Promise.allSettled(collectionPromises);
-      const successful = results.filter((r) => r.status === 'fulfilled' && r.value?.success);
+      const successful = results.filter((r) => r.status === "fulfilled" && r.value?.success);
 
       medicalPerformanceMonitor.endMeasurement(metricId, {
         success: true,
@@ -776,7 +776,7 @@ export class QualityMetricsTracker {
     this.aggregator.addMetric(metric);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'quality_metric_recorded',
+      action: "quality_metric_recorded",
       indicator,
       value,
       performance: metric.performance,
@@ -809,22 +809,22 @@ export class QualityMetricsTracker {
   /**
    * Export quality report
    */
-  exportQualityReport(format = 'json') {
+  exportQualityReport(format = "json") {
     const dashboard = this.getQualityDashboard();
     const report = {
       timestamp: new Date().toISOString(),
-      version: '1.0',
+      version: "1.0",
       dashboard,
       detailedMetrics: this.getDetailedMetrics(),
     };
 
     switch (format) {
-      case 'json':
-        return JSON.stringify(report, null, 2);
-      case 'csv':
-        return this.convertToCSV(report);
-      default:
-        return report;
+    case "json":
+      return JSON.stringify(report, null, 2);
+    case "csv":
+      return this.convertToCSV(report);
+    default:
+      return report;
     }
   }
 
@@ -900,7 +900,7 @@ export class QualityMetricsTracker {
     const confidence = data.predictions?.mortality?.confidence?.percent || 0;
 
     this.recordMetric(
-      'prediction_confidence',
+      "prediction_confidence",
       QualityCategories.EFFICIENCY,
       confidence,
       { patientId: data.patientId },
@@ -909,7 +909,7 @@ export class QualityMetricsTracker {
 
   handleTreatmentDelivered(data) {
     // Track treatment delivery times and rates
-    if (data.treatment === 'thrombolysis') {
+    if (data.treatment === "thrombolysis") {
       const { doorToNeedleTime } = data;
       if (doorToNeedleTime) {
         this.recordMetric(
@@ -924,7 +924,7 @@ export class QualityMetricsTracker {
 
   handlePatientOutcome(data) {
     // Track patient outcomes for quality assessment
-    if (data.outcome === 'mortality_30d') {
+    if (data.outcome === "mortality_30d") {
       this.recordMetric(
         ClinicalIndicators.MORTALITY_RATE_30D,
         QualityCategories.OUTCOME,
@@ -933,7 +933,7 @@ export class QualityMetricsTracker {
       );
     }
 
-    if (data.outcome === 'functional_independence_90d') {
+    if (data.outcome === "functional_independence_90d") {
       this.recordMetric(
         ClinicalIndicators.FUNCTIONAL_INDEPENDENCE_90D,
         QualityCategories.OUTCOME,
@@ -950,9 +950,9 @@ export class QualityMetricsTracker {
     // Simplified appropriateness assessment
     // In real implementation, this would be more sophisticated
 
-    if (alert.severity?.level === 'critical') {
+    if (alert.severity?.level === "critical") {
       return Math.random() > 0.1; // 90% appropriate for critical alerts
-    } if (alert.severity?.level === 'high') {
+    } if (alert.severity?.level === "high") {
       return Math.random() > 0.2; // 80% appropriate for high alerts
     }
     return Math.random() > 0.3; // 70% appropriate for other alerts
@@ -963,21 +963,21 @@ export class QualityMetricsTracker {
    */
   convertToCSV(report) {
     const rows = [
-      ['Indicator', 'Category', 'Current Value', 'Benchmark Target', 'Performance Level', 'Trend Direction'],
+      ["Indicator", "Category", "Current Value", "Benchmark Target", "Performance Level", "Trend Direction"],
     ];
 
     report.dashboard.indicators.forEach((indicator) => {
       rows.push([
         indicator.name,
         indicator.category,
-        indicator.current?.toFixed(2) || 'N/A',
-        indicator.benchmark?.target || 'N/A',
-        indicator.performance?.level || 'N/A',
-        indicator.trend?.direction || 'N/A',
+        indicator.current?.toFixed(2) || "N/A",
+        indicator.benchmark?.target || "N/A",
+        indicator.performance?.level || "N/A",
+        indicator.trend?.direction || "N/A",
       ]);
     });
 
-    return rows.map((row) => row.join(',')).join('\n');
+    return rows.map((row) => row.join(",")).join("\n");
   }
 
   /**
@@ -986,7 +986,7 @@ export class QualityMetricsTracker {
   getQualityTrendsSummary(days = 30) {
     const summary = {
       period: `${days} days`,
-      overallTrend: 'stable',
+      overallTrend: "stable",
       improvingIndicators: [],
       decliningIndicators: [],
       stableIndicators: [],
@@ -1006,9 +1006,9 @@ export class QualityMetricsTracker {
           change: trendDirection.change,
         };
 
-        if (trendDirection.direction === 'improving') {
+        if (trendDirection.direction === "improving") {
           summary.improvingIndicators.push(indicatorSummary);
-        } else if (trendDirection.direction === 'declining') {
+        } else if (trendDirection.direction === "declining") {
           summary.decliningIndicators.push(indicatorSummary);
         } else {
           summary.stableIndicators.push(indicatorSummary);
@@ -1018,9 +1018,9 @@ export class QualityMetricsTracker {
 
     // Determine overall trend
     if (summary.improvingIndicators.length > summary.decliningIndicators.length) {
-      summary.overallTrend = 'improving';
+      summary.overallTrend = "improving";
     } else if (summary.decliningIndicators.length > summary.improvingIndicators.length) {
-      summary.overallTrend = 'declining';
+      summary.overallTrend = "declining";
     }
 
     return summary;
@@ -1038,7 +1038,7 @@ export class QualityMetricsTracker {
     this.isActive = false;
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'quality_metrics_tracker_stopped',
+      action: "quality_metrics_tracker_stopped",
     });
   }
 
@@ -1053,7 +1053,7 @@ export class QualityMetricsTracker {
     this.aggregator.trends.clear();
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'quality_metrics_tracker_disposed',
+      action: "quality_metrics_tracker_disposed",
     });
   }
 }

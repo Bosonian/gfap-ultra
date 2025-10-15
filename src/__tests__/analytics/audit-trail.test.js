@@ -9,7 +9,7 @@ import {
   ClinicalAuditTrail,
   AuditEventType,
   ComplianceFramework,
-} from '../../analytics/audit-trail.js';
+} from "../../analytics/audit-trail.js";
 
 // Mock IndexedDB for testing
 global.indexedDB = {
@@ -32,7 +32,7 @@ global.indexedDB = {
 };
 
 // Mock crypto for browser environment
-Object.defineProperty(global, 'crypto', {
+Object.defineProperty(global, "crypto", {
   value: {
     subtle: {
       digest: jest.fn().mockResolvedValue(new ArrayBuffer(32)),
@@ -41,84 +41,84 @@ Object.defineProperty(global, 'crypto', {
   },
 });
 
-describe('AuditEvent', () => {
+describe("AuditEvent", () => {
   let mockUser;
 
   beforeEach(() => {
     mockUser = {
-      userId: 'physician123',
-      role: 'physician',
-      department: 'neurology',
+      userId: "physician123",
+      role: "physician",
+      department: "neurology",
     };
   });
 
-  describe('Event Creation', () => {
-    test('should create valid audit event with required fields', () => {
+  describe("Event Creation", () => {
+    test("should create valid audit event with required fields", () => {
       const event = new AuditEvent(
         AuditEventType.PATIENT_DATA_ACCESS,
         mockUser,
-        'patient456',
-        'Viewed patient stroke assessment',
+        "patient456",
+        "Viewed patient stroke assessment",
       );
 
       expect(event.id).toBeDefined();
       expect(event.timestamp).toBeInstanceOf(Date);
       expect(event.eventType).toBe(AuditEventType.PATIENT_DATA_ACCESS);
-      expect(event.userId).toBe('physician123');
-      expect(event.resourceId).toBe('patient456');
-      expect(event.description).toBe('Viewed patient stroke assessment');
-      expect(event.userRole).toBe('physician');
-      expect(event.department).toBe('neurology');
+      expect(event.userId).toBe("physician123");
+      expect(event.resourceId).toBe("patient456");
+      expect(event.description).toBe("Viewed patient stroke assessment");
+      expect(event.userRole).toBe("physician");
+      expect(event.department).toBe("neurology");
       expect(event.sessionId).toBeDefined();
       expect(event.ipAddress).toBeDefined();
       expect(event.userAgent).toBeDefined();
     });
 
-    test('should include medical-specific metadata', () => {
+    test("should include medical-specific metadata", () => {
       const metadata = {
-        patientId: 'PT12345',
-        assessmentType: 'stroke_triage',
+        patientId: "PT12345",
+        assessmentType: "stroke_triage",
         riskScore: 0.75,
-        clinicalDecision: 'recommend_thrombolysis',
+        clinicalDecision: "recommend_thrombolysis",
       };
 
       const event = new AuditEvent(
         AuditEventType.CLINICAL_DECISION,
         mockUser,
-        'assessment789',
-        'Clinical decision made',
+        "assessment789",
+        "Clinical decision made",
         metadata,
       );
 
-      expect(event.metadata.patientId).toBe('PT12345');
-      expect(event.metadata.assessmentType).toBe('stroke_triage');
+      expect(event.metadata.patientId).toBe("PT12345");
+      expect(event.metadata.assessmentType).toBe("stroke_triage");
       expect(event.metadata.riskScore).toBe(0.75);
-      expect(event.metadata.clinicalDecision).toBe('recommend_thrombolysis');
+      expect(event.metadata.clinicalDecision).toBe("recommend_thrombolysis");
     });
 
-    test('should sanitize PII from metadata', () => {
+    test("should sanitize PII from metadata", () => {
       const metadata = {
-        patientName: 'John Doe',
-        ssn: '123-45-6789',
-        dob: '1970-01-01',
-        medicalRecordNumber: 'MRN123456',
+        patientName: "John Doe",
+        ssn: "123-45-6789",
+        dob: "1970-01-01",
+        medicalRecordNumber: "MRN123456",
       };
 
       const event = new AuditEvent(
         AuditEventType.PATIENT_DATA_ACCESS,
         mockUser,
-        'patient456',
-        'Data access',
+        "patient456",
+        "Data access",
         metadata,
       );
 
-      expect(event.metadata.patientName).toBe('[REDACTED]');
-      expect(event.metadata.ssn).toBe('[REDACTED]');
-      expect(event.metadata.dob).toBe('[REDACTED]');
+      expect(event.metadata.patientName).toBe("[REDACTED]");
+      expect(event.metadata.ssn).toBe("[REDACTED]");
+      expect(event.metadata.dob).toBe("[REDACTED]");
       expect(event.metadata.medicalRecordNumber).toBeDefined(); // Allowed for audit
     });
 
-    test('should generate unique event IDs', () => {
+    test("should generate unique event IDs", () => {
       const event1 = new AuditEvent(AuditEventType.USER_LOGIN, mockUser);
       const event2 = new AuditEvent(AuditEventType.USER_LOGIN, mockUser);
 
@@ -126,43 +126,43 @@ describe('AuditEvent', () => {
     });
   });
 
-  describe('Validation', () => {
-    test('should validate required fields', () => {
-      expect(() => new AuditEvent()).toThrow('Event type is required');
-      expect(() => new AuditEvent(AuditEventType.USER_LOGIN)).toThrow('User is required');
+  describe("Validation", () => {
+    test("should validate required fields", () => {
+      expect(() => new AuditEvent()).toThrow("Event type is required");
+      expect(() => new AuditEvent(AuditEventType.USER_LOGIN)).toThrow("User is required");
     });
 
-    test('should validate event types', () => {
-      expect(() => new AuditEvent('INVALID_EVENT', mockUser)).toThrow('Invalid event type');
+    test("should validate event types", () => {
+      expect(() => new AuditEvent("INVALID_EVENT", mockUser)).toThrow("Invalid event type");
     });
 
-    test('should validate user structure', () => {
-      const invalidUser = { userId: 'test' }; // Missing role
+    test("should validate user structure", () => {
+      const invalidUser = { userId: "test" }; // Missing role
       expect(() => new AuditEvent(AuditEventType.USER_LOGIN, invalidUser))
-        .toThrow('User must have userId and role');
+        .toThrow("User must have userId and role");
     });
   });
 
-  describe('Integrity', () => {
-    test('should generate integrity hash', async () => {
+  describe("Integrity", () => {
+    test("should generate integrity hash", async () => {
       const event = new AuditEvent(
         AuditEventType.PATIENT_DATA_ACCESS,
         mockUser,
-        'patient456',
-        'Test event',
+        "patient456",
+        "Test event",
       );
 
       const hash = await event.generateIntegrityHash();
       expect(hash).toBeDefined();
-      expect(typeof hash).toBe('string');
+      expect(typeof hash).toBe("string");
     });
 
-    test('should verify integrity', async () => {
+    test("should verify integrity", async () => {
       const event = new AuditEvent(
         AuditEventType.PATIENT_DATA_ACCESS,
         mockUser,
-        'patient456',
-        'Test event',
+        "patient456",
+        "Test event",
       );
 
       const originalHash = await event.generateIntegrityHash();
@@ -172,19 +172,19 @@ describe('AuditEvent', () => {
       expect(isValid).toBe(true);
 
       // Tamper with event
-      event.description = 'Modified description';
+      event.description = "Modified description";
       const isValidAfterTampering = await event.verifyIntegrity();
       expect(isValidAfterTampering).toBe(false);
     });
   });
 
-  describe('Serialization', () => {
-    test('should serialize to JSON correctly', () => {
+  describe("Serialization", () => {
+    test("should serialize to JSON correctly", () => {
       const event = new AuditEvent(
         AuditEventType.PATIENT_DATA_ACCESS,
         mockUser,
-        'patient456',
-        'Test event',
+        "patient456",
+        "Test event",
       );
 
       const json = event.toJSON();
@@ -195,12 +195,12 @@ describe('AuditEvent', () => {
       expect(json.userId).toBe(event.userId);
     });
 
-    test('should create event from JSON', () => {
+    test("should create event from JSON", () => {
       const originalEvent = new AuditEvent(
         AuditEventType.PATIENT_DATA_ACCESS,
         mockUser,
-        'patient456',
-        'Test event',
+        "patient456",
+        "Test event",
       );
 
       const json = originalEvent.toJSON();
@@ -214,52 +214,52 @@ describe('AuditEvent', () => {
   });
 });
 
-describe('AuditStorage', () => {
+describe("AuditStorage", () => {
   let storage;
 
   beforeEach(() => {
     storage = new AuditStorage();
   });
 
-  describe('Initialization', () => {
-    test('should initialize with default configuration', () => {
-      expect(storage.dbName).toBe('ClinicalAuditDB');
+  describe("Initialization", () => {
+    test("should initialize with default configuration", () => {
+      expect(storage.dbName).toBe("ClinicalAuditDB");
       expect(storage.version).toBe(1);
       expect(storage.retentionDays).toBe(2555); // 7 years for medical data
     });
 
-    test('should support custom configuration', () => {
+    test("should support custom configuration", () => {
       const customStorage = new AuditStorage({
-        dbName: 'TestAuditDB',
+        dbName: "TestAuditDB",
         retentionDays: 365,
       });
 
-      expect(customStorage.dbName).toBe('TestAuditDB');
+      expect(customStorage.dbName).toBe("TestAuditDB");
       expect(customStorage.retentionDays).toBe(365);
     });
   });
 
-  describe('Database Operations', () => {
-    test('should handle database initialization', async () => {
+  describe("Database Operations", () => {
+    test("should handle database initialization", async () => {
       const initResult = await storage.initialize();
       expect(initResult).toBe(true);
     });
 
-    test('should store audit events', async () => {
+    test("should store audit events", async () => {
       const event = new AuditEvent(
         AuditEventType.PATIENT_DATA_ACCESS,
-        { userId: 'test', role: 'physician' },
+        { userId: "test", role: "physician" },
       );
 
       await storage.store(event);
       // Mock implementation would verify the store operation
     });
 
-    test('should retrieve events by criteria', async () => {
+    test("should retrieve events by criteria", async () => {
       const criteria = {
-        userId: 'physician123',
-        startDate: new Date('2025-01-01'),
-        endDate: new Date('2025-12-31'),
+        userId: "physician123",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-12-31"),
         eventTypes: [AuditEventType.PATIENT_DATA_ACCESS],
       };
 
@@ -267,85 +267,85 @@ describe('AuditStorage', () => {
       expect(Array.isArray(events)).toBe(true);
     });
 
-    test('should support pagination', async () => {
+    test("should support pagination", async () => {
       const criteria = {
-        userId: 'physician123',
+        userId: "physician123",
         limit: 10,
         offset: 0,
       };
 
       const result = await storage.getEvents(criteria);
-      expect(result).toHaveProperty('events');
-      expect(result).toHaveProperty('totalCount');
-      expect(result).toHaveProperty('hasMore');
+      expect(result).toHaveProperty("events");
+      expect(result).toHaveProperty("totalCount");
+      expect(result).toHaveProperty("hasMore");
     });
   });
 
-  describe('Search and Indexing', () => {
-    test('should search by user ID', async () => {
-      const events = await storage.searchByUserId('physician123');
+  describe("Search and Indexing", () => {
+    test("should search by user ID", async () => {
+      const events = await storage.searchByUserId("physician123");
       expect(Array.isArray(events)).toBe(true);
     });
 
-    test('should search by resource ID', async () => {
-      const events = await storage.searchByResourceId('patient456');
+    test("should search by resource ID", async () => {
+      const events = await storage.searchByResourceId("patient456");
       expect(Array.isArray(events)).toBe(true);
     });
 
-    test('should search by event type', async () => {
+    test("should search by event type", async () => {
       const events = await storage.searchByEventType(AuditEventType.CLINICAL_DECISION);
       expect(Array.isArray(events)).toBe(true);
     });
 
-    test('should search by date range', async () => {
-      const startDate = new Date('2025-01-01');
-      const endDate = new Date('2025-01-31');
+    test("should search by date range", async () => {
+      const startDate = new Date("2025-01-01");
+      const endDate = new Date("2025-01-31");
 
       const events = await storage.searchByDateRange(startDate, endDate);
       expect(Array.isArray(events)).toBe(true);
     });
   });
 
-  describe('Data Retention', () => {
-    test('should identify expired events', async () => {
+  describe("Data Retention", () => {
+    test("should identify expired events", async () => {
       const expiredEvents = await storage.getExpiredEvents();
       expect(Array.isArray(expiredEvents)).toBe(true);
     });
 
-    test('should archive expired events', async () => {
+    test("should archive expired events", async () => {
       const archiveResult = await storage.archiveExpiredEvents();
-      expect(archiveResult).toHaveProperty('archivedCount');
-      expect(archiveResult).toHaveProperty('archiveLocation');
+      expect(archiveResult).toHaveProperty("archivedCount");
+      expect(archiveResult).toHaveProperty("archiveLocation");
     });
 
-    test('should purge expired events after archival', async () => {
+    test("should purge expired events after archival", async () => {
       const purgeResult = await storage.purgeExpiredEvents();
-      expect(typeof purgeResult.deletedCount).toBe('number');
+      expect(typeof purgeResult.deletedCount).toBe("number");
     });
   });
 
-  describe('Compliance Export', () => {
-    test('should export audit trail for compliance', async () => {
+  describe("Compliance Export", () => {
+    test("should export audit trail for compliance", async () => {
       const exportCriteria = {
-        startDate: new Date('2025-01-01'),
-        endDate: new Date('2025-12-31'),
-        format: 'JSON',
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-12-31"),
+        format: "JSON",
         includeIntegrityVerification: true,
       };
 
       const exportResult = await storage.exportAuditTrail(exportCriteria);
-      expect(exportResult).toHaveProperty('data');
-      expect(exportResult).toHaveProperty('metadata');
-      expect(exportResult).toHaveProperty('integrityReport');
+      expect(exportResult).toHaveProperty("data");
+      expect(exportResult).toHaveProperty("metadata");
+      expect(exportResult).toHaveProperty("integrityReport");
     });
 
-    test('should support multiple export formats', async () => {
-      const formats = ['JSON', 'CSV', 'XML'];
+    test("should support multiple export formats", async () => {
+      const formats = ["JSON", "CSV", "XML"];
 
       for (const format of formats) {
         const result = await storage.exportAuditTrail({
-          startDate: new Date('2025-01-01'),
-          endDate: new Date('2025-01-31'),
+          startDate: new Date("2025-01-01"),
+          endDate: new Date("2025-01-31"),
           format,
         });
         expect(result.metadata.format).toBe(format);
@@ -353,17 +353,17 @@ describe('AuditStorage', () => {
     });
   });
 
-  describe('Integrity Verification', () => {
-    test('should verify audit trail integrity', async () => {
+  describe("Integrity Verification", () => {
+    test("should verify audit trail integrity", async () => {
       const integrityReport = await storage.verifyIntegrity();
 
-      expect(integrityReport).toHaveProperty('totalEvents');
-      expect(integrityReport).toHaveProperty('verifiedEvents');
-      expect(integrityReport).toHaveProperty('failedEvents');
-      expect(integrityReport).toHaveProperty('integrityScore');
+      expect(integrityReport).toHaveProperty("totalEvents");
+      expect(integrityReport).toHaveProperty("verifiedEvents");
+      expect(integrityReport).toHaveProperty("failedEvents");
+      expect(integrityReport).toHaveProperty("integrityScore");
     });
 
-    test('should detect tampered events', async () => {
+    test("should detect tampered events", async () => {
       // This would test the ability to detect modifications to stored events
       const tamperedEvents = await storage.detectTampering();
       expect(Array.isArray(tamperedEvents)).toBe(true);
@@ -371,15 +371,15 @@ describe('AuditStorage', () => {
   });
 });
 
-describe('ClinicalAuditTrail', () => {
+describe("ClinicalAuditTrail", () => {
   let auditTrail;
   let mockUser;
 
   beforeEach(() => {
     mockUser = {
-      userId: 'physician123',
-      role: 'physician',
-      department: 'neurology',
+      userId: "physician123",
+      role: "physician",
+      department: "neurology",
     };
 
     auditTrail = new ClinicalAuditTrail({
@@ -391,74 +391,74 @@ describe('ClinicalAuditTrail', () => {
     });
   });
 
-  describe('Initialization', () => {
-    test('should initialize with compliance frameworks', () => {
+  describe("Initialization", () => {
+    test("should initialize with compliance frameworks", () => {
       expect(auditTrail.complianceFrameworks).toContain(ComplianceFramework.HIPAA);
       expect(auditTrail.complianceFrameworks).toContain(ComplianceFramework.FDA_21CFR11);
     });
 
-    test('should set up automatic event handlers', () => {
+    test("should set up automatic event handlers", () => {
       expect(auditTrail.eventHandlers).toBeDefined();
       expect(auditTrail.autoAuditEnabled).toBe(true);
     });
   });
 
-  describe('Event Logging', () => {
-    test('should log user authentication events', async () => {
+  describe("Event Logging", () => {
+    test("should log user authentication events", async () => {
       await auditTrail.logUserLogin(mockUser, {
-        ipAddress: '192.168.1.1',
-        sessionId: 'session123',
+        ipAddress: "192.168.1.1",
+        sessionId: "session123",
       });
 
       // Verify event was created and stored
       expect(auditTrail.pendingEvents.length).toBeGreaterThan(0);
     });
 
-    test('should log patient data access', async () => {
-      await auditTrail.logPatientDataAccess(mockUser, 'patient456', {
-        accessType: 'view',
-        dataElements: ['demographics', 'stroke_assessment'],
-        justification: 'clinical_care',
+    test("should log patient data access", async () => {
+      await auditTrail.logPatientDataAccess(mockUser, "patient456", {
+        accessType: "view",
+        dataElements: ["demographics", "stroke_assessment"],
+        justification: "clinical_care",
       });
 
       const event = auditTrail.pendingEvents[auditTrail.pendingEvents.length - 1];
       expect(event.eventType).toBe(AuditEventType.PATIENT_DATA_ACCESS);
-      expect(event.resourceId).toBe('patient456');
+      expect(event.resourceId).toBe("patient456");
     });
 
-    test('should log clinical decisions', async () => {
-      await auditTrail.logClinicalDecision(mockUser, 'assessment789', {
-        decisionType: 'treatment_recommendation',
-        recommendation: 'thrombolysis',
+    test("should log clinical decisions", async () => {
+      await auditTrail.logClinicalDecision(mockUser, "assessment789", {
+        decisionType: "treatment_recommendation",
+        recommendation: "thrombolysis",
         riskScore: 0.85,
-        evidenceBasis: 'ai_model_prediction',
+        evidenceBasis: "ai_model_prediction",
       });
 
       const event = auditTrail.pendingEvents[auditTrail.pendingEvents.length - 1];
       expect(event.eventType).toBe(AuditEventType.CLINICAL_DECISION);
-      expect(event.metadata.recommendation).toBe('thrombolysis');
+      expect(event.metadata.recommendation).toBe("thrombolysis");
     });
 
-    test('should log system configuration changes', async () => {
+    test("should log system configuration changes", async () => {
       await auditTrail.logSystemChange(mockUser, {
-        changeType: 'configuration_update',
-        component: 'risk_thresholds',
+        changeType: "configuration_update",
+        component: "risk_thresholds",
         oldValues: { criticalThreshold: 0.7 },
         newValues: { criticalThreshold: 0.75 },
-        justification: 'clinical_guideline_update',
+        justification: "clinical_guideline_update",
       });
 
       const event = auditTrail.pendingEvents[auditTrail.pendingEvents.length - 1];
       expect(event.eventType).toBe(AuditEventType.SYSTEM_CONFIGURATION);
     });
 
-    test('should log data export events', async () => {
+    test("should log data export events", async () => {
       await auditTrail.logDataExport(mockUser, {
-        exportType: 'patient_data',
+        exportType: "patient_data",
         recordCount: 150,
-        dateRange: { start: '2025-01-01', end: '2025-01-31' },
-        recipient: 'research_team',
-        purpose: 'quality_improvement',
+        dateRange: { start: "2025-01-01", end: "2025-01-31" },
+        recipient: "research_team",
+        purpose: "quality_improvement",
       });
 
       const event = auditTrail.pendingEvents[auditTrail.pendingEvents.length - 1];
@@ -466,26 +466,26 @@ describe('ClinicalAuditTrail', () => {
     });
   });
 
-  describe('Automatic Event Capture', () => {
-    test('should automatically capture API calls', () => {
+  describe("Automatic Event Capture", () => {
+    test("should automatically capture API calls", () => {
       const apiInterceptor = auditTrail.createAPIInterceptor();
       expect(apiInterceptor).toBeDefined();
-      expect(typeof apiInterceptor.beforeRequest).toBe('function');
-      expect(typeof apiInterceptor.afterResponse).toBe('function');
+      expect(typeof apiInterceptor.beforeRequest).toBe("function");
+      expect(typeof apiInterceptor.afterResponse).toBe("function");
     });
 
-    test('should automatically capture UI interactions', () => {
+    test("should automatically capture UI interactions", () => {
       const uiTracker = auditTrail.createUITracker();
       expect(uiTracker).toBeDefined();
-      expect(typeof uiTracker.trackClick).toBe('function');
-      expect(typeof uiTracker.trackNavigation).toBe('function');
+      expect(typeof uiTracker.trackClick).toBe("function");
+      expect(typeof uiTracker.trackNavigation).toBe("function");
     });
 
-    test('should capture error events', async () => {
-      const error = new Error('Database connection failed');
+    test("should capture error events", async () => {
+      const error = new Error("Database connection failed");
       await auditTrail.logError(mockUser, error, {
-        context: 'patient_data_retrieval',
-        severity: 'high',
+        context: "patient_data_retrieval",
+        severity: "high",
       });
 
       const event = auditTrail.pendingEvents[auditTrail.pendingEvents.length - 1];
@@ -493,38 +493,38 @@ describe('ClinicalAuditTrail', () => {
     });
   });
 
-  describe('Compliance Reporting', () => {
-    test('should generate HIPAA compliance report', async () => {
+  describe("Compliance Reporting", () => {
+    test("should generate HIPAA compliance report", async () => {
       const report = await auditTrail.generateComplianceReport(
         ComplianceFramework.HIPAA,
         {
-          startDate: new Date('2025-01-01'),
-          endDate: new Date('2025-01-31'),
+          startDate: new Date("2025-01-01"),
+          endDate: new Date("2025-01-31"),
         },
       );
 
-      expect(report).toHaveProperty('framework');
-      expect(report).toHaveProperty('period');
-      expect(report).toHaveProperty('accessEvents');
-      expect(report).toHaveProperty('violations');
-      expect(report).toHaveProperty('recommendations');
+      expect(report).toHaveProperty("framework");
+      expect(report).toHaveProperty("period");
+      expect(report).toHaveProperty("accessEvents");
+      expect(report).toHaveProperty("violations");
+      expect(report).toHaveProperty("recommendations");
     });
 
-    test('should generate FDA 21CFR11 compliance report', async () => {
+    test("should generate FDA 21CFR11 compliance report", async () => {
       const report = await auditTrail.generateComplianceReport(
         ComplianceFramework.FDA_21CFR11,
         {
-          startDate: new Date('2025-01-01'),
-          endDate: new Date('2025-01-31'),
+          startDate: new Date("2025-01-01"),
+          endDate: new Date("2025-01-31"),
         },
       );
 
-      expect(report).toHaveProperty('electronicRecords');
-      expect(report).toHaveProperty('electronicSignatures');
-      expect(report).toHaveProperty('systemValidation');
+      expect(report).toHaveProperty("electronicRecords");
+      expect(report).toHaveProperty("electronicSignatures");
+      expect(report).toHaveProperty("systemValidation");
     });
 
-    test('should identify compliance violations', async () => {
+    test("should identify compliance violations", async () => {
       const violations = await auditTrail.identifyViolations({
         framework: ComplianceFramework.HIPAA,
         period: { days: 30 },
@@ -532,26 +532,26 @@ describe('ClinicalAuditTrail', () => {
 
       expect(Array.isArray(violations)).toBe(true);
       violations.forEach(violation => {
-        expect(violation).toHaveProperty('type');
-        expect(violation).toHaveProperty('severity');
-        expect(violation).toHaveProperty('description');
-        expect(violation).toHaveProperty('events');
+        expect(violation).toHaveProperty("type");
+        expect(violation).toHaveProperty("severity");
+        expect(violation).toHaveProperty("description");
+        expect(violation).toHaveProperty("events");
       });
     });
   });
 
-  describe('Real-time Monitoring', () => {
-    test('should set up real-time alerts', () => {
+  describe("Real-time Monitoring", () => {
+    test("should set up real-time alerts", () => {
       const alertRules = [
         {
-          name: 'suspicious_access_pattern',
-          condition: 'multiple_failed_logins',
+          name: "suspicious_access_pattern",
+          condition: "multiple_failed_logins",
           threshold: 3,
           timeWindow: 300000, // 5 minutes
         },
         {
-          name: 'bulk_data_access',
-          condition: 'high_volume_access',
+          name: "bulk_data_access",
+          condition: "high_volume_access",
           threshold: 100,
           timeWindow: 3600000, // 1 hour
         },
@@ -561,14 +561,14 @@ describe('ClinicalAuditTrail', () => {
       expect(auditTrail.alertRules.length).toBe(2);
     });
 
-    test('should trigger alerts for suspicious activity', async () => {
+    test("should trigger alerts for suspicious activity", async () => {
       const alertHandler = jest.fn();
       auditTrail.onAlert(alertHandler);
 
       // Simulate suspicious activity
       for (let i = 0; i < 4; i++) {
         await auditTrail.logUserLogin(mockUser, {
-          ipAddress: '192.168.1.1',
+          ipAddress: "192.168.1.1",
           success: false,
         });
       }
@@ -578,8 +578,8 @@ describe('ClinicalAuditTrail', () => {
     });
   });
 
-  describe('Performance and Scalability', () => {
-    test('should handle high-volume event logging', async () => {
+  describe("Performance and Scalability", () => {
+    test("should handle high-volume event logging", async () => {
       const startTime = Date.now();
       const eventPromises = [];
 
@@ -587,7 +587,7 @@ describe('ClinicalAuditTrail', () => {
       for (let i = 0; i < 1000; i++) {
         eventPromises.push(
           auditTrail.logPatientDataAccess(mockUser, `patient${i}`, {
-            accessType: 'view',
+            accessType: "view",
           }),
         );
       }
@@ -600,7 +600,7 @@ describe('ClinicalAuditTrail', () => {
       expect(duration).toBeLessThan(5000);
     });
 
-    test('should batch events for efficient storage', () => {
+    test("should batch events for efficient storage", () => {
       auditTrail.enableBatching({ batchSize: 100, flushInterval: 1000 });
       expect(auditTrail.batchingEnabled).toBe(true);
       expect(auditTrail.batchSize).toBe(100);
@@ -608,50 +608,50 @@ describe('ClinicalAuditTrail', () => {
   });
 });
 
-describe('Compliance Framework Support', () => {
-  describe('HIPAA Compliance', () => {
-    test('should support HIPAA minimum necessary standard', () => {
+describe("Compliance Framework Support", () => {
+  describe("HIPAA Compliance", () => {
+    test("should support HIPAA minimum necessary standard", () => {
       const hipaaValidator = ClinicalAuditTrail.getComplianceValidator(
         ComplianceFramework.HIPAA,
       );
 
       const accessEvent = {
-        userId: 'physician123',
-        patientId: 'patient456',
-        dataElements: ['demographics', 'vital_signs', 'full_medical_history'],
-        purpose: 'treatment',
+        userId: "physician123",
+        patientId: "patient456",
+        dataElements: ["demographics", "vital_signs", "full_medical_history"],
+        purpose: "treatment",
       };
 
       const validation = hipaaValidator.validateMinimumNecessary(accessEvent);
-      expect(validation).toHaveProperty('compliant');
-      expect(validation).toHaveProperty('violations');
-      expect(validation).toHaveProperty('recommendations');
+      expect(validation).toHaveProperty("compliant");
+      expect(validation).toHaveProperty("violations");
+      expect(validation).toHaveProperty("recommendations");
     });
 
-    test('should track minimum necessary violations', () => {
+    test("should track minimum necessary violations", () => {
       const violations = [
         {
-          type: 'excessive_data_access',
-          description: 'Accessed more data than necessary for stated purpose',
-          severity: 'medium',
+          type: "excessive_data_access",
+          description: "Accessed more data than necessary for stated purpose",
+          severity: "medium",
         },
       ];
 
-      expect(violations[0].type).toBe('excessive_data_access');
+      expect(violations[0].type).toBe("excessive_data_access");
     });
   });
 
-  describe('FDA 21CFR11 Compliance', () => {
-    test('should support electronic signature requirements', () => {
+  describe("FDA 21CFR11 Compliance", () => {
+    test("should support electronic signature requirements", () => {
       const fdaValidator = ClinicalAuditTrail.getComplianceValidator(
         ComplianceFramework.FDA_21CFR11,
       );
 
       const signatureEvent = {
-        userId: 'physician123',
-        documentId: 'clinical_report_456',
-        signatureType: 'electronic',
-        biometricData: 'fingerprint_hash',
+        userId: "physician123",
+        documentId: "clinical_report_456",
+        signatureType: "electronic",
+        biometricData: "fingerprint_hash",
         timestamp: new Date(),
       };
 
@@ -659,30 +659,30 @@ describe('Compliance Framework Support', () => {
       expect(validation.compliant).toBe(true);
     });
 
-    test('should track system validation requirements', () => {
+    test("should track system validation requirements", () => {
       const systemValidation = {
         validated: true,
-        validationDate: new Date('2025-01-01'),
-        validationType: 'retrospective',
-        validatedBy: 'quality_assurance_team',
+        validationDate: new Date("2025-01-01"),
+        validationType: "retrospective",
+        validatedBy: "quality_assurance_team",
       };
 
       expect(systemValidation.validated).toBe(true);
     });
   });
 
-  describe('IEC 62304 Medical Device Software', () => {
-    test('should support software lifecycle processes', () => {
+  describe("IEC 62304 Medical Device Software", () => {
+    test("should support software lifecycle processes", () => {
       const iecValidator = ClinicalAuditTrail.getComplianceValidator(
         ComplianceFramework.IEC_62304,
       );
 
       const softwareEvent = {
-        eventType: 'software_update',
-        version: '2.1.0',
-        safetyClassification: 'Class B',
-        riskAnalysis: 'completed',
-        verification: 'passed',
+        eventType: "software_update",
+        version: "2.1.0",
+        safetyClassification: "Class B",
+        riskAnalysis: "completed",
+        verification: "passed",
       };
 
       const validation = iecValidator.validateSoftwareLifecycle(softwareEvent);
@@ -691,19 +691,19 @@ describe('Compliance Framework Support', () => {
   });
 });
 
-describe('Event Types Coverage', () => {
-  test('should define all required audit event types', () => {
+describe("Event Types Coverage", () => {
+  test("should define all required audit event types", () => {
     const requiredTypes = [
-      'USER_LOGIN',
-      'USER_LOGOUT',
-      'PATIENT_DATA_ACCESS',
-      'PATIENT_DATA_MODIFICATION',
-      'CLINICAL_DECISION',
-      'SYSTEM_CONFIGURATION',
-      'DATA_EXPORT',
-      'DATA_IMPORT',
-      'SYSTEM_ERROR',
-      'SECURITY_VIOLATION',
+      "USER_LOGIN",
+      "USER_LOGOUT",
+      "PATIENT_DATA_ACCESS",
+      "PATIENT_DATA_MODIFICATION",
+      "CLINICAL_DECISION",
+      "SYSTEM_CONFIGURATION",
+      "DATA_EXPORT",
+      "DATA_IMPORT",
+      "SYSTEM_ERROR",
+      "SECURITY_VIOLATION",
     ];
 
     requiredTypes.forEach(type => {
@@ -711,13 +711,13 @@ describe('Event Types Coverage', () => {
     });
   });
 
-  test('should support medical-specific event types', () => {
+  test("should support medical-specific event types", () => {
     const medicalTypes = [
-      'STROKE_ASSESSMENT',
-      'RISK_CALCULATION',
-      'TREATMENT_RECOMMENDATION',
-      'CLINICAL_PROTOCOL_DEVIATION',
-      'QUALITY_METRIC_CALCULATION',
+      "STROKE_ASSESSMENT",
+      "RISK_CALCULATION",
+      "TREATMENT_RECOMMENDATION",
+      "CLINICAL_PROTOCOL_DEVIATION",
+      "QUALITY_METRIC_CALCULATION",
     ];
 
     medicalTypes.forEach(type => {

@@ -9,9 +9,9 @@
  * Service lifetime types
  */
 export const ServiceLifetime = {
-  SINGLETON: 'singleton',
-  TRANSIENT: 'transient',
-  SCOPED: 'scoped',
+  SINGLETON: "singleton",
+  TRANSIENT: "transient",
+  SCOPED: "scoped",
 };
 
 /**
@@ -51,7 +51,7 @@ export class MedicalServiceContainer {
    * @param {Array} dependencies - Dependencies required by this service
    */
   register(key, factory, lifetime = ServiceLifetime.SINGLETON, dependencies = []) {
-    if (typeof factory !== 'function') {
+    if (typeof factory !== "function") {
       throw new Error(`Factory for service '${key}' must be a function`);
     }
 
@@ -113,7 +113,7 @@ export class MedicalServiceContainer {
   resolve(key) {
     // Check for circular dependencies
     if (this.resolutionStack.includes(key)) {
-      const cycle = [...this.resolutionStack, key].join(' -> ');
+      const cycle = [...this.resolutionStack, key].join(" -> ");
       throw new Error(`Circular dependency detected: ${cycle}`);
     }
 
@@ -145,27 +145,27 @@ export class MedicalServiceContainer {
    */
   createInstance(registration) {
     switch (registration.lifetime) {
-      case ServiceLifetime.SINGLETON:
-        if (!registration.instance) {
-          registration.instance = this.instantiate(registration);
-        }
-        return registration.instance;
+    case ServiceLifetime.SINGLETON:
+      if (!registration.instance) {
+        registration.instance = this.instantiate(registration);
+      }
+      return registration.instance;
 
-      case ServiceLifetime.TRANSIENT:
-        return this.instantiate(registration);
+    case ServiceLifetime.TRANSIENT:
+      return this.instantiate(registration);
 
-      case ServiceLifetime.SCOPED:
-        if (!this.currentScope) {
-          throw new Error('No active scope for scoped service resolution');
-        }
-        const scopeKey = `${this.currentScope}_${registration.key}`;
-        if (!this.scopes.has(scopeKey)) {
-          this.scopes.set(scopeKey, this.instantiate(registration));
-        }
-        return this.scopes.get(scopeKey);
+    case ServiceLifetime.SCOPED:
+      if (!this.currentScope) {
+        throw new Error("No active scope for scoped service resolution");
+      }
+      const scopeKey = `${this.currentScope}_${registration.key}`;
+      if (!this.scopes.has(scopeKey)) {
+        this.scopes.set(scopeKey, this.instantiate(registration));
+      }
+      return this.scopes.get(scopeKey);
 
-      default:
-        throw new Error(`Unknown service lifetime: ${registration.lifetime}`);
+    default:
+      throw new Error(`Unknown service lifetime: ${registration.lifetime}`);
     }
   }
 
@@ -197,8 +197,8 @@ export class MedicalServiceContainer {
    * @param {Function} interceptor - Interceptor function
    */
   addInterceptor(interceptor) {
-    if (typeof interceptor !== 'function') {
-      throw new Error('Interceptor must be a function');
+    if (typeof interceptor !== "function") {
+      throw new Error("Interceptor must be a function");
     }
     this.interceptors.push(interceptor);
   }
@@ -210,7 +210,7 @@ export class MedicalServiceContainer {
    */
   createScope(scopeId = `scope_${Date.now()}`) {
     if (this.currentScope) {
-      throw new Error('Cannot create nested scopes');
+      throw new Error("Cannot create nested scopes");
     }
 
     this.currentScope = scopeId;
@@ -235,7 +235,7 @@ export class MedicalServiceContainer {
 
     scopedKeys.forEach((key) => {
       const instance = this.scopes.get(key);
-      if (instance && typeof instance.dispose === 'function') {
+      if (instance && typeof instance.dispose === "function") {
         try {
           instance.dispose();
         } catch (error) {
@@ -294,15 +294,15 @@ export class MedicalServiceContainer {
 
     this.services.forEach((registration) => {
       switch (registration.lifetime) {
-        case ServiceLifetime.SINGLETON:
-          stats.singletons += 1;
-          break;
-        case ServiceLifetime.TRANSIENT:
-          stats.transients += 1;
-          break;
-        case ServiceLifetime.SCOPED:
-          stats.scoped += 1;
-          break;
+      case ServiceLifetime.SINGLETON:
+        stats.singletons += 1;
+        break;
+      case ServiceLifetime.TRANSIENT:
+        stats.transients += 1;
+        break;
+      case ServiceLifetime.SCOPED:
+        stats.scoped += 1;
+        break;
       }
       stats.totalResolves += registration.metadata.resolveCount;
     });
@@ -319,7 +319,7 @@ export class MedicalServiceContainer {
 
     // Dispose singleton services
     this.services.forEach((registration) => {
-      if (registration.instance && typeof registration.instance.dispose === 'function') {
+      if (registration.instance && typeof registration.instance.dispose === "function") {
         try {
           registration.instance.dispose();
         } catch (error) {
@@ -359,35 +359,35 @@ export function Service(key, lifetime = ServiceLifetime.SINGLETON, dependencies 
  */
 export function Inject(serviceKey) {
   return function (target, propertyKey, parameterIndex) {
-    const existingInjects = Reflect.getMetadata('design:injects', target) || [];
+    const existingInjects = Reflect.getMetadata("design:injects", target) || [];
     existingInjects[parameterIndex] = serviceKey;
-    Reflect.defineMetadata('design:injects', existingInjects, target);
+    Reflect.defineMetadata("design:injects", existingInjects, target);
   };
 }
 
 // Medical service keys constants
 export const MEDICAL_SERVICES = {
   // Core services
-  EVENT_OBSERVER: 'medical.event.observer',
-  PERFORMANCE_MONITOR: 'medical.performance.monitor',
-  VALIDATION_FACTORY: 'medical.validation.factory',
-  PREDICTION_CONTEXT: 'medical.prediction.context',
-  COMMAND_INVOKER: 'medical.command.invoker',
+  EVENT_OBSERVER: "medical.event.observer",
+  PERFORMANCE_MONITOR: "medical.performance.monitor",
+  VALIDATION_FACTORY: "medical.validation.factory",
+  PREDICTION_CONTEXT: "medical.prediction.context",
+  COMMAND_INVOKER: "medical.command.invoker",
 
   // Data services
-  STORE: 'medical.store',
-  AUTH_MANAGER: 'medical.auth.manager',
-  API_CLIENT: 'medical.api.client',
+  STORE: "medical.store",
+  AUTH_MANAGER: "medical.auth.manager",
+  API_CLIENT: "medical.api.client",
 
   // UI services
-  RENDERER: 'medical.ui.renderer',
-  ROUTER: 'medical.router',
-  I18N: 'medical.i18n',
+  RENDERER: "medical.ui.renderer",
+  ROUTER: "medical.router",
+  I18N: "medical.i18n",
 
   // Infrastructure
-  LOGGER: 'medical.logger',
-  CACHE: 'medical.cache',
-  SECURITY: 'medical.security',
+  LOGGER: "medical.logger",
+  CACHE: "medical.cache",
+  SECURITY: "medical.security",
 };
 
 // Export singleton container instance

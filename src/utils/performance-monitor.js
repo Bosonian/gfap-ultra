@@ -29,7 +29,7 @@ export class MedicalPerformanceMonitor {
    * @param {string} category - Performance category
    * @returns {Promise<any>} - Function result with timing data
    */
-  async measureClinicalFunction(functionName, fn, category = 'medical_calculation') {
+  async measureClinicalFunction(functionName, fn, category = "medical_calculation") {
     if (!this.isMonitoringEnabled) {
       return await fn();
     }
@@ -138,7 +138,7 @@ export class MedicalPerformanceMonitor {
       this.logCriticalDelay(functionName, duration, threshold, category);
 
       // For development/testing - can be removed in production
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
         // (warningMessage);
       }
     }
@@ -153,14 +153,14 @@ export class MedicalPerformanceMonitor {
    */
   logCriticalDelay(functionName, duration, threshold, category) {
     const delayRecord = {
-      type: 'CRITICAL_DELAY',
+      type: "CRITICAL_DELAY",
       functionName,
       duration,
       threshold,
       category,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent.substring(0, 100), // Limited info only
-      severity: duration > (threshold * 2) ? 'HIGH' : 'MEDIUM',
+      severity: duration > threshold * 2 ? "HIGH" : "MEDIUM",
     };
 
     // Store for clinical review
@@ -176,18 +176,22 @@ export class MedicalPerformanceMonitor {
     let measurements = this.performanceLog;
 
     if (functionName) {
-      measurements = measurements.filter((m) => m.functionName === functionName);
+      measurements = measurements.filter(m => m.functionName === functionName);
     }
 
     if (measurements.length === 0) {
       return {
-        count: 0, average: 0, min: 0, max: 0, successRate: 0,
+        count: 0,
+        average: 0,
+        min: 0,
+        max: 0,
+        successRate: 0,
       };
     }
 
-    const validMeasurements = measurements.filter((m) => typeof m.duration === 'number');
-    const durations = validMeasurements.map((m) => m.duration);
-    const successfulMeasurements = validMeasurements.filter((m) => m.success);
+    const validMeasurements = measurements.filter(m => typeof m.duration === "number");
+    const durations = validMeasurements.map(m => m.duration);
+    const successfulMeasurements = validMeasurements.filter(m => m.success);
 
     return {
       count: validMeasurements.length,
@@ -195,7 +199,7 @@ export class MedicalPerformanceMonitor {
       min: Math.min(...durations),
       max: Math.max(...durations),
       successRate: (successfulMeasurements.length / validMeasurements.length) * 100,
-      criticalDelays: measurements.filter((m) => m.type === 'CRITICAL_DELAY').length,
+      criticalDelays: measurements.filter(m => m.type === "CRITICAL_DELAY").length,
     };
   }
 
@@ -212,19 +216,19 @@ export class MedicalPerformanceMonitor {
     };
 
     // Group by category
-    Object.keys(this.criticalThresholds).forEach((category) => {
-      const categoryMeasurements = this.performanceLog.filter((m) => m.category === category);
+    Object.keys(this.criticalThresholds).forEach(category => {
+      const categoryMeasurements = this.performanceLog.filter(m => m.category === category);
       report.categories[category] = this.getPerformanceStats();
       report.categories[category].measurements = categoryMeasurements.length;
     });
 
     // Critical delays summary
-    const criticalDelays = this.performanceLog.filter((m) => m.type === 'CRITICAL_DELAY');
+    const criticalDelays = this.performanceLog.filter(m => m.type === "CRITICAL_DELAY");
     report.criticalDelays = {
       total: criticalDelays.length,
-      high: criticalDelays.filter((d) => d.severity === 'HIGH').length,
-      medium: criticalDelays.filter((d) => d.severity === 'MEDIUM').length,
-      functions: [...new Set(criticalDelays.map((d) => d.functionName))],
+      high: criticalDelays.filter(d => d.severity === "HIGH").length,
+      medium: criticalDelays.filter(d => d.severity === "MEDIUM").length,
+      functions: [...new Set(criticalDelays.map(d => d.functionName))],
     };
 
     return report;
@@ -279,6 +283,6 @@ export class MedicalPerformanceMonitor {
 export const medicalPerformanceMonitor = new MedicalPerformanceMonitor();
 
 // Helper function for easy integration
-export function measureMedicalFunction(functionName, fn, category = 'medical_calculation') {
+export function measureMedicalFunction(functionName, fn, category = "medical_calculation") {
   return medicalPerformanceMonitor.measureClinicalFunction(functionName, fn, category);
 }

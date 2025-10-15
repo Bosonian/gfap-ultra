@@ -5,9 +5,9 @@
  * Provides pluggable prediction strategies for different medical scenarios
  */
 
-import { predictComaIch, predictLimitedIch, predictFullStroke } from '../api/client.js';
+import { predictComaIch, predictLimitedIch, predictFullStroke } from "../api/client.js";
 
-import { medicalEventObserver, MEDICAL_EVENTS } from './observer.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "./observer.js";
 
 /**
  * Abstract base strategy for medical predictions
@@ -37,7 +37,7 @@ class PredictionStrategy {
     });
 
     if (missingFields.length > 0) {
-      errors.push(`Missing required fields: ${missingFields.join(', ')}`);
+      errors.push(`Missing required fields: ${missingFields.join(", ")}`);
     }
 
     return {
@@ -63,7 +63,7 @@ class PredictionStrategy {
    * @returns {Promise<Object>} Prediction result
    */
   async predict(inputData) {
-    throw new Error('predict() method must be implemented by concrete strategy');
+    throw new Error("predict() method must be implemented by concrete strategy");
   }
 
   /**
@@ -102,22 +102,22 @@ class PredictionStrategy {
  */
 class ComaPredictionStrategy extends PredictionStrategy {
   constructor() {
-    super('COMA_ICH', 'ICH prediction for comatose patients');
-    this.requiredFields = ['gfap'];
-    this.optionalFields = ['age', 'symptoms_duration'];
+    super("COMA_ICH", "ICH prediction for comatose patients");
+    this.requiredFields = ["gfap"];
+    this.optionalFields = ["age", "symptoms_duration"];
   }
 
   preprocessInput(inputData) {
     return {
       gfap: parseFloat(inputData.gfap),
-      patientType: 'comatose',
+      patientType: "comatose",
     };
   }
 
   async predict(inputData) {
     const validation = this.validateInput(inputData);
     if (!validation.isValid) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
     }
 
     const processedInput = this.preprocessInput(inputData);
@@ -142,7 +142,7 @@ class ComaPredictionStrategy extends PredictionStrategy {
       return result;
     } catch (error) {
       medicalEventObserver.publish(MEDICAL_EVENTS.SECURITY_EVENT, {
-        type: 'prediction_error',
+        type: "prediction_error",
         strategy: this.name,
         error: error.message,
       });
@@ -156,9 +156,9 @@ class ComaPredictionStrategy extends PredictionStrategy {
  */
 class LimitedDataPredictionStrategy extends PredictionStrategy {
   constructor() {
-    super('LIMITED_DATA_ICH', 'ICH prediction with limited clinical data');
-    this.requiredFields = ['gfap', 'age', 'systolic_bp', 'diastolic_bp'];
-    this.optionalFields = ['weakness_sudden', 'speech_sudden', 'vigilanzminderung'];
+    super("LIMITED_DATA_ICH", "ICH prediction with limited clinical data");
+    this.requiredFields = ["gfap", "age", "systolic_bp", "diastolic_bp"];
+    this.optionalFields = ["weakness_sudden", "speech_sudden", "vigilanzminderung"];
   }
 
   preprocessInput(inputData) {
@@ -167,16 +167,16 @@ class LimitedDataPredictionStrategy extends PredictionStrategy {
       age: parseInt(inputData.age, 10),
       systolic_bp: parseFloat(inputData.systolic_bp),
       diastolic_bp: parseFloat(inputData.diastolic_bp),
-      weakness_sudden: inputData.weakness_sudden === true || inputData.weakness_sudden === 'true',
-      speech_sudden: inputData.speech_sudden === true || inputData.speech_sudden === 'true',
-      vigilanzminderung: inputData.vigilanzminderung === true || inputData.vigilanzminderung === 'true',
+      weakness_sudden: inputData.weakness_sudden === true || inputData.weakness_sudden === "true",
+      speech_sudden: inputData.speech_sudden === true || inputData.speech_sudden === "true",
+      vigilanzminderung: inputData.vigilanzminderung === true || inputData.vigilanzminderung === "true",
     };
   }
 
   async predict(inputData) {
     const validation = this.validateInput(inputData);
     if (!validation.isValid) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
     }
 
     const processedInput = this.preprocessInput(inputData);
@@ -199,7 +199,7 @@ class LimitedDataPredictionStrategy extends PredictionStrategy {
       return result;
     } catch (error) {
       medicalEventObserver.publish(MEDICAL_EVENTS.SECURITY_EVENT, {
-        type: 'prediction_error',
+        type: "prediction_error",
         strategy: this.name,
         error: error.message,
       });
@@ -213,12 +213,12 @@ class LimitedDataPredictionStrategy extends PredictionStrategy {
  */
 class FullStrokePredictionStrategy extends PredictionStrategy {
   constructor() {
-    super('FULL_STROKE', 'Comprehensive stroke prediction with full clinical data');
+    super("FULL_STROKE", "Comprehensive stroke prediction with full clinical data");
     this.requiredFields = [
-      'gfap', 'age', 'systolic_bp', 'diastolic_bp', 'fast_ed_score',
-      'sex', 'facialtwitching', 'armparese', 'speechdeficit', 'gaze', 'agitation',
+      "gfap", "age", "systolic_bp", "diastolic_bp", "fast_ed_score",
+      "sex", "facialtwitching", "armparese", "speechdeficit", "gaze", "agitation",
     ];
-    this.optionalFields = ['strokeOnsetKnown', 'medical_history'];
+    this.optionalFields = ["strokeOnsetKnown", "medical_history"];
   }
 
   preprocessInput(inputData) {
@@ -228,20 +228,20 @@ class FullStrokePredictionStrategy extends PredictionStrategy {
       systolic_bp: parseFloat(inputData.systolic_bp),
       diastolic_bp: parseFloat(inputData.diastolic_bp),
       fast_ed_score: parseInt(inputData.fast_ed_score, 10),
-      sex: inputData.sex === 'male' ? 1 : 0,
-      facialtwitching: inputData.facialtwitching === true || inputData.facialtwitching === 'true',
-      armparese: inputData.armparese === true || inputData.armparese === 'true',
-      speechdeficit: inputData.speechdeficit === true || inputData.speechdeficit === 'true',
-      gaze: inputData.gaze === true || inputData.gaze === 'true',
-      agitation: inputData.agitation === true || inputData.agitation === 'true',
-      strokeOnsetKnown: inputData.strokeOnsetKnown === true || inputData.strokeOnsetKnown === 'true',
+      sex: inputData.sex === "male" ? 1 : 0,
+      facialtwitching: inputData.facialtwitching === true || inputData.facialtwitching === "true",
+      armparese: inputData.armparese === true || inputData.armparese === "true",
+      speechdeficit: inputData.speechdeficit === true || inputData.speechdeficit === "true",
+      gaze: inputData.gaze === true || inputData.gaze === "true",
+      agitation: inputData.agitation === true || inputData.agitation === "true",
+      strokeOnsetKnown: inputData.strokeOnsetKnown === true || inputData.strokeOnsetKnown === "true",
     };
   }
 
   async predict(inputData) {
     const validation = this.validateInput(inputData);
     if (!validation.isValid) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
     }
 
     const processedInput = this.preprocessInput(inputData);
@@ -264,7 +264,7 @@ class FullStrokePredictionStrategy extends PredictionStrategy {
       return result;
     } catch (error) {
       medicalEventObserver.publish(MEDICAL_EVENTS.SECURITY_EVENT, {
-        type: 'prediction_error',
+        type: "prediction_error",
         strategy: this.name,
         error: error.message,
       });
@@ -294,7 +294,7 @@ export class PredictionContext {
    */
   registerStrategy(strategy) {
     if (!(strategy instanceof PredictionStrategy)) {
-      throw new Error('Strategy must extend PredictionStrategy');
+      throw new Error("Strategy must extend PredictionStrategy");
     }
     this.strategies.set(strategy.name, strategy);
   }
@@ -318,7 +318,7 @@ export class PredictionContext {
    */
   async predict(inputData) {
     if (!this.currentStrategy) {
-      throw new Error('No prediction strategy selected');
+      throw new Error("No prediction strategy selected");
     }
 
     const startTime = performance.now();
@@ -399,7 +399,7 @@ export const predictionContext = new PredictionContext();
 
 // Export strategy types for external reference
 export const PREDICTION_STRATEGIES = {
-  COMA_ICH: 'COMA_ICH',
-  LIMITED_DATA_ICH: 'LIMITED_DATA_ICH',
-  FULL_STROKE: 'FULL_STROKE',
+  COMA_ICH: "COMA_ICH",
+  LIMITED_DATA_ICH: "LIMITED_DATA_ICH",
+  FULL_STROKE: "FULL_STROKE",
 };

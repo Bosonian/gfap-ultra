@@ -20,8 +20,8 @@ export class MedicalEventObserver {
    * @returns {Function} Unsubscribe function
    */
   subscribe(eventType, callback, options = {}) {
-    if (typeof callback !== 'function') {
-      throw new Error('Observer callback must be a function');
+    if (typeof callback !== "function") {
+      throw new Error("Observer callback must be a function");
     }
 
     if (!this.observers.has(eventType)) {
@@ -67,7 +67,7 @@ export class MedicalEventObserver {
       data: this.sanitizeEventData(data),
       metadata: {
         timestamp: new Date().toISOString(),
-        source: 'MedicalEventObserver',
+        source: "MedicalEventObserver",
         ...metadata,
       },
       id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -101,12 +101,12 @@ export class MedicalEventObserver {
    * @returns {Object} Sanitized data
    */
   sanitizeEventData(data) {
-    const sensitiveFields = ['password', 'ssn', 'medical_record_number', 'patient_id'];
+    const sensitiveFields = ["password", "ssn", "medical_record_number", "patient_id"];
     const sanitized = { ...data };
 
     sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
-        sanitized[field] = '[REDACTED]';
+        sanitized[field] = "[REDACTED]";
       }
     });
 
@@ -173,24 +173,24 @@ export class MedicalEventObserver {
 // Medical event types constants
 export const MEDICAL_EVENTS = {
   // Patient data events
-  PATIENT_DATA_UPDATED: 'patient_data_updated',
-  VALIDATION_ERROR: 'validation_error',
-  VALIDATION_SUCCESS: 'validation_success',
+  PATIENT_DATA_UPDATED: "patient_data_updated",
+  VALIDATION_ERROR: "validation_error",
+  VALIDATION_SUCCESS: "validation_success",
 
   // Clinical workflow events
-  TRIAGE_COMPLETED: 'triage_completed',
-  ASSESSMENT_STARTED: 'assessment_started',
-  RESULTS_GENERATED: 'results_generated',
+  TRIAGE_COMPLETED: "triage_completed",
+  ASSESSMENT_STARTED: "assessment_started",
+  RESULTS_GENERATED: "results_generated",
 
   // System events
-  PERFORMANCE_WARNING: 'performance_warning',
-  SECURITY_EVENT: 'security_event',
-  AUDIT_EVENT: 'audit_event',
+  PERFORMANCE_WARNING: "performance_warning",
+  SECURITY_EVENT: "security_event",
+  AUDIT_EVENT: "audit_event",
 
   // User interaction events
-  FORM_SUBMITTED: 'form_submitted',
-  NAVIGATION_CHANGED: 'navigation_changed',
-  SESSION_TIMEOUT: 'session_timeout',
+  FORM_SUBMITTED: "form_submitted",
+  NAVIGATION_CHANGED: "navigation_changed",
+  SESSION_TIMEOUT: "session_timeout",
 };
 
 // Export singleton instance

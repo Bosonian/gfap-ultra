@@ -8,11 +8,12 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
-import { createApp } from './core/app-controller.js';
-import { store } from './state/store.js';
-import { render } from './ui/render.js';
-import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from './utils/error-handler.js';
-import { initializeAPIWarmup } from './core/api-warmup.js';
+import "./index.css";
+import { createApp } from "./core/app-controller.js";
+import { store } from "./state/store.js";
+import { render } from "./ui/render.js";
+import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from "./utils/error-handler.js";
+import { initializeAPIWarmup } from "./core/api-warmup.js";
 
 /**
  * Application instance
@@ -31,29 +32,32 @@ async function initializeApplication() {
       // Start API warmup in background to prevent cold starts
       setTimeout(() => {
         initializeAPIWarmup({ background: true, criticalOnly: false })
-          .then((result) => {
-            console.info('[Main] API warmup started:', result.status || 'completed');
+          .then(result => {
+            console.info("[Main] API warmup started:", result.status || "completed");
           })
-          .catch((error) => {
-            console.warn('[Main] API warmup failed:', error.message);
+          .catch(error => {
+            console.warn("[Main] API warmup failed:", error.message);
           });
       }, 2000); // Start warmup 2 seconds after app initialization
 
       // Log successful initialization
       const status = app.getStatus();
-      const startupEvent = new CustomEvent('appInitialized', {
+      const startupEvent = new CustomEvent("appInitialized", {
         detail: {
           timestamp: new Date().toISOString(),
           status,
-          version: '2.1.0',
-          build: 'production',
+          version: "2.1.0",
+          build: "production",
         },
       });
       document.dispatchEvent(startupEvent);
-
+      document.querySelectorAll(".bar-fill").forEach(el => {
+        const targetWidth = el.getAttribute("data-width");
+        el.style.width = `${targetWidth}%`;
+      });
       return app;
     },
-    (error) => {
+    error => {
       // Critical initialization failure
       handleInitializationFailure(error);
       throw error;
@@ -63,10 +67,10 @@ async function initializeApplication() {
       severity: ERROR_SEVERITY.CRITICAL,
       timeout: 30000,
       context: {
-        operation: 'application_initialization',
-        version: '2.1.0',
+        operation: "application_initialization",
+        version: "2.1.0",
       },
-    },
+    }
   );
 }
 
@@ -76,7 +80,7 @@ async function initializeApplication() {
  */
 function handleInitializationFailure(error) {
   // Create emergency fallback UI
-  const container = document.getElementById('appContainer');
+  const container = document.getElementById("appContainer");
   if (container) {
     container.innerHTML = `
       <div style="
@@ -135,14 +139,14 @@ function handleInitializationFailure(error) {
           </button>
         </div>
         <small style="color: #6c757d; margin-top: 20px;">
-          Error: ${error.message || 'Unknown initialization error'}
+          Error: ${error.message || "Unknown initialization error"}
         </small>
       </div>
     `;
   }
 
   // Log error for debugging
-  const errorEvent = new CustomEvent('appInitializationFailed', {
+  const errorEvent = new CustomEvent("appInitializationFailed", {
     detail: {
       error: error.message,
       timestamp: new Date().toISOString(),
@@ -170,8 +174,8 @@ function handlePageUnload() {
  */
 function setupGlobalErrorHandlers() {
   // Handle page visibility changes (mobile apps, tab switching)
-  document.addEventListener('visibilitychange', () => {
-    if (app && document.visibilityState === 'visible') {
+  document.addEventListener("visibilitychange", () => {
+    if (app && document.visibilityState === "visible") {
       // App became visible - validate session
       const status = app.getStatus();
       if (!status.isAuthenticated) {
@@ -181,8 +185,8 @@ function setupGlobalErrorHandlers() {
   });
 
   // Handle page unload
-  window.addEventListener('beforeunload', handlePageUnload);
-  window.addEventListener('unload', handlePageUnload);
+  window.addEventListener("beforeunload", handlePageUnload);
+  window.addEventListener("unload", handlePageUnload);
 }
 
 /**
@@ -192,20 +196,26 @@ async function main() {
   try {
     // In local preview, make sure no service worker is controlling (avoids stale assets)
     try {
-      const isLocalPreview = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
-      if (isLocalPreview && 'serviceWorker' in navigator) {
+      const isLocalPreview =
+        ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) &&
+        !(import.meta && import.meta.env && import.meta.env.DEV);
+      if (isLocalPreview && "serviceWorker" in navigator) {
         const regs = await navigator.serviceWorker.getRegistrations();
         for (const reg of regs) {
           try {
             await reg.unregister();
-          } catch {}
+          } catch {
+            console.warn("[Main] Failed to unregister service worker:", reg);
+          }
         }
         // Also clear any pending beforeinstallprompt side-effects
-        window.addEventListener('beforeinstallprompt', (e) => {
+        window.addEventListener("beforeinstallprompt", e => {
           e.preventDefault();
         });
       }
-    } catch {}
+    } catch {
+      console.warn("[Main] Service worker cleanup failed");
+    }
 
     // Setup global error handling
     setupGlobalErrorHandlers();
@@ -214,10 +224,10 @@ async function main() {
     await initializeApplication();
 
     // Application started successfully
-    const event = new CustomEvent('appReady', {
+    const event = new CustomEvent("appReady", {
       detail: {
         timestamp: new Date().toISOString(),
-        version: '2.1.0',
+        version: "2.1.0",
       },
     });
     document.dispatchEvent(event);
@@ -229,8 +239,8 @@ async function main() {
 /**
  * Start the application when DOM is ready
  */
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', main);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", main);
 } else {
   main();
 }
@@ -238,10 +248,10 @@ if (document.readyState === 'loading') {
 /**
  * Export for debugging and testing
  */
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.iGFAPApp = {
     getApp: () => app,
-    getStatus: () => app?.getStatus() || { error: 'App not initialized' },
+    getStatus: () => app?.getStatus() || { error: "App not initialized" },
     restart: async () => {
       if (app) {
         app.destroy();
@@ -253,13 +263,13 @@ if (typeof window !== 'undefined') {
       try {
         return store.getState().currentScreen;
       } catch {
-        return 'unknown';
+        return "unknown";
       }
     },
     forceResults: () => {
       try {
-        store.navigate('results');
-        const container = document.getElementById('appContainer');
+        store.navigate("results");
+        const container = document.getElementById("appContainer");
         if (container) {
           render(container);
         }

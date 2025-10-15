@@ -1,7 +1,7 @@
 // User-friendly label formatter for technical field names
 // Converts technical driver and field names to user-friendly labels
 
-import { t } from '../localization/i18n.js';
+import { t } from "../localization/i18n.js";
 
 /**
  * Mapping of technical field names to the same labels used in input forms
@@ -9,49 +9,49 @@ import { t } from '../localization/i18n.js';
  */
 const FIELD_LABEL_MAP = {
   // Age and demographics
-  age_years: 'ageLabel',
-  age: 'ageLabel',
+  age_years: "ageLabel",
+  age: "ageLabel",
 
   // Blood pressure
-  systolic_bp: 'systolicLabel',
-  diastolic_bp: 'diastolicLabel',
-  systolic_blood_pressure: 'systolicLabel',
-  diastolic_blood_pressure: 'diastolicLabel',
-  blood_pressure_systolic: 'systolicLabel',
-  blood_pressure_diastolic: 'diastolicLabel',
+  systolic_bp: "systolicLabel",
+  diastolic_bp: "diastolicLabel",
+  systolic_blood_pressure: "systolicLabel",
+  diastolic_blood_pressure: "diastolicLabel",
+  blood_pressure_systolic: "systolicLabel",
+  blood_pressure_diastolic: "diastolicLabel",
 
   // Biomarkers
-  gfap_value: 'gfapLabel',
-  gfap: 'gfapLabel',
-  gfap_level: 'gfapLabel',
+  gfap_value: "gfapLabel",
+  gfap: "gfapLabel",
+  gfap_level: "gfapLabel",
 
   // Clinical scores
-  fast_ed_score: 'fastEdLabel',
-  fast_ed: 'fastEdLabel',
-  fast_ed_total: 'fastEdLabel',
+  fast_ed_score: "fastEdLabel",
+  fast_ed: "fastEdLabel",
+  fast_ed_total: "fastEdLabel",
 
   // Neurological symptoms
-  vigilanzminderung: 'vigilanzLabel',
-  vigilance_reduction: 'vigilanzLabel',
-  reduced_consciousness: 'vigilanzLabel',
-  armparese: 'armPareseLabel',
-  arm_paresis: 'armPareseLabel',
-  arm_weakness: 'armPareseLabel',
-  beinparese: 'beinPareseLabel',
-  leg_paresis: 'beinPareseLabel',
-  leg_weakness: 'beinPareseLabel',
-  eye_deviation: 'eyeDeviationLabel',
-  blickdeviation: 'eyeDeviationLabel',
-  headache: 'headacheLabel',
-  kopfschmerzen: 'headacheLabel',
+  vigilanzminderung: "vigilanzLabel",
+  vigilance_reduction: "vigilanzLabel",
+  reduced_consciousness: "vigilanzLabel",
+  armparese: "armPareseLabel",
+  arm_paresis: "armPareseLabel",
+  arm_weakness: "armPareseLabel",
+  beinparese: "beinPareseLabel",
+  leg_paresis: "beinPareseLabel",
+  leg_weakness: "beinPareseLabel",
+  eye_deviation: "eyeDeviationLabel",
+  blickdeviation: "eyeDeviationLabel",
+  headache: "headacheLabel",
+  kopfschmerzen: "headacheLabel",
 
   // Medical history
-  atrial_fibrillation: 'atrialFibLabel',
-  vorhofflimmern: 'atrialFibLabel',
-  anticoagulated_noak: 'anticoagLabel',
-  anticoagulation: 'anticoagLabel',
-  antiplatelets: 'antiplateletsLabel',
-  thrombozytenaggregationshemmer: 'antiplateletsLabel',
+  atrial_fibrillation: "atrialFibLabel",
+  vorhofflimmern: "atrialFibLabel",
+  anticoagulated_noak: "anticoagLabel",
+  anticoagulation: "anticoagLabel",
+  antiplatelets: "antiplateletsLabel",
+  thrombozytenaggregationshemmer: "antiplateletsLabel",
 };
 
 /**
@@ -59,14 +59,14 @@ const FIELD_LABEL_MAP = {
  * Used when no specific mapping exists
  */
 const PATTERN_REPLACEMENTS = [
-  { pattern: /_score$/, replacement: ' Score' },
-  { pattern: /_value$/, replacement: ' Level' },
-  { pattern: /_bp$/, replacement: ' Blood Pressure' },
-  { pattern: /_years?$/, replacement: ' (years)' },
-  { pattern: /^ich_/, replacement: 'Brain Bleeding ' },
-  { pattern: /^lvo_/, replacement: 'Large Vessel ' },
-  { pattern: /parese$/, replacement: 'Weakness' },
-  { pattern: /deviation$/, replacement: 'Movement' },
+  { pattern: /_score$/, replacement: " Score" },
+  { pattern: /_value$/, replacement: " Level" },
+  { pattern: /_bp$/, replacement: " Blood Pressure" },
+  { pattern: /_years?$/, replacement: " (years)" },
+  { pattern: /^ich_/, replacement: "Brain Bleeding " },
+  { pattern: /^lvo_/, replacement: "Large Vessel " },
+  { pattern: /parese$/, replacement: "Weakness" },
+  { pattern: /deviation$/, replacement: "Movement" },
 ];
 
 /**
@@ -76,7 +76,7 @@ const PATTERN_REPLACEMENTS = [
  */
 export function formatDriverName(fieldName) {
   if (!fieldName) {
-    return '';
+    return "";
   }
 
   // First, try to find exact match in mapping to input form labels
@@ -96,8 +96,8 @@ export function formatDriverName(fieldName) {
 
   // Clean up and format - keep medical terminology consistent
   formatted = formatted
-    .replace(/_/g, ' ') // Replace underscores with spaces
-    .replace(/\b\w/g, (l) => l.toUpperCase()) // Title case
+    .replace(/_/g, " ") // Replace underscores with spaces
+    .replace(/\b\w/g, l => l.toUpperCase()) // Title case
     .trim();
 
   return formatted;
@@ -114,7 +114,7 @@ export function formatSummaryLabel(fieldName) {
 
   // Remove units from summary labels as they're shown in values
   return friendlyLabel
-    .replace(/\s*\([^)]*\)\s*/g, '') // Remove anything in parentheses
+    .replace(/\s*\([^)]*\)\s*/g, "") // Remove anything in parentheses
     .trim();
 }
 
@@ -124,27 +124,27 @@ export function formatSummaryLabel(fieldName) {
  * @param {string} fieldName - Field name for context
  * @returns {string} - Formatted display value
  */
-export function formatDisplayValue(value, fieldName = '') {
-  if (value === null || value === undefined || value === '') {
-    return '';
+export function formatDisplayValue(value, fieldName = "") {
+  if (value === null || value === undefined || value === "") {
+    return "";
   }
 
-  if (typeof value === 'boolean') {
-    return value ? '✓' : '✗';
+  if (typeof value === "boolean") {
+    return value ? "✓" : "✗";
   }
 
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     // Add units based on field type
-    if (fieldName.includes('bp') || fieldName.includes('blood_pressure')) {
+    if (fieldName.includes("bp") || fieldName.includes("blood_pressure")) {
       return `${value} mmHg`;
     }
-    if (fieldName.includes('gfap')) {
+    if (fieldName.includes("gfap")) {
       return `${value} pg/mL`;
     }
-    if (fieldName.includes('age')) {
+    if (fieldName.includes("age")) {
       return `${value} years`;
     }
-    if (fieldName.includes('score')) {
+    if (fieldName.includes("score")) {
       return value.toString();
     }
 
@@ -162,15 +162,15 @@ export function formatDisplayValue(value, fieldName = '') {
  */
 export function getFieldDescription(fieldName) {
   const descriptions = {
-    fast_ed_score: 'Stroke severity assessment',
-    gfap_value: 'Brain injury biomarker',
-    vigilanzminderung: 'Level of consciousness',
-    systolic_bp: 'Upper blood pressure reading',
-    diastolic_bp: 'Lower blood pressure reading',
-    atrial_fibrillation: 'Irregular heart rhythm',
-    anticoagulated_noak: 'Blood-thinning medication',
-    antiplatelets: 'Anti-clotting medication',
+    fast_ed_score: "Stroke severity assessment",
+    gfap_value: "Brain injury biomarker",
+    vigilanzminderung: "Level of consciousness",
+    systolic_bp: "Upper blood pressure reading",
+    diastolic_bp: "Lower blood pressure reading",
+    atrial_fibrillation: "Irregular heart rhythm",
+    anticoagulated_noak: "Blood-thinning medication",
+    antiplatelets: "Anti-clotting medication",
   };
 
-  return descriptions[fieldName.toLowerCase()] || '';
+  return descriptions[fieldName.toLowerCase()] || "";
 }

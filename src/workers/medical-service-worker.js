@@ -7,17 +7,17 @@
 
 // Bulletproof error handling for service worker
 const ERROR_CATEGORIES = {
-  CACHE: 'cache',
-  NETWORK: 'network',
-  MEDICAL: 'medical',
-  STORAGE: 'storage',
+  CACHE: "cache",
+  NETWORK: "network",
+  MEDICAL: "medical",
+  STORAGE: "storage",
 };
 
 const ERROR_SEVERITY = {
-  LOW: 'low',
-  MEDIUM: 'medium',
-  HIGH: 'high',
-  CRITICAL: 'critical',
+  LOW: "low",
+  MEDIUM: "medium",
+  HIGH: "high",
+  CRITICAL: "critical",
 };
 
 /**
@@ -27,14 +27,14 @@ async function safeAsync(operation, fallback = null, context = {}) {
   try {
     return await operation();
   } catch (error) {
-    console.error('Service Worker error:', error.message, context);
+    console.error("Service Worker error:", error.message, context);
 
     // Send error to main thread
     try {
       const clients = await self.clients.matchAll();
-      clients.forEach((client) => {
+      clients.forEach(client => {
         client.postMessage({
-          type: 'SW_ERROR',
+          type: "SW_ERROR",
           error: {
             message: error.message,
             context,
@@ -43,56 +43,56 @@ async function safeAsync(operation, fallback = null, context = {}) {
         });
       });
     } catch (msgError) {
-      console.error('Failed to send error message to clients:', msgError);
+      console.error("Failed to send error message to clients:", msgError);
     }
 
-    return typeof fallback === 'function' ? fallback(error) : fallback;
+    return typeof fallback === "function" ? fallback(error) : fallback;
   }
 }
 
-const CACHE_VERSION = 'medical-app-v3.0.0';
+const CACHE_VERSION = "medical-app-v3.0.0";
 const STATIC_CACHE_NAME = `${CACHE_VERSION}-static`;
 const API_CACHE_NAME = `${CACHE_VERSION}-api`;
 const RUNTIME_CACHE_NAME = `${CACHE_VERSION}-runtime`;
 
 // Critical resources that must be available offline
 const CRITICAL_RESOURCES = [
-  '/0925/',
-  '/0925/index.html',
-  '/0925/src/main.js',
-  '/0925/src/app.js',
-  '/0925/src/config.js',
-  '/0925/src/state/store.js',
-  '/0925/src/logic/validate.js',
-  '/0925/src/logic/ich-volume-calculator.js',
-  '/0925/src/logic/lvo-local-model.js',
-  '/0925/src/ui/render.js',
-  '/0925/src/styles/app.css',
-  '/0925/manifest.json',
-  '/0925/icon-192.png',
-  '/0925/icon-512.png',
+  "/0925/",
+  "/0925/index.html",
+  "/0925/src/main.js",
+  "/0925/src/app.js",
+  "/0925/src/config.js",
+  "/0925/src/state/store.js",
+  "/0925/src/logic/validate.js",
+  "/0925/src/logic/ich-volume-calculator.js",
+  "/0925/src/logic/lvo-local-model.js",
+  "/0925/src/ui/render.js",
+  "/0925/src/styles/app.css",
+  "/0925/manifest.json",
+  "/0925/icon-192.png",
+  "/0925/icon-512.png",
 ];
 
 // API endpoints for intelligent caching
 const API_ENDPOINTS = [
-  'https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich',
-  'https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich',
-  'https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke',
+  "https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich",
+  "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
+  "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
 ];
 
 // Network strategies
 const NETWORK_STRATEGIES = {
-  CACHE_FIRST: 'cache-first',
-  NETWORK_FIRST: 'network-first',
-  NETWORK_ONLY: 'network-only',
-  CACHE_ONLY: 'cache-only',
-  STALE_WHILE_REVALIDATE: 'stale-while-revalidate',
+  CACHE_FIRST: "cache-first",
+  NETWORK_FIRST: "network-first",
+  NETWORK_ONLY: "network-only",
+  CACHE_ONLY: "cache-only",
+  STALE_WHILE_REVALIDATE: "stale-while-revalidate",
 };
 
 /**
  * Service Worker Installation with bulletproof error handling
  */
-self.addEventListener('install', (event) => {
+self.addEventListener("install", event => {
   // Medical Service Worker installing
 
   event.waitUntil(
@@ -103,7 +103,7 @@ self.addEventListener('install', (event) => {
 
         // Cache resources individually to prevent single failure from blocking entire installation
         const cacheResults = await Promise.allSettled(
-          CRITICAL_RESOURCES.map(async (resource) => {
+          CRITICAL_RESOURCES.map(async resource => {
             try {
               const response = await fetch(resource);
               if (response.ok) {
@@ -114,30 +114,31 @@ self.addEventListener('install', (event) => {
               console.warn(`Failed to cache critical resource ${resource}:`, fetchError.message);
               return null;
             }
-          }),
+          })
         );
 
-        const successfulCaches = cacheResults.filter((result) => result.status === 'fulfilled').length;
+        const successfulCaches = cacheResults.filter(
+          result => result.status === "fulfilled"
+        ).length;
         const failedCaches = CRITICAL_RESOURCES.length - successfulCaches;
 
         if (failedCaches > CRITICAL_RESOURCES.length / 2) {
-          throw new Error(`Too many critical resources failed to cache: ${failedCaches}/${CRITICAL_RESOURCES.length}`);
+          throw new Error(
+            `Too many critical resources failed to cache: ${failedCaches}/${CRITICAL_RESOURCES.length}`
+          );
         }
 
         // Initialize API and runtime caches
-        await Promise.allSettled([
-          caches.open(API_CACHE_NAME),
-          caches.open(RUNTIME_CACHE_NAME),
-        ]);
+        await Promise.allSettled([caches.open(API_CACHE_NAME), caches.open(RUNTIME_CACHE_NAME)]);
 
         // Medical Service Worker installed successfully
 
         // Send installation success message
         try {
           const clients = await self.clients.matchAll();
-          clients.forEach((client) => {
+          clients.forEach(client => {
             client.postMessage({
-              type: 'SW_INSTALLED',
+              type: "SW_INSTALLED",
               cacheVersion: CACHE_VERSION,
               criticalResourcesCount: CRITICAL_RESOURCES.length,
               successfulCaches,
@@ -146,7 +147,7 @@ self.addEventListener('install', (event) => {
             });
           });
         } catch (msgError) {
-          console.warn('Failed to send installation message:', msgError.message);
+          console.warn("Failed to send installation message:", msgError.message);
         }
 
         // Skip waiting to activate immediately
@@ -154,39 +155,39 @@ self.addEventListener('install', (event) => {
 
         return { success: true, successfulCaches, failedCaches };
       },
-      (error) => {
+      error => {
         // Fallback for installation failure
-        console.error('Service Worker installation failed:', error.message);
+        console.error("Service Worker installation failed:", error.message);
 
         try {
           const clients = self.clients.matchAll();
-          clients.then((clientList) => {
-            clientList.forEach((client) => {
+          clients.then(clientList => {
+            clientList.forEach(client => {
               client.postMessage({
-                type: 'SW_INSTALL_ERROR',
+                type: "SW_INSTALL_ERROR",
                 error: error.message,
                 timestamp: new Date().toISOString(),
               });
             });
           });
         } catch (msgError) {
-          console.error('Failed to send installation error message:', msgError.message);
+          console.error("Failed to send installation error message:", msgError.message);
         }
 
         return { success: false, error: error.message };
       },
       {
-        operation: 'service_worker_installation',
+        operation: "service_worker_installation",
         criticalResourcesCount: CRITICAL_RESOURCES.length,
-      },
-    ),
+      }
+    )
   );
 });
 
 /**
  * Service Worker Activation with bulletproof error handling
  */
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", event => {
   // Medical Service Worker activating
 
   event.waitUntil(
@@ -194,10 +195,12 @@ self.addEventListener('activate', (event) => {
       async () => {
         // Clean up old caches with individual error handling
         const cacheNames = await caches.keys();
-        const oldCaches = cacheNames.filter((name) => name.startsWith('medical-app-v') && !name.includes(CACHE_VERSION));
+        const oldCaches = cacheNames.filter(
+          name => name.startsWith("medical-app-v") && !name.includes(CACHE_VERSION)
+        );
 
         const cleanupResults = await Promise.allSettled(
-          oldCaches.map(async (cacheName) => {
+          oldCaches.map(async cacheName => {
             try {
               const deleted = await caches.delete(cacheName);
               return { cacheName, deleted };
@@ -205,34 +208,38 @@ self.addEventListener('activate', (event) => {
               console.warn(`Failed to delete cache ${cacheName}:`, error.message);
               return { cacheName, deleted: false, error: error.message };
             }
-          }),
+          })
         );
 
-        const successfulCleanups = cleanupResults.filter((result) => result.status === 'fulfilled' && result.value.deleted).length;
+        const successfulCleanups = cleanupResults.filter(
+          result => result.status === "fulfilled" && result.value.deleted
+        ).length;
 
         // Cleaned up old caches
 
         // Claim all clients with timeout
         await Promise.race([
           self.clients.claim(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Client claim timeout')), 5000)),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Client claim timeout")), 5000)
+          ),
         ]);
 
         // Medical Service Worker activated
 
         // Notify clients of activation
         const clients = await self.clients.matchAll();
-        const notificationPromises = clients.map((client) => {
+        const notificationPromises = clients.map(client => {
           try {
             return client.postMessage({
-              type: 'SW_ACTIVATED',
+              type: "SW_ACTIVATED",
               cacheVersion: CACHE_VERSION,
               cleanedCaches: successfulCleanups,
               totalOldCaches: oldCaches.length,
               timestamp: new Date().toISOString(),
             });
           } catch (error) {
-            console.warn('Failed to notify client of activation:', error.message);
+            console.warn("Failed to notify client of activation:", error.message);
             return null;
           }
         });
@@ -241,43 +248,43 @@ self.addEventListener('activate', (event) => {
 
         return { success: true, cleanedCaches: successfulCleanups };
       },
-      (error) => {
-        console.error('Service Worker activation failed:', error.message);
+      error => {
+        console.error("Service Worker activation failed:", error.message);
 
         // Try to notify clients of activation failure
         safeAsync(
           async () => {
             const clients = await self.clients.matchAll();
-            clients.forEach((client) => {
+            clients.forEach(client => {
               client.postMessage({
-                type: 'SW_ACTIVATION_ERROR',
+                type: "SW_ACTIVATION_ERROR",
                 error: error.message,
                 timestamp: new Date().toISOString(),
               });
             });
           },
           null,
-          { operation: 'activation_error_notification' },
+          { operation: "activation_error_notification" }
         );
 
         return { success: false, error: error.message };
       },
       {
-        operation: 'service_worker_activation',
-      },
-    ),
+        operation: "service_worker_activation",
+      }
+    )
   );
 });
 
 /**
  * Fetch Event Handler with Intelligent Caching
  */
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", event => {
   const { request } = event;
   const url = new URL(request.url);
 
   // Skip non-GET requests for caching
-  if (request.method !== 'GET') {
+  if (request.method !== "GET") {
     if (isAPIRequest(url)) {
       // Handle API POST requests with intelligent offline behavior
       event.respondWith(handleAPIRequest(request));
@@ -306,7 +313,7 @@ async function handleAPIRequest(request) {
       const url = new URL(request.url);
 
       // For POST requests (predictions), try network first with offline fallback
-      if (request.method === 'POST') {
+      if (request.method === "POST") {
         return await handlePredictionRequest(request);
       }
 
@@ -325,7 +332,7 @@ async function handleAPIRequest(request) {
             }
           },
           null,
-          { operation: 'background_cache_update', url: request.url },
+          { operation: "background_cache_update", url: request.url }
         );
 
         return cachedResponse;
@@ -346,7 +353,7 @@ async function handleAPIRequest(request) {
           try {
             await cache.put(request, networkResponse.clone());
           } catch (cacheError) {
-            console.warn('Failed to cache API response:', cacheError.message);
+            console.warn("Failed to cache API response:", cacheError.message);
           }
         }
 
@@ -356,15 +363,15 @@ async function handleAPIRequest(request) {
         throw fetchError;
       }
     },
-    (error) => {
-      console.warn('API request failed, returning offline fallback:', error.message);
+    error => {
+      console.warn("API request failed, returning offline fallback:", error.message);
       return createOfflineFallbackResponse(request);
     },
     {
-      operation: 'api_request_handling',
+      operation: "api_request_handling",
       url: request.url,
       method: request.method,
-    },
+    }
   );
 }
 
@@ -400,7 +407,7 @@ async function handlePredictionRequest(request) {
               await cache.put(cacheKey, responseWithMetadata);
             },
             null,
-            { operation: 'prediction_cache_storage', url: request.url },
+            { operation: "prediction_cache_storage", url: request.url }
           );
 
           return networkResponse;
@@ -412,26 +419,22 @@ async function handlePredictionRequest(request) {
         throw fetchError;
       }
     },
-    async (error) => {
-      console.warn('Network prediction failed, trying offline alternatives:', error.message);
+    async error => {
+      console.warn("Network prediction failed, trying offline alternatives:", error.message);
 
       // Try local LVO model if available
-      const localPrediction = await safeAsync(
-        () => tryLocalPrediction(request),
-        null,
-        { operation: 'local_prediction_attempt' },
-      );
+      const localPrediction = await safeAsync(() => tryLocalPrediction(request), null, {
+        operation: "local_prediction_attempt",
+      });
 
       if (localPrediction) {
         return localPrediction;
       }
 
       // Return cached similar prediction if available
-      const cachedPrediction = await safeAsync(
-        () => findSimilarCachedPrediction(request),
-        null,
-        { operation: 'cached_prediction_lookup' },
-      );
+      const cachedPrediction = await safeAsync(() => findSimilarCachedPrediction(request), null, {
+        operation: "cached_prediction_lookup",
+      });
 
       if (cachedPrediction) {
         return cachedPrediction;
@@ -441,9 +444,9 @@ async function handlePredictionRequest(request) {
       return createOfflinePredictionGuidance();
     },
     {
-      operation: 'prediction_request_handling',
+      operation: "prediction_request_handling",
       url: request.url,
-    },
+    }
   );
 }
 
@@ -463,55 +466,59 @@ async function tryLocalPrediction(request) {
       }
 
       // Validate required data
-      if (!data || typeof data !== 'object') {
-        throw new Error('Invalid request data format');
+      if (!data || typeof data !== "object") {
+        throw new Error("Invalid request data format");
       }
 
       // Check if we can use local LVO model
-      if (request.url.includes('predict_full_stroke')) {
+      if (request.url.includes("predict_full_stroke")) {
         // Validate required fields
         if (!data.gfap_value || !data.fast_ed_score) {
-          throw new Error('Missing required fields for local LVO prediction');
+          throw new Error("Missing required fields for local LVO prediction");
         }
 
         // Validate field ranges
         if (data.gfap_value < 0 || data.gfap_value > 10000) {
-          throw new Error('GFAP value out of valid range');
+          throw new Error("GFAP value out of valid range");
         }
 
         if (data.fast_ed_score < 0 || data.fast_ed_score > 10) {
-          throw new Error('FAST-ED score out of valid range');
+          throw new Error("FAST-ED score out of valid range");
         }
 
         // Calculate local prediction with error handling
         const localResult = calculateLocalLVO(data.gfap_value, data.fast_ed_score);
 
-        if (!localResult || typeof localResult !== 'object') {
-          throw new Error('Local LVO calculation failed');
+        if (!localResult || typeof localResult !== "object") {
+          throw new Error("Local LVO calculation failed");
         }
 
-        return new Response(JSON.stringify({
-          ...localResult,
-          source: 'local_model',
-          offline: true,
-          timestamp: new Date().toISOString(),
-          warning: 'This is an offline prediction using a simplified model. Seek professional medical advice.',
-        }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            ...localResult,
+            source: "local_model",
+            offline: true,
+            timestamp: new Date().toISOString(),
+            warning:
+              "This is an offline prediction using a simplified model. Seek professional medical advice.",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
 
       return null;
     },
-    (error) => {
-      console.warn('Local prediction failed:', error.message);
+    error => {
+      console.warn("Local prediction failed:", error.message);
       return null;
     },
     {
-      operation: 'local_prediction',
+      operation: "local_prediction",
       url: request.url,
-    },
+    }
   );
 }
 
@@ -521,16 +528,16 @@ async function tryLocalPrediction(request) {
 function calculateLocalLVO(gfap, fastEd) {
   try {
     // Input validation
-    if (typeof gfap !== 'number' || typeof fastEd !== 'number') {
-      throw new Error('GFAP and FAST-ED values must be numbers');
+    if (typeof gfap !== "number" || typeof fastEd !== "number") {
+      throw new Error("GFAP and FAST-ED values must be numbers");
     }
 
     if (!isFinite(gfap) || !isFinite(fastEd)) {
-      throw new Error('GFAP and FAST-ED values must be finite numbers');
+      throw new Error("GFAP and FAST-ED values must be finite numbers");
     }
 
     if (gfap < 0 || fastEd < 0) {
-      throw new Error('GFAP and FAST-ED values cannot be negative');
+      throw new Error("GFAP and FAST-ED values cannot be negative");
     }
 
     // Simplified logic - in practice, this would use the full model
@@ -541,51 +548,58 @@ function calculateLocalLVO(gfap, fastEd) {
     const ichProb = Math.max(0.05, Math.min(0.5, gfap / 2000)); // Very conservative ICH estimate
 
     // Validate calculated probabilities
-    if (!isFinite(lvoProb) || !isFinite(ichProb)
-        || lvoProb < 0 || lvoProb > 1 || ichProb < 0 || ichProb > 1) {
-      throw new Error('Calculated probabilities are invalid');
+    if (
+      !isFinite(lvoProb) ||
+      !isFinite(ichProb) ||
+      lvoProb < 0 ||
+      lvoProb > 1 ||
+      ichProb < 0 ||
+      ichProb > 1
+    ) {
+      throw new Error("Calculated probabilities are invalid");
     }
 
     return {
       lvo: {
         probability: Math.round(lvoProb * 100) / 100, // Round to 2 decimal places
         confidence: 0.6, // Lower confidence for offline model
-        module: 'Local Offline Model',
-        warning: 'Simplified offline calculation - not for clinical decisions',
+        module: "Local Offline Model",
+        warning: "Simplified offline calculation - not for clinical decisions",
       },
       ich: {
         probability: Math.round(ichProb * 100) / 100,
         confidence: 0.4, // Very low confidence for ICH estimation
-        module: 'Local Offline Model',
-        warning: 'Conservative estimate - seek immediate medical evaluation',
+        module: "Local Offline Model",
+        warning: "Conservative estimate - seek immediate medical evaluation",
       },
       metadata: {
         calculatedAt: new Date().toISOString(),
         inputs: { gfap, fastEd },
-        disclaimer: 'This is a simplified offline model for emergency use only. Clinical judgment and professional medical evaluation are essential.',
+        disclaimer:
+          "This is a simplified offline model for emergency use only. Clinical judgment and professional medical evaluation are essential.",
       },
     };
   } catch (error) {
-    console.error('Local LVO calculation failed:', error.message);
+    console.error("Local LVO calculation failed:", error.message);
 
     // Return safe fallback values
     return {
       lvo: {
         probability: 0.1,
         confidence: 0.1,
-        module: 'Emergency Fallback',
-        error: 'Calculation failed - using minimum risk estimate',
+        module: "Emergency Fallback",
+        error: "Calculation failed - using minimum risk estimate",
       },
       ich: {
         probability: 0.1,
         confidence: 0.1,
-        module: 'Emergency Fallback',
-        error: 'Calculation failed - using minimum risk estimate',
+        module: "Emergency Fallback",
+        error: "Calculation failed - using minimum risk estimate",
       },
       metadata: {
         calculatedAt: new Date().toISOString(),
         error: error.message,
-        disclaimer: 'Calculation failed. Immediate medical evaluation required.',
+        disclaimer: "Calculation failed. Immediate medical evaluation required.",
       },
     };
   }
@@ -612,9 +626,9 @@ async function handleStaticResource(request) {
     return networkResponse;
   } catch (error) {
     // For critical resources, return a service unavailable response
-    return new Response('Service temporarily unavailable', {
+    return new Response("Service temporarily unavailable", {
       status: 503,
-      statusText: 'Service Unavailable',
+      statusText: "Service Unavailable",
     });
   }
 }
@@ -634,12 +648,15 @@ async function handleAppShell(request) {
     return networkResponse;
   } catch (error) {
     const cache = await caches.open(STATIC_CACHE_NAME);
-    const cachedResponse = await cache.match('/0925/index.html');
+    const cachedResponse = await cache.match("/0925/index.html");
 
-    return cachedResponse || new Response('App temporarily unavailable', {
-      status: 503,
-      statusText: 'Service Unavailable',
-    });
+    return (
+      cachedResponse ||
+      new Response("App temporarily unavailable", {
+        status: 503,
+        statusText: "Service Unavailable",
+      })
+    );
   }
 }
 
@@ -667,29 +684,31 @@ async function handleRuntimeRequest(request) {
  * Utility functions
  */
 function isAPIRequest(url) {
-  return API_ENDPOINTS.some((endpoint) => url.href.startsWith(endpoint));
+  return API_ENDPOINTS.some(endpoint => url.href.startsWith(endpoint));
 }
 
 function isStaticResource(url) {
-  return url.pathname.includes('/src/')
-         || url.pathname.includes('/styles/')
-         || url.pathname.endsWith('.css')
-         || url.pathname.endsWith('.js')
-         || url.pathname.endsWith('.png')
-         || url.pathname.endsWith('.ico');
+  return (
+    url.pathname.includes("/src/") ||
+    url.pathname.includes("/styles/") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".ico")
+  );
 }
 
 function isAppShell(url) {
-  return url.pathname === '/0925/'
-         || url.pathname === '/0925/index.html'
-         || url.pathname.endsWith('/');
+  return (
+    url.pathname === "/0925/" || url.pathname === "/0925/index.html" || url.pathname.endsWith("/")
+  );
 }
 
 async function createPredictionCacheKey(request) {
   const body = await request.text();
-  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(body));
+  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(body));
   const hashArray = Array.from(new Uint8Array(hash));
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
   return `${request.url}#${hashHex}`;
 }
@@ -717,43 +736,51 @@ async function findSimilarCachedPrediction(request) {
 }
 
 function createOfflineFallbackResponse(request) {
-  return new Response(JSON.stringify({
-    error: 'Network unavailable',
-    offline: true,
-    guidance: 'Please check your network connection. For emergency situations, contact your local emergency services immediately.',
-    timestamp: new Date().toISOString(),
-  }), {
-    status: 503,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return new Response(
+    JSON.stringify({
+      error: "Network unavailable",
+      offline: true,
+      guidance:
+        "Please check your network connection. For emergency situations, contact your local emergency services immediately.",
+      timestamp: new Date().toISOString(),
+    }),
+    {
+      status: 503,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 }
 
 function createOfflinePredictionGuidance() {
-  return new Response(JSON.stringify({
-    offline: true,
-    guidance: {
-      message: 'Prediction services are currently unavailable. Please use clinical judgment and standard stroke protocols.',
-      recommendations: [
-        'Assess patient using standard NIHSS scoring',
-        'Consider time since symptom onset',
-        'Evaluate for contraindications to thrombolysis',
-        'Contact stroke team or neurologist if available',
-        'If in doubt, treat as potential stroke emergency',
-      ],
-    },
-    emergency: 'For immediate emergency response, contact your local emergency services',
-    timestamp: new Date().toISOString(),
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return new Response(
+    JSON.stringify({
+      offline: true,
+      guidance: {
+        message:
+          "Prediction services are currently unavailable. Please use clinical judgment and standard stroke protocols.",
+        recommendations: [
+          "Assess patient using standard NIHSS scoring",
+          "Consider time since symptom onset",
+          "Evaluate for contraindications to thrombolysis",
+          "Contact stroke team or neurologist if available",
+          "If in doubt, treat as potential stroke emergency",
+        ],
+      },
+      emergency: "For immediate emergency response, contact your local emergency services",
+      timestamp: new Date().toISOString(),
+    }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 }
 
 /**
  * Background Sync for Medical Data
  */
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'medical-data-sync') {
+self.addEventListener("sync", event => {
+  if (event.tag === "medical-data-sync") {
     event.waitUntil(syncMedicalData());
   }
 });
@@ -767,9 +794,9 @@ async function syncMedicalData() {
 
     // Notify clients of successful sync
     const clients = await self.clients.matchAll();
-    clients.forEach((client) => {
+    clients.forEach(client => {
       client.postMessage({
-        type: 'MEDICAL_DATA_SYNCED',
+        type: "MEDICAL_DATA_SYNCED",
         timestamp: new Date().toISOString(),
       });
     });
@@ -781,11 +808,11 @@ async function syncMedicalData() {
 /**
  * Push Notifications for Medical Alerts
  */
-self.addEventListener('push', (event) => {
+self.addEventListener("push", event => {
   if (event.data) {
     const data = event.data.json();
 
-    if (data.type === 'medical-alert') {
+    if (data.type === "medical-alert") {
       event.waitUntil(showMedicalNotification(data));
     }
   }
@@ -794,18 +821,18 @@ self.addEventListener('push', (event) => {
 async function showMedicalNotification(data) {
   const options = {
     body: data.message,
-    icon: '/0925/icon-192.png',
-    badge: '/0925/icon-192.png',
+    icon: "/0925/icon-192.png",
+    badge: "/0925/icon-192.png",
     vibrate: [200, 100, 200],
     requireInteraction: true,
     actions: [
       {
-        action: 'view',
-        title: 'View Details',
+        action: "view",
+        title: "View Details",
       },
       {
-        action: 'dismiss',
-        title: 'Dismiss',
+        action: "dismiss",
+        title: "Dismiss",
       },
     ],
   };
@@ -816,38 +843,36 @@ async function showMedicalNotification(data) {
 /**
  * Notification Click Handler
  */
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener("notificationclick", event => {
   event.notification.close();
 
-  if (event.action === 'view') {
-    event.waitUntil(
-      self.clients.openWindow('/0925/'),
-    );
+  if (event.action === "view") {
+    event.waitUntil(self.clients.openWindow("/0925/"));
   }
 });
 
 /**
  * Message Handler for Communication with Main Thread
  */
-self.addEventListener('message', (event) => {
+self.addEventListener("message", event => {
   const { type, data } = event.data;
 
   switch (type) {
-    case 'SKIP_WAITING':
-      self.skipWaiting();
-      break;
+  case "SKIP_WAITING":
+    self.skipWaiting();
+    break;
 
-    case 'GET_CACHE_STATUS':
-      event.ports[0].postMessage(getCacheStatus());
-      break;
+  case "GET_CACHE_STATUS":
+    event.ports[0].postMessage(getCacheStatus());
+    break;
 
-    case 'CLEAR_CACHE':
-      event.waitUntil(clearAllCaches());
-      break;
+  case "CLEAR_CACHE":
+    event.waitUntil(clearAllCaches());
+    break;
 
-    case 'PREFETCH_RESOURCES':
-      event.waitUntil(prefetchResources(data.resources));
-      break;
+  case "PREFETCH_RESOURCES":
+    event.waitUntil(prefetchResources(data.resources));
+    break;
   }
 });
 
@@ -870,9 +895,7 @@ async function getCacheStatus() {
 
 async function clearAllCaches() {
   const cacheNames = await caches.keys();
-  await Promise.all(
-    cacheNames.map((cacheName) => caches.delete(cacheName)),
-  );
+  await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
 
   // All caches cleared
 }

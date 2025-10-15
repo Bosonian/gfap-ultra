@@ -5,23 +5,23 @@
  * Provides modular architecture for medical application components
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from '../patterns/observer.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
 
-import { medicalContainer, MEDICAL_SERVICES } from './dependency-injection.js';
+import { medicalContainer, MEDICAL_SERVICES } from "./dependency-injection.js";
 
 /**
  * Module lifecycle states
  */
 export const ModuleState = {
-  UNREGISTERED: 'unregistered',
-  REGISTERED: 'registered',
-  INITIALIZING: 'initializing',
-  INITIALIZED: 'initialized',
-  STARTING: 'starting',
-  STARTED: 'started',
-  STOPPING: 'stopping',
-  STOPPED: 'stopped',
-  ERROR: 'error',
+  UNREGISTERED: "unregistered",
+  REGISTERED: "registered",
+  INITIALIZING: "initializing",
+  INITIALIZED: "initialized",
+  STARTING: "starting",
+  STARTED: "started",
+  STOPPING: "stopping",
+  STOPPED: "stopped",
+  ERROR: "error",
 };
 
 /**
@@ -69,7 +69,7 @@ export class MedicalModule {
       this.metadata.state = ModuleState.INITIALIZED;
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'module_initialized',
+        action: "module_initialized",
         module: this.metadata.name,
         version: this.metadata.version,
       });
@@ -97,7 +97,7 @@ export class MedicalModule {
       this.metadata.startedAt = new Date().toISOString();
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'module_started',
+        action: "module_started",
         module: this.metadata.name,
       });
     } catch (error) {
@@ -123,7 +123,7 @@ export class MedicalModule {
       this.metadata.state = ModuleState.STOPPED;
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'module_stopped',
+        action: "module_stopped",
         module: this.metadata.name,
       });
     } catch (error) {
@@ -158,7 +158,7 @@ export class MedicalModule {
 
     // Dispose services
     this.services.forEach((service) => {
-      if (service && typeof service.dispose === 'function') {
+      if (service && typeof service.dispose === "function") {
         try {
           service.dispose();
         } catch (error) {
@@ -173,7 +173,7 @@ export class MedicalModule {
     this.disposed = true;
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'module_disposed',
+      action: "module_disposed",
       module: this.metadata.name,
     });
   }
@@ -281,7 +281,7 @@ export class MedicalModuleRegistry {
    */
   registerModule(module) {
     if (!(module instanceof MedicalModule)) {
-      throw new Error('Module must extend MedicalModule');
+      throw new Error("Module must extend MedicalModule");
     }
 
     const { name } = module.metadata;
@@ -296,7 +296,7 @@ export class MedicalModuleRegistry {
     this.dependencyGraph.set(name, module.metadata.dependencies);
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'module_registered',
+      action: "module_registered",
       module: name,
       version: module.metadata.version,
     });

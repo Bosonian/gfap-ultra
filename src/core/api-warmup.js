@@ -3,22 +3,22 @@
  * Prevents cold start delays by warming up Cloud Functions on app initialization
  */
 
-import { medicalLogger } from '../utils/medical-logger.js';
+import { medicalLogger } from "../utils/medical-logger.js";
 
 // Cloud Function endpoints that need warming up
 const API_ENDPOINTS = {
-  authentication: 'https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access',
-  comaIch: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich',
-  limitedIch: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich',
-  fullStroke: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke',
-  lvo: 'https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo',
+  authentication: "https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access",
+  comaIch: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich",
+  limitedIch: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
+  fullStroke: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
+  lvo: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_lvo",
 };
 
 // Lightweight test payloads to warm up APIs
 const WARMUP_PAYLOADS = {
   authentication: {
-    action: 'validate_session',
-    session_token: 'warmup-test-token',
+    action: "validate_session",
+    session_token: "warmup-test-token",
   },
   comaIch: {
     gfap_value: 100,
@@ -66,7 +66,7 @@ class APIWarmupService {
    */
   async warmupAllAPIs(background = true) {
     if (this.isWarming) {
-      medicalLogger.info('API warmup already in progress', { category: 'WARMUP' });
+      medicalLogger.info("API warmup already in progress", { category: "WARMUP" });
       return this.warmupResults;
     }
 
@@ -75,8 +75,8 @@ class APIWarmupService {
     this.successfulWarmups = 0;
     this.warmupResults = {};
 
-    medicalLogger.info('Starting API warmup process', {
-      category: 'WARMUP',
+    medicalLogger.info("Starting API warmup process", {
+      category: "WARMUP",
       endpoints: Object.keys(API_ENDPOINTS).length,
     });
 
@@ -105,14 +105,14 @@ class APIWarmupService {
       Promise.all(warmupPromises).then(() => {
         this.completeWarmup();
       }).catch((error) => {
-        medicalLogger.error('Background API warmup failed', {
-          category: 'WARMUP',
+        medicalLogger.error("Background API warmup failed", {
+          category: "WARMUP",
           error: error.message,
         });
         this.isWarming = false;
       });
 
-      return { status: 'warming', message: 'APIs warming up in background' };
+      return { status: "warming", message: "APIs warming up in background" };
     }
     // Wait for all warmups to complete
     await Promise.all(warmupPromises);
@@ -132,13 +132,13 @@ class APIWarmupService {
     this.warmupAttempts++;
 
     try {
-      medicalLogger.info(`Warming up ${name} API`, { category: 'WARMUP', url });
+      medicalLogger.info(`Warming up ${name} API`, { category: "WARMUP", url });
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'iGFAP-Warmup/2.1.0',
+          "Content-Type": "application/json",
+          "User-Agent": "iGFAP-Warmup/2.1.0",
         },
         body: JSON.stringify(payload),
         signal: AbortSignal.timeout(10000), // 10 second timeout
@@ -157,7 +157,7 @@ class APIWarmupService {
       };
 
       medicalLogger.info(`Successfully warmed up ${name} API`, {
-        category: 'WARMUP',
+        category: "WARMUP",
         duration,
         status: response.status,
       });
@@ -167,15 +167,15 @@ class APIWarmupService {
       const duration = Date.now() - startTime;
 
       // Network errors are expected for CORS issues, but the function still gets warmed up
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      if (error.name === "TypeError" && error.message.includes("Failed to fetch")) {
         medicalLogger.info(`${name} API warmup encountered CORS (expected), function still warmed`, {
-          category: 'WARMUP',
+          category: "WARMUP",
           duration,
         });
 
         return {
           success: true, // Consider CORS as successful warmup
-          status: 'cors-blocked',
+          status: "cors-blocked",
           duration,
           message: `${name} API warmed (CORS blocked but function activated)`,
           timestamp: new Date().toISOString(),
@@ -183,7 +183,7 @@ class APIWarmupService {
       }
 
       medicalLogger.warn(`Failed to warm up ${name} API`, {
-        category: 'WARMUP',
+        category: "WARMUP",
         error: error.message,
         duration,
       });
@@ -210,14 +210,14 @@ class APIWarmupService {
       results: this.warmupResults,
     };
 
-    medicalLogger.info('API warmup process completed', {
-      category: 'WARMUP',
+    medicalLogger.info("API warmup process completed", {
+      category: "WARMUP",
       summary,
     });
 
     // Dispatch custom event for UI feedback
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('api-warmup-complete', {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("api-warmup-complete", {
         detail: summary,
       }));
     }
@@ -241,10 +241,10 @@ class APIWarmupService {
    * @returns {Promise<Object>} Results of critical API warmup
    */
   async warmupCriticalAPIs() {
-    const criticalAPIs = ['authentication', 'comaIch', 'limitedIch'];
+    const criticalAPIs = ["authentication", "comaIch", "limitedIch"];
 
-    medicalLogger.info('Starting critical API warmup', {
-      category: 'WARMUP',
+    medicalLogger.info("Starting critical API warmup", {
+      category: "WARMUP",
       apis: criticalAPIs,
     });
 
@@ -260,8 +260,8 @@ class APIWarmupService {
       }
     }
 
-    medicalLogger.info('Critical API warmup completed', {
-      category: 'WARMUP',
+    medicalLogger.info("Critical API warmup completed", {
+      category: "WARMUP",
       results,
     });
 
@@ -288,8 +288,8 @@ export async function initializeAPIWarmup(options = {}) {
     }
     return await apiWarmupService.warmupAllAPIs(background);
   } catch (error) {
-    medicalLogger.error('API warmup initialization failed', {
-      category: 'WARMUP',
+    medicalLogger.error("API warmup initialization failed", {
+      category: "WARMUP",
       error: error.message,
     });
     return { error: error.message };
@@ -324,7 +324,7 @@ export async function warmupSpecificAPIs(apiNames) {
 }
 
 // Auto-start warmup when module loads (background mode)
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // Only in browser environment
   setTimeout(() => {
     initializeAPIWarmup({ background: true, criticalOnly: false });

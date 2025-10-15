@@ -5,7 +5,7 @@
  * Creates validation rules based on medical field types and requirements
  */
 
-import { GFAP_RANGES } from '../config.js';
+import { GFAP_RANGES } from "../config.js";
 
 /**
  * Abstract base class for validation rules
@@ -33,7 +33,7 @@ class ValidationRule {
 
     // Check required field
     if (this.required && !value && value !== 0) {
-      errors.push('This field is required');
+      errors.push("This field is required");
     }
 
     // Run basic validators
@@ -71,11 +71,11 @@ class NumericValidationRule extends ValidationRule {
     super(name, required);
     this.min = min;
     this.max = max;
-    this.type = 'number';
+    this.type = "number";
 
     if (min !== null) {
       this.addValidator((value) => {
-        if (value !== '' && !isNaN(value) && parseFloat(value) < min) {
+        if (value !== "" && !isNaN(value) && parseFloat(value) < min) {
           return `Value must be at least ${min}`;
         }
         return null;
@@ -84,7 +84,7 @@ class NumericValidationRule extends ValidationRule {
 
     if (max !== null) {
       this.addValidator((value) => {
-        if (value !== '' && !isNaN(value) && parseFloat(value) > max) {
+        if (value !== "" && !isNaN(value) && parseFloat(value) > max) {
           return `Value must be at most ${max}`;
         }
         return null;
@@ -115,8 +115,8 @@ class BiomarkerValidationRule extends NumericValidationRule {
         return null;
       }
 
-      if (biomarkerType === 'GFAP' && numValue > ranges.critical) {
-        return 'Extremely high GFAP value - please verify lab result';
+      if (biomarkerType === "GFAP" && numValue > ranges.critical) {
+        return "Extremely high GFAP value - please verify lab result";
       }
 
       return null;
@@ -137,22 +137,22 @@ class VitalSignValidationRule extends NumericValidationRule {
       }
 
       switch (vitalType) {
-        case 'SYSTOLIC_BP':
-          if (formData?.diastolic_bp) {
-            const diastolic = parseFloat(formData.diastolic_bp);
-            if (!isNaN(diastolic) && numValue <= diastolic) {
-              return 'Systolic BP must be higher than diastolic BP';
-            }
+      case "SYSTOLIC_BP":
+        if (formData?.diastolic_bp) {
+          const diastolic = parseFloat(formData.diastolic_bp);
+          if (!isNaN(diastolic) && numValue <= diastolic) {
+            return "Systolic BP must be higher than diastolic BP";
           }
-          break;
-        case 'DIASTOLIC_BP':
-          if (formData?.systolic_bp) {
-            const systolic = parseFloat(formData.systolic_bp);
-            if (!isNaN(systolic) && numValue >= systolic) {
-              return 'Diastolic BP must be lower than systolic BP';
-            }
+        }
+        break;
+      case "DIASTOLIC_BP":
+        if (formData?.systolic_bp) {
+          const systolic = parseFloat(formData.systolic_bp);
+          if (!isNaN(systolic) && numValue >= systolic) {
+            return "Diastolic BP must be lower than systolic BP";
           }
-          break;
+        }
+        break;
       }
 
       return null;
@@ -171,7 +171,7 @@ class AgeValidationRule extends NumericValidationRule {
       }
 
       if (numValue < 18) {
-        return 'Emergency stroke assessment typically for adults (≥18 years)';
+        return "Emergency stroke assessment typically for adults (≥18 years)";
       }
 
       return null;
@@ -191,16 +191,16 @@ class ClinicalScaleValidationRule extends NumericValidationRule {
       }
 
       switch (scaleType) {
-        case 'GCS':
-          if (numValue < 8) {
-            return 'GCS < 8 indicates severe consciousness impairment - consider coma module';
-          }
-          break;
-        case 'FAST_ED':
-          if (numValue >= 4) {
-            return 'High FAST-ED score suggests LVO - consider urgent intervention';
-          }
-          break;
+      case "GCS":
+        if (numValue < 8) {
+          return "GCS < 8 indicates severe consciousness impairment - consider coma module";
+        }
+        break;
+      case "FAST_ED":
+        if (numValue >= 4) {
+          return "High FAST-ED score suggests LVO - consider urgent intervention";
+        }
+        break;
       }
 
       return null;
@@ -214,41 +214,41 @@ class ClinicalScaleValidationRule extends NumericValidationRule {
 export class MedicalValidationFactory {
   static createRule(type, name, options = {}) {
     switch (type) {
-      case 'AGE':
-        return new AgeValidationRule(name);
+    case "AGE":
+      return new AgeValidationRule(name);
 
-      case 'BIOMARKER':
-        if (options.biomarkerType === 'GFAP') {
-          return new BiomarkerValidationRule(name, 'GFAP', GFAP_RANGES);
-        }
-        throw new Error(`Unsupported biomarker type: ${options.biomarkerType}`);
+    case "BIOMARKER":
+      if (options.biomarkerType === "GFAP") {
+        return new BiomarkerValidationRule(name, "GFAP", GFAP_RANGES);
+      }
+      throw new Error(`Unsupported biomarker type: ${options.biomarkerType}`);
 
-      case 'VITAL_SIGN':
-        return new VitalSignValidationRule(
-          name,
-          options.vitalType,
-          options.min,
-          options.max,
-        );
+    case "VITAL_SIGN":
+      return new VitalSignValidationRule(
+        name,
+        options.vitalType,
+        options.min,
+        options.max,
+      );
 
-      case 'CLINICAL_SCALE':
-        return new ClinicalScaleValidationRule(
-          name,
-          options.scaleType,
-          options.min,
-          options.max,
-        );
+    case "CLINICAL_SCALE":
+      return new ClinicalScaleValidationRule(
+        name,
+        options.scaleType,
+        options.min,
+        options.max,
+      );
 
-      case 'NUMERIC':
-        return new NumericValidationRule(
-          name,
-          options.required,
-          options.min,
-          options.max,
-        );
+    case "NUMERIC":
+      return new NumericValidationRule(
+        name,
+        options.required,
+        options.min,
+        options.max,
+      );
 
-      default:
-        throw new Error(`Unsupported validation rule type: ${type}`);
+    default:
+      throw new Error(`Unsupported validation rule type: ${type}`);
     }
   }
 
@@ -261,48 +261,48 @@ export class MedicalValidationFactory {
     const rules = {};
 
     switch (moduleType) {
-      case 'LIMITED':
-        rules.age_years = this.createRule('AGE', 'age_years').toConfig();
-        rules.systolic_bp = this.createRule('VITAL_SIGN', 'systolic_bp', {
-          vitalType: 'SYSTOLIC_BP',
-          min: 60,
-          max: 300,
-        }).toConfig();
-        rules.diastolic_bp = this.createRule('VITAL_SIGN', 'diastolic_bp', {
-          vitalType: 'DIASTOLIC_BP',
-          min: 30,
-          max: 200,
-        }).toConfig();
-        rules.gfap_value = this.createRule('BIOMARKER', 'gfap_value', {
-          biomarkerType: 'GFAP',
-        }).toConfig();
-        break;
+    case "LIMITED":
+      rules.age_years = this.createRule("AGE", "age_years").toConfig();
+      rules.systolic_bp = this.createRule("VITAL_SIGN", "systolic_bp", {
+        vitalType: "SYSTOLIC_BP",
+        min: 60,
+        max: 300,
+      }).toConfig();
+      rules.diastolic_bp = this.createRule("VITAL_SIGN", "diastolic_bp", {
+        vitalType: "DIASTOLIC_BP",
+        min: 30,
+        max: 200,
+      }).toConfig();
+      rules.gfap_value = this.createRule("BIOMARKER", "gfap_value", {
+        biomarkerType: "GFAP",
+      }).toConfig();
+      break;
 
-      case 'FULL':
-        // Include all limited module rules
-        Object.assign(rules, this.createModuleValidation('LIMITED'));
+    case "FULL":
+      // Include all limited module rules
+      Object.assign(rules, this.createModuleValidation("LIMITED"));
 
-        // Add additional full module rules
-        rules.fast_ed_score = this.createRule('CLINICAL_SCALE', 'fast_ed_score', {
-          scaleType: 'FAST_ED',
-          min: 0,
-          max: 9,
-        }).toConfig();
-        break;
+      // Add additional full module rules
+      rules.fast_ed_score = this.createRule("CLINICAL_SCALE", "fast_ed_score", {
+        scaleType: "FAST_ED",
+        min: 0,
+        max: 9,
+      }).toConfig();
+      break;
 
-      case 'COMA':
-        rules.gfap_value = this.createRule('BIOMARKER', 'gfap_value', {
-          biomarkerType: 'GFAP',
-        }).toConfig();
-        rules.gcs = this.createRule('CLINICAL_SCALE', 'gcs', {
-          scaleType: 'GCS',
-          min: 3,
-          max: 15,
-        }).toConfig();
-        break;
+    case "COMA":
+      rules.gfap_value = this.createRule("BIOMARKER", "gfap_value", {
+        biomarkerType: "GFAP",
+      }).toConfig();
+      rules.gcs = this.createRule("CLINICAL_SCALE", "gcs", {
+        scaleType: "GCS",
+        min: 3,
+        max: 15,
+      }).toConfig();
+      break;
 
-      default:
-        throw new Error(`Unsupported module type: ${moduleType}`);
+    default:
+      throw new Error(`Unsupported module type: ${moduleType}`);
     }
 
     return rules;
@@ -335,23 +335,23 @@ export class MedicalValidationFactory {
 
 // Export validation rule types for external use
 export const VALIDATION_RULE_TYPES = {
-  AGE: 'AGE',
-  BIOMARKER: 'BIOMARKER',
-  VITAL_SIGN: 'VITAL_SIGN',
-  CLINICAL_SCALE: 'CLINICAL_SCALE',
-  NUMERIC: 'NUMERIC',
+  AGE: "AGE",
+  BIOMARKER: "BIOMARKER",
+  VITAL_SIGN: "VITAL_SIGN",
+  CLINICAL_SCALE: "CLINICAL_SCALE",
+  NUMERIC: "NUMERIC",
 };
 
 export const BIOMARKER_TYPES = {
-  GFAP: 'GFAP',
+  GFAP: "GFAP",
 };
 
 export const VITAL_SIGN_TYPES = {
-  SYSTOLIC_BP: 'SYSTOLIC_BP',
-  DIASTOLIC_BP: 'DIASTOLIC_BP',
+  SYSTOLIC_BP: "SYSTOLIC_BP",
+  DIASTOLIC_BP: "DIASTOLIC_BP",
 };
 
 export const CLINICAL_SCALE_TYPES = {
-  GCS: 'GCS',
-  FAST_ED: 'FAST_ED',
+  GCS: "GCS",
+  FAST_ED: "FAST_ED",
 };
