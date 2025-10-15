@@ -8,12 +8,12 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
+import "./index.css";
 import { createApp } from "./core/app-controller.js";
 import { store } from "./state/store.js";
 import { render } from "./ui/render.js";
 import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from "./utils/error-handler.js";
 import { initializeAPIWarmup } from "./core/api-warmup.js";
-import "./index.css";
 
 /**
  * Application instance
