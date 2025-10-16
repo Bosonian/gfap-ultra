@@ -203,23 +203,23 @@ export class MedicalServiceWorkerManager {
       const { type, data } = event.data;
 
       switch (type) {
-      case "SW_INSTALLED":
-        this.handleServiceWorkerInstalled(data);
-        break;
+        case "SW_INSTALLED":
+          this.handleServiceWorkerInstalled(data);
+          break;
 
-      case "SW_ACTIVATED":
-        this.handleServiceWorkerActivated(data);
-        break;
+        case "SW_ACTIVATED":
+          this.handleServiceWorkerActivated(data);
+          break;
 
-      case "SW_INSTALL_ERROR":
-        this.handleServiceWorkerError(data);
-        break;
+        case "SW_INSTALL_ERROR":
+          this.handleServiceWorkerError(data);
+          break;
 
-      case "MEDICAL_DATA_SYNCED":
-        this.handleMedicalDataSynced(data);
-        break;
+        case "MEDICAL_DATA_SYNCED":
+          this.handleMedicalDataSynced(data);
+          break;
 
-      default:
+        default:
         // ('Unknown service worker message:', type, data);
       }
     });
@@ -709,54 +709,48 @@ export class OfflineInstallPrompt {
    * Show PWA install banner
    */
   showInstallBanner() {
-    if (!this.isInstallable) {
-      return;
-    }
+    if (!this.isInstallable) return;
 
+    // Banner container
     const banner = document.createElement("div");
     banner.id = "install-banner";
-    banner.className = "install-banner";
+    banner.className =
+      "fixed bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 z-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-3 animate-fadeIn";
 
-    // Create banner content manually to avoid HTML sanitization issues
-    const bannerContent = document.createElement("div");
-    bannerContent.className = "banner-content";
-
+    // Text content
     const bannerText = document.createElement("div");
-    bannerText.className = "banner-text";
+    bannerText.className = "flex-1 text-center md:text-left";
+    bannerText.innerHTML = `
+    <strong class="block text-lg font-semibold mb-1">Install Stroke Triage Assistant</strong>
+    <p class="text-sm text-gray-600 dark:text-gray-400">
+      Get offline access and faster performance.
+    </p>
+  `;
 
-    const title = document.createElement("strong");
-    title.textContent = "Install Stroke Triage Assistant";
-
-    const description = document.createElement("p");
-    description.textContent = "Get offline access and faster performance";
-
-    bannerText.appendChild(title);
-    bannerText.appendChild(description);
-
+    // Actions (buttons)
     const bannerActions = document.createElement("div");
-    bannerActions.className = "banner-actions";
+    bannerActions.className = "flex items-center gap-2 justify-center md:justify-end";
 
+    // Install button
     const installButton = document.createElement("button");
-    installButton.className = "install-button";
+    installButton.className =
+      "bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg shadow transition-colors";
     installButton.textContent = "Install";
-    installButton.addEventListener("click", () => {
-      this.promptInstall();
-    });
+    installButton.addEventListener("click", () => this.promptInstall());
 
+    // Dismiss button
     const dismissButton = document.createElement("button");
-    dismissButton.className = "dismiss-button";
+    dismissButton.className =
+      "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl leading-none font-bold";
     dismissButton.textContent = "×";
-    dismissButton.addEventListener("click", () => {
-      this.hideInstallBanner();
-    });
+    dismissButton.addEventListener("click", () => this.hideInstallBanner());
 
+    // Append
     bannerActions.appendChild(installButton);
     bannerActions.appendChild(dismissButton);
 
-    bannerContent.appendChild(bannerText);
-    bannerContent.appendChild(bannerActions);
-    banner.appendChild(bannerContent);
-
+    banner.appendChild(bannerText);
+    banner.appendChild(bannerActions);
     document.body.appendChild(banner);
   }
 
