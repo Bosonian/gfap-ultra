@@ -64,12 +64,14 @@ export class AuthenticationManager {
             "Password is required",
             "EMPTY_PASSWORD",
             ERROR_CATEGORIES.VALIDATION,
-            ERROR_SEVERITY.MEDIUM,
+            ERROR_SEVERITY.MEDIUM
           );
         }
 
         // Local preview (localhost, vite preview): authenticate locally to avoid CORS
-        const isLocalPreview = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+        const isLocalPreview =
+          ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) &&
+          !(import.meta && import.meta.env && import.meta.env.DEV);
         if (isLocalPreview || DEV_CONFIG.isDevelopment) {
           medicalLogger.info("Development mode authentication path", {
             category: LOG_CATEGORIES.AUTHENTICATION,
@@ -86,7 +88,7 @@ export class AuthenticationManager {
             };
           }
 
-          await new Promise((resolve) => setTimeout(resolve, 300)); // small UX delay
+          await new Promise(resolve => setTimeout(resolve, 300)); // small UX delay
 
           this.isAuthenticated = true;
           this.sessionToken = DEV_CONFIG.mockAuthResponse.session_token;
@@ -108,7 +110,9 @@ export class AuthenticationManager {
         }
 
         // This branch is now unreachable due to isLocalPreview handling above; keep as guard
-        const isLocalHost = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
+        const isLocalHost = ["localhost", "127.0.0.1", "0.0.0.0"].includes(
+          window.location.hostname
+        );
         const preferMock = localStorage.getItem("use_mock_api") !== "false";
         if (isLocalHost && preferMock && !(import.meta && import.meta.env && import.meta.env.DEV)) {
           if (password.trim() !== getResearchPassword()) {
@@ -121,7 +125,7 @@ export class AuthenticationManager {
           }
 
           // Simulate minimal delay for UX
-          await new Promise((resolve) => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, 200));
 
           this.isAuthenticated = true;
           this.sessionToken = `local-preview-token-${Date.now()}`;
@@ -171,7 +175,7 @@ export class AuthenticationManager {
             errorMessage,
             errorCode,
             ERROR_CATEGORIES.AUTHENTICATION,
-            response.status >= 500 ? ERROR_SEVERITY.HIGH : ERROR_SEVERITY.MEDIUM,
+            response.status >= 500 ? ERROR_SEVERITY.HIGH : ERROR_SEVERITY.MEDIUM
           ).withContext({ statusCode: response.status, url: API_URLS.AUTHENTICATE });
         }
 
@@ -182,7 +186,7 @@ export class AuthenticationManager {
             "Invalid response from authentication service",
             "INVALID_RESPONSE",
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.HIGH,
+            ERROR_SEVERITY.HIGH
           );
         }
 
@@ -213,7 +217,7 @@ export class AuthenticationManager {
           data.message || "Invalid credentials",
           "INVALID_CREDENTIALS",
           ERROR_CATEGORIES.AUTHENTICATION,
-          ERROR_SEVERITY.MEDIUM,
+          ERROR_SEVERITY.MEDIUM
         ).withContext({
           remainingAttempts: data.rate_limit_remaining,
           statusCode: response.status,
@@ -221,9 +225,12 @@ export class AuthenticationManager {
       },
       {
         timeout: 15000,
-        fallback: (error) => ({
+        fallback: error => ({
           success: false,
-          message: error instanceof MedicalError ? error.getUserMessage() : "Authentication service unavailable. Please try again.",
+          message:
+            error instanceof MedicalError
+              ? error.getUserMessage()
+              : "Authentication service unavailable. Please try again.",
           errorCode: error.code || "NETWORK_ERROR",
           details: error.message,
           remainingAttempts: error.context?.remainingAttempts,
@@ -232,7 +239,7 @@ export class AuthenticationManager {
           operation: "user_authentication",
           endpoint: "authenticate",
         },
-      },
+      }
     );
   }
 
@@ -266,7 +273,9 @@ export class AuthenticationManager {
     return safeAuthOperation(
       async () => {
         // Skip remote validation on local preview to avoid CORS noise
-        const isLocalPreview = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) && !(import.meta && import.meta.env && import.meta.env.DEV);
+        const isLocalPreview =
+          ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname) &&
+          !(import.meta && import.meta.env && import.meta.env.DEV);
         if (isLocalPreview) {
           this.updateActivity();
           return true;
@@ -294,7 +303,7 @@ export class AuthenticationManager {
             "Session validation service error",
             "VALIDATION_ERROR",
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.MEDIUM,
+            ERROR_SEVERITY.MEDIUM
           ).withContext({ statusCode: response.status });
         }
 
@@ -305,7 +314,7 @@ export class AuthenticationManager {
             "Invalid response from session validation service",
             "INVALID_RESPONSE",
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.MEDIUM,
+            ERROR_SEVERITY.MEDIUM
           );
         }
 
@@ -318,7 +327,7 @@ export class AuthenticationManager {
       },
       {
         timeout: 10000,
-        fallback: (error) => {
+        fallback: error => {
           // On network errors, allow local session to continue
           // This prevents logout during temporary network issues
           console.warn("Session validation failed, continuing with local session:", error.message);
@@ -328,7 +337,7 @@ export class AuthenticationManager {
           operation: "session_validation",
           endpoint: "validate_session",
         },
-      },
+      }
     );
   }
 
@@ -390,7 +399,7 @@ export class AuthenticationManager {
             "Invalid input for password hashing",
             "INVALID_INPUT",
             ERROR_CATEGORIES.VALIDATION,
-            ERROR_SEVERITY.MEDIUM,
+            ERROR_SEVERITY.MEDIUM
           );
         }
 
@@ -399,7 +408,7 @@ export class AuthenticationManager {
             "Crypto API not available",
             "CRYPTO_UNAVAILABLE",
             ERROR_CATEGORIES.SECURITY,
-            ERROR_SEVERITY.HIGH,
+            ERROR_SEVERITY.HIGH
           );
         }
 
@@ -407,7 +416,7 @@ export class AuthenticationManager {
         const data = encoder.encode(input);
         const hashBuffer = await crypto.subtle.digest("SHA-256", data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
         return hashHex;
       },
       {
@@ -419,7 +428,7 @@ export class AuthenticationManager {
           let hash = 0;
           for (let i = 0; i < input.length; i++) {
             const char = input.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
+            hash = (hash << 5) - hash + char;
             hash &= hash; // Convert to 32-bit integer
           }
           return Math.abs(hash).toString(16);
@@ -428,7 +437,7 @@ export class AuthenticationManager {
           operation: "password_hashing",
           inputLength: input ? input.length : 0,
         },
-      },
+      }
     );
   }
 
@@ -443,7 +452,7 @@ export class AuthenticationManager {
             "Cannot store session: not authenticated",
             "NOT_AUTHENTICATED",
             ERROR_CATEGORIES.AUTHENTICATION,
-            ERROR_SEVERITY.LOW,
+            ERROR_SEVERITY.LOW
           );
         }
 
@@ -452,7 +461,7 @@ export class AuthenticationManager {
             "Session storage not available",
             "STORAGE_UNAVAILABLE",
             ERROR_CATEGORIES.STORAGE,
-            ERROR_SEVERITY.MEDIUM,
+            ERROR_SEVERITY.MEDIUM
           );
         }
 
@@ -470,7 +479,7 @@ export class AuthenticationManager {
         category: ERROR_CATEGORIES.STORAGE,
         severity: ERROR_SEVERITY.LOW,
         timeout: 1000,
-        fallback: (error) => {
+        fallback: error => {
           console.warn("Failed to store session:", error.message);
           return false;
         },
@@ -479,7 +488,7 @@ export class AuthenticationManager {
           hasToken: !!this.sessionToken,
           hasExpiry: !!this.sessionExpiry,
         },
-      },
+      }
     );
   }
 
@@ -503,7 +512,7 @@ export class AuthenticationManager {
               "Session storage not available",
               "STORAGE_UNAVAILABLE",
               ERROR_CATEGORIES.STORAGE,
-              ERROR_SEVERITY.LOW,
+              ERROR_SEVERITY.LOW
             );
           }
 
@@ -530,7 +539,7 @@ export class AuthenticationManager {
                 "Invalid session timestamp",
                 "INVALID_SESSION_DATA",
                 ERROR_CATEGORIES.STORAGE,
-                ERROR_SEVERITY.MEDIUM,
+                ERROR_SEVERITY.MEDIUM
               );
             }
 
@@ -547,7 +556,7 @@ export class AuthenticationManager {
           category: ERROR_CATEGORIES.STORAGE,
           severity: ERROR_SEVERITY.LOW,
           timeout: 1000,
-          fallback: (error) => {
+          fallback: error => {
             console.warn("Failed to check stored session:", error.message);
             this.logout();
             return false;
@@ -555,7 +564,7 @@ export class AuthenticationManager {
           context: {
             operation: "check_stored_session",
           },
-        },
+        }
       );
     } catch (error) {
       this.logout();
@@ -576,7 +585,7 @@ export class AuthenticationManager {
       }
     };
 
-    events.forEach((event) => {
+    events.forEach(event => {
       document.addEventListener(event, updateActivity, { passive: true });
     });
   }
@@ -586,9 +595,10 @@ export class AuthenticationManager {
    */
   async delayFailedAttempt() {
     return safeAsync(
-      async () => new Promise((resolve) => {
-        setTimeout(resolve, 1000); // 1 second delay
-      }),
+      async () =>
+        new Promise(resolve => {
+          setTimeout(resolve, 1000); // 1 second delay
+        }),
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
         severity: ERROR_SEVERITY.LOW,
@@ -599,7 +609,7 @@ export class AuthenticationManager {
         context: {
           operation: "auth_delay",
         },
-      },
+      }
     );
   }
 

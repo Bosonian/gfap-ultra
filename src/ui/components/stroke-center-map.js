@@ -150,18 +150,139 @@ function requestUserLocation(results, resultsContainer) {
   );
 }
 
+// async function geocodeLocation(locationString, results, resultsContainer) {
+//   // ✅ Local cache to avoid repeated network calls
+//   if (!window.__geocodeCache) window.__geocodeCache = new Map();
+//   const cache = window.__geocodeCache;
+
+//   // 🧹 Early input validation
+//   if (!locationString || !locationString.trim()) {
+//     showLocationError("Please enter a location or coordinates.", resultsContainer);
+//     return;
+//   }
+
+//   // 🕓 Show loading message
+//   try {
+//     safeSetInnerHTML(resultsContainer, `<div class="loading">${t("searchingLocation")}...</div>`);
+//   } catch (error) {
+//     resultsContainer.textContent = "Searching location...";
+//     console.error("Sanitization failed:", error);
+//   }
+
+//   // 🧭 Check if input is coordinates (lat, lng)
+//   const coordPattern = /^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/;
+//   const coordMatch = locationString.trim().match(coordPattern);
+
+//   if (coordMatch) {
+//     const lat = parseFloat(coordMatch[1]);
+//     const lng = parseFloat(coordMatch[2]);
+
+//     // ✅ Expanded range for Germany (with buffer)
+//     if (lat >= 46.5 && lat <= 55.1 && lng >= 5.5 && lng <= 15.5) {
+//       try {
+//         safeSetInnerHTML(
+//           resultsContainer,
+//           `
+//           <div class="location-success">
+//             <p>📍 Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+//           </div>
+//         `
+//         );
+//       } catch (error) {
+//         resultsContainer.textContent = `Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+//         console.error("Sanitization failed:", error);
+//       }
+
+//       setTimeout(() => showNearestCenters(lat, lng, results, resultsContainer), 500);
+//       return;
+//     }
+
+//     showLocationError(
+//       "Coordinates appear to be outside Germany. Please check the values.",
+//       resultsContainer
+//     );
+//     return;
+//   }
+
+//   // 🧹 Clean up input
+//   let searchLocation = locationString.trim();
+
+//   // Add ", Deutschland" if not included
+//   if (
+//     !/deutschland|germany|bayern|bavaria|baden|württemberg|nordrhein|westfalen/i.test(
+//       searchLocation
+//     )
+//   ) {
+//     searchLocation += ", Deutschland";
+//   }
+
+//   // 🧠 Cached result check
+//   if (cache.has(searchLocation)) {
+//     const cached = cache.get(searchLocation);
+//     displayLocationSuccess(cached, results, resultsContainer);
+//     return;
+//   }
+
+//   // 💤 Optional debounce to prevent API spam
+//   await new Promise(r => setTimeout(r, 300));
+
+//   // 🌍 Build Nominatim request
+//   const encodedLocation = encodeURIComponent(searchLocation);
+//   const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&countrycodes=de&format=json&limit=3&addressdetails=1`;
+
+//   try {
+//     const response = await fetch(url, {
+//       method: "GET",
+//       headers: {
+//         Accept: "application/json",
+//         "User-Agent": "iGFAP-StrokeTriage/2.1.0 (contact: support@yourdomain.de)",
+//       },
+//     });
+
+//     if (!response.ok) throw new Error(`Geocoding API error: ${response.status}`);
+
+//     const data = await response.json();
+
+//     if (data && data.length > 0) {
+//       const supportedStates = ["Bayern", "Baden-Württemberg", "Nordrhein-Westfalen"];
+//       let location =
+//         data.find(r => r.address && supportedStates.includes(r.address.state)) || data[0];
+
+//       const lat = parseFloat(location.lat);
+//       const lng = parseFloat(location.lon);
+//       const locationName = location.display_name || locationString;
+
+//       // ✅ Cache result
+//       cache.set(searchLocation, { lat, lng, locationName });
+
+//       displayLocationSuccess({ lat, lng, locationName }, results, resultsContainer);
+//     } else {
+//       showLocationError(
+//         `
+//         <strong>Location "${locationString}" not found.</strong><br>
+//         <small>Try:</small>
+//         <ul style="text-align: left; font-size: 0.9em; margin: 10px 0;">
+//           <li>City name: "München", "Köln", "Stuttgart"</li>
+//           <li>Address: "Marienplatz 1, München"</li>
+//           <li>Coordinates: "48.1351, 11.5820"</li>
+//         </ul>
+//       `,
+//         resultsContainer
+//       );
+//     }
+//   } catch (error) {
+//     console.error("Geocoding failed:", error);
+//     showLocationError(
+//       `
+//       <strong>Unable to search location.</strong><br>
+//       <small>Please try entering coordinates directly (e.g., "48.1351, 11.5820")</small>
+//     `,
+//       resultsContainer
+//     );
+//   }
+// }
+
 async function geocodeLocation(locationString, results, resultsContainer) {
-  // ✅ Local cache to avoid repeated network calls
-  if (!window.__geocodeCache) window.__geocodeCache = new Map();
-  const cache = window.__geocodeCache;
-
-  // 🧹 Early input validation
-  if (!locationString || !locationString.trim()) {
-    showLocationError("Please enter a location or coordinates.", resultsContainer);
-    return;
-  }
-
-  // 🕓 Show loading message
   try {
     safeSetInnerHTML(resultsContainer, `<div class="loading">${t("searchingLocation")}...</div>`);
   } catch (error) {
@@ -169,16 +290,17 @@ async function geocodeLocation(locationString, results, resultsContainer) {
     console.error("Sanitization failed:", error);
   }
 
-  // 🧭 Check if input is coordinates (lat, lng)
+  // Check if user entered coordinates (format: lat, lng or lat,lng)
   const coordPattern = /^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/;
   const coordMatch = locationString.trim().match(coordPattern);
 
   if (coordMatch) {
+    // Direct coordinate input
     const lat = parseFloat(coordMatch[1]);
     const lng = parseFloat(coordMatch[2]);
 
-    // ✅ Expanded range for Germany (with buffer)
-    if (lat >= 46.5 && lat <= 55.1 && lng >= 5.5 && lng <= 15.5) {
+    // Validate coordinates are within supported German states (Bayern, BW, NRW)
+    if (lat >= 47.2 && lat <= 52.5 && lng >= 5.9 && lng <= 15.0) {
       try {
         safeSetInnerHTML(
           resultsContainer,
@@ -192,11 +314,11 @@ async function geocodeLocation(locationString, results, resultsContainer) {
         resultsContainer.textContent = `Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         console.error("Sanitization failed:", error);
       }
-
-      setTimeout(() => showNearestCenters(lat, lng, results, resultsContainer), 500);
+      setTimeout(() => {
+        showNearestCenters(lat, lng, results, resultsContainer);
+      }, 500);
       return;
     }
-
     showLocationError(
       "Coordinates appear to be outside Germany. Please check the values.",
       resultsContainer
@@ -204,58 +326,77 @@ async function geocodeLocation(locationString, results, resultsContainer) {
     return;
   }
 
-  // 🧹 Clean up input
-  let searchLocation = locationString.trim();
-
-  // Add ", Deutschland" if not included
-  if (
-    !/deutschland|germany|bayern|bavaria|baden|württemberg|nordrhein|westfalen/i.test(
-      searchLocation
-    )
-  ) {
-    searchLocation += ", Deutschland";
-  }
-
-  // 🧠 Cached result check
-  if (cache.has(searchLocation)) {
-    const cached = cache.get(searchLocation);
-    displayLocationSuccess(cached, results, resultsContainer);
-    return;
-  }
-
-  // 💤 Optional debounce to prevent API spam
-  await new Promise(r => setTimeout(r, 300));
-
-  // 🌍 Build Nominatim request
-  const encodedLocation = encodeURIComponent(searchLocation);
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&countrycodes=de&format=json&limit=3&addressdetails=1`;
-
   try {
+    // Clean up the location string
+    let searchLocation = locationString.trim();
+
+    // If it doesn't already include country info, add it
+    if (
+      !searchLocation.toLowerCase().includes("deutschland") &&
+      !searchLocation.toLowerCase().includes("germany") &&
+      !searchLocation.toLowerCase().includes("bayern") &&
+      !searchLocation.toLowerCase().includes("bavaria") &&
+      !searchLocation.toLowerCase().includes("nordrhein") &&
+      !searchLocation.toLowerCase().includes("baden")
+    ) {
+      searchLocation += ", Deutschland";
+    }
+
+    // Use Nominatim (OpenStreetMap) geocoding service - free and reliable
+    // Note: encodeURIComponent properly handles umlauts (ä, ö, ü, ß)
+    const encodedLocation = encodeURIComponent(searchLocation);
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&countrycodes=de&format=json&limit=3&addressdetails=1`;
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
         Accept: "application/json",
-        "User-Agent": "iGFAP-StrokeTriage/2.1.0 (contact: support@yourdomain.de)",
+        "User-Agent": "iGFAP-StrokeTriage/2.1.0", // Required by Nominatim
       },
     });
 
-    if (!response.ok) throw new Error(`Geocoding API error: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Geocoding API error: ${response.status}`);
+    }
 
     const data = await response.json();
 
     if (data && data.length > 0) {
+      // Prefer results from supported states (Bayern, Baden-Württemberg, NRW)
+      let location = data[0];
       const supportedStates = ["Bayern", "Baden-Württemberg", "Nordrhein-Westfalen"];
-      let location =
-        data.find(r => r.address && supportedStates.includes(r.address.state)) || data[0];
+
+      for (const result of data) {
+        if (result.address && supportedStates.includes(result.address.state)) {
+          location = result;
+          break;
+        }
+      }
 
       const lat = parseFloat(location.lat);
       const lng = parseFloat(location.lon);
       const locationName = location.display_name || locationString;
 
-      // ✅ Cache result
-      cache.set(searchLocation, { lat, lng, locationName });
+      // Show success message and then proceed with location
+      try {
+        safeSetInnerHTML(
+          resultsContainer,
+          `
+          <div class="location-success">
+            <p>📍 Found: ${locationName}</p>
+            <small style="color: #666;">Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}</small>
+          </div>
+        `
+        );
+      } catch (error) {
+        resultsContainer.textContent = `Found: ${locationName} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        console.error("Sanitization failed:", error);
+      }
 
-      displayLocationSuccess({ lat, lng, locationName }, results, resultsContainer);
+      // Wait a moment to show the found location, then show centers
+      setTimeout(() => {
+        showNearestCenters(lat, lng, results, resultsContainer);
+      }, 1000);
     } else {
       showLocationError(
         `
@@ -271,7 +412,7 @@ async function geocodeLocation(locationString, results, resultsContainer) {
       );
     }
   } catch (error) {
-    console.error("Geocoding failed:", error);
+    // ('Geocoding failed:', error);
     showLocationError(
       `
       <strong>Unable to search location.</strong><br>

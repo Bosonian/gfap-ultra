@@ -91,7 +91,6 @@ export function initializeLoginScreen() {
 
     try {
       const authResult = await authManager.authenticate(password);
-      console.log(authResult);
       if (authResult.success) {
         store.logEvent("auth_success", {
           timestamp: new Date().toISOString(),

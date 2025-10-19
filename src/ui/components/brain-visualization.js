@@ -320,11 +320,24 @@ export function renderCircularBrainDisplay(volume) {
   const canvasId = `volume-canvas-${Math.random().toString(36).substr(2, 9)}`;
 
   return `
-    <div class="volume-circle text-center" data-volume="${volume}">
-      <div class="volume-number">${formattedVolume}</div>
-      <canvas id="${canvasId}" class="volume-canvas" 
-              data-volume="${volume}" data-canvas-id="${canvasId}"></canvas>
-    </div>
+  <div
+  class="volume-circle relative inline-block w-[120px] h-[120px] text-center"
+  data-volume="${volume}"
+>
+  <canvas
+    id="${canvasId}"
+    class="volume-canvas absolute top-0 left-0"
+    data-volume="${volume}"
+    data-canvas-id="${canvasId}"
+  ></canvas>
+
+  <div
+    class="volume-number absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[22px] font-bold text-black dark:text-white z-[1]"
+  >
+    ${formattedVolume}
+  </div>
+</div>
+
   `;
 }
 

@@ -104,21 +104,21 @@ class EnvironmentConfig {
     // Type conversion and validation
     try {
       switch (type) {
-      case "number":
-        return value !== null ? Number(value) : defaultValue;
-      case "boolean":
-        if (typeof value === "boolean") {
-          return value;
-        }
-        return value === "true" || value === "1" || value === "yes";
-      case "array":
-        if (Array.isArray(value)) {
-          return value;
-        }
-        return typeof value === "string" ? value.split(",").map((s) => s.trim()) : defaultValue;
-      case "string":
-      default:
-        return value !== null ? String(value) : defaultValue;
+        case "number":
+          return value !== null ? Number(value) : defaultValue;
+        case "boolean":
+          if (typeof value === "boolean") {
+            return value;
+          }
+          return value === "true" || value === "1" || value === "yes";
+        case "array":
+          if (Array.isArray(value)) {
+            return value;
+          }
+          return typeof value === "string" ? value.split(",").map(s => s.trim()) : defaultValue;
+        case "string":
+        default:
+          return value !== null ? String(value) : defaultValue;
       }
     } catch (error) {
       console.warn(`Failed to convert environment variable ${key} to ${type}:`, error.message);
@@ -157,8 +157,11 @@ class EnvironmentConfig {
    * @returns {boolean} True if in development
    */
   isDevelopment() {
-    return this.get("NODE_ENV") === "development"
-           || typeof window !== "undefined" && ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
+    return (
+      this.get("NODE_ENV") === "development" ||
+      (typeof window !== "undefined" &&
+        ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname))
+    );
   }
 
   /**
@@ -217,7 +220,7 @@ class EnvironmentConfig {
       if (typeof crypto !== "undefined" && crypto.getRandomValues) {
         const array = new Uint8Array(32);
         crypto.getRandomValues(array);
-        return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("");
+        return Array.from(array, byte => byte.toString(16).padStart(2, "0")).join("");
       }
     } catch (error) {
       console.warn("Failed to generate cryptographically secure key, using fallback");
@@ -284,15 +287,24 @@ class EnvironmentConfig {
    */
   getSafeConfig() {
     const safeKeys = [
-      "NODE_ENV", "DEBUG_MODE", "MOCK_API_ENABLED", "LOG_LEVEL",
-      "SESSION_TIMEOUT_HOURS", "BCRYPT_SALT_ROUNDS", "ENCRYPTION_KEY_LENGTH",
-      "MAX_AUTH_ATTEMPTS", "RATE_LIMIT_WINDOW_MS",
-      "ENABLE_DATA_ENCRYPTION", "ENABLE_AUDIT_TRAIL", "DATA_RETENTION_DAYS",
-      "GCP_PROJECT_ID", "GCP_REGION",
+      "NODE_ENV",
+      "DEBUG_MODE",
+      "MOCK_API_ENABLED",
+      "LOG_LEVEL",
+      "SESSION_TIMEOUT_HOURS",
+      "BCRYPT_SALT_ROUNDS",
+      "ENCRYPTION_KEY_LENGTH",
+      "MAX_AUTH_ATTEMPTS",
+      "RATE_LIMIT_WINDOW_MS",
+      "ENABLE_DATA_ENCRYPTION",
+      "ENABLE_AUDIT_TRAIL",
+      "DATA_RETENTION_DAYS",
+      "GCP_PROJECT_ID",
+      "GCP_REGION",
     ];
 
     const safeConfig = {};
-    safeKeys.forEach((key) => {
+    safeKeys.forEach(key => {
       safeConfig[key] = this.config[key];
     });
 
@@ -306,7 +318,7 @@ const environmentConfig = new EnvironmentConfig();
 // Export convenience functions
 export const getEnv = (key, defaultValue, type) => environmentConfig.get(key, defaultValue, type);
 export const getResearchPassword = () => environmentConfig.getResearchPassword();
-export const getApiKey = (service) => environmentConfig.getApiKey(service);
+export const getApiKey = service => environmentConfig.getApiKey(service);
 export const isDevelopment = () => environmentConfig.isDevelopment();
 export const isProduction = () => environmentConfig.isProduction();
 export const getSessionConfig = () => environmentConfig.getSessionConfig();
