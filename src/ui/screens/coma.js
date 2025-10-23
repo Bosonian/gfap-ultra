@@ -21,7 +21,7 @@ export function renderComa() {
              <form data-module="coma" class="flex flex-col space-y-4">
                 <div class="flex flex-col space-y-2">
                   <label for="gfap_value" class="text-gray-700 dark:text-gray-200 font-semibold flex items-center space-x-2">
-                    <span>${t("gfapValueLabel")}</span>
+                    <span data-i18n-key="gfapValueLabel"></span>
                     <span class="relative group cursor-pointer text-gray-400 dark:text-gray-300">
                       ℹ️
                       <span class="absolute left-1/2 transform -translate-x-1/2 -top-8 w-56 p-2 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -41,8 +41,9 @@ export function renderComa() {
                     class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
                   <div id="gfap-help" class="text-gray-500 dark:text-gray-400 text-sm">
-                    ${t("gfapRange").replace("{min}", GFAP_RANGES.min).replace("{max}", GFAP_RANGES.max)}
+                    ${t("gfapRange").replace("{min}", GFAP_RANGES.min).replace("{max}", GFAP_RANGES.max)}   <span data-i18n-key="pgml" class="text-gray-500 dark:text-gray-400 text-sm"></span>
                   </div>
+                 
                 </div>
        
               <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">

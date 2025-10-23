@@ -22,6 +22,7 @@ import {
 import { calculateLegacyICH } from "../../research/legacy-ich-model.js";
 import { safeLogResearchData, isResearchModeEnabled } from "../../research/data-logger.js";
 import { renderModelComparison, renderResearchToggle } from "../../research/comparison-ui.js";
+import { escapeHTML } from "../../security/html-sanitizer.js";
 
 function renderInputSummary() {
   const { formData } = store.getState() || {};
@@ -750,7 +751,7 @@ function renderCompactDriver(driver, type) {
         ${formatDriverName(driver.label)}
       </div>
       <div class="compact-driver-value text-sm font-semibold ${textColor}">
-        ${percentage}%
+        ${escapeHTML(percentage)}%
       </div>
     </div>
   `;
@@ -891,8 +892,8 @@ function renderStrokeDifferentialDiagnoses(probability) {
 
         <!-- Diagnosis List -->
         <ul class="diagnosis-list list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 ml-2">
-          <li>${t("unclearTimeWindow")}</li>
-          <li>${t("rareDiagnoses")}</li>
+          <li><span data-i18n-key="unclearTimeWindow"></span></li>
+          <li><span data-i18n-key="rareDiagnoses"></span></li>
         </ul>
       </div>
     </div>

@@ -85,7 +85,7 @@ export const messages = {
     diastolicBpHelp: "Normal: 60-90 mmHg",
     gfapTooltip: "Brain injury biomarker",
     gfapTooltipLong: "Glial Fibrillary Acidic Protein - Brain injury biomarker",
-    gfapRange: "Range: {min} - {max} pg/mL",
+    gfapRange: "Range: {min} - {max}",
     fastEdTooltip: "0-9 scale for LVO screening",
 
     // Module buttons
@@ -332,6 +332,7 @@ export const messages = {
     dataProtection: "Data Protection",
     gdprComplaint: "GDPR compliant - local processing only",
     clinicalOversight: "Clinical Oversight",
+    pgml: "pg/mL",
   },
 
   de: {
@@ -416,7 +417,7 @@ export const messages = {
     diastolicBpHelp: "Normal: 60-90 mmHg",
     gfapTooltip: "Hirnverletzungs-Biomarker",
     gfapTooltipLong: "Glial Fibrillary Acidic Protein - Hirnverletzungs-Biomarker",
-    gfapRange: "Bereich: {min} - {max} pg/mL",
+    gfapRange: "Bereich: {min} - {max}",
     fastEdTooltip: "0-9 Skala für LVO-Screening",
 
     // Module buttons
@@ -665,5 +666,6 @@ export const messages = {
     dataProtection: "Daten- und Datenschutz",
     gdprComplaint: "DSGVO-konform - nur lokale Verarbeitung",
     clinicalOversight: "Klinische Aufsicht",
+    pgml: "pg/mL",
   },
 };

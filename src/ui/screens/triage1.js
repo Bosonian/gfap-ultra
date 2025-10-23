@@ -12,7 +12,7 @@ export default function renderTriage1() {
       <!-- Card -->
       <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
         <!-- Title -->
-        <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 text-center">
+        <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 text-center" data-decode="true">
           ${t("triage1Title")}
         </h2>
 
@@ -21,9 +21,9 @@ export default function renderTriage1() {
           <p class="text-lg text-gray-800 dark:text-gray-200 font-medium mb-2 text-center">
             ${t("triage1Question")}
           </p>
-          <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
-            ${t("triage1Help")}
-          </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 text-center">
+              <span data-i18n-key="triage1Help"></span>
+            </p>
         </div>
 
         <!-- Buttons -->

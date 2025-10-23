@@ -99,7 +99,6 @@ export function formatDriverName(fieldName) {
     .replace(/_/g, " ") // Replace underscores with spaces
     .replace(/\b\w/g, l => l.toUpperCase()) // Title case
     .trim();
-
   return formatted;
 }
 
@@ -124,6 +123,25 @@ export function formatSummaryLabel(fieldName) {
  * @param {string} fieldName - Field name for context
  * @returns {string} - Formatted display value
  */
+
+/**
+ * Safely formats units for HTML output.
+ * Prevents sanitizers from misinterpreting characters like "/" or "<".
+ * Automatically adds a non-breaking space (&nbsp;) between the value and the unit.
+ */
+export function safeUnit(value, unit) {
+  if (value === null || value === undefined || value === "") return "";
+
+  // Encode problematic characters in the unit for HTML
+  const encodedUnit = unit
+    .replace(/\//g, "&#47;") // encode "/"
+    .replace(/</g, "&lt;") // extra safety
+    .replace(/>/g, "&gt;"); // extra safety
+
+  // Return HTML-safe string with non-breaking space
+  return `${value}&nbsp;${encodedUnit}`;
+}
+
 export function formatDisplayValue(value, fieldName = "") {
   if (value === null || value === undefined || value === "") {
     return "";
@@ -134,21 +152,20 @@ export function formatDisplayValue(value, fieldName = "") {
   }
 
   if (typeof value === "number") {
-    // Add units based on field type
     if (fieldName.includes("bp") || fieldName.includes("blood_pressure")) {
-      return `${value} mmHg`;
+      return safeUnit(value, "mmHg");
     }
     if (fieldName.includes("gfap")) {
-      return `${value} pg/mL`;
+      return safeUnit(value, "pg/mL");
     }
     if (fieldName.includes("age")) {
-      return `${value} years`;
+      return safeUnit(value, "years");
     }
     if (fieldName.includes("score")) {
       return value.toString();
     }
 
-    // Default number formatting
+    // Default numeric formatting
     return Number.isInteger(value) ? value.toString() : value.toFixed(1);
   }
 

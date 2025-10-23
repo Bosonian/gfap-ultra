@@ -26,7 +26,7 @@ export function renderLimited() {
               <input type="number" name="age_years" id="age_years"
                      class="mt-1 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors duration-300"
                      min="0" max="120" required aria-describedby="age-help">
-              <div id="age-help" class="text-xs text-gray-500 dark:text-slate-400 mt-1">${t("ageYearsHelp")}</div>
+              <div id="age-help" class="text-xs text-gray-500 dark:text-slate-400 mt-1"><span data-i18n-key="ageYearsHelp"></span></div>
             </div>
 
             <!-- Systolic BP -->
@@ -56,7 +56,7 @@ export function renderLimited() {
             <!-- GFAP Value -->
             <div class="flex flex-col">
               <label for="gfap_value" class="text-sm font-medium text-gray-700 dark:text-slate-200 flex items-center gap-2">
-                ${t("gfapValueLabel")}
+                <span data-i18n-key="gfapValueLabel"></span>
                 <span class="tooltip relative group cursor-pointer">
                   ℹ️
                   <span class="tooltiptext absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-800 dark:bg-slate-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity w-48 text-center z-10">
@@ -68,7 +68,7 @@ export function renderLimited() {
                 <input type="number" name="gfap_value" id="gfap_value"
                        class="mt-1 w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors duration-300"
                        min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" step="0.1" required inputmode="decimal">
-                <span class="absolute right-3 top-2.5 text-gray-400 dark:text-slate-400 text-sm">pg/mL</span>
+                 <span class="absolute right-3 top-2.5 text-gray-400 dark:text-slate-400 text-sm" data-i18n-key="pgml"></span>
               </div>
             </div>
           </div>

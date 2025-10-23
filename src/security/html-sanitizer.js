@@ -8,6 +8,8 @@
  * @contact Deepak Bos <bosdeepak@gmail.com>
  */
 
+import { t } from "../localization/i18n";
+
 /**
  * Allowed HTML tags for medical content
  */
@@ -300,7 +302,20 @@ function sanitizeStyleAttribute(styleValue) {
  * @param {string} text - Text content
  * @returns {string} - Escaped text
  */
-function escapeTextContent(text) {
+
+/**
+ * Escapes unsafe HTML characters in strings to prevent XSS or broken rendering.
+ */
+export function escapeHTML(str = "") {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+export function escapeTextContent(text) {
   if (!text) {
     return "";
   }
@@ -338,6 +353,15 @@ function escapeAttributeValue(value) {
  * @param {string} html - HTML content to set
  * @param {Object} options - Sanitization options
  */
+
+export function populateI18nPlaceholders(root) {
+  root.querySelectorAll("[data-i18n-key]").forEach(el => {
+    const key = el.dataset.i18nKey;
+    // Use textContent to avoid HTML parsing and keep it safe
+    el.textContent = t(key);
+  });
+}
+
 export function safeSetInnerHTML(element, html, options = {}) {
   if (!element || typeof html !== "string") {
     return;
