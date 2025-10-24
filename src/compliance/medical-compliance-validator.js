@@ -142,7 +142,7 @@ export class MedicalComplianceValidator {
         `Unknown compliance standard: ${standard}`,
         standard,
         "unknown_standard",
-        ViolationSeverity.CRITICAL
+        ViolationSeverity.CRITICAL,
       );
     }
 
@@ -172,7 +172,7 @@ export class MedicalComplianceValidator {
     ]);
 
     // Aggregate results
-    ruleResults.forEach(result => {
+    ruleResults.forEach((result) => {
       if (result.violations.length > 0) {
         validationResult.status = ComplianceStatus.NON_COMPLIANT;
         validationResult.violations.push(...result.violations);
@@ -196,14 +196,22 @@ export class MedicalComplianceValidator {
 
     // HIPAA minimum necessary validation
     if (this.config.enabledStandards.includes(ComplianceStandard.HIPAA)) {
-      const hipaaResult = await this.validateHIPAAMinimumNecessary(patientData, operation, user);
+      const hipaaResult = await this.validateHIPAAMinimumNecessary(
+        patientData,
+        operation,
+        user,
+      );
       violations.push(...hipaaResult.violations);
       warnings.push(...hipaaResult.warnings);
     }
 
     // GDPR data minimization validation
     if (this.config.enabledStandards.includes(ComplianceStandard.GDPR)) {
-      const gdprResult = await this.validateGDPRDataMinimization(patientData, operation, user);
+      const gdprResult = await this.validateGDPRDataMinimization(
+        patientData,
+        operation,
+        user,
+      );
       violations.push(...gdprResult.violations);
       warnings.push(...gdprResult.warnings);
     }
@@ -235,10 +243,7 @@ export class MedicalComplianceValidator {
 
     // FDA 21CFR11 electronic signature validation
     if (this.config.enabledStandards.includes(ComplianceStandard.FDA_21CFR11)) {
-      if (
-        !decision.electronicSignature ||
-        !this.validateElectronicSignature(decision.electronicSignature)
-      ) {
+      if (!decision.electronicSignature || !this.validateElectronicSignature(decision.electronicSignature)) {
         violations.push({
           standard: ComplianceStandard.FDA_21CFR11,
           type: "missing_electronic_signature",
@@ -320,8 +325,7 @@ export class MedicalComplianceValidator {
     const config = this.environmentConfig.getMedicalConfig();
 
     // Validate retention period compliance
-    if (config.dataRetentionDays < 2555) {
-      // 7 years minimum for medical data
+    if (config.dataRetentionDays < 2555) { // 7 years minimum for medical data
       violations.push({
         type: "insufficient_retention_period",
         message: `Data retention period (${config.dataRetentionDays} days) below medical requirement (2555 days)`,
@@ -378,7 +382,7 @@ export class MedicalComplianceValidator {
       }
 
       const criticalViolations = validation.violations.filter(
-        v => v.severity === ViolationSeverity.CRITICAL
+        (v) => v.severity === ViolationSeverity.CRITICAL,
       );
 
       report.summary.totalViolations += validation.violations.length;
@@ -473,7 +477,7 @@ export class MedicalComplianceValidator {
     const accessedData = Object.keys(patientData);
 
     // Check for excessive data access
-    const excessiveAccess = accessedData.filter(field => !allowedData.includes(field));
+    const excessiveAccess = accessedData.filter((field) => !allowedData.includes(field));
     if (excessiveAccess.length > 0) {
       violations.push({
         standard: ComplianceStandard.HIPAA,
@@ -532,12 +536,12 @@ export class MedicalComplianceValidator {
 
   validateElectronicSignature(signature) {
     return (
-      signature &&
-      signature.userId &&
-      signature.timestamp &&
-      signature.hash &&
-      signature.biometricData &&
-      this.verifySignatureIntegrity(signature)
+      signature
+      && signature.userId
+      && signature.timestamp
+      && signature.hash
+      && signature.biometricData
+      && this.verifySignatureIntegrity(signature)
     );
   }
 
@@ -575,8 +579,7 @@ export class MedicalComplianceValidator {
     const securityConfig = this.environmentConfig.getSecurityConfig();
 
     // Validate session timeout
-    if (securityConfig.sessionTimeout > 3600000) {
-      // 1 hour
+    if (securityConfig.sessionTimeout > 3600000) { // 1 hour
       warnings.push({
         type: "long_session_timeout",
         message: "Session timeout exceeds recommended 1 hour for medical applications",
@@ -628,24 +631,24 @@ export class MedicalComplianceValidator {
   calculateSecurityScore(violations, warnings) {
     let score = 100;
 
-    violations.forEach(violation => {
+    violations.forEach((violation) => {
       switch (violation.severity) {
-        case ViolationSeverity.CRITICAL:
-          score -= 25;
-          break;
-        case ViolationSeverity.HIGH:
-          score -= 15;
-          break;
-        case ViolationSeverity.MEDIUM:
-          score -= 10;
-          break;
-        case ViolationSeverity.LOW:
-          score -= 5;
-          break;
+      case ViolationSeverity.CRITICAL:
+        score -= 25;
+        break;
+      case ViolationSeverity.HIGH:
+        score -= 15;
+        break;
+      case ViolationSeverity.MEDIUM:
+        score -= 10;
+        break;
+      case ViolationSeverity.LOW:
+        score -= 5;
+        break;
       }
     });
 
-    warnings.forEach(warning => {
+    warnings.forEach((warning) => {
       score -= 2;
     });
 
@@ -655,29 +658,29 @@ export class MedicalComplianceValidator {
   generateRecommendations(violations, warnings) {
     const recommendations = [];
 
-    violations.forEach(violation => {
+    violations.forEach((violation) => {
       switch (violation.type) {
-        case "excessive_data_access":
-          recommendations.push({
-            priority: "high",
-            action: "Implement role-based data access controls",
-            description: "Restrict data access to minimum necessary for each user role",
-          });
-          break;
-        case "missing_electronic_signature":
-          recommendations.push({
-            priority: "high",
-            action: "Implement electronic signature system",
-            description: "Deploy FDA 21CFR11 compliant electronic signature capability",
-          });
-          break;
-        case "weak_encryption_key":
-          recommendations.push({
-            priority: "critical",
-            action: "Upgrade encryption key strength",
-            description: "Use minimum 256-bit encryption keys for medical data",
-          });
-          break;
+      case "excessive_data_access":
+        recommendations.push({
+          priority: "high",
+          action: "Implement role-based data access controls",
+          description: "Restrict data access to minimum necessary for each user role",
+        });
+        break;
+      case "missing_electronic_signature":
+        recommendations.push({
+          priority: "high",
+          action: "Implement electronic signature system",
+          description: "Deploy FDA 21CFR11 compliant electronic signature capability",
+        });
+        break;
+      case "weak_encryption_key":
+        recommendations.push({
+          priority: "critical",
+          action: "Upgrade encryption key strength",
+          description: "Use minimum 256-bit encryption keys for medical data",
+        });
+        break;
       }
     });
 

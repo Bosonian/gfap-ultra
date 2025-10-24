@@ -186,6 +186,7 @@ export const messages = {
     denialNeglectPartial: "Partial neglect (1)",
     denialNeglectComplete: "Complete neglect (2)",
     totalScoreTitle: "Total FAST-ED Score",
+    riskLevel: "Risk Level",
     riskLevelLow: "LOW (Score <4)",
     riskLevelHigh: "HIGH (Score ≥4 - Consider LVO)",
     applyScore: "Apply Score",
@@ -194,6 +195,7 @@ export const messages = {
     // Results Screen Enhancements
     riskAnalysis: "Risk Analysis",
     riskAnalysisSubtitle: "Clinical factors in this assessment",
+    contributingFactors: "Contributing factors",
     factorsShown: "shown",
     positiveFactors: "Positive factors",
     negativeFactors: "Negative factors",
@@ -516,6 +518,7 @@ export const messages = {
     denialNeglectPartial: "Partieller Neglect (1)",
     denialNeglectComplete: "Kompletter Neglect (2)",
     totalScoreTitle: "Gesamt-FAST-ED-Score",
+    riskLevel: "Risikostufe",
     riskLevelLow: "NIEDRIG (Score <4)",
     riskLevelHigh: "HOCH (Score ≥4 - LVO erwägen)",
     applyScore: "Score Anwenden",
@@ -524,6 +527,7 @@ export const messages = {
     // Results Screen Enhancements
     riskAnalysis: "Risikoanalyse",
     riskAnalysisSubtitle: "Klinische Faktoren in dieser Bewertung",
+    contributingFactors: "Beitragende Faktoren",
     factorsShown: "angezeigt",
     positiveFactors: "Positive Faktoren",
     negativeFactors: "Negative Faktoren",

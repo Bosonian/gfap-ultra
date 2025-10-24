@@ -3,12 +3,10 @@
  * Provides compact and detailed views of hemorrhage volume and mortality
  */
 
-import {
-  calculateICHVolume,
-  formatVolumeDisplay,
-  VOLUME_THRESHOLDS,
-} from "../../logic/ich-volume-calculator.js";
+import { calculateICHVolume, formatVolumeDisplay, VOLUME_THRESHOLDS } from "../../logic/ich-volume-calculator.js";
+import { t } from "../../localization/i18n.js";
 import { safeSetInnerHTML } from "../../security/html-sanitizer.js";
+
 import { renderBrainVisualization, renderCompactBrainIcon } from "./brain-visualization.js";
 
 /**
@@ -61,16 +59,12 @@ export function renderCompactVolumeDisplay(gfapValue) {
           </div>
         </div>
       </div>
-      ${
-        riskLevel === "critical"
-          ? `
+      ${riskLevel === "critical" ? `
         <div class="volume-warning">
           <span class="warning-icon">⚠️</span>
           <span class="warning-text">Volume ≥30ml threshold</span>
         </div>
-      `
-          : ""
-      }
+      ` : ""}
     </div>
   `;
 }
@@ -107,9 +101,7 @@ export function renderDetailedVolumeCard(gfapValue, expanded = false) {
         <span class="expand-icon">${expanded ? "▲" : "▼"}</span>
       </div>
       
-      ${
-        expanded
-          ? `
+      ${expanded ? `
         <div class="volume-content">
           <!-- Large brain visualization -->
           <div class="brain-container">
@@ -155,23 +147,17 @@ export function renderDetailedVolumeCard(gfapValue, expanded = false) {
               </small>
             </div>
             
-            ${
-              volumeResult.threshold === "SURGICAL"
-                ? `
+            ${volumeResult.threshold === "SURGICAL" ? `
               <div class="threshold-alert critical">
                 <span class="alert-icon">🔴</span>
                 <span class="alert-text">Volume exceeds 30ml surgical threshold</span>
               </div>
-            `
-                : volumeResult.threshold === "HIGH_RISK"
-                  ? `
+            ` : volumeResult.threshold === "HIGH_RISK" ? `
               <div class="threshold-alert warning">
                 <span class="alert-icon">🟡</span>
                 <span class="alert-text">Approaching critical volume threshold</span>
               </div>
-            `
-                  : ""
-            }
+            ` : ""}
             
             <div class="research-citation">
               <small class="citation-text">
@@ -180,8 +166,7 @@ export function renderDetailedVolumeCard(gfapValue, expanded = false) {
             </div>
           </div>
         </div>
-      `
-          : `
+      ` : `
         <div class="volume-summary">
           <div class="summary-metric">
             ${renderCompactBrainIcon(volumeResult.volume, 28)}
@@ -191,8 +176,7 @@ export function renderDetailedVolumeCard(gfapValue, expanded = false) {
             </span>
           </div>
         </div>
-      `
-      }
+      `}
     </div>
   `;
 }
@@ -252,7 +236,7 @@ window.toggleVolumeDetails = function () {
     }
 
     // Re-render content with new state
-    const gfapValue = parseFloat(document.querySelector('[name="gfap_value"]')?.value || 0);
+    const gfapValue = parseFloat(document.querySelector("[name=\"gfap_value\"]")?.value || 0);
     if (gfapValue > 0) {
       try {
         const newContent = renderDetailedVolumeCard(gfapValue, !isExpanded);
@@ -278,7 +262,7 @@ window.toggleVolumeDetails = function () {
 export function updateVolumeDisplays(newGfapValue) {
   // Update compact displays
   const compactDisplays = document.querySelectorAll(".compact-volume-display");
-  compactDisplays.forEach(display => {
+  compactDisplays.forEach((display) => {
     try {
       const newContent = renderCompactVolumeDisplay(newGfapValue);
       const tempElement = document.createElement("div");
@@ -294,7 +278,7 @@ export function updateVolumeDisplays(newGfapValue) {
 
   // Update volume indicators
   const indicators = document.querySelectorAll(".volume-indicator");
-  indicators.forEach(indicator => {
+  indicators.forEach((indicator) => {
     const newContent = renderVolumeIndicator(newGfapValue);
     if (newContent) {
       try {
@@ -314,7 +298,7 @@ export function updateVolumeDisplays(newGfapValue) {
 
   // Update detailed cards if expanded
   const detailCards = document.querySelectorAll(".volume-detail-card.expanded");
-  detailCards.forEach(card => {
+  detailCards.forEach((card) => {
     try {
       const newContent = renderDetailedVolumeCard(newGfapValue, true);
       const tempElement = document.createElement("div");

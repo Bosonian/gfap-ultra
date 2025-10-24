@@ -78,18 +78,18 @@ export class MedicalError extends Error {
    */
   getUserMessage() {
     switch (this.category) {
-      case ERROR_CATEGORIES.NETWORK:
-        return "Network connection issue. Please check your internet connection and try again.";
-      case ERROR_CATEGORIES.VALIDATION:
-        return "Please check your input data and try again.";
-      case ERROR_CATEGORIES.AUTHENTICATION:
-        return "Authentication failed. Please log in again.";
-      case ERROR_CATEGORIES.CALCULATION:
-        return "Unable to complete calculation. Please verify your input data.";
-      case ERROR_CATEGORIES.MEDICAL:
-        return "Medical calculation could not be completed. Please verify all clinical data.";
-      default:
-        return "An unexpected error occurred. Please try again.";
+    case ERROR_CATEGORIES.NETWORK:
+      return "Network connection issue. Please check your internet connection and try again.";
+    case ERROR_CATEGORIES.VALIDATION:
+      return "Please check your input data and try again.";
+    case ERROR_CATEGORIES.AUTHENTICATION:
+      return "Authentication failed. Please log in again.";
+    case ERROR_CATEGORIES.CALCULATION:
+      return "Unable to complete calculation. Please verify your input data.";
+    case ERROR_CATEGORIES.MEDICAL:
+      return "Medical calculation could not be completed. Please verify all clinical data.";
+    default:
+      return "An unexpected error occurred. Please try again.";
     }
   }
 }

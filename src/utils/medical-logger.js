@@ -625,7 +625,7 @@ export class MedicalLogger {
       log.timestamp,
       log.level,
       log.category,
-      `"${log.message.replace(/"/g, '""')}"`,
+      `"${log.message.replace(/"/g, "\"\"")}"`,
       log.sessionId,
     ]);
 

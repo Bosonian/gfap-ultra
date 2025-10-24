@@ -138,7 +138,7 @@ export function validatePatientData(data) {
   }
 
   if (!["male", "female", "other"].includes(data.gender)) {
-    errors.push('Gender must be "male", "female", or "other"');
+    errors.push("Gender must be \"male\", \"female\", or \"other\"");
   }
 
   if (typeof data.gfap !== "number" || data.gfap < 29 || data.gfap > 10001) {
@@ -146,10 +146,7 @@ export function validatePatientData(data) {
   }
 
   // Optional fields validation
-  if (
-    data.nihss !== undefined &&
-    (typeof data.nihss !== "number" || data.nihss < 0 || data.nihss > 42)
-  ) {
+  if (data.nihss !== undefined && (typeof data.nihss !== "number" || data.nihss < 0 || data.nihss > 42)) {
     errors.push("NIHSS must be a number between 0 and 42");
   }
 
@@ -191,7 +188,7 @@ export function validateICHRiskResult(result) {
   }
 
   if (!["low", "moderate", "high", "critical"].includes(result.riskLevel)) {
-    errors.push('Risk level must be "low", "moderate", "high", or "critical"');
+    errors.push("Risk level must be \"low\", \"moderate\", \"high\", or \"critical\"");
   }
 
   if (!result.timestamp || !Date.parse(result.timestamp)) {
@@ -244,8 +241,8 @@ export const MEDICAL_CONSTANTS = {
   /** @type {Object.<string, number>} Risk thresholds */
   RISK_THRESHOLDS: {
     LOW: 0.25,
-    MODERATE: 0.5,
-    HIGH: 0.7,
+    MODERATE: 0.50,
+    HIGH: 0.70,
     CRITICAL: 0.85,
   },
 
@@ -274,31 +271,31 @@ export class TypeChecker {
     let actualType = typeof value;
 
     switch (expectedType) {
-      case "PatientData":
-        isValid = isPatientData(value);
-        actualType = "Invalid PatientData";
-        break;
-      case "ICHRiskResult":
-        isValid = isICHRiskResult(value);
-        actualType = "Invalid ICHRiskResult";
-        break;
-      case "number":
-        isValid = typeof value === "number" && !isNaN(value);
-        break;
-      case "string":
-        isValid = typeof value === "string";
-        break;
-      case "boolean":
-        isValid = typeof value === "boolean";
-        break;
-      default:
-        isValid = typeof value === expectedType;
+    case "PatientData":
+      isValid = isPatientData(value);
+      actualType = "Invalid PatientData";
+      break;
+    case "ICHRiskResult":
+      isValid = isICHRiskResult(value);
+      actualType = "Invalid ICHRiskResult";
+      break;
+    case "number":
+      isValid = typeof value === "number" && !isNaN(value);
+      break;
+    case "string":
+      isValid = typeof value === "string";
+      break;
+    case "boolean":
+      isValid = typeof value === "boolean";
+      break;
+    default:
+      isValid = typeof value === expectedType;
     }
 
     if (!isValid) {
       throw new TypeError(
-        `Type error in ${fieldName}: expected ${expectedType}, got ${actualType}. ` +
-          "This is a critical error in medical calculations."
+        `Type error in ${fieldName}: expected ${expectedType}, got ${actualType}. `
+        + "This is a critical error in medical calculations.",
       );
     }
   }
@@ -316,8 +313,8 @@ export class TypeChecker {
 
     if (value < min || value > max) {
       throw new RangeError(
-        `Range error in ${fieldName}: value ${value} must be between ${min} and ${max}. ` +
-          "This is a critical error in medical calculations."
+        `Range error in ${fieldName}: value ${value} must be between ${min} and ${max}. `
+        + "This is a critical error in medical calculations.",
       );
     }
   }

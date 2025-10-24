@@ -78,18 +78,18 @@ class PerformanceMetric {
    */
   getThresholdKey() {
     switch (this.type) {
-      case PerformanceMetricType.API_CALL:
-        return this.metadata.critical ? "CRITICAL_API_RESPONSE" : "PREDICTION_RESPONSE";
-      case PerformanceMetricType.VALIDATION:
-        return "VALIDATION_RESPONSE";
-      case PerformanceMetricType.PREDICTION:
-        return "PREDICTION_RESPONSE";
-      case PerformanceMetricType.RENDER:
-        return "UI_RENDER";
-      case PerformanceMetricType.USER_INTERACTION:
-        return "USER_INTERACTION";
-      default:
-        return null;
+    case PerformanceMetricType.API_CALL:
+      return this.metadata.critical ? "CRITICAL_API_RESPONSE" : "PREDICTION_RESPONSE";
+    case PerformanceMetricType.VALIDATION:
+      return "VALIDATION_RESPONSE";
+    case PerformanceMetricType.PREDICTION:
+      return "PREDICTION_RESPONSE";
+    case PerformanceMetricType.RENDER:
+      return "UI_RENDER";
+    case PerformanceMetricType.USER_INTERACTION:
+      return "USER_INTERACTION";
+    default:
+      return null;
     }
   }
 
@@ -197,8 +197,8 @@ export class MedicalPerformanceMonitor {
    */
   initializePerformanceObserver() {
     try {
-      this.performanceObserver = new PerformanceObserver(list => {
-        list.getEntries().forEach(entry => {
+      this.performanceObserver = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
           this.recordPerformanceEntry(entry);
         });
       });
@@ -219,18 +219,16 @@ export class MedicalPerformanceMonitor {
 
     // Categorize based on entry type
     switch (entry.entryType) {
-      case "navigation":
-        metricType = PerformanceMetricType.RENDER;
-        name = "page_load";
-        break;
-      case "resource":
-        metricType = entry.name.includes("/api/")
-          ? PerformanceMetricType.API_CALL
-          : PerformanceMetricType.NETWORK;
-        break;
-      case "measure":
-        metricType = this.categorizeUserMeasure(entry.name);
-        break;
+    case "navigation":
+      metricType = PerformanceMetricType.RENDER;
+      name = "page_load";
+      break;
+    case "resource":
+      metricType = entry.name.includes("/api/") ? PerformanceMetricType.API_CALL : PerformanceMetricType.NETWORK;
+      break;
+    case "measure":
+      metricType = this.categorizeUserMeasure(entry.name);
+      break;
     }
 
     const metric = new PerformanceMetric(metricType, name, entry.startTime);
@@ -420,10 +418,10 @@ export class MedicalPerformanceMonitor {
   generatePerformanceReport() {
     const metrics = Array.from(this.metrics.values());
     const now = Date.now();
-    const lastHour = now - 60 * 60 * 1000;
+    const lastHour = now - (60 * 60 * 1000);
 
     // Filter metrics from last hour
-    const recentMetrics = metrics.filter(m => new Date(m.timestamp).getTime() > lastHour);
+    const recentMetrics = metrics.filter((m) => new Date(m.timestamp).getTime() > lastHour);
 
     // Group by type
     const metricsByType = recentMetrics.reduce((acc, metric) => {
@@ -441,14 +439,14 @@ export class MedicalPerformanceMonitor {
       totalMetrics: recentMetrics.length,
       memoryStatus: this.checkMemoryLeaks(),
       metricsByType: {},
-      violations: recentMetrics.filter(m => m.exceedsThreshold()).length,
+      violations: recentMetrics.filter((m) => m.exceedsThreshold()).length,
       topSlowOperations: this.getTopSlowOperations(recentMetrics),
     };
 
     // Calculate statistics for each type
     Object.entries(metricsByType).forEach(([type, typeMetrics]) => {
-      const durations = typeMetrics.map(m => m.duration);
-      const grades = typeMetrics.map(m => m.getPerformanceGrade());
+      const durations = typeMetrics.map((m) => m.duration);
+      const grades = typeMetrics.map((m) => m.getPerformanceGrade());
 
       report.metricsByType[type] = {
         count: typeMetrics.length,
@@ -456,7 +454,7 @@ export class MedicalPerformanceMonitor {
         medianDuration: this.calculateMedian(durations),
         minDuration: Math.min(...durations),
         maxDuration: Math.max(...durations),
-        violations: typeMetrics.filter(m => m.exceedsThreshold()).length,
+        violations: typeMetrics.filter((m) => m.exceedsThreshold()).length,
         gradeDistribution: this.calculateGradeDistribution(grades),
       };
     });
@@ -472,7 +470,9 @@ export class MedicalPerformanceMonitor {
   calculateMedian(values) {
     const sorted = [...values].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    return sorted.length % 2 === 0
+      ? (sorted[mid - 1] + sorted[mid]) / 2
+      : sorted[mid];
   }
 
   /**
@@ -492,7 +492,7 @@ export class MedicalPerformanceMonitor {
     return metrics
       .sort((a, b) => b.duration - a.duration)
       .slice(0, limit)
-      .map(m => ({
+      .map((m) => ({
         name: m.name,
         type: m.type,
         duration: m.duration,
@@ -508,15 +508,14 @@ export class MedicalPerformanceMonitor {
     const now = Date.now();
     const cutoff = now - timeframeMs;
 
-    const typeMetrics = Array.from(this.metrics.values()).filter(
-      m => m.type === type && new Date(m.timestamp).getTime() > cutoff
-    );
+    const typeMetrics = Array.from(this.metrics.values())
+      .filter((m) => m.type === type && new Date(m.timestamp).getTime() > cutoff);
 
     if (typeMetrics.length === 0) {
       return null;
     }
 
-    const durations = typeMetrics.map(m => m.duration);
+    const durations = typeMetrics.map((m) => m.duration);
     return {
       type,
       count: typeMetrics.length,
@@ -524,7 +523,7 @@ export class MedicalPerformanceMonitor {
       medianDuration: this.calculateMedian(durations),
       minDuration: Math.min(...durations),
       maxDuration: Math.max(...durations),
-      violations: typeMetrics.filter(m => m.exceedsThreshold()).length,
+      violations: typeMetrics.filter((m) => m.exceedsThreshold()).length,
     };
   }
 

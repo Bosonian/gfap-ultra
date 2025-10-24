@@ -6,11 +6,8 @@
 import { calculateICHVolume } from "../../logic/ich-volume-calculator.js";
 import { store } from "../../state/store.js";
 import { safeSetInnerHTML } from "../../security/html-sanitizer.js";
-import {
-  renderCompactVolumeDisplay,
-  renderDetailedVolumeCard,
-  renderVolumeIndicator,
-} from "./volume-display.js";
+
+import { renderCompactVolumeDisplay, renderDetailedVolumeCard, renderVolumeIndicator } from "./volume-display.js";
 
 /**
  * Get GFAP value from current form data
@@ -90,10 +87,7 @@ export function addVolumeCardToResults(resultsContainer, expanded = false) {
       safeSetInnerHTML(volumeCardElement, volumeCardHtml);
       if (volumeCardElement.firstElementChild) {
         // Insert after risk cards
-        riskCards.parentNode.insertBefore(
-          volumeCardElement.firstElementChild,
-          riskCards.nextSibling
-        );
+        riskCards.parentNode.insertBefore(volumeCardElement.firstElementChild, riskCards.nextSibling);
       }
     } catch (error) {
       console.error("Volume card sanitization failed:", error);
@@ -108,10 +102,7 @@ export function addVolumeCardToResults(resultsContainer, expanded = false) {
     try {
       safeSetInnerHTML(volumeCardElement, volumeCardHtml);
       if (volumeCardElement.firstElementChild) {
-        resultsContainer.insertBefore(
-          volumeCardElement.firstElementChild,
-          resultsContainer.firstChild
-        );
+        resultsContainer.insertBefore(volumeCardElement.firstElementChild, resultsContainer.firstChild);
       }
     } catch (error) {
       console.error("Volume card sanitization failed:", error);
@@ -175,7 +166,7 @@ export function updateAllVolumeDisplays(newGfapValue) {
 
   // Update compact displays
   const compactDisplays = document.querySelectorAll(".compact-volume-display");
-  compactDisplays.forEach(display => {
+  compactDisplays.forEach((display) => {
     try {
       const newContent = renderCompactVolumeDisplay(newGfapValue);
       const tempElement = document.createElement("div");
@@ -191,7 +182,7 @@ export function updateAllVolumeDisplays(newGfapValue) {
 
   // Update volume indicators in risk cards
   const indicators = document.querySelectorAll(".volume-indicator");
-  indicators.forEach(indicator => {
+  indicators.forEach((indicator) => {
     const newContent = renderVolumeIndicator(newGfapValue);
     if (newContent) {
       try {
@@ -211,7 +202,7 @@ export function updateAllVolumeDisplays(newGfapValue) {
 
   // Update detailed cards (preserve expanded state)
   const detailCards = document.querySelectorAll(".volume-detail-card");
-  detailCards.forEach(card => {
+  detailCards.forEach((card) => {
     const isExpanded = card.classList.contains("expanded");
     const newContent = renderDetailedVolumeCard(newGfapValue, isExpanded);
     try {
@@ -239,7 +230,7 @@ export function initializeVolumeVisualization() {
   document.head.appendChild(cssLink);
 
   // Listen for GFAP input changes
-  document.addEventListener("input", event => {
+  document.addEventListener("input", (event) => {
     if (event.target.name === "gfap_value") {
       const gfapValue = parseFloat(event.target.value) || 0;
       updateAllVolumeDisplays(gfapValue);
@@ -257,7 +248,7 @@ export function testVolumeIntegration() {
 
   const testValues = [100, 500, 1000, 1500, 3000, 5000];
 
-  testValues.forEach(gfap => {
+  testValues.forEach((gfap) => {
     const result = calculateICHVolume(gfap);
     // (`GFAP ${gfap}: ${result.displayVolume} (${result.riskLevel}) - ${result.mortalityRate}`);
   });

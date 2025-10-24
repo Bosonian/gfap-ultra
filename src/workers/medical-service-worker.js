@@ -5,6 +5,21 @@
  * Provides intelligent offline capabilities for critical medical operations with bulletproof error handling
  */
 
+// Bulletproof error handling for service worker
+const ERROR_CATEGORIES = {
+  CACHE: "cache",
+  NETWORK: "network",
+  MEDICAL: "medical",
+  STORAGE: "storage",
+};
+
+const ERROR_SEVERITY = {
+  LOW: "low",
+  MEDIUM: "medium",
+  HIGH: "high",
+  CRITICAL: "critical",
+};
+
 /**
  * Safe async wrapper for service worker operations
  */
@@ -64,6 +79,15 @@ const API_ENDPOINTS = [
   "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
   "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
 ];
+
+// Network strategies
+const NETWORK_STRATEGIES = {
+  CACHE_FIRST: "cache-first",
+  NETWORK_FIRST: "network-first",
+  NETWORK_ONLY: "network-only",
+  CACHE_ONLY: "cache-only",
+  STALE_WHILE_REVALIDATE: "stale-while-revalidate",
+};
 
 /**
  * Service Worker Installation with bulletproof error handling
@@ -834,21 +858,21 @@ self.addEventListener("message", event => {
   const { type, data } = event.data;
 
   switch (type) {
-    case "SKIP_WAITING":
-      self.skipWaiting();
-      break;
+  case "SKIP_WAITING":
+    self.skipWaiting();
+    break;
 
-    case "GET_CACHE_STATUS":
-      event.ports[0].postMessage(getCacheStatus());
-      break;
+  case "GET_CACHE_STATUS":
+    event.ports[0].postMessage(getCacheStatus());
+    break;
 
-    case "CLEAR_CACHE":
-      event.waitUntil(clearAllCaches());
-      break;
+  case "CLEAR_CACHE":
+    event.waitUntil(clearAllCaches());
+    break;
 
-    case "PREFETCH_RESOURCES":
-      event.waitUntil(prefetchResources(data.resources));
-      break;
+  case "PREFETCH_RESOURCES":
+    event.waitUntil(prefetchResources(data.resources));
+    break;
   }
 });
 

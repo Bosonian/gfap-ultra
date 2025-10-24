@@ -6,6 +6,7 @@
 import {
   calculateHemorrhageSizePercent,
   getVolumeColor,
+  calculateICHVolume,
   formatVolumeDisplay,
 } from "../../logic/ich-volume-calculator.js";
 
@@ -336,6 +337,7 @@ export function renderCircularBrainDisplay(volume) {
     ${formattedVolume}
   </div>
 </div>
+
   `;
 }
 

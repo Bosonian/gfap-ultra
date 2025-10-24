@@ -107,7 +107,7 @@ export const strokeCenters = [
     type: "comprehensive",
     address: "Oberdürrbacher Str. 6, 97080 Würzburg",
     coordinates: {
-      lat: 49.784,
+      lat: 49.7840,
       lng: 9.9721,
     },
     phone: "+49 931 201-0",
@@ -429,7 +429,7 @@ export const strokeCenters = [
 
 // Helper functions for stroke center data
 export function getStrokeCentersByType(type) {
-  return strokeCenters.filter(center => center.type === type);
+  return strokeCenters.filter((center) => center.type === type);
 }
 
 export function getComprehensiveStrokeCenters() {
@@ -441,7 +441,7 @@ export function getPrimaryStrokeCenters() {
 }
 
 export function getStrokeCenterById(id) {
-  return strokeCenters.find(center => center.id === id);
+  return strokeCenters.find((center) => center.id === id);
 }
 
 // Calculate distance between two coordinates using Haversine formula (fallback)
@@ -449,9 +449,9 @@ export function calculateDistance(lat1, lng1, lat2, lng2) {
   const R = 6371; // Earth's radius in kilometers
   const dLat = toRadians(lat2 - lat1);
   const dLng = toRadians(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2))
+    * Math.sin(dLng / 2) * Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -466,10 +466,7 @@ export async function calculateTravelTime(fromLat, fromLng, toLat, toLng, profil
     // Using OpenRoute Service (free tier)
     const url = `https://api.openrouteservice.org/v2/directions/${profile}`;
     const body = {
-      coordinates: [
-        [fromLng, fromLat],
-        [toLng, toLat],
-      ],
+      coordinates: [[fromLng, fromLat], [toLng, toLat]],
       radiuses: [1000, 1000], // Allow 1km radius for routing
       format: "json",
     };
@@ -477,8 +474,7 @@ export async function calculateTravelTime(fromLat, fromLng, toLat, toLng, profil
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        Accept:
-          "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
+        Accept: "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
         Authorization: "5b3ce3597851110001cf624868c4c27b63ae476c9c26c8bffbc35688", // Free tier key
         "Content-Type": "application/json; charset=utf-8",
       },
@@ -512,10 +508,7 @@ export async function calculateTravelTime(fromLat, fromLng, toLat, toLng, profil
       console.info("[TravelTime] OpenRouteService timeout, using distance estimation");
       source = "timeout-fallback";
     } else {
-      console.info(
-        "[TravelTime] OpenRouteService error, using distance estimation:",
-        error.message
-      );
+      console.info("[TravelTime] OpenRouteService error, using distance estimation:", error.message);
       source = "error-fallback";
     }
 
@@ -559,25 +552,14 @@ export async function calculateEmergencyTravelTime(fromLat, fromLng, toLat, toLn
 }
 
 // Find nearest stroke centers with travel time calculation
-export async function findNearestStrokeCentersWithTravelTime(
-  lat,
-  lng,
-  maxResults = 5,
-  maxTime = 120,
-  useEmergencyRouting = true
-) {
+export async function findNearestStrokeCentersWithTravelTime(lat, lng, maxResults = 5, maxTime = 120, useEmergencyRouting = true) {
   // ('Calculating travel times to stroke centers...');
 
   const centersWithTravelTime = await Promise.all(
-    strokeCenters.map(async center => {
+    strokeCenters.map(async (center) => {
       try {
         const travelInfo = useEmergencyRouting
-          ? await calculateEmergencyTravelTime(
-              lat,
-              lng,
-              center.coordinates.lat,
-              center.coordinates.lng
-            )
+          ? await calculateEmergencyTravelTime(lat, lng, center.coordinates.lat, center.coordinates.lng)
           : await calculateTravelTime(lat, lng, center.coordinates.lat, center.coordinates.lng);
 
         return {
@@ -589,12 +571,7 @@ export async function findNearestStrokeCentersWithTravelTime(
       } catch (error) {
         // (`Failed to calculate travel time to ${center.name}:`, error);
         // Fallback to distance calculation
-        const distance = calculateDistance(
-          lat,
-          lng,
-          center.coordinates.lat,
-          center.coordinates.lng
-        );
+        const distance = calculateDistance(lat, lng, center.coordinates.lat, center.coordinates.lng);
         return {
           ...center,
           travelTime: Math.round(distance / 0.8), // Estimate: 48 km/h average
@@ -602,46 +579,39 @@ export async function findNearestStrokeCentersWithTravelTime(
           travelSource: "fallback",
         };
       }
-    })
+    }),
   );
 
   return centersWithTravelTime
-    .filter(center => center.travelTime <= maxTime)
+    .filter((center) => center.travelTime <= maxTime)
     .sort((a, b) => a.travelTime - b.travelTime)
     .slice(0, maxResults);
 }
 
 // Find nearest stroke centers using distance (fallback/fast method)
 export function findNearestStrokeCenters(lat, lng, maxResults = 5, maxDistance = 100) {
-  const centersWithDistance = strokeCenters.map(center => ({
+  const centersWithDistance = strokeCenters.map((center) => ({
     ...center,
     distance: calculateDistance(lat, lng, center.coordinates.lat, center.coordinates.lng),
   }));
 
   return centersWithDistance
-    .filter(center => center.distance <= maxDistance)
+    .filter((center) => center.distance <= maxDistance)
     .sort((a, b) => a.distance - b.distance)
     .slice(0, maxResults);
 }
 
 // Get stroke center recommendations with travel time (async)
-export async function getRecommendedStrokeCentersWithTravelTime(
-  lat,
-  lng,
-  conditionType = "stroke"
-) {
+export async function getRecommendedStrokeCentersWithTravelTime(lat, lng, conditionType = "stroke") {
   const nearestCenters = await findNearestStrokeCentersWithTravelTime(lat, lng, 10, 120, true);
 
   if (conditionType === "lvo" || conditionType === "thrombectomy") {
     // For LVO cases, prioritize comprehensive stroke centers within 60 minutes
-    const comprehensive = nearestCenters.filter(
-      center =>
-        center.type === "comprehensive" &&
-        center.services.includes("thrombectomy") &&
-        center.travelTime <= 60
-    );
+    const comprehensive = nearestCenters.filter((center) => center.type === "comprehensive"
+      && center.services.includes("thrombectomy")
+      && center.travelTime <= 60);
 
-    const primary = nearestCenters.filter(center => center.type === "primary");
+    const primary = nearestCenters.filter((center) => center.type === "primary");
 
     return {
       recommended: comprehensive.slice(0, 3),
@@ -651,13 +621,12 @@ export async function getRecommendedStrokeCentersWithTravelTime(
 
   // For ICH cases, prioritize neurosurgical capabilities
   if (conditionType === "ich") {
-    const neurosurgical = nearestCenters.filter(
-      center => center.services.includes("neurosurgery") && center.travelTime <= 45
-    );
+    const neurosurgical = nearestCenters.filter((center) => center.services.includes("neurosurgery")
+      && center.travelTime <= 45);
 
     return {
       recommended: neurosurgical.slice(0, 3),
-      alternative: nearestCenters.filter(c => !neurosurgical.includes(c)).slice(0, 2),
+      alternative: nearestCenters.filter((c) => !neurosurgical.includes(c)).slice(0, 2),
     };
   }
 
@@ -674,11 +643,10 @@ export function getRecommendedStrokeCenters(lat, lng, conditionType = "stroke") 
 
   if (conditionType === "lvo" || conditionType === "thrombectomy") {
     // For LVO cases, prioritize comprehensive stroke centers
-    const comprehensive = nearestCenters.filter(
-      center => center.type === "comprehensive" && center.services.includes("thrombectomy")
-    );
+    const comprehensive = nearestCenters.filter((center) => center.type === "comprehensive"
+      && center.services.includes("thrombectomy"));
 
-    const primary = nearestCenters.filter(center => center.type === "primary");
+    const primary = nearestCenters.filter((center) => center.type === "primary");
 
     return {
       recommended: comprehensive.slice(0, 3),

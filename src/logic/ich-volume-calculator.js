@@ -27,30 +27,16 @@ import { medicalLogger, LOG_CATEGORIES } from "../utils/medical-logger.js";
 // Volume-based risk thresholds with clinical significance
 export const VOLUME_THRESHOLDS = {
   low: {
-    max: 10,
-    color: "#dc2626",
-    label: "Small",
-    severity: "low",
+    max: 10, color: "#dc2626", label: "Small", severity: "low",
   },
   moderate: {
-    min: 10,
-    max: 20,
-    color: "#dc2626",
-    label: "Moderate",
-    severity: "moderate",
+    min: 10, max: 20, color: "#dc2626", label: "Moderate", severity: "moderate",
   },
   high: {
-    min: 20,
-    max: 30,
-    color: "#dc2626",
-    label: "Large",
-    severity: "high",
+    min: 20, max: 30, color: "#dc2626", label: "Large", severity: "high",
   },
   critical: {
-    min: 30,
-    color: "#dc2626",
-    label: "Critical",
-    severity: "critical",
+    min: 30, color: "#dc2626", label: "Critical", severity: "critical",
   },
 };
 
@@ -75,7 +61,7 @@ export const MORTALITY_BY_VOLUME = {
  */
 export async function calculateICHVolume(gfapValue) {
   return safeMedicalCalculation(
-    async inputs => {
+    async (inputs) => {
       const { gfap } = inputs;
 
       medicalLogger.info("ICH volume calculation started", {
@@ -100,7 +86,7 @@ export async function calculateICHVolume(gfapValue) {
             warningMin: 29,
             warningMax: 10000,
           },
-        }
+        },
       );
 
       if (!validation.isValid) {
@@ -108,7 +94,7 @@ export async function calculateICHVolume(gfapValue) {
           validation.errors[0]?.message || "Invalid GFAP value",
           MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
           ERROR_CATEGORIES.VALIDATION,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ validationErrors: validation.errors, gfapValue: gfap });
       }
 
@@ -129,9 +115,7 @@ export async function calculateICHVolume(gfapValue) {
       const cappedGfap = Math.min(gfap, 10000);
       const warnings = [];
       if (gfap > 10000) {
-        warnings.push(
-          `GFAP value ${gfap} exceeds maximum calculation range and was capped at 10,000 pg/ml`
-        );
+        warnings.push(`GFAP value ${gfap} exceeds maximum calculation range and was capped at 10,000 pg/ml`);
       }
 
       // Values above 10,000 pg/ml are capped for calculation stability
@@ -145,7 +129,7 @@ export async function calculateICHVolume(gfapValue) {
           "GFAP value must be positive for volume calculation",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ gfapValue: cappedGfap });
       }
 
@@ -155,7 +139,7 @@ export async function calculateICHVolume(gfapValue) {
           "Invalid logarithm calculation for GFAP value",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ gfapValue: cappedGfap, logValue: logGfap });
       }
 
@@ -165,7 +149,7 @@ export async function calculateICHVolume(gfapValue) {
           "Invalid volume calculation result",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ logGfap, logVolume });
       }
 
@@ -175,7 +159,7 @@ export async function calculateICHVolume(gfapValue) {
           "Calculated volume is invalid",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ logVolume, calculatedVolume });
       }
 
@@ -215,8 +199,7 @@ export async function calculateICHVolume(gfapValue) {
         mortalityRate,
         isValid: true,
         calculation: `Based on GFAP ${gfap} pg/ml`,
-        threshold:
-          calculatedVolume >= 30 ? "SURGICAL" : calculatedVolume >= 20 ? "HIGH_RISK" : "MANAGEABLE",
+        threshold: calculatedVolume >= 30 ? "SURGICAL" : calculatedVolume >= 20 ? "HIGH_RISK" : "MANAGEABLE",
         warnings,
         metadata: {
           originalGfap: gfap,
@@ -237,7 +220,7 @@ export async function calculateICHVolume(gfapValue) {
           "Final volume calculation result is invalid",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.CRITICAL
+          ERROR_SEVERITY.CRITICAL,
         ).withContext({ result });
       }
 
@@ -255,7 +238,7 @@ export async function calculateICHVolume(gfapValue) {
     { gfap: gfapValue },
     {
       timeout: 5000,
-      fallback: error => ({
+      fallback: (error) => ({
         volume: 0,
         volumeRange: { min: 0, max: 0 },
         riskLevel: "low",
@@ -271,7 +254,7 @@ export async function calculateICHVolume(gfapValue) {
         gfapValue,
         formula: "log₁₀(Volume) = 0.0192 + 0.4533 × log₁₀(GFAP)",
       },
-    }
+    },
   );
 }
 
@@ -327,7 +310,7 @@ function getVolumeRiskLevel(volume) {
         "Invalid volume for risk level calculation",
         MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
         ERROR_CATEGORIES.MEDICAL,
-        ERROR_SEVERITY.MEDIUM
+        ERROR_SEVERITY.MEDIUM,
       ).withContext({ volume, type: typeof volume });
     }
 
@@ -336,7 +319,7 @@ function getVolumeRiskLevel(volume) {
         "Volume cannot be negative",
         MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
         ERROR_CATEGORIES.MEDICAL,
-        ERROR_SEVERITY.MEDIUM
+        ERROR_SEVERITY.MEDIUM,
       ).withContext({ volume });
     }
 
@@ -371,7 +354,7 @@ function getMortalityRate(volume) {
         "Invalid volume for mortality rate calculation",
         MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
         ERROR_CATEGORIES.MEDICAL,
-        ERROR_SEVERITY.MEDIUM
+        ERROR_SEVERITY.MEDIUM,
       ).withContext({ volume, type: typeof volume });
     }
 
@@ -388,14 +371,14 @@ function getMortalityRate(volume) {
     // Broderick: 30ml = 19% mortality
     if (volume < 30) {
       // Linear interpolation: 10ml=10%, 30ml=19%
-      const rate = Math.round(10 + ((volume - 10) * (19 - 10)) / (30 - 10));
+      const rate = Math.round(10 + (volume - 10) * (19 - 10) / (30 - 10));
       // Validate interpolated rate
       if (rate < 0 || rate > 100) {
         throw new MedicalError(
           "Calculated mortality rate out of valid range",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%⁴`;
@@ -405,13 +388,13 @@ function getMortalityRate(volume) {
     // Interpolating from Broderick 30ml=19% to 50ml≈44%
     if (volume < 50) {
       // Linear interpolation: 30ml=19%, 50ml=44%
-      const rate = Math.round(19 + ((volume - 30) * (44 - 19)) / (50 - 30));
+      const rate = Math.round(19 + (volume - 30) * (44 - 19) / (50 - 30));
       if (rate < 0 || rate > 100) {
         throw new MedicalError(
           "Calculated mortality rate out of valid range",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%³`;
@@ -421,13 +404,13 @@ function getMortalityRate(volume) {
     // Broderick: 60ml = 91% mortality
     if (volume < 60) {
       // Steeper increase: 50ml=44%, 60ml=91%
-      const rate = Math.round(44 + ((volume - 50) * (91 - 44)) / (60 - 50));
+      const rate = Math.round(44 + (volume - 50) * (91 - 44) / (60 - 50));
       if (rate < 0 || rate > 100) {
         throw new MedicalError(
           "Calculated mortality rate out of valid range",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%²`;
@@ -437,13 +420,13 @@ function getMortalityRate(volume) {
     // Broderick: >60ml = 91-100%
     if (volume < 80) {
       // 60ml=91%, 80ml=96%
-      const rate = Math.round(91 + ((volume - 60) * (96 - 91)) / (80 - 60));
+      const rate = Math.round(91 + (volume - 60) * (96 - 91) / (80 - 60));
       if (rate < 0 || rate > 100) {
         throw new MedicalError(
           "Calculated mortality rate out of valid range",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.HIGH
+          ERROR_SEVERITY.HIGH,
         ).withContext({ volume, rate });
       }
       return `${rate}%¹`;
@@ -473,7 +456,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           "Invalid volume for size percentage calculation",
           MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
           ERROR_CATEGORIES.VALIDATION,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume, type: typeof volume });
       }
 
@@ -482,7 +465,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           "Volume cannot be negative for visualization",
           MEDICAL_ERROR_CODES.INVALID_VITAL_SIGNS,
           ERROR_CATEGORIES.VALIDATION,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume });
       }
 
@@ -501,7 +484,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           "Invalid square root calculation for visualization",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume, sqrtValue });
       }
 
@@ -514,7 +497,7 @@ export async function calculateHemorrhageSizePercent(volume) {
           "Calculated percentage out of valid range",
           MEDICAL_ERROR_CODES.CALCULATION_FAILED,
           ERROR_CATEGORIES.MEDICAL,
-          ERROR_SEVERITY.MEDIUM
+          ERROR_SEVERITY.MEDIUM,
         ).withContext({ volume, basePercent, result });
       }
 
@@ -538,7 +521,7 @@ export async function calculateHemorrhageSizePercent(volume) {
         operation: "hemorrhage_size_calculation",
         volume,
       },
-    }
+    },
   );
 }
 
@@ -570,14 +553,11 @@ export async function testVolumeCalculator() {
 
       // ICH Volume Calculator Test Results
       const results = await Promise.allSettled(
-        testCases.map(async test => {
+        testCases.map(async (test) => {
           try {
             const result = await calculateICHVolume(test.gfap);
             return {
-              gfap: test.gfap,
-              result,
-              expected: test.expectedVolume,
-              success: true,
+              gfap: test.gfap, result, expected: test.expectedVolume, success: true,
             };
           } catch (error) {
             return {
@@ -588,7 +568,7 @@ export async function testVolumeCalculator() {
               error: error.message,
             };
           }
-        })
+        }),
       );
 
       // Process results and handle any failures
@@ -605,7 +585,7 @@ export async function testVolumeCalculator() {
         };
       });
 
-      const successfulTests = processedResults.filter(r => r.success).length;
+      const successfulTests = processedResults.filter((r) => r.success).length;
       const totalTests = testCases.length;
 
       return {
@@ -623,7 +603,7 @@ export async function testVolumeCalculator() {
       category: ERROR_CATEGORIES.MEDICAL,
       severity: ERROR_SEVERITY.LOW,
       timeout: 10000,
-      fallback: error => ({
+      fallback: (error) => ({
         results: [],
         summary: {
           total: 0,
@@ -637,7 +617,7 @@ export async function testVolumeCalculator() {
       context: {
         operation: "volume_calculator_test",
       },
-    }
+    },
   );
 }
 

@@ -44,7 +44,7 @@ export function validateForm(form) {
 
   // Collect form data for medical checks
   const formData = {};
-  Object.keys(VALIDATION_RULES).forEach(name => {
+  Object.keys(VALIDATION_RULES).forEach((name) => {
     const input = form.elements[name];
     if (input) {
       formData[name] = input.value;
@@ -89,7 +89,7 @@ export function showValidationErrors(container, validationErrors) {
       if (group) {
         group.classList.add("error");
         // Remove existing error messages
-        group.querySelectorAll(".error-message").forEach(el => el.remove());
+        group.querySelectorAll(".error-message").forEach((el) => el.remove());
         // Add new error message safely without innerHTML
         const errorDiv = document.createElement("div");
         errorDiv.className = "error-message";
@@ -114,7 +114,7 @@ export function showValidationWarnings(container, validationWarnings) {
       if (group) {
         group.classList.add("warning");
         // Remove existing warning messages
-        group.querySelectorAll(".warning-message").forEach(el => el.remove());
+        group.querySelectorAll(".warning-message").forEach((el) => el.remove());
         // Add new warning message safely without innerHTML
         const warningDiv = document.createElement("div");
         warningDiv.className = "warning-message";
@@ -132,16 +132,16 @@ export function showValidationWarnings(container, validationWarnings) {
 }
 
 export function clearValidationErrors(container) {
-  container.querySelectorAll(".input-group.error").forEach(group => {
+  container.querySelectorAll(".input-group.error").forEach((group) => {
     group.classList.remove("error");
-    group.querySelectorAll(".error-message").forEach(el => el.remove());
+    group.querySelectorAll(".error-message").forEach((el) => el.remove());
   });
 }
 
 export function clearValidationWarnings(container) {
-  container.querySelectorAll(".input-group.warning").forEach(group => {
+  container.querySelectorAll(".input-group.warning").forEach((group) => {
     group.classList.remove("warning");
-    group.querySelectorAll(".warning-message").forEach(el => el.remove());
+    group.querySelectorAll(".warning-message").forEach((el) => el.remove());
   });
 }
 

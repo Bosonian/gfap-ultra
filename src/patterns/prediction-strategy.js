@@ -30,7 +30,7 @@ class PredictionStrategy {
     const missingFields = [];
 
     // Check required fields
-    this.requiredFields.forEach(field => {
+    this.requiredFields.forEach((field) => {
       if (!(field in inputData) || inputData[field] === null || inputData[field] === undefined) {
         missingFields.push(field);
       }
@@ -88,7 +88,7 @@ class PredictionStrategy {
    */
   createInputSummary(inputData) {
     const summary = {};
-    [...this.requiredFields, ...this.optionalFields].forEach(field => {
+    [...this.requiredFields, ...this.optionalFields].forEach((field) => {
       if (field in inputData) {
         summary[field] = typeof inputData[field];
       }
@@ -169,8 +169,7 @@ class LimitedDataPredictionStrategy extends PredictionStrategy {
       diastolic_bp: parseFloat(inputData.diastolic_bp),
       weakness_sudden: inputData.weakness_sudden === true || inputData.weakness_sudden === "true",
       speech_sudden: inputData.speech_sudden === true || inputData.speech_sudden === "true",
-      vigilanzminderung:
-        inputData.vigilanzminderung === true || inputData.vigilanzminderung === "true",
+      vigilanzminderung: inputData.vigilanzminderung === true || inputData.vigilanzminderung === "true",
     };
   }
 
@@ -216,17 +215,8 @@ class FullStrokePredictionStrategy extends PredictionStrategy {
   constructor() {
     super("FULL_STROKE", "Comprehensive stroke prediction with full clinical data");
     this.requiredFields = [
-      "gfap",
-      "age",
-      "systolic_bp",
-      "diastolic_bp",
-      "fast_ed_score",
-      "sex",
-      "facialtwitching",
-      "armparese",
-      "speechdeficit",
-      "gaze",
-      "agitation",
+      "gfap", "age", "systolic_bp", "diastolic_bp", "fast_ed_score",
+      "sex", "facialtwitching", "armparese", "speechdeficit", "gaze", "agitation",
     ];
     this.optionalFields = ["strokeOnsetKnown", "medical_history"];
   }
@@ -244,8 +234,7 @@ class FullStrokePredictionStrategy extends PredictionStrategy {
       speechdeficit: inputData.speechdeficit === true || inputData.speechdeficit === "true",
       gaze: inputData.gaze === true || inputData.gaze === "true",
       agitation: inputData.agitation === true || inputData.agitation === "true",
-      strokeOnsetKnown:
-        inputData.strokeOnsetKnown === true || inputData.strokeOnsetKnown === "true",
+      strokeOnsetKnown: inputData.strokeOnsetKnown === true || inputData.strokeOnsetKnown === "true",
     };
   }
 

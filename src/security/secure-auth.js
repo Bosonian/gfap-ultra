@@ -14,10 +14,7 @@
  */
 
 import {
-  getResearchPassword,
-  getSessionConfig,
-  getSecurityConfig,
-  isDevelopment,
+  getResearchPassword, getSessionConfig, getSecurityConfig, isDevelopment,
 } from "./environment.js";
 
 // Mock bcrypt implementation for browser environment
@@ -37,6 +34,7 @@ const mockBcrypt = {
         return false;
       }
 
+      const saltRounds = parseInt(parts[2]);
       const saltAndHash = parts[3];
       const salt = saltAndHash.substring(0, 22);
       const originalHash = saltAndHash.substring(22);
@@ -76,17 +74,14 @@ const mockBcrypt = {
       const data = encoder.encode(password + salt);
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("")
-        .substring(0, 31);
+      return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("").substring(0, 31);
     }
     // Fallback hash for environments without WebCrypto
     let hash = 0;
     const str = password + salt;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
+      hash = ((hash << 5) - hash) + char;
       hash &= hash; // Convert to 32bit integer
     }
     return Math.abs(hash).toString(16).padStart(31, "0").substring(0, 31);
@@ -160,7 +155,7 @@ const mockJwt = {
         encoder.encode(secret),
         { name: "HMAC", hash: "SHA-256" },
         false,
-        ["sign"]
+        ["sign"],
       );
       const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
       const hashArray = Array.from(new Uint8Array(signature));
@@ -171,7 +166,7 @@ const mockJwt = {
     const str = data + secret;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
+      hash = ((hash << 5) - hash) + char;
       hash &= hash;
     }
     return this.base64UrlEncode(Math.abs(hash).toString(16));
@@ -221,9 +216,7 @@ export class SecureAuthenticationManager {
           attemptCount: blockInfo.attemptCount,
         });
 
-        throw new Error(
-          `IP temporarily blocked. Try again after ${new Date(blockInfo.expiresAt).toLocaleString()}`
-        );
+        throw new Error(`IP temporarily blocked. Try again after ${new Date(blockInfo.expiresAt).toLocaleString()}`);
       }
 
       // Check rate limiting
@@ -269,9 +262,11 @@ export class SecureAuthenticationManager {
         clientIp: isDevelopment() ? clientIp : "masked",
       };
 
-      const token = mockJwt.sign(tokenPayload, this.sessionConfig.secretKey, {
-        expiresIn: this.sessionConfig.timeoutHours * 3600,
-      });
+      const token = mockJwt.sign(
+        tokenPayload,
+        this.sessionConfig.secretKey,
+        { expiresIn: this.sessionConfig.timeoutHours * 3600 },
+      );
 
       // Clear failed attempts on successful authentication
       this.failedAttempts.delete(clientIp);
@@ -431,7 +426,7 @@ export class SecureAuthenticationManager {
   generateSessionId() {
     const timestamp = Date.now().toString(36);
     const randomBytes = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-      .map(b => b.toString(16).padStart(2, "0"))
+      .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
     return `${timestamp}-${randomBytes}`;
   }
@@ -442,7 +437,7 @@ export class SecureAuthenticationManager {
    */
   async secureDelay() {
     const delay = 100 + Math.random() * 200; // 100-300ms random delay
-    return new Promise(resolve => setTimeout(resolve, delay));
+    return new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   /**
@@ -485,23 +480,19 @@ export class SecureAuthenticationManager {
     let filteredLog = [...this.auditLog];
 
     if (filters.category) {
-      filteredLog = filteredLog.filter(entry => entry.category === filters.category);
+      filteredLog = filteredLog.filter((entry) => entry.category === filters.category);
     }
 
     if (filters.action) {
-      filteredLog = filteredLog.filter(entry => entry.action === filters.action);
+      filteredLog = filteredLog.filter((entry) => entry.action === filters.action);
     }
 
     if (filters.startDate) {
-      filteredLog = filteredLog.filter(
-        entry => new Date(entry.timestamp) >= new Date(filters.startDate)
-      );
+      filteredLog = filteredLog.filter((entry) => new Date(entry.timestamp) >= new Date(filters.startDate));
     }
 
     if (filters.endDate) {
-      filteredLog = filteredLog.filter(
-        entry => new Date(entry.timestamp) <= new Date(filters.endDate)
-      );
+      filteredLog = filteredLog.filter((entry) => new Date(entry.timestamp) <= new Date(filters.endDate));
     }
 
     return filteredLog;
@@ -513,31 +504,27 @@ export class SecureAuthenticationManager {
    */
   getAuthStats() {
     const now = Date.now();
-    const last24Hours = now - 24 * 60 * 60 * 1000;
-    const lastHour = now - 60 * 60 * 1000;
+    const last24Hours = now - (24 * 60 * 60 * 1000);
+    const lastHour = now - (60 * 60 * 1000);
 
-    const recent24h = this.auditLog.filter(
-      entry => new Date(entry.timestamp).getTime() > last24Hours && entry.category === "auth"
-    );
+    const recent24h = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > last24Hours
+      && entry.category === "auth");
 
-    const recentHour = this.auditLog.filter(
-      entry => new Date(entry.timestamp).getTime() > lastHour && entry.category === "auth"
-    );
+    const recentHour = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > lastHour
+      && entry.category === "auth");
 
     return {
       totalAttempts24h: recent24h.length,
-      successfulLogins24h: recent24h.filter(e => e.action === "AUTH_SUCCESS").length,
-      failedAttempts24h: recent24h.filter(e => e.action === "AUTH_FAILED").length,
-      blockedIPs24h: recent24h.filter(e => e.action === "IP_BLOCKED").length,
+      successfulLogins24h: recent24h.filter((e) => e.action === "AUTH_SUCCESS").length,
+      failedAttempts24h: recent24h.filter((e) => e.action === "AUTH_FAILED").length,
+      blockedIPs24h: recent24h.filter((e) => e.action === "IP_BLOCKED").length,
 
       totalAttemptsLastHour: recentHour.length,
-      successfulLoginsLastHour: recentHour.filter(e => e.action === "AUTH_SUCCESS").length,
-      failedAttemptsLastHour: recentHour.filter(e => e.action === "AUTH_FAILED").length,
+      successfulLoginsLastHour: recentHour.filter((e) => e.action === "AUTH_SUCCESS").length,
+      failedAttemptsLastHour: recentHour.filter((e) => e.action === "AUTH_FAILED").length,
 
-      currentlyBlockedIPs: Array.from(this.blockedIPs.keys()).filter(ip => this.isIpBlocked(ip))
-        .length,
-      systemUptime:
-        now - (this.auditLog.find(e => e.action === "AUTH_SYSTEM_INITIALIZED")?.timestamp || now),
+      currentlyBlockedIPs: Array.from(this.blockedIPs.keys()).filter((ip) => this.isIpBlocked(ip)).length,
+      systemUptime: now - (this.auditLog.find((e) => e.action === "AUTH_SYSTEM_INITIALIZED")?.timestamp || now),
     };
   }
 
@@ -562,8 +549,8 @@ export class SecureAuthenticationManager {
     }
 
     // Clean old audit logs (keep only last 7 days)
-    const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
-    this.auditLog = this.auditLog.filter(entry => new Date(entry.timestamp).getTime() > weekAgo);
+    const weekAgo = now - (7 * 24 * 60 * 60 * 1000);
+    this.auditLog = this.auditLog.filter((entry) => new Date(entry.timestamp).getTime() > weekAgo);
 
     this.logAuditEvent("system", "MAINTENANCE_CLEANUP", {
       cleanedBlocks: this.blockedIPs.size,
@@ -578,12 +565,9 @@ export const secureAuthManager = new SecureAuthenticationManager();
 
 // Set up automatic maintenance cleanup
 if (typeof window !== "undefined") {
-  setInterval(
-    () => {
-      secureAuthManager.performMaintenanceCleanup();
-    },
-    60 * 60 * 1000
-  ); // Every hour
+  setInterval(() => {
+    secureAuthManager.performMaintenanceCleanup();
+  }, 60 * 60 * 1000); // Every hour
 }
 
 export default secureAuthManager;

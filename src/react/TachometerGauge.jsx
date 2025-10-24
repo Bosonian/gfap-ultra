@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 export default function TachometerGauge({
   lvoProb = 0,
@@ -8,6 +8,12 @@ export default function TachometerGauge({
   const canvasRef = useRef(null);
 
   // Compute confidence & clamped ratio here so JSX overlay can show it
+  const eps = 0.5;
+  const safeIch = Math.max(ichProb, eps);
+  const rawRatio = lvoProb / safeIch;
+  const rmin = 0.5,
+    rmax = 2.0;
+  const clampedRatio = Math.max(rmin, Math.min(rmax, rawRatio));
   const absDiff = Math.abs(lvoProb - ichProb);
   const maxProb = Math.max(lvoProb, ichProb);
   let confidence =

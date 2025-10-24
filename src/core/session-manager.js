@@ -12,7 +12,7 @@ import { store } from "../state/store.js";
 import { APP_CONFIG } from "../config.js";
 import { authManager } from "../auth/authentication.js";
 import { safeAsync, ERROR_CATEGORIES, ERROR_SEVERITY } from "../utils/error-handler.js";
-import { secureRemove } from "../security/data-encryption.js";
+import { secureStore, secureRetrieve, secureRemove } from "../security/data-encryption.js";
 import { medicalLogger, LOG_CATEGORIES } from "../utils/medical-logger.js";
 
 /**
@@ -53,7 +53,7 @@ export class SessionManager {
         this.restoreFormData();
         return true;
       },
-      error => {
+      (error) => {
         // Session validation failed - clear data for safety
         this.clearSessionData();
         return false;
@@ -62,7 +62,7 @@ export class SessionManager {
         category: ERROR_CATEGORIES.AUTHENTICATION,
         severity: ERROR_SEVERITY.MEDIUM,
         context: { operation: "validate_stored_session" },
-      }
+      },
     );
   }
 
@@ -113,14 +113,14 @@ export class SessionManager {
         this.lastAutoSave = Date.now();
         return savedCount > 0;
       },
-      error =>
+      (error) =>
         // Auto-save failure is non-critical
         false,
       {
         category: ERROR_CATEGORIES.STORAGE,
         severity: ERROR_SEVERITY.LOW,
         context: { operation: "auto_save" },
-      }
+      },
     );
   }
 
@@ -179,7 +179,7 @@ export class SessionManager {
 
         const forms = container.querySelectorAll("form[data-module]");
 
-        forms.forEach(form => {
+        forms.forEach((form) => {
           try {
             const { module } = form.dataset;
             if (module) {
@@ -193,13 +193,13 @@ export class SessionManager {
           }
         });
       },
-      error => {
+      (error) => {
         // Form restoration failure is non-critical
       },
       {
         category: ERROR_CATEGORIES.STORAGE,
         context: { operation: "restore_form_data" },
-      }
+      },
     );
   }
 
@@ -247,12 +247,9 @@ export class SessionManager {
    */
   setupSessionValidation() {
     // Check session validity every 5 minutes
-    this.sessionCheckInterval = setInterval(
-      () => {
-        this.validateCurrentSession();
-      },
-      5 * 60 * 1000
-    );
+    this.sessionCheckInterval = setInterval(() => {
+      this.validateCurrentSession();
+    }, 5 * 60 * 1000);
   }
 
   /**
@@ -275,13 +272,13 @@ export class SessionManager {
 
         return true;
       },
-      error =>
+      (error) =>
         // Session validation failed - continue with local session
         authManager.isValidSession(),
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
         context: { operation: "validate_current_session" },
-      }
+      },
     );
   }
 
@@ -292,7 +289,7 @@ export class SessionManager {
     safeAsync(
       async () => {
         const shouldContinue = confirm(
-          "Your session will expire in 1 minute. Would you like to continue?"
+          "Your session will expire in 1 minute. Would you like to continue?",
         );
 
         if (shouldContinue) {
@@ -305,13 +302,13 @@ export class SessionManager {
           this.endSession();
         }
       },
-      error => {
+      (error) => {
         // If warning fails, continue session
       },
       {
         category: ERROR_CATEGORIES.AUTHENTICATION,
         context: { operation: "session_timeout_warning" },
-      }
+      },
     );
   }
 

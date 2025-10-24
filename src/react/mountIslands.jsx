@@ -1,4 +1,7 @@
+import React from "react";
 import { createRoot } from "react-dom/client";
+import ProbabilityRing from "./ProbabilityRing";
+import TachometerGauge from "./TachometerGauge";
 
 export function mountIslands() {
   // Probability rings

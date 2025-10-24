@@ -40,33 +40,33 @@ export class FastEdCalculator {
           <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
             
             ${this.renderSection("facial_palsy", t("facialPalsyTitle"), [
-              { label: t("facialPalsyNormal"), value: 0 },
-              { label: t("facialPalsyMild"), value: 1 },
-            ])}
+    { label: t("facialPalsyNormal"), value: 0 },
+    { label: t("facialPalsyMild"), value: 1 },
+  ])}
 
             ${this.renderSection("arm_weakness", t("armWeaknessTitle"), [
-              { label: t("armWeaknessNormal"), value: 0 },
-              { label: t("armWeaknessMild"), value: 1 },
-              { label: t("armWeaknessSevere"), value: 2 },
-            ])}
+    { label: t("armWeaknessNormal"), value: 0 },
+    { label: t("armWeaknessMild"), value: 1 },
+    { label: t("armWeaknessSevere"), value: 2 },
+  ])}
 
             ${this.renderSection("speech_changes", t("speechChangesTitle"), [
-              { label: t("speechChangesNormal"), value: 0 },
-              { label: t("speechChangesMild"), value: 1 },
-              { label: t("speechChangesSevere"), value: 2 },
-            ])}
+    { label: t("speechChangesNormal"), value: 0 },
+    { label: t("speechChangesMild"), value: 1 },
+    { label: t("speechChangesSevere"), value: 2 },
+  ])}
 
             ${this.renderSection("eye_deviation", t("eyeDeviationTitle"), [
-              { label: t("eyeDeviationNormal"), value: 0 },
-              { label: t("eyeDeviationPartial"), value: 1 },
-              { label: t("eyeDeviationForced"), value: 2 },
-            ])}
+    { label: t("eyeDeviationNormal"), value: 0 },
+    { label: t("eyeDeviationPartial"), value: 1 },
+    { label: t("eyeDeviationForced"), value: 2 },
+  ])}
 
             ${this.renderSection("denial_neglect", t("denialNeglectTitle"), [
-              { label: t("denialNeglectNormal"), value: 0 },
-              { label: t("denialNeglectPartial"), value: 1 },
-              { label: t("denialNeglectComplete"), value: 2 },
-            ])}
+    { label: t("denialNeglectNormal"), value: 0 },
+    { label: t("denialNeglectPartial"), value: 1 },
+    { label: t("denialNeglectComplete"), value: 2 },
+  ])}
 
             <!-- Total -->
             <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 flex flex-col items-center text-center">
@@ -75,10 +75,10 @@ export class FastEdCalculator {
               </h3>
               <div class="risk-indicator mt-2 px-4 py-2 rounded-full font-medium 
                 ${
-                  riskLevel === "high"
-                    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                    : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                }">
+  riskLevel === "high"
+    ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+    : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+}">
                 ${t("riskLevel")}: ${riskLevel === "high" ? t("riskLevelHigh") : t("riskLevelLow")}
               </div>
             </div>
@@ -100,16 +100,16 @@ export class FastEdCalculator {
         <h3 class="font-semibold text-gray-800 dark:text-gray-100">${title}</h3>
         <div class="flex flex-wrap gap-3">
           ${options
-            .map(
-              opt => `
+    .map(
+      opt => `
             <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
               <input type="radio" name="${name}" value="${opt.value}" 
                 class="accent-blue-600 dark:accent-blue-500"
                 ${this.scores[name] === opt.value ? "checked" : ""}>
               <span>${opt.label}</span>
             </label>`
-            )
-            .join("")}
+    )
+    .join("")}
         </div>
       </div>
     `;
@@ -128,10 +128,10 @@ export class FastEdCalculator {
 
     this.modal.querySelector(".modal-close")?.addEventListener("click", () => this.close());
     this.modal
-      .querySelector('[data-action="cancel-fast-ed"]')
+      .querySelector("[data-action=\"cancel-fast-ed\"]")
       ?.addEventListener("click", () => this.close());
     this.modal
-      .querySelector('[data-action="apply-fast-ed"]')
+      .querySelector("[data-action=\"apply-fast-ed\"]")
       ?.addEventListener("click", () => this.apply());
 
     this.modal.addEventListener("click", e => {

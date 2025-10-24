@@ -80,7 +80,7 @@ export class MedicalEventObserver {
     const sortedObservers = Array.from(eventObservers).sort((a, b) => b.priority - a.priority);
 
     // Notify observers with error handling
-    sortedObservers.forEach(observer => {
+    sortedObservers.forEach((observer) => {
       try {
         observer.callback(event);
 
@@ -104,7 +104,7 @@ export class MedicalEventObserver {
     const sensitiveFields = ["password", "ssn", "medical_record_number", "patient_id"];
     const sanitized = { ...data };
 
-    sensitiveFields.forEach(field => {
+    sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
         sanitized[field] = "[REDACTED]";
       }
@@ -136,7 +136,7 @@ export class MedicalEventObserver {
    */
   getEventHistory(eventType = null) {
     if (eventType) {
-      return this.eventHistory.filter(event => event.type === eventType);
+      return this.eventHistory.filter((event) => event.type === eventType);
     }
     return [...this.eventHistory];
   }
