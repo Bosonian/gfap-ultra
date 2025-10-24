@@ -10,7 +10,6 @@ import {
 import { initializeResearchMode } from "../research/comparison-ui.js";
 import { authManager } from "../auth/authentication.js";
 import { populateI18nPlaceholders, safeSetInnerHTML } from "../security/html-sanitizer.js";
-
 import { renderComa } from "./screens/coma.js";
 import { renderLimited } from "./screens/limited.js";
 import { renderFull } from "./screens/full.js";

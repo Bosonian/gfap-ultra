@@ -25,7 +25,10 @@ export function normalizeDrivers(drivers) {
   }
 
   // Check if it's logistic contributions format
-  if (drivers.logistic_contributions || (drivers.kind && drivers.kind === "logistic_contributions")) {
+  if (
+    drivers.logistic_contributions ||
+    (drivers.kind && drivers.kind === "logistic_contributions")
+  ) {
     return normalizeLogisticContributions(drivers);
   }
 
@@ -78,17 +81,19 @@ function normalizeShapValues(drivers) {
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
 
   // Specific check for FAST-ED related features
-  const fastEdFeatures = features.filter((f) => f.label.toLowerCase().includes("fast")
-    || f.label.toLowerCase().includes("ed")
-    || f.label.includes("fast_ed"));
+  const fastEdFeatures = features.filter(
+    f =>
+      f.label.toLowerCase().includes("fast") ||
+      f.label.toLowerCase().includes("ed") ||
+      f.label.includes("fast_ed")
+  );
   if (fastEdFeatures.length > 0) {
-
   } else {
     // No FAST-ED features found in drivers
   }
 
-  const positive = features.filter((f) => f.weight > 0);
-  const negative = features.filter((f) => f.weight < 0);
+  const positive = features.filter(f => f.weight > 0);
+  const negative = features.filter(f => f.weight < 0);
 
   const meta = {};
   if (drivers.base_value !== undefined) {
@@ -116,7 +121,10 @@ function normalizeLogisticContributions(drivers) {
 
   if (typeof logitData === "object") {
     Object.entries(logitData).forEach(([feature, value]) => {
-      if (typeof value === "number" && !["intercept", "contrib_sum", "logit_total"].includes(feature)) {
+      if (
+        typeof value === "number" &&
+        !["intercept", "contrib_sum", "logit_total"].includes(feature)
+      ) {
         features.push({
           label: feature,
           weight: value,
@@ -128,8 +136,8 @@ function normalizeLogisticContributions(drivers) {
   // Sort by absolute weight value
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
 
-  const positive = features.filter((f) => f.weight > 0);
-  const negative = features.filter((f) => f.weight < 0);
+  const positive = features.filter(f => f.weight > 0);
+  const negative = features.filter(f => f.weight < 0);
 
   const meta = {};
   if (logitData.intercept !== undefined) {
@@ -169,8 +177,8 @@ function normalizeRawDrivers(drivers) {
   // Sort by absolute weight value
   features.sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
 
-  const positive = features.filter((f) => f.weight > 0);
-  const negative = features.filter((f) => f.weight < 0);
+  const positive = features.filter(f => f.weight > 0);
+  const negative = features.filter(f => f.weight < 0);
 
   return {
     kind: "raw_weights",
@@ -182,5 +190,5 @@ function normalizeRawDrivers(drivers) {
 }
 
 function isRawDriversObject(obj) {
-  return Object.values(obj).every((value) => typeof value === "number");
+  return Object.values(obj).every(value => typeof value === "number");
 }

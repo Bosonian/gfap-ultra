@@ -29,10 +29,10 @@ export function renderProgressIndicator(currentStep) {
 
         <!-- Connector Line (except last step) -->
         ${
-  index < steps.length - 1
-    ? `<div class="absolute top-4 left-1/2 w-full h-1 ${isCompleted ? "bg-green-500" : "bg-gray-300"} z-0"></div>`
-    : ""
-}
+          index < steps.length - 1
+            ? `<div class="absolute top-4 left-1/2 w-full h-1 ${isCompleted ? "bg-green-500" : "bg-gray-300"} z-0"></div>`
+            : ""
+        }
       </div>
     `;
   });

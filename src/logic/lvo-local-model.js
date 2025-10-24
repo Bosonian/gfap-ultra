@@ -6,18 +6,168 @@
 // Balanced obfuscated model parameters for clinically realistic LVO probabilities
 const _0x9c2a = [0.123, 0.0, 1.0, 3.6667, 2.3495, -0.8, 0.3, 2.1, 1.0, 0.0];
 const _0x8d4f = btoa("calibrated-lvo-fallback-v3");
-const _0x3e7b = (i) => _0x9c2a[i];
+const _0x3e7b = i => _0x9c2a[i];
 
 // Encoded parameter mapping
 const _0xParams = (() => {
-  const k1 = String.fromCharCode(80, 79, 87, 69, 82, 95, 84, 82, 65, 78, 83, 70, 79, 82, 77, 69, 82, 95, 76, 65, 77, 66, 68, 65);
+  const k1 = String.fromCharCode(
+    80,
+    79,
+    87,
+    69,
+    82,
+    95,
+    84,
+    82,
+    65,
+    78,
+    83,
+    70,
+    79,
+    82,
+    77,
+    69,
+    82,
+    95,
+    76,
+    65,
+    77,
+    66,
+    68,
+    65
+  );
   const k2 = String.fromCharCode(71, 70, 65, 80, 95, 83, 67, 65, 76, 69, 82, 95, 77, 69, 65, 78);
-  const k3 = String.fromCharCode(71, 70, 65, 80, 95, 83, 67, 65, 76, 69, 82, 95, 83, 67, 65, 76, 69);
-  const k4 = String.fromCharCode(70, 65, 83, 84, 95, 69, 68, 95, 83, 67, 65, 76, 69, 82, 95, 77, 69, 65, 78);
-  const k5 = String.fromCharCode(70, 65, 83, 84, 95, 69, 68, 95, 83, 67, 65, 76, 69, 82, 95, 83, 67, 65, 76, 69);
-  const k6 = String.fromCharCode(66, 65, 83, 69, 95, 77, 79, 68, 69, 76, 95, 73, 78, 84, 69, 82, 67, 69, 80, 84);
-  const k7 = String.fromCharCode(66, 65, 83, 69, 95, 77, 79, 68, 69, 76, 95, 67, 79, 69, 70, 95, 71, 70, 65, 80);
-  const k8 = String.fromCharCode(66, 65, 83, 69, 95, 77, 79, 68, 69, 76, 95, 67, 79, 69, 70, 95, 70, 65, 83, 84, 95, 69, 68);
+  const k3 = String.fromCharCode(
+    71,
+    70,
+    65,
+    80,
+    95,
+    83,
+    67,
+    65,
+    76,
+    69,
+    82,
+    95,
+    83,
+    67,
+    65,
+    76,
+    69
+  );
+  const k4 = String.fromCharCode(
+    70,
+    65,
+    83,
+    84,
+    95,
+    69,
+    68,
+    95,
+    83,
+    67,
+    65,
+    76,
+    69,
+    82,
+    95,
+    77,
+    69,
+    65,
+    78
+  );
+  const k5 = String.fromCharCode(
+    70,
+    65,
+    83,
+    84,
+    95,
+    69,
+    68,
+    95,
+    83,
+    67,
+    65,
+    76,
+    69,
+    82,
+    95,
+    83,
+    67,
+    65,
+    76,
+    69
+  );
+  const k6 = String.fromCharCode(
+    66,
+    65,
+    83,
+    69,
+    95,
+    77,
+    79,
+    68,
+    69,
+    76,
+    95,
+    73,
+    78,
+    84,
+    69,
+    82,
+    67,
+    69,
+    80,
+    84
+  );
+  const k7 = String.fromCharCode(
+    66,
+    65,
+    83,
+    69,
+    95,
+    77,
+    79,
+    68,
+    69,
+    76,
+    95,
+    67,
+    79,
+    69,
+    70,
+    95,
+    71,
+    70,
+    65,
+    80
+  );
+  const k8 = String.fromCharCode(
+    66,
+    65,
+    83,
+    69,
+    95,
+    77,
+    79,
+    68,
+    69,
+    76,
+    95,
+    67,
+    79,
+    69,
+    70,
+    95,
+    70,
+    65,
+    83,
+    84,
+    95,
+    69,
+    68
+  );
   const k9 = String.fromCharCode(67, 65, 76, 73, 66, 82, 65, 84, 79, 82, 95, 65);
   const k10 = String.fromCharCode(67, 65, 76, 73, 66, 82, 65, 84, 79, 82, 95, 66);
 
@@ -41,10 +191,12 @@ const _0xTransforms = {
   _0x4a8c: (x, λ) => {
     const _0x1f = x >= 0;
     if (_0x1f) {
-      return λ === 0 ? Math[String.fromCharCode(108, 111, 103)](x + 1)
+      return λ === 0
+        ? Math[String.fromCharCode(108, 111, 103)](x + 1)
         : (Math[String.fromCharCode(112, 111, 119)](x + 1, λ) - 1) / λ;
     }
-    return λ === 2 ? -Math[String.fromCharCode(108, 111, 103)](-x + 1)
+    return λ === 2
+      ? -Math[String.fromCharCode(108, 111, 103)](-x + 1)
       : -(Math[String.fromCharCode(112, 111, 119)](-x + 1, 2 - λ) - 1) / (2 - λ);
   },
 
@@ -52,10 +204,10 @@ const _0xTransforms = {
   _0x7e2d: (v, m, s) => (v - m) / s,
 
   // Sigmoid activation (obfuscated)
-  _0x9b5f: (z) => 1 / (1 + Math[String.fromCharCode(101, 120, 112)](-z)),
+  _0x9b5f: z => 1 / (1 + Math[String.fromCharCode(101, 120, 112)](-z)),
 
   // Noise injection (security through obscurity)
-  _0x6c8a: (x) => Math.sin(x * 1337) * 0 + x,
+  _0x6c8a: x => Math.sin(x * 1337) * 0 + x,
 };
 
 /**
@@ -83,14 +235,164 @@ export function predictLVO(gfapValue, fastEdScore) {
 
     // Decode parameter keys
     const _0xKeys = {
-      lambda: String.fromCharCode(80, 79, 87, 69, 82, 95, 84, 82, 65, 78, 83, 70, 79, 82, 77, 69, 82, 95, 76, 65, 77, 66, 68, 65),
+      lambda: String.fromCharCode(
+        80,
+        79,
+        87,
+        69,
+        82,
+        95,
+        84,
+        82,
+        65,
+        78,
+        83,
+        70,
+        79,
+        82,
+        77,
+        69,
+        82,
+        95,
+        76,
+        65,
+        77,
+        66,
+        68,
+        65
+      ),
       gfapMean: String.fromCharCode(71, 70, 65, 80, 95, 83, 67, 65, 76, 69, 82, 95, 77, 69, 65, 78),
-      gfapScale: String.fromCharCode(71, 70, 65, 80, 95, 83, 67, 65, 76, 69, 82, 95, 83, 67, 65, 76, 69),
-      fastMean: String.fromCharCode(70, 65, 83, 84, 95, 69, 68, 95, 83, 67, 65, 76, 69, 82, 95, 77, 69, 65, 78),
-      fastScale: String.fromCharCode(70, 65, 83, 84, 95, 69, 68, 95, 83, 67, 65, 76, 69, 82, 95, 83, 67, 65, 76, 69),
-      intercept: String.fromCharCode(66, 65, 83, 69, 95, 77, 79, 68, 69, 76, 95, 73, 78, 84, 69, 82, 67, 69, 80, 84),
-      gfapCoef: String.fromCharCode(66, 65, 83, 69, 95, 77, 79, 68, 69, 76, 95, 67, 79, 69, 70, 95, 71, 70, 65, 80),
-      fastCoef: String.fromCharCode(66, 65, 83, 69, 95, 77, 79, 68, 69, 76, 95, 67, 79, 69, 70, 95, 70, 65, 83, 84, 95, 69, 68),
+      gfapScale: String.fromCharCode(
+        71,
+        70,
+        65,
+        80,
+        95,
+        83,
+        67,
+        65,
+        76,
+        69,
+        82,
+        95,
+        83,
+        67,
+        65,
+        76,
+        69
+      ),
+      fastMean: String.fromCharCode(
+        70,
+        65,
+        83,
+        84,
+        95,
+        69,
+        68,
+        95,
+        83,
+        67,
+        65,
+        76,
+        69,
+        82,
+        95,
+        77,
+        69,
+        65,
+        78
+      ),
+      fastScale: String.fromCharCode(
+        70,
+        65,
+        83,
+        84,
+        95,
+        69,
+        68,
+        95,
+        83,
+        67,
+        65,
+        76,
+        69,
+        82,
+        95,
+        83,
+        67,
+        65,
+        76,
+        69
+      ),
+      intercept: String.fromCharCode(
+        66,
+        65,
+        83,
+        69,
+        95,
+        77,
+        79,
+        68,
+        69,
+        76,
+        95,
+        73,
+        78,
+        84,
+        69,
+        82,
+        67,
+        69,
+        80,
+        84
+      ),
+      gfapCoef: String.fromCharCode(
+        66,
+        65,
+        83,
+        69,
+        95,
+        77,
+        79,
+        68,
+        69,
+        76,
+        95,
+        67,
+        79,
+        69,
+        70,
+        95,
+        71,
+        70,
+        65,
+        80
+      ),
+      fastCoef: String.fromCharCode(
+        66,
+        65,
+        83,
+        69,
+        95,
+        77,
+        79,
+        68,
+        69,
+        76,
+        95,
+        67,
+        79,
+        69,
+        70,
+        95,
+        70,
+        65,
+        83,
+        84,
+        95,
+        69,
+        68
+      ),
       calA: String.fromCharCode(67, 65, 76, 73, 66, 82, 65, 84, 79, 82, 95, 65),
       calB: String.fromCharCode(67, 65, 76, 73, 66, 82, 65, 84, 79, 82, 95, 66),
     };
@@ -100,16 +402,25 @@ export function predictLVO(gfapValue, fastEdScore) {
     const _0xNoise1 = _0xTransforms._0x6c8a(_0x1Transform);
 
     // Step 2: Obfuscated scaling
-    const _0x2Scaled = _0xTransforms._0x7e2d(_0x1Transform, _0xParams[_0xKeys.gfapMean], _0xParams[_0xKeys.gfapScale]);
-    const _0x3Scaled = _0xTransforms._0x7e2d(fastEdScore, _0xParams[_0xKeys.fastMean], _0xParams[_0xKeys.fastScale]);
+    const _0x2Scaled = _0xTransforms._0x7e2d(
+      _0x1Transform,
+      _0xParams[_0xKeys.gfapMean],
+      _0xParams[_0xKeys.gfapScale]
+    );
+    const _0x3Scaled = _0xTransforms._0x7e2d(
+      fastEdScore,
+      _0xParams[_0xKeys.fastMean],
+      _0xParams[_0xKeys.fastScale]
+    );
 
     // Step 3: Obfuscated logit calculation
-    const _0xLogitUncal = _0xParams[_0xKeys.intercept]
-                          + (_0xParams[_0xKeys.gfapCoef] * _0x2Scaled)
-                          + (_0xParams[_0xKeys.fastCoef] * _0x3Scaled);
+    const _0xLogitUncal =
+      _0xParams[_0xKeys.intercept] +
+      _0xParams[_0xKeys.gfapCoef] * _0x2Scaled +
+      _0xParams[_0xKeys.fastCoef] * _0x3Scaled;
 
     // Step 4: Obfuscated calibration and sigmoid
-    const _0xLogitCal = (_0xParams[_0xKeys.calA] * _0xLogitUncal) + _0xParams[_0xKeys.calB];
+    const _0xLogitCal = _0xParams[_0xKeys.calA] * _0xLogitUncal + _0xParams[_0xKeys.calB];
     const finalProbability = _0xTransforms._0x9b5f(_0xLogitCal);
 
     // Store scaled values for debugging
@@ -213,7 +524,8 @@ function interpretLVOProbability(probability, fastEdScore, gfapValue) {
       return `High probability of LVO (${probPercent}%). FAST-ED score of ${fastEdScore} strongly suggests large vessel occlusion. Consider immediate thrombectomy evaluation.`;
     }
     return `High probability of LVO (${probPercent}%). Despite moderate FAST-ED score, biomarker pattern suggests large vessel occlusion.`;
-  } if (probability > 0.4) {
+  }
+  if (probability > 0.4) {
     if (gfapValue > 500) {
       return `Moderate LVO probability (${probPercent}%). Elevated GFAP (${gfapValue.toFixed(0)} pg/mL) may indicate hemorrhagic component. Further imaging recommended.`;
     }
@@ -231,9 +543,11 @@ function interpretLVOProbability(probability, fastEdScore, gfapValue) {
  * @returns {boolean} True if local model can be used
  */
 export function canUseLocalModel(patientData) {
-  return patientData?.gfap_value != null
-         && patientData?.fast_ed_score != null
-         && patientData?.gfap_value >= 0
-         && patientData?.fast_ed_score >= 0
-         && patientData?.fast_ed_score <= 9;
+  return (
+    patientData?.gfap_value != null &&
+    patientData?.fast_ed_score != null &&
+    patientData?.gfap_value >= 0 &&
+    patientData?.fast_ed_score >= 0 &&
+    patientData?.fast_ed_score <= 9
+  );
 }

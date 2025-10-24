@@ -7,7 +7,8 @@ import { medicalLogger } from "../utils/medical-logger.js";
 
 // Cloud Function endpoints that need warming up
 const API_ENDPOINTS = {
-  authentication: "https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access",
+  authentication:
+    "https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access",
   comaIch: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich",
   limitedIch: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
   fullStroke: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
@@ -102,15 +103,17 @@ class APIWarmupService {
 
     if (background) {
       // Don't await in background mode - let it run asynchronously
-      Promise.all(warmupPromises).then(() => {
-        this.completeWarmup();
-      }).catch((error) => {
-        medicalLogger.error("Background API warmup failed", {
-          category: "WARMUP",
-          error: error.message,
+      Promise.all(warmupPromises)
+        .then(() => {
+          this.completeWarmup();
+        })
+        .catch(error => {
+          medicalLogger.error("Background API warmup failed", {
+            category: "WARMUP",
+            error: error.message,
+          });
+          this.isWarming = false;
         });
-        this.isWarming = false;
-      });
 
       return { status: "warming", message: "APIs warming up in background" };
     }
@@ -168,10 +171,13 @@ class APIWarmupService {
 
       // Network errors are expected for CORS issues, but the function still gets warmed up
       if (error.name === "TypeError" && error.message.includes("Failed to fetch")) {
-        medicalLogger.info(`${name} API warmup encountered CORS (expected), function still warmed`, {
-          category: "WARMUP",
-          duration,
-        });
+        medicalLogger.info(
+          `${name} API warmup encountered CORS (expected), function still warmed`,
+          {
+            category: "WARMUP",
+            duration,
+          }
+        );
 
         return {
           success: true, // Consider CORS as successful warmup
@@ -217,9 +223,11 @@ class APIWarmupService {
 
     // Dispatch custom event for UI feedback
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("api-warmup-complete", {
-        detail: summary,
-      }));
+      window.dispatchEvent(
+        new CustomEvent("api-warmup-complete", {
+          detail: summary,
+        })
+      );
     }
   }
 
@@ -255,7 +263,7 @@ class APIWarmupService {
         results[apiName] = await this.warmupSingleAPI(
           apiName,
           API_ENDPOINTS[apiName],
-          WARMUP_PAYLOADS[apiName],
+          WARMUP_PAYLOADS[apiName]
         );
       }
     }
@@ -309,7 +317,7 @@ export async function warmupSpecificAPIs(apiNames) {
       results[apiName] = await apiWarmupService.warmupSingleAPI(
         apiName,
         API_ENDPOINTS[apiName],
-        WARMUP_PAYLOADS[apiName],
+        WARMUP_PAYLOADS[apiName]
       );
     } else {
       results[apiName] = {

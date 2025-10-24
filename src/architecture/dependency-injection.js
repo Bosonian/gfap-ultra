@@ -145,27 +145,27 @@ export class MedicalServiceContainer {
    */
   createInstance(registration) {
     switch (registration.lifetime) {
-    case ServiceLifetime.SINGLETON:
-      if (!registration.instance) {
-        registration.instance = this.instantiate(registration);
-      }
-      return registration.instance;
+      case ServiceLifetime.SINGLETON:
+        if (!registration.instance) {
+          registration.instance = this.instantiate(registration);
+        }
+        return registration.instance;
 
-    case ServiceLifetime.TRANSIENT:
-      return this.instantiate(registration);
+      case ServiceLifetime.TRANSIENT:
+        return this.instantiate(registration);
 
-    case ServiceLifetime.SCOPED:
-      if (!this.currentScope) {
-        throw new Error("No active scope for scoped service resolution");
-      }
-      const scopeKey = `${this.currentScope}_${registration.key}`;
-      if (!this.scopes.has(scopeKey)) {
-        this.scopes.set(scopeKey, this.instantiate(registration));
-      }
-      return this.scopes.get(scopeKey);
+      case ServiceLifetime.SCOPED:
+        if (!this.currentScope) {
+          throw new Error("No active scope for scoped service resolution");
+        }
+        const scopeKey = `${this.currentScope}_${registration.key}`;
+        if (!this.scopes.has(scopeKey)) {
+          this.scopes.set(scopeKey, this.instantiate(registration));
+        }
+        return this.scopes.get(scopeKey);
 
-    default:
-      throw new Error(`Unknown service lifetime: ${registration.lifetime}`);
+      default:
+        throw new Error(`Unknown service lifetime: ${registration.lifetime}`);
     }
   }
 
@@ -176,7 +176,7 @@ export class MedicalServiceContainer {
    */
   instantiate(registration) {
     // Resolve dependencies
-    const resolvedDependencies = registration.dependencies.map((dep) => this.resolve(dep));
+    const resolvedDependencies = registration.dependencies.map(dep => this.resolve(dep));
 
     // Create instance with resolved dependencies
     return registration.factory(...resolvedDependencies);
@@ -231,9 +231,9 @@ export class MedicalServiceContainer {
 
     // Cleanup scoped services
     const scopePrefix = `${this.currentScope}_`;
-    const scopedKeys = Array.from(this.scopes.keys()).filter((key) => key.startsWith(scopePrefix));
+    const scopedKeys = Array.from(this.scopes.keys()).filter(key => key.startsWith(scopePrefix));
 
-    scopedKeys.forEach((key) => {
+    scopedKeys.forEach(key => {
       const instance = this.scopes.get(key);
       if (instance && typeof instance.dispose === "function") {
         try {
@@ -292,17 +292,17 @@ export class MedicalServiceContainer {
       currentScope: this.currentScope,
     };
 
-    this.services.forEach((registration) => {
+    this.services.forEach(registration => {
       switch (registration.lifetime) {
-      case ServiceLifetime.SINGLETON:
-        stats.singletons += 1;
-        break;
-      case ServiceLifetime.TRANSIENT:
-        stats.transients += 1;
-        break;
-      case ServiceLifetime.SCOPED:
-        stats.scoped += 1;
-        break;
+        case ServiceLifetime.SINGLETON:
+          stats.singletons += 1;
+          break;
+        case ServiceLifetime.TRANSIENT:
+          stats.transients += 1;
+          break;
+        case ServiceLifetime.SCOPED:
+          stats.scoped += 1;
+          break;
       }
       stats.totalResolves += registration.metadata.resolveCount;
     });
@@ -318,7 +318,7 @@ export class MedicalServiceContainer {
     this.disposeScope();
 
     // Dispose singleton services
-    this.services.forEach((registration) => {
+    this.services.forEach(registration => {
       if (registration.instance && typeof registration.instance.dispose === "function") {
         try {
           registration.instance.dispose();

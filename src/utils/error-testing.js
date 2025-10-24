@@ -18,7 +18,6 @@ import {
 } from "../logic/ich-volume-calculator.js";
 import { medicalSyncManager } from "../sync/medical-sync-manager.js";
 import { medicalSWManager } from "../workers/sw-manager.js";
-
 import { getErrorHandler } from "./error-handler.js";
 
 /**

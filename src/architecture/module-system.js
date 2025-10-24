@@ -147,7 +147,7 @@ export class MedicalModule {
     }
 
     // Remove event handlers
-    this.eventHandlers.forEach((unsubscribe) => {
+    this.eventHandlers.forEach(unsubscribe => {
       try {
         unsubscribe();
       } catch (error) {
@@ -157,7 +157,7 @@ export class MedicalModule {
     this.eventHandlers.clear();
 
     // Dispose services
-    this.services.forEach((service) => {
+    this.services.forEach(service => {
       if (service && typeof service.dispose === "function") {
         try {
           service.dispose();
@@ -388,12 +388,12 @@ export class MedicalModuleRegistry {
    * @returns {Object} Health status summary
    */
   getHealthStatus() {
-    const moduleHealth = Array.from(this.modules.values()).map((module) => module.getHealthStatus());
+    const moduleHealth = Array.from(this.modules.values()).map(module => module.getHealthStatus());
 
     const summary = {
       totalModules: this.modules.size,
-      healthyModules: moduleHealth.filter((health) => health.healthy).length,
-      unhealthyModules: moduleHealth.filter((health) => !health.healthy).length,
+      healthyModules: moduleHealth.filter(health => health.healthy).length,
+      unhealthyModules: moduleHealth.filter(health => !health.healthy).length,
       modules: moduleHealth,
     };
 
@@ -409,7 +409,7 @@ export class MedicalModuleRegistry {
     const visiting = new Set();
     const order = [];
 
-    const visit = (moduleName) => {
+    const visit = moduleName => {
       if (visiting.has(moduleName)) {
         throw new Error(`Circular dependency detected involving module: ${moduleName}`);
       }
@@ -446,7 +446,7 @@ export class MedicalModuleRegistry {
    */
   getStats() {
     const stateCount = {};
-    this.modules.forEach((module) => {
+    this.modules.forEach(module => {
       const { state } = module.metadata;
       stateCount[state] = (stateCount[state] || 0) + 1;
     });

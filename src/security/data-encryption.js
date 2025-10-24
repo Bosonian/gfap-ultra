@@ -45,10 +45,12 @@ export class MedicalDataEncryption {
    * Check if Web Crypto API is supported
    */
   checkWebCryptoSupport() {
-    return typeof window !== "undefined"
-           && window.crypto
-           && window.crypto.subtle
-           && typeof window.crypto.subtle.encrypt === "function";
+    return (
+      typeof window !== "undefined" &&
+      window.crypto &&
+      window.crypto.subtle &&
+      typeof window.crypto.subtle.encrypt === "function"
+    );
   }
 
   /**
@@ -74,7 +76,7 @@ export class MedicalDataEncryption {
             length: this.keyLength,
           },
           false, // Not extractable for security
-          ["encrypt", "decrypt"],
+          ["encrypt", "decrypt"]
         );
 
         medicalLogger.info("Medical data encryption initialized", {
@@ -89,7 +91,7 @@ export class MedicalDataEncryption {
         category: ERROR_CATEGORIES.SECURITY,
         severity: ERROR_SEVERITY.HIGH,
         context: { operation: "encryption_initialization" },
-      },
+      }
     );
   }
 
@@ -105,7 +107,7 @@ export class MedicalDataEncryption {
         if (!keyData) {
           // Generate new key material for this session
           const randomBytes = window.crypto.getRandomValues(new Uint8Array(32));
-          keyData = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+          keyData = Array.from(randomBytes, byte => byte.toString(16).padStart(2, "0")).join("");
           sessionStorage.setItem("_medical_km", keyData);
 
           medicalLogger.debug("Generated new encryption key material", {
@@ -114,21 +116,17 @@ export class MedicalDataEncryption {
         }
 
         // Convert hex string back to Uint8Array
-        const keyBytes = new Uint8Array(keyData.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+        const keyBytes = new Uint8Array(keyData.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
 
         // Import key material
-        return await window.crypto.subtle.importKey(
-          "raw",
-          keyBytes,
-          "PBKDF2",
-          false,
-          ["deriveKey"],
-        );
+        return await window.crypto.subtle.importKey("raw", keyBytes, "PBKDF2", false, [
+          "deriveKey",
+        ]);
       },
       {
         category: ERROR_CATEGORIES.SECURITY,
         context: { operation: "key_material_generation" },
-      },
+      }
     );
   }
 
@@ -161,7 +159,7 @@ export class MedicalDataEncryption {
             iv,
           },
           this.encryptionKey,
-          dataBytes,
+          dataBytes
         );
 
         // Convert to base64 for storage
@@ -193,7 +191,7 @@ export class MedicalDataEncryption {
           return JSON.stringify(data);
         },
         context: { operation: "data_encryption" },
-      },
+      }
     );
   }
 
@@ -237,13 +235,13 @@ export class MedicalDataEncryption {
         const encryptedBytes = new Uint8Array(
           atob(encryptedData.encrypted)
             .split("")
-            .map((char) => char.charCodeAt(0)),
+            .map(char => char.charCodeAt(0))
         );
 
         const iv = new Uint8Array(
           atob(encryptedData.iv)
             .split("")
-            .map((char) => char.charCodeAt(0)),
+            .map(char => char.charCodeAt(0))
         );
 
         // Decrypt the data
@@ -253,7 +251,7 @@ export class MedicalDataEncryption {
             iv,
           },
           this.encryptionKey,
-          encryptedBytes,
+          encryptedBytes
         );
 
         // Convert back to string and parse JSON
@@ -277,7 +275,7 @@ export class MedicalDataEncryption {
           return null;
         },
         context: { operation: "data_decryption" },
-      },
+      }
     );
   }
 
@@ -310,7 +308,7 @@ export class MedicalDataEncryption {
       {
         category: ERROR_CATEGORIES.STORAGE,
         context: { operation: "secure_store", key },
-      },
+      }
     );
   }
 
@@ -359,7 +357,7 @@ export class MedicalDataEncryption {
       {
         category: ERROR_CATEGORIES.STORAGE,
         context: { operation: "secure_retrieve", key },
-      },
+      }
     );
   }
 
@@ -389,7 +387,7 @@ export class MedicalDataEncryption {
       {
         category: ERROR_CATEGORIES.STORAGE,
         context: { operation: "secure_remove", key },
-      },
+      }
     );
   }
 
@@ -451,7 +449,7 @@ export class MedicalDataEncryption {
       {
         category: ERROR_CATEGORIES.STORAGE,
         context: { operation: "migrate_legacy_data", key },
-      },
+      }
     );
   }
 
@@ -492,10 +490,13 @@ export class MedicalDataEncryption {
 export const medicalEncryption = new MedicalDataEncryption();
 
 // Convenience functions
-export const secureStore = (key, data, useSessionStorage = false) => medicalEncryption.secureStore(key, data, useSessionStorage);
+export const secureStore = (key, data, useSessionStorage = false) =>
+  medicalEncryption.secureStore(key, data, useSessionStorage);
 
-export const secureRetrieve = (key, useSessionStorage = false) => medicalEncryption.secureRetrieve(key, useSessionStorage);
+export const secureRetrieve = (key, useSessionStorage = false) =>
+  medicalEncryption.secureRetrieve(key, useSessionStorage);
 
-export const secureRemove = (key, useSessionStorage = false) => medicalEncryption.secureRemove(key, useSessionStorage);
+export const secureRemove = (key, useSessionStorage = false) =>
+  medicalEncryption.secureRemove(key, useSessionStorage);
 
 export const clearEncryptionKeys = () => medicalEncryption.clearEncryptionKeys();

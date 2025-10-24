@@ -143,11 +143,11 @@ class MedicalCommand {
  */
 class UpdatePatientDataCommand extends MedicalCommand {
   constructor(fieldName, newValue, previousValue, store) {
-    super(
-      "UPDATE_PATIENT_DATA",
-      `Update ${fieldName} from ${previousValue} to ${newValue}`,
-      { fieldName, newValue, previousValue },
-    );
+    super("UPDATE_PATIENT_DATA", `Update ${fieldName} from ${previousValue} to ${newValue}`, {
+      fieldName,
+      newValue,
+      previousValue,
+    });
     this.fieldName = fieldName;
     this.newValue = newValue;
     this.previousValue = previousValue;
@@ -195,11 +195,10 @@ class UpdatePatientDataCommand extends MedicalCommand {
  */
 class NavigationCommand extends MedicalCommand {
   constructor(targetScreen, sourceScreen, store) {
-    super(
-      "NAVIGATE",
-      `Navigate from ${sourceScreen} to ${targetScreen}`,
-      { targetScreen, sourceScreen },
-    );
+    super("NAVIGATE", `Navigate from ${sourceScreen} to ${targetScreen}`, {
+      targetScreen,
+      sourceScreen,
+    });
     this.targetScreen = targetScreen;
     this.sourceScreen = sourceScreen;
     this.store = store;
@@ -234,11 +233,10 @@ class NavigationCommand extends MedicalCommand {
  */
 class SubmitFormCommand extends MedicalCommand {
   constructor(formData, moduleType, predictionStrategy) {
-    super(
-      "SUBMIT_FORM",
-      `Submit ${moduleType} form for prediction`,
-      { moduleType, formFields: Object.keys(formData) },
-    );
+    super("SUBMIT_FORM", `Submit ${moduleType} form for prediction`, {
+      moduleType,
+      formFields: Object.keys(formData),
+    });
     this.formData = { ...formData };
     this.moduleType = moduleType;
     this.predictionStrategy = predictionStrategy;
@@ -275,14 +273,14 @@ class SubmitFormCommand extends MedicalCommand {
 
   getStrategyName() {
     switch (this.moduleType) {
-    case "coma":
-      return "COMA_ICH";
-    case "limited":
-      return "LIMITED_DATA_ICH";
-    case "full":
-      return "FULL_STROKE";
-    default:
-      throw new Error(`Unknown module type: ${this.moduleType}`);
+      case "coma":
+        return "COMA_ICH";
+      case "limited":
+        return "LIMITED_DATA_ICH";
+      case "full":
+        return "FULL_STROKE";
+      default:
+        throw new Error(`Unknown module type: ${this.moduleType}`);
     }
   }
 }
@@ -292,11 +290,7 @@ class SubmitFormCommand extends MedicalCommand {
  */
 class ClearDataCommand extends MedicalCommand {
   constructor(dataType, store) {
-    super(
-      "CLEAR_DATA",
-      `Clear ${dataType} data for privacy compliance`,
-      { dataType },
-    );
+    super("CLEAR_DATA", `Clear ${dataType} data for privacy compliance`, { dataType });
     this.dataType = dataType;
     this.store = store;
     this.backupData = null;
@@ -308,17 +302,17 @@ class ClearDataCommand extends MedicalCommand {
 
     // Clear the specified data
     switch (this.dataType) {
-    case "all":
-      this.store.reset();
-      break;
-    case "forms":
-      this.store.clearFormData();
-      break;
-    case "results":
-      this.store.clearResults();
-      break;
-    default:
-      throw new Error(`Unknown data type: ${this.dataType}`);
+      case "all":
+        this.store.reset();
+        break;
+      case "forms":
+        this.store.clearFormData();
+        break;
+      case "results":
+        this.store.clearResults();
+        break;
+      default:
+        throw new Error(`Unknown data type: ${this.dataType}`);
     }
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
@@ -421,9 +415,11 @@ export class MedicalCommandInvoker {
    * Check if undo is possible
    */
   canUndo() {
-    return this.currentIndex >= 0
-           && this.commandHistory[this.currentIndex]
-           && this.commandHistory[this.currentIndex].canUndo();
+    return (
+      this.currentIndex >= 0 &&
+      this.commandHistory[this.currentIndex] &&
+      this.commandHistory[this.currentIndex].canUndo()
+    );
   }
 
   /**
@@ -437,7 +433,7 @@ export class MedicalCommandInvoker {
    * Get command history for audit
    */
   getCommandHistory() {
-    return this.commandHistory.map((cmd) => cmd.getSummary());
+    return this.commandHistory.map(cmd => cmd.getSummary());
   }
 
   /**

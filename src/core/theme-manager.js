@@ -180,7 +180,7 @@ export class ThemeManager {
    * @param {string} theme - Current theme
    */
   updateMetaThemeColor(theme) {
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    let metaThemeColor = document.querySelector("meta[name='theme-color']");
 
     if (!metaThemeColor) {
       metaThemeColor = document.createElement("meta");

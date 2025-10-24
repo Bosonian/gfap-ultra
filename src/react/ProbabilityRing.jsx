@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function ProbabilityRing({ percent = 0, level = "normal" }) {
   const radius = 50;
   const strokeWidth = 8;

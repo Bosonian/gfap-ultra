@@ -6,7 +6,10 @@
  */
 
 import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
-import { medicalPerformanceMonitor, PerformanceMetricType } from "../performance/medical-performance-monitor.js";
+import {
+  medicalPerformanceMonitor,
+  PerformanceMetricType,
+} from "../performance/medical-performance-monitor.js";
 
 /**
  * Component loading priorities
@@ -61,7 +64,7 @@ class LazyComponent {
     const metricId = medicalPerformanceMonitor.startMeasurement(
       PerformanceMetricType.USER_INTERACTION,
       `lazy_load_${this.name}`,
-      { priority: this.priority },
+      { priority: this.priority }
     );
 
     this.state = LoadState.LOADING;
@@ -114,7 +117,7 @@ class LazyComponent {
 
         // Exponential backoff
         const delay = Math.min(1000 * 2 ** (this.retryCount - 1), 5000);
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise(resolve => setTimeout(resolve, delay));
 
         this.loadPromise = null;
         return this.load();
@@ -141,11 +144,12 @@ class LazyComponent {
       return;
     }
 
-    const dependencyPromises = this.dependencies.map((dep) => {
+    const dependencyPromises = this.dependencies.map(dep => {
       if (typeof dep === "string") {
         // Load dependency by name
         return LazyLoader.load(dep);
-      } if (typeof dep === "function") {
+      }
+      if (typeof dep === "function") {
         // Load dependency function
         return dep();
       }
@@ -197,11 +201,11 @@ export class LazyLoader {
     // Intersection Observer for viewport-based loading
     if ("IntersectionObserver" in window) {
       this.intersectionObserver = new IntersectionObserver(
-        (entries) => this.handleIntersectionChanges(entries),
+        entries => this.handleIntersectionChanges(entries),
         {
           rootMargin: "50px",
           threshold: 0.1,
-        },
+        }
       );
     }
 
@@ -249,13 +253,18 @@ export class LazyLoader {
    * Preload components based on priority
    */
   async preload(priority = LoadPriority.HIGH) {
-    const priorities = [LoadPriority.CRITICAL, LoadPriority.HIGH, LoadPriority.NORMAL, LoadPriority.LOW];
+    const priorities = [
+      LoadPriority.CRITICAL,
+      LoadPriority.HIGH,
+      LoadPriority.NORMAL,
+      LoadPriority.LOW,
+    ];
     const targetPriorities = priorities.slice(0, priorities.indexOf(priority) + 1);
 
     const preloadPromises = [];
 
-    targetPriorities.forEach((pri) => {
-      this.loadQueue[pri].forEach((component) => {
+    targetPriorities.forEach(pri => {
+      this.loadQueue[pri].forEach(component => {
         if (component.state === LoadState.PENDING) {
           preloadPromises.push(component.load());
         }
@@ -287,11 +296,11 @@ export class LazyLoader {
    * Handle intersection observer changes
    */
   handleIntersectionChanges(entries) {
-    entries.forEach((entry) => {
+    entries.forEach(entry => {
       if (entry.isIntersecting) {
         const componentName = entry.target.dataset.lazyComponent;
         if (componentName) {
-          this.load(componentName).catch((error) => {
+          this.load(componentName).catch(error => {
             // (`Failed to load component ${componentName}:`, error);
           });
 
@@ -330,15 +339,19 @@ export class LazyLoader {
    */
   async processQueueByPriority(priority) {
     const queue = this.loadQueue[priority];
-    const pendingComponents = queue.filter((comp) => comp.state === LoadState.PENDING);
+    const pendingComponents = queue.filter(comp => comp.state === LoadState.PENDING);
 
     if (pendingComponents.length === 0) {
       return;
     }
 
-    const loadPromises = pendingComponents.map((component) => component.load().catch((error) =>
-      // (`Component ${component.name} failed to load:`, error);
-      null));
+    const loadPromises = pendingComponents.map(component =>
+      component.load().catch(
+        error =>
+          // (`Component ${component.name} failed to load:`, error);
+          null
+      )
+    );
 
     await Promise.allSettled(loadPromises);
   }
@@ -349,10 +362,13 @@ export class LazyLoader {
   scheduleIdleLoading() {
     const scheduleNext = () => {
       if ("requestIdleCallback" in window) {
-        this.idleCallback = requestIdleCallback((deadline) => {
-          this.processIdleQueue(deadline);
-          scheduleNext();
-        }, { timeout: 5000 });
+        this.idleCallback = requestIdleCallback(
+          deadline => {
+            this.processIdleQueue(deadline);
+            scheduleNext();
+          },
+          { timeout: 5000 }
+        );
       } else {
         // Fallback for browsers without requestIdleCallback
         setTimeout(() => {
@@ -374,12 +390,13 @@ export class LazyLoader {
 
     // Process normal priority first, then low priority
     const pendingComponents = [
-      ...normalQueue.filter((comp) => comp.state === LoadState.PENDING),
-      ...lowQueue.filter((comp) => comp.state === LoadState.PENDING),
+      ...normalQueue.filter(comp => comp.state === LoadState.PENDING),
+      ...lowQueue.filter(comp => comp.state === LoadState.PENDING),
     ];
 
     for (const component of pendingComponents) {
-      if (deadline.timeRemaining() > 10) { // Need at least 10ms
+      if (deadline.timeRemaining() > 10) {
+        // Need at least 10ms
         try {
           await component.load();
         } catch (error) {
@@ -398,10 +415,16 @@ export class LazyLoader {
     const stats = {
       total: this.components.size,
       byState: {
-        pending: 0, loading: 0, loaded: 0, error: 0,
+        pending: 0,
+        loading: 0,
+        loaded: 0,
+        error: 0,
       },
       byPriority: {
-        critical: 0, high: 0, normal: 0, low: 0,
+        critical: 0,
+        high: 0,
+        normal: 0,
+        low: 0,
       },
       totalLoadTime: 0,
       averageLoadTime: 0,
@@ -410,7 +433,7 @@ export class LazyLoader {
     let totalLoadTime = 0;
     let loadedCount = 0;
 
-    this.components.forEach((component) => {
+    this.components.forEach(component => {
       stats.byState[component.state]++;
       stats.byPriority[component.priority]++;
 
@@ -459,7 +482,7 @@ export class LazyLoader {
     }
 
     this.components.clear();
-    Object.values(this.loadQueue).forEach((queue) => queue.length = 0);
+    Object.values(this.loadQueue).forEach(queue => (queue.length = 0));
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
       action: "lazy_loader_disposed",
@@ -487,51 +510,45 @@ export class MedicalComponentLoader {
     this.lazyLoader.register(
       "advanced-analytics",
       () => import("../analytics/quality-metrics.js"),
-      { priority: LoadPriority.LOW },
+      { priority: LoadPriority.LOW }
     );
 
     this.lazyLoader.register(
       "clinical-reporting",
       () => import("../analytics/clinical-reporting.js"),
-      { priority: LoadPriority.LOW },
+      { priority: LoadPriority.LOW }
     );
 
-    this.lazyLoader.register(
-      "audit-trail",
-      () => import("../analytics/audit-trail.js"),
-      { priority: LoadPriority.LOW },
-    );
+    this.lazyLoader.register("audit-trail", () => import("../analytics/audit-trail.js"), {
+      priority: LoadPriority.LOW,
+    });
 
     // Service workers and background features
     this.lazyLoader.register(
       "medical-service-worker",
       () => import("../workers/medical-service-worker.js"),
-      { priority: LoadPriority.LOW },
+      { priority: LoadPriority.LOW }
     );
 
-    this.lazyLoader.register(
-      "sw-manager",
-      () => import("../workers/sw-manager.js"),
-      { priority: LoadPriority.LOW },
-    );
+    this.lazyLoader.register("sw-manager", () => import("../workers/sw-manager.js"), {
+      priority: LoadPriority.LOW,
+    });
 
     // Advanced architectural patterns (loaded only when needed)
-    this.lazyLoader.register(
-      "command-pattern",
-      () => import("../patterns/command.js"),
-      { priority: LoadPriority.NORMAL },
-    );
+    this.lazyLoader.register("command-pattern", () => import("../patterns/command.js"), {
+      priority: LoadPriority.NORMAL,
+    });
 
     this.lazyLoader.register(
       "prediction-strategy",
       () => import("../patterns/prediction-strategy.js"),
-      { priority: LoadPriority.NORMAL },
+      { priority: LoadPriority.NORMAL }
     );
 
     this.lazyLoader.register(
       "validation-factory",
       () => import("../patterns/validation-factory.js"),
-      { priority: LoadPriority.NORMAL },
+      { priority: LoadPriority.NORMAL }
     );
   }
 
@@ -540,31 +557,31 @@ export class MedicalComponentLoader {
    */
   async loadByClinicalPriority(clinicalSituation) {
     switch (clinicalSituation) {
-    case "emergency":
-      // Load high-priority architectural patterns
-      await this.lazyLoader.preload(LoadPriority.HIGH);
-      break;
+      case "emergency":
+        // Load high-priority architectural patterns
+        await this.lazyLoader.preload(LoadPriority.HIGH);
+        break;
 
-    case "routine":
-      // Load normal priority patterns and command structures
-      await this.lazyLoader.preload(LoadPriority.NORMAL);
-      break;
+      case "routine":
+        // Load normal priority patterns and command structures
+        await this.lazyLoader.preload(LoadPriority.NORMAL);
+        break;
 
-    case "research":
-      // Load research and analytics tools
-      await this.lazyLoader.load("advanced-analytics");
-      await this.lazyLoader.load("clinical-reporting");
-      await this.lazyLoader.load("audit-trail");
-      break;
+      case "research":
+        // Load research and analytics tools
+        await this.lazyLoader.load("advanced-analytics");
+        await this.lazyLoader.load("clinical-reporting");
+        await this.lazyLoader.load("audit-trail");
+        break;
 
-    case "background":
-      // Load service workers and background features
-      await this.lazyLoader.load("medical-service-worker");
-      await this.lazyLoader.load("sw-manager");
-      break;
+      case "background":
+        // Load service workers and background features
+        await this.lazyLoader.load("medical-service-worker");
+        await this.lazyLoader.load("sw-manager");
+        break;
 
-    default:
-      await this.lazyLoader.preload(LoadPriority.NORMAL);
+      default:
+        await this.lazyLoader.preload(LoadPriority.NORMAL);
     }
   }
 
@@ -582,7 +599,7 @@ export class MedicalComponentLoader {
     };
 
     const components = moduleComponents[moduleType] || [];
-    const loadPromises = components.map((comp) => this.lazyLoader.load(comp));
+    const loadPromises = components.map(comp => this.lazyLoader.load(comp));
 
     await Promise.allSettled(loadPromises);
 
@@ -605,13 +622,15 @@ export class MedicalComponentLoader {
       "audit-trail",
     ];
 
-    const loadPromises = enterpriseComponents.map((comp) => this.lazyLoader.load(comp).catch((error) => {
-      console.warn(`Enterprise feature ${comp} failed to load:`, error);
-      return null;
-    }));
+    const loadPromises = enterpriseComponents.map(comp =>
+      this.lazyLoader.load(comp).catch(error => {
+        console.warn(`Enterprise feature ${comp} failed to load:`, error);
+        return null;
+      })
+    );
 
     const results = await Promise.allSettled(loadPromises);
-    const loadedCount = results.filter((r) => r.status === "fulfilled" && r.value !== null).length;
+    const loadedCount = results.filter(r => r.status === "fulfilled" && r.value !== null).length;
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
       action: "enterprise_features_loaded",

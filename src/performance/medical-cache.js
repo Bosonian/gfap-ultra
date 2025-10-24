@@ -5,28 +5,28 @@
  * Provides HIPAA-compliant caching with TTL and secure data handling
  */
 
-import { medicalEventObserver, MEDICAL_EVENTS } from '../patterns/observer.js';
+import { medicalEventObserver, MEDICAL_EVENTS } from "../patterns/observer.js";
 
-import { medicalPerformanceMonitor, PerformanceMetricType } from './medical-performance-monitor.js';
+import { medicalPerformanceMonitor, PerformanceMetricType } from "./medical-performance-monitor.js";
 
 /**
  * Cache storage types for different data sensitivity levels
  */
 export const CacheStorageType = {
-  MEMORY: 'memory',
-  SESSION: 'session',
-  LOCAL: 'local',
-  INDEXED_DB: 'indexed_db',
+  MEMORY: "memory",
+  SESSION: "session",
+  LOCAL: "local",
+  INDEXED_DB: "indexed_db",
 };
 
 /**
  * Cache entry priorities for medical data
  */
 export const CachePriority = {
-  CRITICAL: 'critical', // Emergency data, never evict
-  HIGH: 'high', // Important medical data
-  NORMAL: 'normal', // Standard application data
-  LOW: 'low', // Non-critical data, evict first
+  CRITICAL: "critical", // Emergency data, never evict
+  HIGH: "high", // Important medical data
+  NORMAL: "normal", // Standard application data
+  LOW: "low", // Non-critical data, evict first
 };
 
 /**
@@ -64,7 +64,7 @@ class CacheEntry {
    * Sanitize sensitive data before caching
    */
   sanitizeValue(value) {
-    if (typeof value !== 'object' || value === null) {
+    if (typeof value !== "object" || value === null) {
       return value;
     }
 
@@ -72,7 +72,7 @@ class CacheEntry {
     const sanitized = JSON.parse(JSON.stringify(value));
 
     // Remove or mask sensitive fields
-    const sensitiveFields = ['ssn', 'mrn', 'patient_id', 'user_id', 'session_token'];
+    const sensitiveFields = ["ssn", "mrn", "patient_id", "user_id", "session_token"];
     this.removeSensitiveFields(sanitized, sensitiveFields);
 
     return sanitized;
@@ -82,10 +82,10 @@ class CacheEntry {
    * Recursively remove sensitive fields
    */
   removeSensitiveFields(obj, sensitiveFields) {
-    Object.keys(obj).forEach((key) => {
-      if (sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
-        obj[key] = '[REDACTED]';
-      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+    Object.keys(obj).forEach(key => {
+      if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
+        obj[key] = "[REDACTED]";
+      } else if (typeof obj[key] === "object" && obj[key] !== null) {
         this.removeSensitiveFields(obj[key], sensitiveFields);
       }
     });
@@ -198,7 +198,7 @@ export class MedicalCache {
     }
 
     try {
-      const cacheData = this.storage.getItem('medical_cache');
+      const cacheData = this.storage.getItem("medical_cache");
       if (cacheData) {
         const parsed = JSON.parse(cacheData);
         Object.entries(parsed).forEach(([key, entryData]) => {
@@ -207,7 +207,7 @@ export class MedicalCache {
             entryData.value,
             entryData.ttl,
             entryData.priority,
-            entryData.metadata,
+            entryData.metadata
           );
           entry.expiresAt = entryData.expiresAt;
 
@@ -243,7 +243,7 @@ export class MedicalCache {
         };
       });
 
-      this.storage.setItem('medical_cache', JSON.stringify(cacheData));
+      this.storage.setItem("medical_cache", JSON.stringify(cacheData));
     } catch (error) {
       // ('Failed to save cache to storage:', error.message);
     }
@@ -260,11 +260,17 @@ export class MedicalCache {
   /**
    * Set cache entry
    */
-  set(key, value, ttl = MedicalCacheTTL.API_RESPONSES, priority = CachePriority.NORMAL, metadata = {}) {
+  set(
+    key,
+    value,
+    ttl = MedicalCacheTTL.API_RESPONSES,
+    priority = CachePriority.NORMAL,
+    metadata = {}
+  ) {
     const metricId = medicalPerformanceMonitor.startMeasurement(
       PerformanceMetricType.CACHE,
-      'cache_set',
-      { key, priority },
+      "cache_set",
+      { key, priority }
     );
 
     try {
@@ -289,7 +295,7 @@ export class MedicalCache {
       }
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'cache_set',
+        action: "cache_set",
         key,
         size,
         ttl,
@@ -311,8 +317,8 @@ export class MedicalCache {
   get(key) {
     const metricId = medicalPerformanceMonitor.startMeasurement(
       PerformanceMetricType.CACHE,
-      'cache_get',
-      { key },
+      "cache_get",
+      { key }
     );
 
     try {
@@ -366,7 +372,7 @@ export class MedicalCache {
       }
 
       medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-        action: 'cache_delete',
+        action: "cache_delete",
         key,
       });
 
@@ -384,11 +390,11 @@ export class MedicalCache {
     this.totalSize = 0;
 
     if (this.storage) {
-      this.storage.removeItem('medical_cache');
+      this.storage.removeItem("medical_cache");
     }
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'cache_cleared',
+      action: "cache_cleared",
       entriesCleared,
     });
   }
@@ -451,7 +457,7 @@ export class MedicalCache {
     const duration = performance.now() - startTime;
 
     medicalEventObserver.publish(MEDICAL_EVENTS.AUDIT_EVENT, {
-      action: 'cache_cleanup',
+      action: "cache_cleanup",
       cleanedCount,
       duration,
       remainingEntries: this.cache.size,
@@ -498,9 +504,10 @@ export class MedicalCache {
    * Get cache statistics
    */
   getStats() {
-    const hitRate = this.hitCount + this.missCount > 0
-      ? (this.hitCount / (this.hitCount + this.missCount)) * 100
-      : 0;
+    const hitRate =
+      this.hitCount + this.missCount > 0
+        ? (this.hitCount / (this.hitCount + this.missCount)) * 100
+        : 0;
 
     return {
       entries: this.cache.size,
@@ -616,32 +623,26 @@ export class MedicalCacheFactory {
    * Clear all caches (privacy compliance)
    */
   static clearAllCaches() {
-    [
-      this.patientDataCache,
-      this.predictionCache,
-      this.validationCache,
-      this.apiCache,
-    ].forEach((cache) => {
-      if (cache) {
-        cache.clear();
+    [this.patientDataCache, this.predictionCache, this.validationCache, this.apiCache].forEach(
+      cache => {
+        if (cache) {
+          cache.clear();
+        }
       }
-    });
+    );
   }
 
   /**
    * Dispose all caches
    */
   static disposeAllCaches() {
-    [
-      this.patientDataCache,
-      this.predictionCache,
-      this.validationCache,
-      this.apiCache,
-    ].forEach((cache) => {
-      if (cache) {
-        cache.dispose();
+    [this.patientDataCache, this.predictionCache, this.validationCache, this.apiCache].forEach(
+      cache => {
+        if (cache) {
+          cache.dispose();
+        }
       }
-    });
+    );
 
     this.patientDataCache = null;
     this.predictionCache = null;

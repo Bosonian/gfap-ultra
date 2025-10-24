@@ -35,15 +35,15 @@ export function renderPrerequisitesModal() {
           
           <div class="space-y-4">
             ${prerequisites
-    .map(
-      item => `
+              .map(
+                item => `
               <label class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition">
                 <span class="text-gray-800 dark:text-gray-100 font-medium">${t(item.id)}</span>
                 <input type="checkbox" id="${item.id}" class="toggle-input w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
               </label>
             `
-    )
-    .join("")}
+              )
+              .join("")}
           </div>
 
           <div id="prerequisitesWarning" class="hidden items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm">

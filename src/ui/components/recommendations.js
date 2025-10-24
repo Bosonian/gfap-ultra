@@ -7,7 +7,7 @@ export function renderRecommendations(ich, lvo, startTime) {
     <div class="result-card info">
       <h3>📋 Clinical Recommendations</h3>
       <ul style="text-align: left; margin: 10px 0;">
-        ${recommendations.map((rec) => `<li>${rec}</li>`).join("")}
+        ${recommendations.map(rec => `<li>${rec}</li>`).join("")}
       </ul>
       <p style="margin-top: 15px;">
         <strong>Time since assessment started:</strong> ${formatTime(Date.now() - startTime)}

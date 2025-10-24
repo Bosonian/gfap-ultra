@@ -6,7 +6,8 @@ export function getRiskLevel(probabilityPercent, type) {
 
   if (p >= thresholds.high) {
     return "🔴 HIGH RISK";
-  } if (p >= thresholds.medium) {
+  }
+  if (p >= thresholds.medium) {
     return "🟡 MEDIUM RISK";
   }
   return "🟢 LOW RISK";

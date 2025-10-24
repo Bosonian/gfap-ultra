@@ -29,11 +29,13 @@ class Store {
         const randomBytes = new Uint8Array(8);
         crypto.getRandomValues(randomBytes);
         const randomHex = Array.from(randomBytes)
-          .map((b) => b.toString(16).padStart(2, "0"))
+          .map(b => b.toString(16).padStart(2, "0"))
           .join("");
         return `session_${timestamp}_${randomHex}`;
       }
-    } catch {}
+    } catch {
+      // Ignore and fallback
+    }
     // Fallback to Math.random when Web Crypto is unavailable
     const fallback = Math.random().toString(36).slice(2, 10);
     return `session_${timestamp}_${fallback}`;
@@ -48,7 +50,7 @@ class Store {
   // Notify all listeners of state changes
   notify() {
     console.log(`[Store] Notifying ${this.listeners.size} listeners of state change`);
-    this.listeners.forEach((listener) => listener(this.state));
+    this.listeners.forEach(listener => listener(this.state));
   }
 
   // Get current state (read-only)
