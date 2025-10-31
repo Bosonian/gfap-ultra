@@ -109,40 +109,6 @@ export class AuthenticationManager {
           };
         }
 
-        // This branch is now unreachable due to isLocalPreview handling above; keep as guard
-        const isLocalHost = ["localhost", "127.0.0.1", "0.0.0.0"].includes(
-          window.location.hostname
-        );
-        const preferMock = localStorage.getItem("use_mock_api") !== "false";
-        if (isLocalHost && preferMock && !(import.meta && import.meta.env && import.meta.env.DEV)) {
-          if (password.trim() !== getResearchPassword()) {
-            await this.delayFailedAttempt();
-            return {
-              success: false,
-              message: "Invalid credentials",
-              errorCode: "INVALID_CREDENTIALS",
-            };
-          }
-
-          // Simulate minimal delay for UX
-          await new Promise(resolve => setTimeout(resolve, 200));
-
-          this.isAuthenticated = true;
-          this.sessionToken = `local-preview-token-${Date.now()}`;
-          this.sessionExpiry = new Date(Date.now() + 30 * 60 * 1000);
-          this.lastActivity = Date.now();
-
-          try {
-            this.storeSecureSession();
-          } catch {}
-
-          return {
-            success: true,
-            message: "Authentication successful",
-            sessionDuration: 1800,
-          };
-        }
-
         medicalLogger.debug("Sending authentication request", {
           category: LOG_CATEGORIES.AUTHENTICATION,
           url: API_URLS.AUTHENTICATE,
@@ -154,8 +120,8 @@ export class AuthenticationManager {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            action: "login",
             password: password.trim(),
+            action: "login",
           }),
         });
 
