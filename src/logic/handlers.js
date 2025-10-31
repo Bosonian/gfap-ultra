@@ -4,7 +4,6 @@ import { t } from "../localization/i18n.js";
 import { showPrerequisitesModal } from "../ui/components/prerequisites-modal.js";
 import { safeSetInnerHTML } from "../security/html-sanitizer.js";
 import { DEV_CONFIG } from "../config.js";
-
 import { validateForm, showValidationErrors } from "./validate.js";
 
 export function handleTriage1(isComatose) {

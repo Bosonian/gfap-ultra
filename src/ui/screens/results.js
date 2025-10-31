@@ -423,10 +423,10 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
           </button>
         </div>
         <div class="flex flex-wrap gap-4">
-          <button data-action="goBack" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition">
+          <button data-action="goBack" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition cursor-pointer">
             ← ${t("goBack")}
           </button>
-          <button data-action="goHome" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition">
+          <button data-action="goHome" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition cursor-pointer">
             🏠 ${t("goHome")}
           </button>
         </div>
