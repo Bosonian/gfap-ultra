@@ -1,0 +1,8 @@
+RequirementID,Module,TestReference
+R1,logic/shap.js,Test_Model_Calculation
+R2,logic/lvo-local-model.js,Test_Model_Calculation
+R3,ui/forms.js,Manual_Form_Validation
+R4,ui/components/tachometer.js,Visual_Animation_Test
+R5,state/theme-manager.js,Manual_DarkMode_Test
+R6,ui/components/print-button.js,Manual_Print_Test
+R7,core/app-controller.js,Manual_PWA_Test
