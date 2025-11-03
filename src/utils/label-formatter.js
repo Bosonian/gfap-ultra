@@ -132,14 +132,8 @@ export function formatSummaryLabel(fieldName) {
 export function safeUnit(value, unit) {
   if (value === null || value === undefined || value === "") return "";
 
-  // Encode problematic characters in the unit for HTML
-  const encodedUnit = unit
-    .replace(/\//g, "&#47;") // encode "/"
-    .replace(/</g, "&lt;") // extra safety
-    .replace(/>/g, "&gt;"); // extra safety
-
-  // Return HTML-safe string with non-breaking space
-  return `${value}&nbsp;${encodedUnit}`;
+  // No need to encode "/" here
+  return `${value}&nbsp;${unit}`;
 }
 
 export function formatDisplayValue(value, fieldName = "") {

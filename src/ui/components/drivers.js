@@ -252,7 +252,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
 
       html += `
         <div class="flex justify-between items-center text-sm bg-white dark:bg-gray-800 rounded-md px-3 py-2 shadow-sm border border-green-100 dark:border-green-800">
-          <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
+          <span class="text-gray-700 dark:text-gray-300"><span data-i18n-key="${cleanLabel}"></span></span>
           <span class="text-green-600 dark:text-green-400 font-semibold">+${relativeImportance.toFixed(0)}%</span>
         </div>
       `;
@@ -287,7 +287,7 @@ export function renderEnhancedDriversPanel(drivers, title, type, probability) {
 
       html += `
         <div class="flex justify-between items-center text-sm bg-white dark:bg-gray-800 rounded-md px-3 py-2 shadow-sm border border-red-100 dark:border-red-800">
-          <span class="text-gray-700 dark:text-gray-300">${cleanLabel}</span>
+          <span class="text-gray-700 dark:text-gray-300"><span data-i18n-key="${cleanLabel}"></span>
           <span class="text-red-600 dark:text-red-400 font-semibold">-${relativeImportance.toFixed(0)}%</span>
         </div>
       `;

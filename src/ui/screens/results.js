@@ -43,7 +43,7 @@ function renderInputSummary() {
           const displayValue = formatDisplayValue(value, key);
           return `
             <div class="summary-item flex justify-between items-center py-1.5 border-b border-gray-200 dark:border-gray-700">
-              <span class="summary-label text-gray-600 dark:text-gray-300 font-medium">${label}</span>
+              <span class="summary-label text-gray-600 dark:text-gray-300 font-medium"><span data-i18n-key="${label}"></span></span>
               <span class="summary-value text-gray-900 dark:text-gray-100 font-semibold">${displayValue}</span>
             </div>
           `;
@@ -1053,10 +1053,10 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
         <!-- Header -->
         <div class="tachometer-header flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            🎯 ${title}
+            🎯 <span data-i18n-key="decisonSupportTitle"> </span>
           </h3>
           <div class="ratio-display text-sm text-gray-600 dark:text-gray-400">
-            LVO/ICH Ratio: <span class="font-semibold text-blue-600 dark:text-blue-400">${ratio.toFixed(2)}</span>
+            <span data-i18n-key="LVO_ICH"></span> Ratio: <span class="font-semibold text-blue-600 dark:text-blue-400">${ratio.toFixed(2)}</span>
           </div>
         </div>
 
@@ -1081,7 +1081,7 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
           <div class="metric-card p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700">
             <div class="metric-label text-gray-500 dark:text-gray-400 text-sm uppercase">Ratio</div>
             <div class="metric-value text-2xl font-bold text-blue-600 dark:text-blue-400">${ratio.toFixed(2)}</div>
-            <div class="metric-unit text-xs text-gray-500 dark:text-gray-400">LVO / ICH</div>
+            <div class="metric-unit text-xs text-gray-500 dark:text-gray-400"><span data-i18n-key="LVO_ICH"></div>
           </div>
 
           <div class="metric-card p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/10 border border-green-200 dark:border-green-800">
@@ -1093,7 +1093,7 @@ function renderTachometerGauge(ichPercent, lvoPercent) {
           <div class="metric-card p-4 rounded-xl bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/10 border border-red-200 dark:border-red-800">
             <div class="metric-label text-gray-500 dark:text-gray-400 text-sm uppercase">Difference</div>
             <div class="metric-value text-2xl font-bold text-red-600 dark:text-red-400">${Math.abs(lvoPercent - ichPercent).toFixed(0)}%</div>
-            <div class="metric-unit text-xs text-gray-500 dark:text-gray-400">|LVO − ICH|</div>
+            <div class="metric-unit text-xs text-gray-500 dark:text-gray-400">|<span data-i18n-key="LVO_ICH"></span>|</div>
           </div>
         </div>
 

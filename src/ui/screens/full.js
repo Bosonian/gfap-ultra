@@ -62,7 +62,7 @@ export function renderFull() {
 
             <!-- Biomarkers & Scores -->
             <div>
-              <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">${t("biomarkersScores")}</h3>
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3"> <span data-i18n-key="biomarkersScores"></span></h3>
               <div class="space-y-4">
 
                 <!-- GFAP -->

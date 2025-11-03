@@ -4,6 +4,13 @@ import { data } from "autoprefixer";
 
 export const messages = {
   en: {
+    //
+    enterRequiredDetails: "Enter the required data for full module analysis",
+    //progress title
+    triage: "Triage",
+    assessment: "Assessment",
+    resultsProgress: "Results",
+
     // Header
     appTitle: "iGFAP",
     emergencyBadge: "Emergency Tool",
@@ -333,9 +340,20 @@ export const messages = {
     gdprComplaint: "GDPR compliant - local processing only",
     clinicalOversight: "Clinical Oversight",
     pgml: "pg/mL",
+    LVO_ICH: "LVO / ICH",
+    decisonSupportTitle: "Decision Support – LVO/ICH",
   },
 
   de: {
+    //
+    enterRequiredDetails:
+      "Geben Sie die erforderlichen Daten für die vollständige Modulanalyse ein.",
+
+    //
+    triage: "Triage",
+    assessment: "Evaluation",
+    resultsProgress: "Ergebnisse",
+
     // Header
     appTitle: "iGFAP",
     emergencyBadge: "Notfall-Tool",
@@ -667,5 +685,7 @@ export const messages = {
     gdprComplaint: "DSGVO-konform - nur lokale Verarbeitung",
     clinicalOversight: "Klinische Aufsicht",
     pgml: "pg/mL",
+    LVO_ICH: "LVO / ICH",
+    decisonSupportTitle: "Entscheidungshilfe – LVO/ICH",
   },
 };

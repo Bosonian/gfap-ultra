@@ -1,8 +1,10 @@
+import { t } from "../../localization/i18n";
+
 export function renderProgressIndicator(currentStep) {
   const steps = [
-    { id: 1, label: "Triage" },
-    { id: 2, label: "Assessment" },
-    { id: 3, label: "Results" },
+    { id: 1, label: "triage" },
+    { id: 2, label: "assessment" },
+    { id: 3, label: "resultsProgress" },
   ];
 
   let html = `
@@ -24,15 +26,15 @@ export function renderProgressIndicator(currentStep) {
 
         <!-- Step Label -->
         <span class="mt-2 text-xs ${isActive ? "text-blue-500" : "text-gray-500"}">
-          ${step.label}
+          ${t(step.label) || step.label}
         </span>
 
         <!-- Connector Line (except last step) -->
         ${
-  index < steps.length - 1
-    ? `<div class="absolute top-4 left-1/2 w-full h-1 ${isCompleted ? "bg-green-500" : "bg-gray-300"} z-0"></div>`
-    : ""
-}
+          index < steps.length - 1
+            ? `<div class="absolute top-4 left-1/2 w-full h-1 ${isCompleted ? "bg-green-500" : "bg-gray-300"} z-0"></div>`
+            : ""
+        }
       </div>
     `;
   });
