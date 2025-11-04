@@ -89,12 +89,20 @@ export function renderFull() {
                 <div class="flex flex-col">
                   <label for="fast_ed_score" class="text-sm font-medium text-gray-700 dark:text-slate-200 flex items-center gap-2">
                     ${t("fastEdScoreLabel")}
-                    <span class="tooltip relative group cursor-pointer">
-                      ℹ️
-                      <span class="tooltiptext absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-800 dark:bg-slate-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity w-48 text-center z-10">
-                        ${t("fastEdCalculatorSubtitle")}
+                      <span class="relative group select-none ml-1 text-gray-400 text-sm align-middle">
+                        <!-- Icon -->
+                        <span class="pointer-events-none">ℹ️</span>
+
+                        <!-- Tooltip text (to the right of icon) -->
+                        <span
+                          class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2
+                                bg-gray-800 dark:bg-slate-800 text-white text-xs rounded-lg p-2
+                                opacity-0 group-hover:opacity-100 transition-all duration-200 ease-in-out
+                                w-48 text-center z-10 pointer-events-none"
+                        >
+                          ${t("fastEdCalculatorSubtitle")}
+                        </span>
                       </span>
-                    </span>
                   </label>
                   <input type="number" name="fast_ed_score" id="fast_ed_score"
                          class="mt-1 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 

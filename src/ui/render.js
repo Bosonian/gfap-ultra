@@ -205,9 +205,13 @@ function attachEvents(container) {
   const fastEdInput = container.querySelector("#fast_ed_score");
   if (fastEdInput) {
     fastEdInput.addEventListener("click", e => {
+      // Ignore clicks on tooltip or its children
+      if (e.target.matches(".tooltip, .tooltip *")) {
+        alert("sdfdsfsdf");
+        return;
+      }
       e.preventDefault();
       const currentValue = parseInt(fastEdInput.value) || 0;
-
       fastEdCalculator.show(currentValue, result => {
         // Update FAST-ED score
         fastEdInput.value = result.total;
@@ -228,7 +232,8 @@ function attachEvents(container) {
         fastEdInput.dispatchEvent(new Event("change", { bubbles: true }));
       });
     });
-    // Prevent manual typing (baseline behavior)
+
+    // Prevent manual typing
     fastEdInput.addEventListener("keydown", e => {
       e.preventDefault();
     });
