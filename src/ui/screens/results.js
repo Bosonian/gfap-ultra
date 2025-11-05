@@ -41,10 +41,15 @@ function renderInputSummary() {
         .map(([key, value]) => {
           const label = formatSummaryLabel(key);
           const displayValue = formatDisplayValue(value, key);
+          const displayType = displayValue.type ? displayValue.type : "";
+          let displayHtml = "<span>" + displayType + "</span>";
+          if (displayType == "pg/mL") {
+            displayHtml = "<span data-i18n-key='pgml'></span>";
+          }
           return `
             <div class="summary-item flex justify-between items-center py-1.5 border-b border-gray-200 dark:border-gray-700">
               <span class="summary-label text-gray-600 dark:text-gray-300 font-medium"><span data-i18n-key="${label}"></span></span>
-              <span class="summary-value text-gray-900 dark:text-gray-100 font-semibold">${displayValue}</span>
+              <span class="summary-value text-gray-900 dark:text-gray-100 font-semibold">${displayValue.value} ${displayHtml}</span>
             </div>
           `;
         })

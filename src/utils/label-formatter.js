@@ -142,28 +142,28 @@ export function formatDisplayValue(value, fieldName = "") {
   }
 
   if (typeof value === "boolean") {
-    return value ? "✓" : "✗";
+    return { value: value ? "✓" : "✗" };
   }
 
   if (typeof value === "number") {
     if (fieldName.includes("bp") || fieldName.includes("blood_pressure")) {
-      return safeUnit(value, "mmHg");
+      return { value: value, type: "mmHg" };
     }
     if (fieldName.includes("gfap")) {
-      return safeUnit(value, "pg/mL");
+      return { value: value, type: "pg/mL" };
     }
     if (fieldName.includes("age")) {
-      return safeUnit(value, "years");
+      return { value: value, type: "years" };
     }
     if (fieldName.includes("score")) {
-      return value.toString();
+      return { value: value, type: "" };
     }
 
     // Default numeric formatting
-    return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+    return { value: Number.isInteger(value) ? value.toString() : value.toFixed(1) };
   }
 
-  return value.toString();
+  return { value: value.toString() };
 }
 
 /**
