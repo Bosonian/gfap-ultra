@@ -129,6 +129,7 @@ export async function handleSubmit(e, container) {
   }
 
   try {
+    document.getElementById("loadingScreen").classList.remove("hidden");
     console.log("[Submit] Module:", module);
     console.log("[Submit] Inputs:", inputs);
     // Run models based on module
@@ -199,6 +200,8 @@ export async function handleSubmit(e, container) {
     });
 
     console.log("[Submit] Navigating to results...");
+    document.getElementById("loadingScreen").classList.add("hidden");
+
     navigate("results");
     // Visual confirmation that results screen loaded
     showToast("✅ Results loaded", 2000);
