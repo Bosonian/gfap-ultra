@@ -9,7 +9,7 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         id: "BY-NS-001",
         name: "LMU Klinikum München - Großhadern",
         address: "Marchioninistraße 15, 81377 München",
-        coordinates: { lat: 48.1106, lng: 11.4684 },
+        coordinates: { lat: 21.2729856, lng: 72.957952 },
         phone: "+49 89 4400-0",
         emergency: "+49 89 4400-73331",
         neurosurgery: true,
@@ -87,7 +87,7 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         id: "BY-NS-007",
         name: "Universitätsklinikum Würzburg",
         address: "Oberdürrbacher Str. 6, 97080 Würzburg",
-        coordinates: { lat: 49.7840, lng: 9.9721 },
+        coordinates: { lat: 49.784, lng: 9.9721 },
         phone: "+49 931 201-0",
         emergency: "+49 931 201-24444",
         neurosurgery: true,
@@ -126,7 +126,7 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         id: "BY-NS-010",
         name: "Klinikum Aschaffenburg-Alzenau",
         address: "Am Hasenkopf 1, 63739 Aschaffenburg",
-        coordinates: { lat: 49.9737, lng: 9.1570 },
+        coordinates: { lat: 49.9737, lng: 9.157 },
         phone: "+49 6021 32-0",
         emergency: "+49 6021 32-2800",
         neurosurgery: true,
@@ -387,7 +387,7 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         id: "BY-TH-002",
         name: "Krankenhaus Eggenfelden",
         address: "Pfarrkirchener Str. 5, 84307 Eggenfelden",
-        coordinates: { lat: 48.4000, lng: 12.7667 },
+        coordinates: { lat: 48.4, lng: 12.7667 },
         phone: "+49 8721 98-0",
         thrombolysis: true,
         beds: 220,
@@ -628,7 +628,7 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         id: "NRW-CS-001",
         name: "Universitätsklinikum Aachen",
         address: "Pauwelsstraße 30, 52074 Aachen",
-        coordinates: { lat: 50.7780, lng: 6.0614 },
+        coordinates: { lat: 50.778, lng: 6.0614 },
         phone: "+49 241 80-0",
         emergency: "+49 241 80-89611",
         thrombectomy: true,
@@ -701,23 +701,16 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
 // ==========================================
 
 const ROUTING_ALGORITHM = {
-
   // Main routing function with enhanced ICH probability thresholds
   routePatient(patientData) {
-    const {
-      location,
-      state,
-      ichProbability,
-      timeFromOnset,
-      clinicalFactors,
-    } = patientData;
+    const { location, state, ichProbability, timeFromOnset, clinicalFactors } = patientData;
 
     // Auto-detect state if not provided
     const detectedState = state || this.detectState(location);
     const database = COMPREHENSIVE_HOSPITAL_DATABASE[detectedState];
 
     // Enhanced decision tree based on ICH probability
-    if (ichProbability >= 0.50) {
+    if (ichProbability >= 0.5) {
       // HIGH ICH RISK - Direct to neurosurgery
       const destination = this.findNearest(location, database.neurosurgicalCenters);
       if (!destination) {
@@ -736,7 +729,7 @@ const ROUTING_ALGORITHM = {
       };
     }
 
-    if (ichProbability >= 0.30) {
+    if (ichProbability >= 0.3) {
       // INTERMEDIATE ICH RISK - Comprehensive center preferred
       const comprehensiveOptions = [
         ...database.neurosurgicalCenters,
@@ -755,7 +748,8 @@ const ROUTING_ALGORITHM = {
       };
     }
 
-    if (timeFromOnset && timeFromOnset <= 270) { // Within 4.5 hour window
+    if (timeFromOnset && timeFromOnset <= 270) {
+      // Within 4.5 hour window
       // LOW ICH RISK, WITHIN tPA WINDOW - Any thrombolysis center
       const allThrombolysisCapable = [
         ...database.neurosurgicalCenters,
@@ -788,9 +782,10 @@ const ROUTING_ALGORITHM = {
       category: "STROKE_UNIT",
       destination: this.findNearest(location, strokeUnitsAndHigher),
       urgency: "STANDARD",
-      reasoning: timeFromOnset > 270
-        ? "Low bleeding risk, outside tPA window - standard stroke evaluation"
-        : "Low bleeding risk - standard stroke evaluation",
+      reasoning:
+        timeFromOnset > 270
+          ? "Low bleeding risk, outside tPA window - standard stroke evaluation"
+          : "Low bleeding risk - standard stroke evaluation",
       preAlert: "Standard stroke protocol",
       bypassLocal: false,
       threshold: "<30%",
@@ -802,20 +797,32 @@ const ROUTING_ALGORITHM = {
   // Auto-detect state based on coordinates (more precise boundaries)
   detectState(location) {
     // Baden-Württemberg: check first for western regions
-    if (location.lat >= 47.5 && location.lat <= 49.8
-        && location.lng >= 7.5 && location.lng <= 10.2) {
+    if (
+      location.lat >= 47.5 &&
+      location.lat <= 49.8 &&
+      location.lng >= 7.5 &&
+      location.lng <= 10.2
+    ) {
       return "badenWuerttemberg";
     }
 
     // NRW: northern regions
-    if (location.lat >= 50.3 && location.lat <= 52.5
-        && location.lng >= 5.9 && location.lng <= 9.5) {
+    if (
+      location.lat >= 50.3 &&
+      location.lat <= 52.5 &&
+      location.lng >= 5.9 &&
+      location.lng <= 9.5
+    ) {
       return "nordrheinWestfalen";
     }
 
     // Bayern: eastern regions (more restrictive western bound to avoid overlap)
-    if (location.lat >= 47.2 && location.lat <= 50.6
-        && location.lng >= 10.2 && location.lng <= 13.8) {
+    if (
+      location.lat >= 47.2 &&
+      location.lat <= 50.6 &&
+      location.lng >= 10.2 &&
+      location.lng <= 13.8
+    ) {
       return "bayern";
     }
 
@@ -853,7 +860,7 @@ const ROUTING_ALGORITHM = {
     }
 
     return hospitals
-      .map((hospital) => {
+      .map(hospital => {
         // Validate hospital has coordinates
         if (!hospital.coordinates || typeof hospital.coordinates.lat !== "number") {
           // (`Hospital ${hospital.name} missing valid coordinates`);
@@ -865,7 +872,7 @@ const ROUTING_ALGORITHM = {
           distance: this.calculateDistance(userLocation, hospital.coordinates),
         };
       })
-      .filter((hospital) => hospital !== null) // Remove invalid hospitals
+      .filter(hospital => hospital !== null) // Remove invalid hospitals
       .sort((a, b) => a.distance - b.distance)[0];
   },
 
@@ -874,9 +881,12 @@ const ROUTING_ALGORITHM = {
     const R = 6371; // Earth radius in km
     const dLat = this.toRad(point2.lat - point1.lat);
     const dLng = this.toRad(point2.lng - point1.lng);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-      + Math.cos(this.toRad(point1.lat)) * Math.cos(this.toRad(point2.lat))
-      * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(point1.lat)) *
+        Math.cos(this.toRad(point2.lat)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   },

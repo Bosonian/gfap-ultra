@@ -23,6 +23,7 @@ import { calculateLegacyICH } from "../../research/legacy-ich-model.js";
 import { safeLogResearchData, isResearchModeEnabled } from "../../research/data-logger.js";
 import { renderModelComparison, renderResearchToggle } from "../../research/comparison-ui.js";
 import { escapeHTML } from "../../security/html-sanitizer.js";
+import { detectKioskMode } from "../../logic/kiosk-loader.js";
 
 function renderInputSummary() {
   const { formData } = store.getState() || {};
@@ -312,6 +313,10 @@ export function renderResults(results, startTime) {
 }
 
 export function renderICHFocusedResults(ich, results, startTime, legacyResults, currentModule) {
+  // Detect kiosk mode
+  const kioskMode = detectKioskMode();
+  const isKioskMode = kioskMode.isKioskMode;
+
   const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : "";
   const ichPercentLocal = Math.round((ich?.probability || 0) * 100);
   const strokeCenterHtml = renderStrokeCenterMap(results);
@@ -419,22 +424,88 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
 
       <!-- Actions -->
       <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
-        <div class="flex flex-wrap gap-4">
-          <button id="printResults" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-md transition">
-            📄 ${t("printResults")}
-          </button>
-          <button data-action="reset" class="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold shadow-md transition">
-            ${t("newAssessment")}
-          </button>
-        </div>
-        <div class="flex flex-wrap gap-4">
-          <button data-action="goBack" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition cursor-pointer">
-            ← ${t("goBack")}
-          </button>
-          <button data-action="goHome" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition cursor-pointer">
-            🏠 ${t("goHome")}
-          </button>
-        </div>
+      ${
+        isKioskMode
+          ? `
+    <!-- 🖥️ Kiosk Mode: Simple navigation back to case list -->
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <button
+        type="button"
+        data-action="kiosk-home"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+      >
+        🏠 ${t("backToCaseList")}
+      </button>
+
+      <button
+        type="button"
+        id="printResults"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+      >
+        📄 ${t("printResults")}
+      </button>
+    </div>
+  `
+          : `
+    <!-- 🌐 Normal Mode: Full actions -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      
+      <!-- Primary Actions -->
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          id="shareToKiosk"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-green-600 text-white text-sm font-semibold shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition"
+        >
+          🚀 ${t("sendToHospital")}
+        </button>
+
+        <button
+          type="button"
+          id="shareCaseLink"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+        >
+          📲 ${t("shareCase")}
+        </button>
+
+        <button
+          type="button"
+          id="printResults"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+        >
+          📄 ${t("printResults")}
+        </button>
+
+        <button
+          type="button"
+          data-action="reset"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 text-sm font-medium border border-yellow-300 dark:border-yellow-700 hover:bg-yellow-200 dark:hover:bg-yellow-800/60 transition"
+        >
+          ${t("newAssessment")}
+        </button>
+      </div>
+
+      <!-- Navigation Actions -->
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          data-action="goBack"
+          class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        >
+          ← ${t("goBack")}
+        </button>
+
+        <button
+          type="button"
+          data-action="goHome"
+          class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        >
+          🏠 ${t("goHome")}
+        </button>
+      </div>
+    </div>
+  `
+      }
       </div>
 
       <!-- Disclaimer -->
@@ -453,6 +524,8 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
 }
 
 function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, currentModule) {
+  const kioskMode = detectKioskMode();
+  const isKioskMode = kioskMode.isKioskMode;
   const ichPercent = Math.round((ich?.probability || 0) * 100);
   const lvoPercent = Math.round((lvo?.probability || 0) * 100);
 
@@ -587,24 +660,92 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
         </div>
       </div>
       
-       <!-- Actions -->
-      <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
-        <div class="flex flex-wrap gap-4">
-          <button id="printResults" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-md transition">
-            📄 ${t("printResults")}
-          </button>
-          <button data-action="reset" class="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold shadow-md transition">
-            ${t("newAssessment")}
-          </button>
-        </div>
-        <div class="flex flex-wrap gap-4">
-          <button data-action="goBack" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition">
-            ← ${t("goBack")}
-          </button>
-          <button data-action="goHome" class="px-5 py-3 text-blue-600 hover:text-blue-700 font-medium transition">
-            🏠 ${t("goHome")}
-          </button>
-        </div>
+       <!-- Actions --> 
+     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    ${
+      isKioskMode
+        ? `
+    <!-- 🖥️ Kiosk Mode: Simple navigation back to case list -->
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <button
+        type="button"
+        data-action="kiosk-home"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+      >
+        🏠 Zurück zur Fallliste / Back to Case List
+      </button>
+
+      <button
+        type="button"
+        id="printResults"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+      >
+        📄 ${t("printResults")}
+      </button>
+    </div>
+  `
+        : `
+    <!-- 🌐 Normal Mode: Full actions -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      
+      <!-- Primary Actions -->
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          id="shareToKiosk"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-green-600 text-white text-sm font-semibold shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition"
+        >
+          🚀 ${t("sendToHospital")}
+        </button>
+
+        <button
+          type="button"
+          id="shareCaseLink"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+        >
+          📲 ${t("shareCase")}
+        </button>
+
+        <button
+          type="button"
+          id="printResults"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+        >
+          📄 ${t("printResults")}
+        </button>
+
+        <button
+          type="button"
+          data-action="reset"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 text-sm font-medium border border-yellow-300 dark:border-yellow-700 hover:bg-yellow-200 dark:hover:bg-yellow-800/60 transition"
+        >
+          ${t("newAssessment")}
+        </button>
+      </div>
+
+      <!-- Navigation Actions -->
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          data-action="goBack"
+          class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        >
+          ← ${t("goBack")}
+        </button>
+
+        <button
+          type="button"
+          data-action="goHome"
+          class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        >
+          🏠 ${t("goHome")}
+        </button>
+      </div>
+    </div>
+  `
+    }
+    </div>
+
       </div>
 
       <!-- Disclaimer -->

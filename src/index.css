@@ -63,3 +63,9 @@
   height: 120px; /* must match width */
   display: block;
 }
+
+.hospital-selector-overlay {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+}

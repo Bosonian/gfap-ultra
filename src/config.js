@@ -116,6 +116,25 @@ export const APP_CONFIG = {
   fullStrokeTimeout: 20000, // 20 seconds for full stroke (handles cold starts)
 };
 
+// Kiosk case sharing configuration
+// Kiosk case sharing configuration
+export const KIOSK_CONFIG = {
+  caseSharingUrl: "https://case-sharing-564499947017.europe-west3.run.app",
+
+  // Google Maps API key
+  googleMapsApiKey: "AIzaSyACBndIj8HD1wwZ4Vw8PDDI0bIe6DoBExI",
+
+  // GPS tracking settings
+  gpsUpdateInterval: 30000, // 30 seconds
+  gpsHighAccuracy: true,
+  gpsTimeout: 10000, // 10 seconds
+  gpsMaxAge: 0, // Always get fresh location
+
+  // Auto-archive settings
+  autoArchiveHours: 2,
+  staleGpsMinutes: 5,
+};
+
 export const VALIDATION_RULES = {
   age_years: {
     required: true,
