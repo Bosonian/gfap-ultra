@@ -672,7 +672,7 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
         data-action="kiosk-home"
         class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
       >
-        🏠 Zurück zur Fallliste / Back to Case List
+        🏠 ${t("backToCaseList")}
       </button>
 
       <button

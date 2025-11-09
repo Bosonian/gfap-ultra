@@ -117,7 +117,6 @@ export const APP_CONFIG = {
 };
 
 // Kiosk case sharing configuration
-// Kiosk case sharing configuration
 export const KIOSK_CONFIG = {
   caseSharingUrl: "https://case-sharing-564499947017.europe-west3.run.app",
 

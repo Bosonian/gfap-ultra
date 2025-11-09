@@ -21,6 +21,7 @@ import { initializeStrokeCenterMap } from "./components/stroke-center-map.js";
 import { fastEdCalculator } from "./components/fastEdModal.js";
 import renderTriage1 from "./screens/triage1.js";
 import renderTriage2 from "./screens/triage2.js";
+import { getKioskHomeUrl } from "../logic/kiosk-loader.js";
 
 export function render(container) {
   const state = store.getState();
@@ -183,6 +184,9 @@ function attachEvents(container) {
           break;
         case "goHome":
           goHome();
+          break;
+        case "kiosk-home":
+          window.location.href = getKioskHomeUrl();
           break;
       }
     });
