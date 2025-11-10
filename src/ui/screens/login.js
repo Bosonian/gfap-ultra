@@ -30,7 +30,7 @@ export function renderLoginScreen() {
         <ul class="list-disc ml-5 space-y-1">
           <li><span class="font-semibold">${t("researchUseOnly")}</span> - ${t("noClinicalDecision")}</li>
           <li><span class="font-semibold">${t("noDataStorage")}</span> - ${t("dataProcessedLocally")}</li>
-          <li><span class="font-semibold">${t("clinicalAdvisory")}</span> - ${t("supervision")}</li>
+          <li><span class="font-semibold">${t("clinicalAdvisory")}</span> - <span data-i18n-key="supervision"></span></li>
           <li><span class="font-semibold">${t("contact")}:</span> Deepak Bos (bosdeepak@gmail.com)</li>
         </ul>
       </div>
