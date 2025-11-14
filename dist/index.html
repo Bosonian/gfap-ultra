@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Mobile viewport - Gold standard for web apps -->
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
@@ -16,10 +15,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <!-- Cache-bust: v2.1.1 -->
-
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/0925/assets/manifest-Zf9Kpcyt.json" />
+    <link rel="manifest" href="/gfap-ultra/assets/manifest-CgZQOV_e.json" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -28,36 +24,37 @@
     <meta name="msapplication-tap-highlight" content="no" />
 
     <!-- Favicon and Icons -->
-    <link rel="icon" href="/0925/assets/favicon-DPOKeJP6.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/0925/assets/icon-32x32-BZn9ZIFo.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/0925/assets/icon-16x16-BUOTCe54.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/0925/assets/apple-touch-icon-IbqiIBz1.png" />
-    <link rel="mask-icon" href="/0925/assets/icon-192x192-88fexMmU.png" color="#0066CC" />
-    <script type="module" crossorigin src="/0925/assets/index-bmQyHUpJ.js"></script>
-    <link rel="stylesheet" crossorigin href="/0925/assets/index-yGAPR7t4.css">
+    <link rel="icon" href="/gfap-ultra/assets/favicon-DPOKeJP6.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/gfap-ultra/assets/icon-32x32-BZn9ZIFo.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/gfap-ultra/assets/icon-16x16-BUOTCe54.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/gfap-ultra/assets/apple-touch-icon-IbqiIBz1.png" />
+    <link rel="mask-icon" href="/gfap-ultra/assets/icon-192x192-88fexMmU.png" color="#0066CC" />
+    <script type="module" crossorigin src="/gfap-ultra/assets/index-DJAlfFXN.js"></script>
+    <link rel="stylesheet" crossorigin href="/gfap-ultra/assets/index-BzoOBXcf.css">
   </head>
   <body class="min-h-screen flex flex-col">
     <header
-      class="bg-gray-100 dark:bg-gray-800 shadow-xl px-4 py-3 md:px-8 transition-colors duration-300"
+      class="bg-[#0059b0] dark:bg-gray-800 shadow-xl px-4 py-3 md:px-8 transition-colors duration-300"
     >
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <!-- Logo + Title -->
         <div class="flex items-center space-x-3">
           <!-- Logo SVG -->
           <div
-            class="w-10 h-10 flex items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-blue-400 shadow-md"
+            id="homeButton"
+            class="cursor-pointer w-10 h-10 flex items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-blue-400 shadow-md"
           >
-            🧠
+            🏠
           </div>
 
           <!-- Text -->
           <div class="hidden md:block">
             <h1
-              class="text-xl font-extrabold text-gray-900 dark:text-white transition-colors duration-300"
+              class="text-xl font-extrabold text-white dark:text-white transition-colors duration-300"
             >
               iGFAP
             </h1>
-            <small class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
+            <small class="text-sm text-white dark:text-gray-400 transition-colors duration-300">
               Stroke Triage Assistant
             </small>
           </div>
@@ -97,52 +94,21 @@
               <path fill="#141414" d="M32 5H4a4 4 0 0 0-4 4v5h36V9a4 4 0 0 0-4-4z"></path>
             </svg>
           </button>
-          <span
-            id="apiModeToggle"
-            class="px-3 py-3 rounded-full text-xs font-semibold transition-colors duration-300 border border-gray-200 hover:border-gray-300"
-          >
-            Live Data
-          </span>
         </div>
-
-        <!-- <div class="md:hidden flex items-center">
-          <button
-            id="mobileMenuButton"
-            class="text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded transition-colors duration-300"
-          >
-            ☰
-          </button>
-        </div> -->
       </div>
-
-      <!-- <div id="mobileMenu" class="hidden md:hidden mt-2 px-2 space-y-2">
-        <button
-          id="helpButtonMobile"
-          class="w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-300"
-        >
-          ❓ Help
-        </button>
-        <button
-          id="darkModeToggle"
-          class="w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-300"
-        >
-          🌙 Theme
-        </button>
-        <button
-          id="languageToggleMobile"
-          data-lang="en"
-          class="w-full text-left px-2 py-1 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-300"
-        >
-          🇬🇧 Language
-        </button>
-        <span
-          id="apiModeToggleMobile"
-          class="inline-block px-2 py-1 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded text-xs font-semibold transition-colors duration-300"
-        >
-          Live Data
-        </span>
-      </div> -->
     </header>
+    <div
+      id="loadingScreen"
+      class="fixed inset-0 flex items-center justify-center bg-white/80 z-50 hidden"
+    >
+      <div class="text-center">
+        <div
+          class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"
+        ></div>
+        <p class="mt-4 text-gray-700 text-lg font-medium">Loading...</p>
+      </div>
+    </div>
+
     <div
       id="appLoader"
       class="fixed inset-0 flex items-center justify-center bg-white dark:bg-gray-900 z-50"
@@ -151,11 +117,8 @@
         class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 border-solid"
       ></div>
     </div>
-    <main role="main" class="flex-1 w-full flex">
-      <div
-        id="appContainer"
-        class="flex flex-col justify-start items-center bg-white dark:bg-gray-700 w-full"
-      ></div>
+    <main role="main" class="flex-1 w-full flex pt-4 bg-white dark:bg-gray-700">
+      <div id="appContainer" class="flex flex-col justify-start items-center w-full"></div>
     </main>
 
     <footer
@@ -338,6 +301,6 @@
           setTimeout(() => loader.remove(), 500); // Remove from DOM after fade
         }
       });
-    </script>
+    </script>
   </body>
 </html>

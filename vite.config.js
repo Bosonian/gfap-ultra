@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   // 👇 Important: Must match your repo name exactly
-  base: "/0925/",
+  base: "/gfap-ultra/",
   plugins: [tailwindcss()],
   server: {
     host: true,
