@@ -29,6 +29,27 @@ export function renderComa() {
                       </span>
                     </span>
                   </label>
+
+                  <!-- Cartridge Type Toggle -->
+                  <div class="mt-2 mb-2">
+                    <label class="text-xs font-medium text-gray-600 dark:text-slate-300 mb-1 block" data-i18n-key="gfapCartridgeType"></label>
+                    <div class="inline-flex rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 p-1" role="group">
+                      <button type="button" id="cartridge-plasma"
+                              class="cartridge-toggle px-4 py-2 text-sm font-medium rounded-md transition-all duration-200
+                                     bg-blue-500 text-white shadow-sm"
+                              data-cartridge="plasma">
+                        <span data-i18n-key="gfapPlasma"></span>
+                      </button>
+                      <button type="button" id="cartridge-wholeblood"
+                              class="cartridge-toggle px-4 py-2 text-sm font-medium rounded-md transition-all duration-200
+                                     text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                              data-cartridge="wholeblood">
+                        <span data-i18n-key="gfapWholeBlood"></span>
+                      </button>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-slate-400 mt-1 hidden" id="gfap-conversion-note" data-i18n-key="gfapConversionNote"></p>
+                  </div>
+
                   <input
                     type="number"
                     id="gfap_value"
@@ -43,7 +64,7 @@ export function renderComa() {
                   <div id="gfap-help" class="text-gray-500 dark:text-gray-400 text-sm">
                     ${t("gfapRange").replace("{min}", GFAP_RANGES.min).replace("{max}", GFAP_RANGES.max)}   <span data-i18n-key="pgml" class="text-gray-500 dark:text-gray-400 text-sm"></span>
                   </div>
-                 
+                  <input type="hidden" id="gfap_cartridge_type" value="plasma">
                 </div>
        
               <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">

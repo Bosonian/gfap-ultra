@@ -243,6 +243,66 @@ function attachEvents(container) {
     });
   }
 
+  // GFAP Cartridge Type Toggle Handler
+  const cartridgeToggles = container.querySelectorAll(".cartridge-toggle");
+  const gfapInput = container.querySelector("#gfap_value");
+  const cartridgeTypeInput = container.querySelector("#gfap_cartridge_type");
+  const conversionNote = container.querySelector("#gfap-conversion-note");
+
+  if (cartridgeToggles.length && gfapInput && cartridgeTypeInput) {
+    const WHOLE_BLOOD_CONVERSION = 0.94; // Conversion factor from whole blood to plasma
+
+    cartridgeToggles.forEach(toggle => {
+      toggle.addEventListener("click", e => {
+        const selectedType = e.currentTarget.dataset.cartridge;
+        const previousType = cartridgeTypeInput.value;
+        const currentValue = parseFloat(gfapInput.value) || 0;
+
+        // Update cartridge type
+        cartridgeTypeInput.value = selectedType;
+
+        // Update button styles
+        cartridgeToggles.forEach(btn => {
+          if (btn.dataset.cartridge === selectedType) {
+            btn.classList.remove("text-gray-700", "dark:text-slate-300", "hover:bg-gray-100", "dark:hover:bg-slate-700");
+            btn.classList.add("bg-blue-500", "text-white", "shadow-sm");
+          } else {
+            btn.classList.remove("bg-blue-500", "text-white", "shadow-sm");
+            btn.classList.add("text-gray-700", "dark:text-slate-300", "hover:bg-gray-100", "dark:hover:bg-slate-700");
+          }
+        });
+
+        // Convert GFAP value if it exists and type changed
+        if (currentValue > 0 && previousType !== selectedType) {
+          let newValue;
+          if (selectedType === "wholeblood" && previousType === "plasma") {
+            // Converting from plasma to whole blood display (divide by conversion factor)
+            newValue = currentValue / WHOLE_BLOOD_CONVERSION;
+          } else if (selectedType === "plasma" && previousType === "wholeblood") {
+            // Converting from whole blood to plasma display (multiply by conversion factor)
+            newValue = currentValue * WHOLE_BLOOD_CONVERSION;
+          }
+
+          if (newValue) {
+            gfapInput.value = Math.round(newValue);
+          }
+        }
+
+        // Show/hide conversion note
+        if (conversionNote) {
+          if (selectedType === "wholeblood") {
+            conversionNote.classList.remove("hidden");
+          } else {
+            conversionNote.classList.add("hidden");
+          }
+        }
+
+        // Trigger change event to save form data
+        gfapInput.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    });
+  }
+
   // Collapsible info toggles handler
   const infoToggles = container.querySelectorAll(".info-toggle");
 

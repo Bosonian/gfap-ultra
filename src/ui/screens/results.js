@@ -1,5 +1,5 @@
 import { renderProgressIndicator } from "../components/progress.js";
-import { renderCriticalAlert } from "../components/alerts.js";
+import { renderCriticalAlert, renderCriticalLvoAlert } from "../components/alerts.js";
 import { renderDriversSection } from "../components/drivers.js";
 import { renderStrokeCenterMap } from "../components/stroke-center-map.js";
 import { getRiskLevel } from "../../logic/formatters.js";
@@ -317,7 +317,7 @@ export function renderICHFocusedResults(ich, results, startTime, legacyResults, 
   const kioskMode = detectKioskMode();
   const isKioskMode = kioskMode.isKioskMode;
 
-  const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : "";
+  const criticalAlert = ich && ich.probability > 0.7 ? renderCriticalAlert() : "";
   const ichPercentLocal = Math.round((ich?.probability || 0) * 100);
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
@@ -532,7 +532,8 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
   console.log("[FullModuleResults] ICH probability:", ich?.probability, "-> %:", ichPercent);
   console.log("[FullModuleResults] LVO probability:", lvo?.probability, "-> %:", lvoPercent);
 
-  const criticalAlert = ich && ich.probability > 0.6 ? renderCriticalAlert() : "";
+  const criticalIchAlert = ich && ich.probability > 0.7 ? renderCriticalAlert() : "";
+  const criticalLvoAlert = lvo && lvo.probability > 0.7 ? renderCriticalLvoAlert() : "";
   const strokeCenterHtml = renderStrokeCenterMap(results);
   const inputSummaryHtml = renderInputSummary();
   const researchToggleHtml = isResearchModeEnabled(currentModule) ? renderResearchToggle() : "";
@@ -597,8 +598,9 @@ function renderFullModuleResults(ich, lvo, results, startTime, legacyResults, cu
       <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 text-center">
         ${t("resultsTitle")}
       </h2>
-      ${criticalAlert}
-      
+      ${criticalIchAlert}
+      ${criticalLvoAlert}
+
       <!-- Risk Assessment Display -->
       <div class="${layoutClass} gap-1 flex flex-col flex-wrap justify-center items-stretch mb-6">
         ${renderRiskCard("ich", ich, results)}

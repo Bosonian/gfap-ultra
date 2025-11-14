@@ -68,7 +68,7 @@ export function renderFull() {
                 <!-- GFAP -->
                 <div class="flex flex-col">
                   <label for="gfap_value" class="text-sm font-medium text-gray-700 dark:text-slate-200 flex items-center gap-2">
-                <span data-i18n-key="gfapValueLabel"></span>
+                    <span data-i18n-key="gfapValueLabel"></span>
                     <span class="tooltip relative group cursor-pointer">
                       ℹ️
                       <span class="tooltiptext absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-800 dark:bg-slate-800 text-white text-xs rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity w-48 text-center z-10">
@@ -76,13 +76,36 @@ export function renderFull() {
                       </span>
                     </span>
                   </label>
+
+                  <!-- Cartridge Type Toggle -->
+                  <div class="mt-2 mb-2">
+                    <label class="text-xs font-medium text-gray-600 dark:text-slate-300 mb-1 block" data-i18n-key="gfapCartridgeType"></label>
+                    <div class="inline-flex rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 p-1" role="group">
+                      <button type="button" id="cartridge-plasma"
+                              class="cartridge-toggle px-4 py-2 text-sm font-medium rounded-md transition-all duration-200
+                                     bg-blue-500 text-white shadow-sm"
+                              data-cartridge="plasma">
+                        <span data-i18n-key="gfapPlasma"></span>
+                      </button>
+                      <button type="button" id="cartridge-wholeblood"
+                              class="cartridge-toggle px-4 py-2 text-sm font-medium rounded-md transition-all duration-200
+                                     text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+                              data-cartridge="wholeblood">
+                        <span data-i18n-key="gfapWholeBlood"></span>
+                      </button>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-slate-400 mt-1 hidden" id="gfap-conversion-note" data-i18n-key="gfapConversionNote"></p>
+                  </div>
+
                   <div class="relative">
                     <input type="number" name="gfap_value" id="gfap_value"
-                           class="mt-1 w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 
+                           class="mt-1 w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700
                                   text-gray-900 dark:text-white rounded-lg px-3 py-2 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                            min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" required>
                     <span class="absolute right-3 top-2.5 text-gray-400 dark:text-slate-400 text-sm" data-i18n-key="pgml"></span>
                   </div>
+                  <input type="hidden" id="gfap_cartridge_type" value="plasma">
+                  <input type="hidden" id="gfap_displayed_value" value="">
                 </div>
 
                 <!-- FAST-ED Score -->

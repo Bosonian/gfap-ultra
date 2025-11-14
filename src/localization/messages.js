@@ -93,6 +93,10 @@ export const messages = {
     gfapTooltip: "Brain injury biomarker",
     gfapTooltipLong: "Glial Fibrillary Acidic Protein - Brain injury biomarker",
     gfapRange: "Range: {min} - {max}",
+    gfapCartridgeType: "Cartridge Type",
+    gfapPlasma: "Plasma",
+    gfapWholeBlood: "Whole Blood",
+    gfapConversionNote: "Whole blood values are automatically converted to plasma equivalent",
     fastEdTooltip: "0-9 scale for LVO screening",
 
     // Module buttons
@@ -146,6 +150,8 @@ export const messages = {
     // Critical Alert
     criticalAlertTitle: "CRITICAL RISK DETECTED",
     criticalAlertMessage: "High probability of intracerebral hemorrhage detected.",
+    criticalLvoAlertTitle: "CRITICAL LVO RISK DETECTED",
+    criticalLvoAlertMessage: "High probability of large vessel occlusion detected.",
     immediateActionsRequired: "Immediate actions required",
     initiateStrokeProtocol: "Initiate stroke protocol immediately",
     urgentCtImaging: "Urgent CT imaging required",
@@ -450,6 +456,10 @@ export const messages = {
     gfapTooltip: "Hirnverletzungs-Biomarker",
     gfapTooltipLong: "Glial Fibrillary Acidic Protein - Hirnverletzungs-Biomarker",
     gfapRange: "Bereich: {min} - {max}",
+    gfapCartridgeType: "Kartuschentyp",
+    gfapPlasma: "Plasma",
+    gfapWholeBlood: "Vollblut",
+    gfapConversionNote: "Vollblutwerte werden automatisch in Plasmaäquivalent umgerechnet",
     fastEdTooltip: "0-9 Skala für LVO-Screening",
 
     // Module buttons
@@ -503,6 +513,8 @@ export const messages = {
     // Critical Alert
     criticalAlertTitle: "KRITISCHES RISIKO ERKANNT",
     criticalAlertMessage: "Hohe Wahrscheinlichkeit einer intrazerebralen Blutung erkannt.",
+    criticalLvoAlertTitle: "KRITISCHES LVO-RISIKO ERKANNT",
+    criticalLvoAlertMessage: "Hohe Wahrscheinlichkeit eines Verschlusses großer Gefäße erkannt.",
     immediateActionsRequired: "Sofortige Maßnahmen erforderlich",
     initiateStrokeProtocol: "Schlaganfall-Protokoll sofort einleiten",
     urgentCtImaging: "Dringende CT-Bildgebung erforderlich",

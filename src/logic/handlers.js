@@ -112,6 +112,17 @@ export async function handleSubmit(e, container) {
     }
   });
 
+  // Convert GFAP from whole blood to plasma if needed (for all modules with GFAP)
+  if ((module === "full" || module === "coma" || module === "limited") && inputs.gfap_value) {
+    const cartridgeType = form.elements["gfap_cartridge_type"]?.value || "plasma";
+    if (cartridgeType === "wholeblood") {
+      // Convert whole blood to plasma equivalent (multiply by 0.94)
+      const WHOLE_BLOOD_TO_PLASMA_CONVERSION = 0.94;
+      inputs.gfap_value = inputs.gfap_value * WHOLE_BLOOD_TO_PLASMA_CONVERSION;
+      console.log(`[Submit] GFAP converted from whole blood to plasma (${module} module): ${inputs.gfap_value.toFixed(2)} pg/mL`);
+    }
+  }
+
   // Store form data
   store.setFormData(module, inputs);
 
