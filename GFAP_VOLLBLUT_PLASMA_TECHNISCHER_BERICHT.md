@@ -130,6 +130,7 @@ logit(P_ICH) = β₀ + β_age × Age + β_SBP × SBP + β_DBP × DBP
 **Modelltyp**: Gradient Boosted Trees (200 Estimatoren)
 
 **Nicht-lineare Transformation**:
+
 ```
 Yeo-Johnson mit λ ≈ -0,5 (geschätzt, feature-spezifisch)
 GFAP_transformed = ((GFAP)^λ - 1) / λ  (für λ ≠ 0)
@@ -481,9 +482,3 @@ Relative Änderung = 0,20 / 3,63 = 5,5%
 
 **Ende des Berichts**
 
----
-
-**Autor**: Dr. Deepak Bos, Universitätsklinikum Frankfurt
-**Review**: Prof. Dr. Christian Förch
-**Version**: 1.0
-**Status**: Bereit für klinische Validierung

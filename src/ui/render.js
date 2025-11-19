@@ -250,7 +250,9 @@ function attachEvents(container) {
   const conversionNote = container.querySelector("#gfap-conversion-note");
 
   if (cartridgeToggles.length && gfapInput && cartridgeTypeInput) {
-    const WHOLE_BLOOD_CONVERSION = 0.94; // Conversion factor from whole blood to plasma
+    // Harmonization factor: k = 30/65 = 0.46 (clinical cut-off ratio)
+    // Aligns whole blood cartridge scale (65 pg/mL cut-off) to legacy plasma scale (30 pg/mL)
+    const WHOLE_BLOOD_HARMONIZATION = 0.46;
 
     cartridgeToggles.forEach(toggle => {
       toggle.addEventListener("click", e => {
@@ -272,15 +274,15 @@ function attachEvents(container) {
           }
         });
 
-        // Convert GFAP value if it exists and type changed
+        // Convert GFAP value display when switching cartridge types
         if (currentValue > 0 && previousType !== selectedType) {
           let newValue;
           if (selectedType === "wholeblood" && previousType === "plasma") {
-            // Converting from plasma to whole blood display (divide by conversion factor)
-            newValue = currentValue / WHOLE_BLOOD_CONVERSION;
+            // Display conversion: plasma → whole blood (divide by harmonization factor)
+            newValue = currentValue / WHOLE_BLOOD_HARMONIZATION;
           } else if (selectedType === "plasma" && previousType === "wholeblood") {
-            // Converting from whole blood to plasma display (multiply by conversion factor)
-            newValue = currentValue * WHOLE_BLOOD_CONVERSION;
+            // Display conversion: whole blood → plasma (multiply by harmonization factor)
+            newValue = currentValue * WHOLE_BLOOD_HARMONIZATION;
           }
 
           if (newValue) {

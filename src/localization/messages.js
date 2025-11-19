@@ -96,7 +96,7 @@ export const messages = {
     gfapCartridgeType: "Cartridge Type",
     gfapPlasma: "Plasma",
     gfapWholeBlood: "Whole Blood",
-    gfapConversionNote: "Whole blood values are automatically converted to plasma equivalent",
+    gfapConversionNote: "Whole blood cartridge values are automatically harmonized to legacy plasma scale (k=0.46)",
     fastEdTooltip: "0-9 scale for LVO screening",
 
     // Module buttons
@@ -459,7 +459,7 @@ export const messages = {
     gfapCartridgeType: "Kartuschentyp",
     gfapPlasma: "Plasma",
     gfapWholeBlood: "Vollblut",
-    gfapConversionNote: "Vollblutwerte werden automatisch in Plasmaäquivalent umgerechnet",
+    gfapConversionNote: "Vollblut-Kartuschen-Werte werden automatisch auf Legacy-Plasma-Skala harmonisiert (k=0,46)",
     fastEdTooltip: "0-9 Skala für LVO-Screening",
 
     // Module buttons
