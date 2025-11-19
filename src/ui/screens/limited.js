@@ -88,9 +88,15 @@ export function renderLimited() {
               <div class="relative">
                 <input type="number" name="gfap_value" id="gfap_value"
                        class="mt-1 w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors duration-300"
-                       min="${GFAP_RANGES.min}" max="${GFAP_RANGES.max}" step="0.1" required inputmode="decimal">
+                       min="${GFAP_RANGES.plasma.min}" max="${GFAP_RANGES.plasma.max}"
+                       data-plasma-min="${GFAP_RANGES.plasma.min}" data-plasma-max="${GFAP_RANGES.plasma.max}"
+                       data-wb-min="${GFAP_RANGES.wholeblood.min}" data-wb-max="${GFAP_RANGES.wholeblood.max}"
+                       step="0.1" required inputmode="decimal">
                  <span class="absolute right-3 top-2.5 text-gray-400 dark:text-slate-400 text-sm" data-i18n-key="pgml"></span>
               </div>
+              <p class="text-xs text-gray-500 dark:text-slate-400 mt-1" id="gfap-range-note">
+                <span data-i18n-key="validRange"></span>: <span id="gfap-range-display">${GFAP_RANGES.plasma.min}-${GFAP_RANGES.plasma.max} pg/mL</span>
+              </p>
               <input type="hidden" id="gfap_cartridge_type" value="plasma">
             </div>
           </div>

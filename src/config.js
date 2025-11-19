@@ -101,7 +101,25 @@ export const CRITICAL_THRESHOLDS = {
   },
 };
 
+// GFAP ranges for different cartridge types
+// Whole Blood ranges calculated using harmonization factor k=0.46
+// WB_min = Plasma_min / 0.46, WB_max = Plasma_max / 0.46
 export const GFAP_RANGES = {
+  plasma: {
+    min: 29,
+    max: 10001,
+    normal: 100,
+    elevated: 500,
+    critical: 1000,
+  },
+  wholeblood: {
+    min: 63,  // 29 / 0.46 ≈ 63
+    max: 21741,  // 10001 / 0.46 ≈ 21741
+    normal: 217,  // 100 / 0.46 ≈ 217
+    elevated: 1087,  // 500 / 0.46 ≈ 1087
+    critical: 2174,  // 1000 / 0.46 ≈ 2174
+  },
+  // Legacy compatibility (defaults to plasma)
   min: 29,
   max: 10001,
   normal: 100,

@@ -248,6 +248,7 @@ function attachEvents(container) {
   const gfapInput = container.querySelector("#gfap_value");
   const cartridgeTypeInput = container.querySelector("#gfap_cartridge_type");
   const conversionNote = container.querySelector("#gfap-conversion-note");
+  const rangeDisplay = container.querySelector("#gfap-range-display");
 
   if (cartridgeToggles.length && gfapInput && cartridgeTypeInput) {
     // Harmonization factor: k = 30/65 = 0.46 (clinical cut-off ratio)
@@ -273,6 +274,25 @@ function attachEvents(container) {
             btn.classList.add("text-gray-700", "dark:text-slate-300", "hover:bg-gray-100", "dark:hover:bg-slate-700");
           }
         });
+
+        // Update min/max attributes and range display based on cartridge type
+        if (selectedType === "wholeblood") {
+          const minWB = gfapInput.dataset.wbMin;
+          const maxWB = gfapInput.dataset.wbMax;
+          gfapInput.setAttribute("min", minWB);
+          gfapInput.setAttribute("max", maxWB);
+          if (rangeDisplay) {
+            rangeDisplay.textContent = `${minWB}-${maxWB} pg/mL`;
+          }
+        } else {
+          const minPlasma = gfapInput.dataset.plasmaMin;
+          const maxPlasma = gfapInput.dataset.plasmaMax;
+          gfapInput.setAttribute("min", minPlasma);
+          gfapInput.setAttribute("max", maxPlasma);
+          if (rangeDisplay) {
+            rangeDisplay.textContent = `${minPlasma}-${maxPlasma} pg/mL`;
+          }
+        }
 
         // Convert GFAP value display when switching cartridge types
         if (currentValue > 0 && previousType !== selectedType) {
