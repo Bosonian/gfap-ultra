@@ -25,14 +25,46 @@ export function renderLoginScreen() {
       <p class="text-gray-700 dark:text-gray-200 text-sm mb-2">
         ${t("researchrPreviewValidation")}
       </p>
-      <div class="bg-yellow-100 dark:bg-gray-800 p-2 rounded border border-yellow-200 dark:border-yellow-600 text-sm text-gray-800 dark:text-gray-100">
-        <h3 class="font-semibold mb-1 text-yellow-600 dark:text-yellow-400">⚠️ ${t("importantNotice")}</h3>
-        <ul class="list-disc ml-5 space-y-1">
-          <li><span class="font-semibold">${t("researchUseOnly")}</span> - ${t("noClinicalDecision")}</li>
-          <li><span class="font-semibold">${t("noDataStorage")}</span> - ${t("dataProcessedLocally")}</li>
-          <li><span class="font-semibold">${t("clinicalAdvisory")}</span> - <span data-i18n-key="supervision"></span></li>
-          <li><span class="font-semibold">${t("contact")}:</span> Deepak Bos (bosdeepak@gmail.com)</li>
-        </ul>
+      <div class="bg-yellow-100 dark:bg-gray-800 p-3 rounded border border-yellow-200 dark:border-yellow-600 text-sm text-gray-800 dark:text-gray-100">
+        <h3 class="font-semibold mb-2 text-yellow-600 dark:text-yellow-400">⚠️ ${t("regulatoryNotice")}</h3>
+
+        <div class="mb-2">
+          <p class="font-semibold mb-1">${t("legalStatus")}:</p>
+          <ul class="list-disc ml-5 space-y-0.5">
+            <li>${t("legalStatusResearchPrototype")}</li>
+            <li>${t("legalStatusNotDiagnostic")}</li>
+          </ul>
+        </div>
+
+        <div class="mb-2">
+          <p class="font-semibold mb-1">${t("dataPrivacySecurity")}:</p>
+          <ul class="list-disc ml-5 space-y-0.5">
+            <li>${t("dataPrivacyNoStorage")}</li>
+            <li>${t("dataPrivacyLocalProcessing")}</li>
+            <li>${t("dataPrivacyEncryption")}</li>
+          </ul>
+        </div>
+
+        <div class="mb-2">
+          <p class="font-semibold mb-1">${t("scientificSupervision")}:</p>
+          <ul class="list-disc ml-5 space-y-0.5">
+            <li>${t("scientificSupervisorForech")}</li>
+          </ul>
+        </div>
+
+        <div class="mb-2">
+          <p class="font-semibold mb-1">${t("clinicalCollaboration")}:</p>
+          <ul class="list-disc ml-5 space-y-0.5">
+            <li>${t("clinicalCollaboratorKalra")}</li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="font-semibold mb-1">${t("developmentResponsibility")}:</p>
+          <ul class="list-disc ml-5 space-y-0.5">
+            <li>${t("developmentDeveloperBos")}</li>
+          </ul>
+        </div>
       </div>
     </div>
     <!-- Login Form -->
