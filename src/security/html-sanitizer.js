@@ -222,8 +222,9 @@ function sanitizeNode(node, options) {
       // Recursively sanitize children
       sanitizeNode(child, options);
     } else if (child.nodeType === Node.TEXT_NODE) {
-      // Escape text content
-      child.textContent = escapeTextContent(child.textContent);
+      // Text nodes are already safe - they cannot contain HTML markup
+      // No escaping needed; the browser treats them as literal text
+      // Leave text content as-is to prevent double-encoding (pg/mL, <, >, etc.)
     } else {
       // Remove other node types (comments, etc.)
       nodesToRemove.push(child);
@@ -320,13 +321,14 @@ export function escapeTextContent(text) {
     return "";
   }
 
+  // Only escape characters that can break HTML structure
+  // Forward slashes (/) are safe in text content and don't need escaping
   return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;")
-    .replace(/\//g, "&#x2F;");
+    .replace(/'/g, "&#x27;");
 }
 
 /**
