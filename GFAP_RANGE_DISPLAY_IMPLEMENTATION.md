@@ -21,22 +21,22 @@ Implemented dynamic min/max validation ranges and user-friendly range displays t
 ```javascript
 export const GFAP_RANGES = {
   plasma: {
-    min: 29,
-    max: 10001,
+    min: 30,      // Abbott spec: 30 pg/mL (clinical cut-off)
+    max: 10000,   // Abbott spec: 10000 pg/mL
     normal: 100,
     elevated: 500,
     critical: 1000,
   },
   wholeblood: {
-    min: 63,      // 29 / 0.46 ≈ 63
-    max: 21741,   // 10001 / 0.46 ≈ 21741
-    normal: 217,  // 100 / 0.46 ≈ 217
-    elevated: 1087,  // 500 / 0.46 ≈ 1087
-    critical: 2174,  // 1000 / 0.46 ≈ 2174
+    min: 65,      // Abbott spec: 65 pg/mL (clinical cut-off, NOT 47 analytical min)
+    max: 10000,   // Abbott spec: 10000 pg/mL (same as plasma)
+    normal: 217,  // ~100 / 0.46 for reference
+    elevated: 1087,
+    critical: 2174,
   },
   // Legacy compatibility (defaults to plasma)
-  min: 29,
-  max: 10001,
+  min: 30,
+  max: 10000,
   normal: 100,
   elevated: 500,
   critical: 1000,
@@ -142,7 +142,7 @@ validRange: "Gültiger Bereich",
 │ ┌─────────────────────────────┐    │
 │ │ [    100    ] pg/mL         │    │
 │ └─────────────────────────────┘    │
-│ Valid range: 29-10001 pg/mL        │
+│ Valid range: 30-10000 pg/mL        │
 └─────────────────────────────────────┘
 ```
 
@@ -156,7 +156,7 @@ validRange: "Gültiger Bereich",
 │ ┌─────────────────────────────┐    │
 │ │ [    217    ] pg/mL         │    │
 │ └─────────────────────────────┘    │
-│ Valid range: 63-21741 pg/mL        │
+│ Valid range: 65-10000 pg/mL        │
 │ ℹ️ Whole blood values auto-harmonized│
 └─────────────────────────────────────┘
 ```
@@ -168,13 +168,13 @@ validRange: "Gültiger Bereich",
 ### HTML5 Native Validation
 
 **Plasma Cartridge:**
-- min="29"
-- max="10001"
+- min="30"
+- max="10000"
 - Browser rejects values outside this range
 
 **Whole Blood Cartridge:**
-- min="63"
-- max="21741"
+- min="65" (clinical cut-off)
+- max="10000"
 - Browser rejects values outside this range
 
 ### Benefits
@@ -190,17 +190,21 @@ validRange: "Gültiger Bereich",
 
 ### Range Calculations
 
-| Metric | Plasma | Whole Blood | Calculation |
-|--------|--------|-------------|-------------|
-| Min | 29 | 63 | 29 / 0.46 |
-| Max | 10001 | 21741 | 10001 / 0.46 |
-| Normal | 100 | 217 | 100 / 0.46 |
-| Elevated | 500 | 1087 | 500 / 0.46 |
-| Critical | 1000 | 2174 | 1000 / 0.46 |
+| Metric | Plasma | Whole Blood | Notes |
+|--------|--------|-------------|-------|
+| Min | 30 | 65 | Clinical cut-offs (NOT analytical minimums) |
+| Max | 10000 | 10000 | Same upper limit for both cartridges |
+| Normal | 100 | 217 | ~100 / 0.46 |
+| Elevated | 500 | 1087 | ~500 / 0.46 |
+| Critical | 1000 | 2174 | ~1000 / 0.46 |
 
-**Formula**: `WholeBlood_Range = Plasma_Range / 0.46`
+**Critical Design Decision**: Using clinical cut-offs (30 and 65 pg/mL) instead of analytical measuring intervals (30 and 47 pg/mL) to ensure harmonized values remain valid.
 
-**Rationale**: Whole Blood cartridge measures ~2.17x higher than Plasma cartridge (inverse of 0.46), so acceptable ranges must be proportionally larger.
+**Why 65 pg/mL minimum for whole blood?**
+- Values below 65 pg/mL are below clinical threshold
+- When harmonized: 65 * 0.46 ≈ 30 pg/mL (aligns with plasma cut-off)
+- Prevents harmonized values from falling below model expectations
+- **Bug fix**: Previously used 47 pg/mL, causing values 47-65 to harmonize to 21.62-29.9 pg/mL (below plasma minimum of 30)
 
 ---
 
@@ -211,7 +215,7 @@ validRange: "Gültiger Bereich",
 User has entered: 50 pg/mL (Plasma)
 User clicks: Whole Blood
 Input value converts: 50 → 109 pg/mL
-Range updates: 29-10001 → 63-21741
+Range updates: 30-10000 → 65-10000
 Result: ✅ Both value and range scaled correctly
 ```
 
@@ -219,16 +223,31 @@ Result: ✅ Both value and range scaled correctly
 ```
 User clicks: Whole Blood (no value entered)
 Input value: Remains empty
-Range updates: 29-10001 → 63-21741
+Range updates: 30-10000 → 65-10000
 Result: ✅ Range updates, value conversion skipped
 ```
 
-### 3. Invalid Value Entered
+### 3. Invalid Value Entered (Below Minimum)
 ```
-User enters: 25 pg/mL (Plasma, below min of 29)
+User enters: 49 pg/mL (Whole Blood, below min of 65)
 Browser shows: Red border + validation message
 Submit button: Disabled
-Result: ✅ Form submission prevented
+Result: ✅ Form submission prevented (prevents harmonization to 22.54 pg/mL)
+```
+
+### 4. Critical Bug Fix (Nov 2025)
+```
+BEFORE (Buggy):
+User enters: 49 pg/mL (Whole Blood, within 47-10000 range)
+Validation: ✅ Passes (49 >= 47)
+Harmonization: 49 * 0.46 = 22.54 pg/mL
+API call: ❌ Rejects (22.54 < 30 plasma minimum)
+Result: ❌ App gets stuck
+
+AFTER (Fixed):
+User enters: 49 pg/mL (Whole Blood)
+Validation: ❌ Fails (49 < 65 minimum)
+Result: ✅ User sees validation error, prevented from submitting
 ```
 
 ---
