@@ -117,6 +117,9 @@ const clientHelpers = {
 
       if (!response.ok) {
         const errorText = await response.text().catch(() => "Network error");
+        console.error(`[API] Request failed with status ${response.status}`);
+        console.error(`[API] Error response:`, errorText);
+        console.error(`[API] Payload that was sent:`, JSON.stringify(normalizedPayload, null, 2));
         throw new MedicalAPIError(
           `API request failed: ${response.status} ${response.statusText} - ${errorText}`,
           response.status,
@@ -189,7 +192,7 @@ export async function warmUpFunctions() {
     API_URLS.LVO_PREDICTION, // New LVO endpoint
     API_URLS.COMA_ICH,
     API_URLS.LDM_ICH,
-    API_URLS.AUTHENTICATE,
+    // NOTE: Authentication removed from warmup to prevent rate limiting
   ];
 
   const warmUpPromises = prioritizedUrls.map(async (url, index) => {

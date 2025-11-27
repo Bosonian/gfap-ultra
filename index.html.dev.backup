@@ -15,7 +15,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="manifest" href="/gfap-ultra/assets/manifest-CgZQOV_e.json" />
+    <link rel="manifest" href="./manifest.json" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -24,13 +24,11 @@
     <meta name="msapplication-tap-highlight" content="no" />
 
     <!-- Favicon and Icons -->
-    <link rel="icon" href="/gfap-ultra/assets/favicon-DPOKeJP6.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/gfap-ultra/assets/icon-32x32-BZn9ZIFo.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/gfap-ultra/assets/icon-16x16-BUOTCe54.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/gfap-ultra/assets/apple-touch-icon-IbqiIBz1.png" />
-    <link rel="mask-icon" href="/gfap-ultra/assets/icon-192x192-88fexMmU.png" color="#0066CC" />
-    <script type="module" crossorigin src="/gfap-ultra/assets/index-D4x884w9.js"></script>
-    <link rel="stylesheet" crossorigin href="/gfap-ultra/assets/index-Cln72WVh.css">
+    <link rel="icon" href="./favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./icons/icon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
+    <link rel="mask-icon" href="./icons/icon-192x192.png" color="#0066CC" />
   </head>
   <body class="min-h-screen flex flex-col">
     <header
@@ -302,5 +300,6 @@
         }
       });
     </script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

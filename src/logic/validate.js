@@ -85,14 +85,23 @@ export function showValidationErrors(container, validationErrors) {
   Object.entries(validationErrors).forEach(([name, errors]) => {
     const input = container.querySelector(`[name="${name}"]`);
     if (input) {
-      const group = input.closest(".input-group");
+      let group = input.closest(".input-group");
+
+      // If no .input-group found, use parent element
+      if (!group) {
+        group = input.parentElement;
+      }
+
       if (group) {
         group.classList.add("error");
-        // Remove existing error messages
+        input.classList.add("border-red-500");
+
+        // Remove existing error messages in this group
         group.querySelectorAll(".error-message").forEach((el) => el.remove());
+
         // Add new error message safely without innerHTML
         const errorDiv = document.createElement("div");
-        errorDiv.className = "error-message";
+        errorDiv.className = "error-message text-red-600 dark:text-red-400 text-sm mt-1";
 
         const iconSpan = document.createElement("span");
         iconSpan.className = "error-icon";
@@ -100,7 +109,13 @@ export function showValidationErrors(container, validationErrors) {
 
         errorDiv.appendChild(iconSpan);
         errorDiv.appendChild(document.createTextNode(` ${errors[0]}`));
-        group.appendChild(errorDiv);
+
+        // Insert after the input
+        if (input.nextSibling) {
+          group.insertBefore(errorDiv, input.nextSibling);
+        } else {
+          group.appendChild(errorDiv);
+        }
       }
     }
   });
