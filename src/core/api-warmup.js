@@ -6,8 +6,8 @@
 import { medicalLogger } from "../utils/medical-logger.js";
 
 // Cloud Function endpoints that need warming up
+// NOTE: Authentication endpoint removed from warmup to prevent rate limiting
 const API_ENDPOINTS = {
-  authentication: "https://europe-west3-igfap-452720.cloudfunctions.net/authenticate-research-access",
   comaIch: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich",
   limitedIch: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich",
   fullStroke: "https://europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke",
@@ -15,11 +15,8 @@ const API_ENDPOINTS = {
 };
 
 // Lightweight test payloads to warm up APIs
+// NOTE: Authentication payload removed (endpoint not warmed up)
 const WARMUP_PAYLOADS = {
-  authentication: {
-    action: "validate_session",
-    session_token: "warmup-test-token",
-  },
   comaIch: {
     gfap_value: 100,
   },
@@ -237,11 +234,11 @@ class APIWarmupService {
   }
 
   /**
-   * Quick warmup for critical APIs only (authentication, ICH prediction)
+   * Quick warmup for critical APIs only (ICH prediction)
    * @returns {Promise<Object>} Results of critical API warmup
    */
   async warmupCriticalAPIs() {
-    const criticalAPIs = ["authentication", "comaIch", "limitedIch"];
+    const criticalAPIs = ["comaIch", "limitedIch"];
 
     medicalLogger.info("Starting critical API warmup", {
       category: "WARMUP",
