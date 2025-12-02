@@ -11,13 +11,17 @@ Per professor's instruction, the **Coma module** now uses **Abbott's Passing-Bab
 
 ---
 
-## Module-Specific Conversion Factors
+## Module-Specific Conversion Formulas
 
-| Module | Factor | Method | Rationale |
-|--------|--------|--------|-----------|
-| **Coma** | **0.94** | Abbott Passing-Bablok | Professor's instruction |
-| **Limited** | 0.46 | Clinical cut-off ratio | Unchanged |
-| **Full/Stroke** | 0.46 | Clinical cut-off ratio | Unchanged |
+| Module | Formula | Method | Rationale |
+|--------|---------|--------|-----------|
+| **Coma** | **y = 0.94x - 1.34** | Abbott Passing-Bablok | Professor's instruction |
+| **Limited** | y = 0.46x | Clinical cut-off ratio | Unchanged |
+| **Full/Stroke** | y = 0.46x | Clinical cut-off ratio | Unchanged |
+
+Where:
+- **y** = Plasma GFAP (pg/mL)
+- **x** = Whole Blood GFAP (pg/mL)
 
 ---
 
@@ -35,18 +39,22 @@ if ((module === "full" || module === "coma" || module === "limited") && inputs.g
   let conversionMethod;
 
   if (module === "coma") {
-    // Coma Module: Abbott Passing-Bablok sample matrix conversion
-    // Professor's instruction: Use Abbott equation for Coma module
-    conversionFactor = 0.94;
-    conversionMethod = "Abbott Passing-Bablok (sample matrix conversion)";
+    // Coma Module: Abbott Passing-Bablok regression equation
+    // Professor's instruction: Use complete Abbott equation for Coma module
+    // Formula: Plasma GFAP = 0.94 × Whole Blood GFAP - 1.34
+    const ABBOTT_SLOPE = 0.94;
+    const ABBOTT_INTERCEPT = -1.34;
+    const originalValue = inputs.gfap_value;
+    inputs.gfap_value = (ABBOTT_SLOPE * originalValue) + ABBOTT_INTERCEPT;
+    conversionMethod = "Abbott Passing-Bablok (complete equation)";
+    console.log(`[Submit] GFAP converted (coma): ${originalValue} → ${inputs.gfap_value.toFixed(2)} pg/mL (y = 0.94x - 1.34)`);
   } else {
     // Limited & Full Modules: Clinical cut-off ratio harmonization
     conversionFactor = 0.46;
     conversionMethod = "Clinical cut-off ratio harmonization";
+    inputs.gfap_value = inputs.gfap_value * conversionFactor;
+    console.log(`[Submit] GFAP converted (${module}): ${inputs.gfap_value.toFixed(2)} pg/mL (y = 0.46x)`);
   }
-
-  inputs.gfap_value = inputs.gfap_value * conversionFactor;
-  console.log(`[Submit] GFAP converted (${module} module): ${inputs.gfap_value.toFixed(2)} pg/mL using ${conversionMethod}`);
 }
 ```
 
@@ -60,51 +68,62 @@ if ((module === "full" || module === "coma" || module === "limited") && inputs.g
 
 ---
 
-## Comparison: 0.46 vs 0.94
+## Comparison: Complete Equations
 
 ### Example: GFAP = 100 pg/mL (Whole Blood Input)
 
-**Coma Module** (Abbott 0.94):
+**Coma Module** (Abbott Passing-Bablok):
 ```
 Input:     100 pg/mL (whole blood)
-Converted: 100 × 0.94 = 94 pg/mL (sent to Cloud Function)
-Formula:   logit = -6.30 + 2.25 × log₁₀(94) = -1.858
-Result:    P_ICH = 13.5%
+Formula:   y = 0.94 × 100 - 1.34 = 92.66 pg/mL
+Converted: 92.66 pg/mL (sent to Cloud Function)
+Prediction: logit = -6.30 + 2.25 × log₁₀(92.66) = -1.873
+Result:    P_ICH = 13.3%
 ```
 
-**Limited/Full Modules** (Harmonization 0.46):
+**Limited/Full Modules** (Harmonization):
 ```
 Input:     100 pg/mL (whole blood)
-Converted: 100 × 0.46 = 46 pg/mL (sent to Cloud Function)
-Formula:   [Model-specific calculation]
+Formula:   y = 0.46 × 100 = 46 pg/mL
+Converted: 46 pg/mL (sent to Cloud Function)
+Prediction: [Model-specific calculation]
 Result:    [Model-specific probability]
 ```
 
 ### Impact on Coma Predictions
 
-| Whole Blood | Abbott (0.94) | Harmonization (0.46) | Difference |
-|-------------|---------------|----------------------|------------|
-| 50 pg/mL | 47 pg/mL → 7.1% | 23 pg/mL → 3.0% | +4.1% |
-| 100 pg/mL | 94 pg/mL → 13.5% | 46 pg/mL → 7.2% | +6.3% |
-| 200 pg/mL | 188 pg/mL → 24.2% | 92 pg/mL → 13.5% | +10.7% |
-| 500 pg/mL | 470 pg/mL → 49.8% | 230 pg/mL → 28.6% | +21.2% |
+| Whole Blood | Abbott (0.94x - 1.34) | Harmonization (0.46x) | Difference |
+|-------------|----------------------|----------------------|------------|
+| 50 pg/mL | 45.66 pg/mL → 6.9% | 23 pg/mL → 3.0% | +3.9% |
+| 100 pg/mL | 92.66 pg/mL → 13.3% | 46 pg/mL → 7.2% | +6.1% |
+| 200 pg/mL | 186.66 pg/mL → 24.0% | 92 pg/mL → 13.5% | +10.5% |
+| 500 pg/mL | 468.66 pg/mL → 49.7% | 230 pg/mL → 28.6% | +21.1% |
 
-**Key Observation**: Abbott conversion (0.94) produces **higher ICH probability estimates** than harmonization (0.46).
+**Key Observations**:
+- Abbott equation (0.94x - 1.34) produces **higher ICH probability estimates** than harmonization (0.46x)
+- The **-1.34 intercept** slightly reduces the converted value compared to pure multiplication by 0.94
+- Impact of intercept is proportionally larger at lower GFAP values
 
 ---
 
 ## Rationale: Why Different Factors?
 
-### Abbott's 0.94 Factor
+### Abbott's Passing-Bablok Equation
 
-**Definition**: Sample matrix conversion for Abbott i-STAT cartridges
+**Definition**: Linear regression equation for Abbott i-STAT cartridges
 ```
-Plasma GFAP = Whole Blood GFAP × 0.94
+Plasma GFAP = 0.94 × Whole Blood GFAP - 1.34
 ```
 
-**Source**: Abbott i-STAT Alinity product specifications
+**Components**:
+- **Slope (b)**: 0.94 (proportional bias)
+- **Intercept (a)**: -1.34 (systematic bias)
+
+**Source**: Abbott i-STAT Alinity Passing-Bablok regression analysis
 
 **Application**: Converts between whole blood and plasma **samples** measured with the **same cartridge**
+
+**Statistical Method**: Passing-Bablok regression (non-parametric, robust to outliers)
 
 ### Clinical Cut-Off Ratio 0.46
 

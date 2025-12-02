@@ -122,19 +122,23 @@ export async function handleSubmit(e, container) {
     let conversionMethod;
 
     if (module === "coma") {
-      // Coma Module: Abbott Passing-Bablok sample matrix conversion
-      // Professor's instruction: Use Abbott equation for Coma module
-      conversionFactor = 0.94;
-      conversionMethod = "Abbott Passing-Bablok (sample matrix conversion)";
+      // Coma Module: Abbott Passing-Bablok regression equation
+      // Professor's instruction: Use complete Abbott equation for Coma module
+      // Formula: Plasma GFAP = 0.94 × Whole Blood GFAP - 1.34
+      const ABBOTT_SLOPE = 0.94;
+      const ABBOTT_INTERCEPT = -1.34;
+      const originalValue = inputs.gfap_value;
+      inputs.gfap_value = (ABBOTT_SLOPE * originalValue) + ABBOTT_INTERCEPT;
+      conversionMethod = "Abbott Passing-Bablok (complete equation)";
+      console.log(`[Submit] GFAP converted (coma module): ${originalValue} pg/mL → ${inputs.gfap_value.toFixed(2)} pg/mL using ${conversionMethod} (y = 0.94x - 1.34)`);
     } else {
       // Limited & Full Modules: Clinical cut-off ratio harmonization
       // k = 30 pg/mL (plasma cut-off) / 65 pg/mL (whole blood cut-off) = 0.46
       conversionFactor = 0.46;
       conversionMethod = "Clinical cut-off ratio harmonization";
+      inputs.gfap_value = inputs.gfap_value * conversionFactor;
+      console.log(`[Submit] GFAP converted (${module} module): ${inputs.gfap_value.toFixed(2)} pg/mL using ${conversionMethod} (factor: ${conversionFactor})`);
     }
-
-    inputs.gfap_value = inputs.gfap_value * conversionFactor;
-    console.log(`[Submit] GFAP converted (${module} module): ${inputs.gfap_value.toFixed(2)} pg/mL using ${conversionMethod} (factor: ${conversionFactor})`);
   }
 
   // Store form data
