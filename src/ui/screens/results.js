@@ -39,10 +39,16 @@ function renderInputSummary() {
 
       const itemsHtml = Object.entries(data)
         .filter(([_, value]) => value !== "" && value !== null && value !== undefined)
-        .filter(([key, _]) => key !== "gfap_cartridge_type")
+        .filter(([key, _]) => key !== "gfap_cartridge_type" && key !== "gfap_value_original")
         .map(([key, value]) => {
+          // For GFAP value, use the original (user-entered) value if it exists
+          let displayVal = value;
+          if (key === "gfap_value" && data.gfap_value_original) {
+            displayVal = data.gfap_value_original;
+          }
+
           const label = formatSummaryLabel(key);
-          const displayValue = formatDisplayValue(value, key);
+          const displayValue = formatDisplayValue(displayVal, key);
           const displayType = displayValue.type ? displayValue.type : "";
           let displayHtml = "<span>" + displayType + "</span>";
           if (displayType == "pg/mL") {

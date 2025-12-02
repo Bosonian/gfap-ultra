@@ -116,6 +116,9 @@ export async function handleSubmit(e, container) {
   // Using clinical cut-off ratio: k = 30 pg/mL (plasma) / 65 pg/mL (whole blood) = 0.46
   // Note: All GFAP inputs are now whole blood only (plasma option removed for study phase)
   if ((module === "full" || module === "coma" || module === "limited") && inputs.gfap_value) {
+    // Save original value for display in input summary (so user can verify their input)
+    inputs.gfap_value_original = inputs.gfap_value;
+
     // Harmonization factor: aligns whole blood cartridge scale (65 pg/mL cut-off)
     // to legacy plasma cartridge scale (30 pg/mL cut-off) that models were trained on
     const WHOLE_BLOOD_HARMONIZATION_FACTOR = 0.46;
