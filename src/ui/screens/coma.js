@@ -42,7 +42,7 @@ export function renderComa() {
                     class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
                   <div id="gfap-help" class="text-gray-500 dark:text-gray-400 text-sm">
-                    <span data-i18n-key="validRange"></span>: <span id="gfap-range-display">${GFAP_RANGES.wholeblood.min}-${GFAP_RANGES.wholeblood.max} pg/mL</span> (Whole Blood)
+                    <span data-i18n-key="validRange"></span>: <span id="gfap-range-display">${GFAP_RANGES.wholeblood.min}-${GFAP_RANGES.wholeblood.max} pg/mL</span> (<span data-i18n-key="gfapWholeBlood"></span>)
                   </div>
                   <input type="hidden" id="gfap_cartridge_type" value="wholeblood">
                 </div>

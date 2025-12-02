@@ -73,7 +73,7 @@ export function renderLimited() {
                  <span class="absolute right-3 top-2.5 text-gray-400 dark:text-slate-400 text-sm" data-i18n-key="pgml"></span>
               </div>
               <p class="text-xs text-gray-500 dark:text-slate-400 mt-1" id="gfap-range-note">
-                <span data-i18n-key="validRange"></span>: <span id="gfap-range-display">${GFAP_RANGES.wholeblood.min}-${GFAP_RANGES.wholeblood.max} pg/mL</span> (Whole Blood)
+                <span data-i18n-key="validRange"></span>: <span id="gfap-range-display">${GFAP_RANGES.wholeblood.min}-${GFAP_RANGES.wholeblood.max} pg/mL</span> (<span data-i18n-key="gfapWholeBlood"></span>)
               </p>
               <input type="hidden" id="gfap_cartridge_type" value="wholeblood">
             </div>
