@@ -82,6 +82,19 @@ export function renderLoginScreen() {
         >
       </div>
       <div id="loginError" class="text-red-600 dark:text-red-400 text-sm hidden"></div>
+
+      <!-- Remember Device Checkbox -->
+      <div class="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="rememberDevice"
+          name="rememberDevice"
+          class="accent-blue-600 dark:accent-blue-500 w-4 h-4 rounded focus:ring-2 focus:ring-blue-600">
+        <label for="rememberDevice" class="text-sm text-gray-700 dark:text-gray-300">
+          <span data-i18n-key="rememberThisDevice"></span>
+        </label>
+      </div>
+
       <button type="submit" class="w-full bg-blue-600 dark:bg-blue-800 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center disabled:opacity-50 login-button">
         <span class="button-text">${t("accessResearchBtn")}</span>
         <span class="loading-spinner ml-2 hidden">⏳</span>
@@ -104,6 +117,7 @@ export function initializeLoginScreen() {
   if (!loginForm) return;
 
   const passwordInput = document.getElementById("researchPassword");
+  const rememberDeviceCheckbox = document.getElementById("rememberDevice");
   const loginError = document.getElementById("loginError");
   const loginButton = loginForm.querySelector(".login-button");
 
@@ -112,6 +126,7 @@ export function initializeLoginScreen() {
   loginForm.addEventListener("submit", async e => {
     e.preventDefault();
     const password = passwordInput.value.trim();
+    const rememberDevice = rememberDeviceCheckbox ? rememberDeviceCheckbox.checked : false;
 
     if (!password) {
       showLoginError("Please enter the research access code");
@@ -122,7 +137,7 @@ export function initializeLoginScreen() {
     hideLoginError();
 
     try {
-      const authResult = await authManager.authenticate(password);
+      const authResult = await authManager.authenticate(password, rememberDevice);
       if (authResult.success) {
         store.logEvent("auth_success", {
           timestamp: new Date().toISOString(),

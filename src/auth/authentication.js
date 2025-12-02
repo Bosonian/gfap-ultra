@@ -36,6 +36,7 @@ export class AuthenticationManager {
     this.sessionToken = null;
     this.sessionExpiry = null;
     this.lastActivity = Date.now();
+    this.rememberDevice = false;
     this.setupActivityTracking();
   }
 
@@ -44,12 +45,13 @@ export class AuthenticationManager {
    * @param {string} password - Research access password
    * @returns {Promise<{success: boolean, message: string, sessionInfo?: SessionInfo}>} - Authentication result with success status and message
    */
-  async authenticate(password) {
+  async authenticate(password, rememberDevice = false) {
     return safeAuthOperation(
       async () => {
         medicalLogger.info("Authentication attempt started", {
           category: LOG_CATEGORIES.AUTHENTICATION,
           hasPassword: !!password && password.length > 0,
+          rememberDevice: rememberDevice,
           isDevelopment: DEV_CONFIG.isDevelopment,
         });
 
@@ -91,6 +93,7 @@ export class AuthenticationManager {
           await new Promise(resolve => setTimeout(resolve, 300)); // small UX delay
 
           this.isAuthenticated = true;
+          this.rememberDevice = rememberDevice;
           this.sessionToken = DEV_CONFIG.mockAuthResponse.session_token;
           this.sessionExpiry = new Date(DEV_CONFIG.mockAuthResponse.expires_at);
           this.lastActivity = Date.now();
@@ -158,6 +161,7 @@ export class AuthenticationManager {
 
         if (data.success) {
           this.isAuthenticated = true;
+          this.rememberDevice = rememberDevice;
           this.sessionToken = data.session_token;
           this.sessionExpiry = data.expires_at ? new Date(data.expires_at) : null;
           this.lastActivity = Date.now();
@@ -316,7 +320,7 @@ export class AuthenticationManager {
   }
 
   /**
-   * Logout and clear session securely
+   * Logout and clear session securely from both localStorage and sessionStorage
    */
   async logout() {
     medicalLogger.info("User logout initiated", {
@@ -326,21 +330,25 @@ export class AuthenticationManager {
     this.isAuthenticated = false;
     this.sessionToken = null;
     this.sessionExpiry = null;
+    this.rememberDevice = false;
 
-    // Clear all encrypted session storage securely
+    // Clear all session data from both storages
     try {
-      await secureRemove("auth_session", true);
-      await secureRemove("auth_timestamp", true);
-      await secureRemove("session_token", true);
-      await secureRemove("session_expiry", true);
-
-      // Clear legacy unencrypted data
+      // Clear sessionStorage
       sessionStorage.removeItem("auth_session");
       sessionStorage.removeItem("auth_timestamp");
       sessionStorage.removeItem("session_token");
       sessionStorage.removeItem("session_expiry");
+      sessionStorage.removeItem("remember_device");
 
-      medicalLogger.info("Session data cleared during logout", {
+      // Clear localStorage
+      localStorage.removeItem("auth_session");
+      localStorage.removeItem("auth_timestamp");
+      localStorage.removeItem("session_token");
+      localStorage.removeItem("session_expiry");
+      localStorage.removeItem("remember_device");
+
+      medicalLogger.info("Session data cleared from both storages during logout", {
         category: LOG_CATEGORIES.SECURITY,
       });
     } catch (error) {
@@ -409,6 +417,7 @@ export class AuthenticationManager {
 
   /**
    * Store authenticated session securely
+   * Uses localStorage if rememberDevice is true, otherwise sessionStorage
    */
   storeSecureSession() {
     return safeAsync(
@@ -422,9 +431,13 @@ export class AuthenticationManager {
           );
         }
 
-        if (typeof sessionStorage === "undefined") {
+        // Choose storage based on rememberDevice preference
+        const storage = this.rememberDevice ? localStorage : sessionStorage;
+        const storageType = this.rememberDevice ? "localStorage" : "sessionStorage";
+
+        if (typeof storage === "undefined") {
           throw new MedicalError(
-            "Session storage not available",
+            `${storageType} not available`,
             "STORAGE_UNAVAILABLE",
             ERROR_CATEGORIES.STORAGE,
             ERROR_SEVERITY.MEDIUM
@@ -432,12 +445,18 @@ export class AuthenticationManager {
         }
 
         // Store session data securely
-        sessionStorage.setItem("auth_session", "verified");
-        sessionStorage.setItem("auth_timestamp", this.lastActivity.toString());
-        sessionStorage.setItem("session_token", this.sessionToken);
+        storage.setItem("auth_session", "verified");
+        storage.setItem("auth_timestamp", this.lastActivity.toString());
+        storage.setItem("session_token", this.sessionToken);
+        storage.setItem("remember_device", this.rememberDevice.toString());
         if (this.sessionExpiry) {
-          sessionStorage.setItem("session_expiry", this.sessionExpiry.toISOString());
+          storage.setItem("session_expiry", this.sessionExpiry.toISOString());
         }
+
+        medicalLogger.info(`Session stored in ${storageType}`, {
+          category: LOG_CATEGORIES.SECURITY,
+          rememberDevice: this.rememberDevice,
+        });
 
         return true;
       },
@@ -466,26 +485,38 @@ export class AuthenticationManager {
   }
 
   /**
-   * Check for existing valid session
+   * Check for existing valid session in both localStorage and sessionStorage
+   * Checks localStorage first (for persistent sessions), then sessionStorage
    * @returns {boolean} - Stored session validity
    */
   checkStoredSession() {
     try {
       return safeAsync(
         async () => {
-          if (typeof sessionStorage === "undefined") {
-            throw new MedicalError(
-              "Session storage not available",
-              "STORAGE_UNAVAILABLE",
-              ERROR_CATEGORIES.STORAGE,
-              ERROR_SEVERITY.LOW
-            );
+          // Try localStorage first (persistent sessions)
+          let session, timestamp, storedToken, storedExpiry, rememberDevice;
+          let foundInLocalStorage = false;
+
+          if (typeof localStorage !== "undefined") {
+            session = localStorage.getItem("auth_session");
+            timestamp = localStorage.getItem("auth_timestamp");
+            storedToken = localStorage.getItem("session_token");
+            storedExpiry = localStorage.getItem("session_expiry");
+            rememberDevice = localStorage.getItem("remember_device");
+
+            if (session === "verified" && timestamp && storedToken) {
+              foundInLocalStorage = true;
+            }
           }
 
-          const session = await secureRetrieve("auth_session", true);
-          const timestamp = await secureRetrieve("auth_timestamp", true);
-          const storedToken = await secureRetrieve("session_token", true);
-          const storedExpiry = await secureRetrieve("session_expiry", true);
+          // Fall back to sessionStorage if nothing in localStorage
+          if (!foundInLocalStorage && typeof sessionStorage !== "undefined") {
+            session = sessionStorage.getItem("auth_session");
+            timestamp = sessionStorage.getItem("auth_timestamp");
+            storedToken = sessionStorage.getItem("session_token");
+            storedExpiry = sessionStorage.getItem("session_expiry");
+            rememberDevice = sessionStorage.getItem("remember_device");
+          }
 
           if (session === "verified" && timestamp && storedToken) {
             // Check if session has expired
@@ -510,8 +541,16 @@ export class AuthenticationManager {
             }
 
             this.isAuthenticated = true;
+            this.rememberDevice = rememberDevice === "true";
             this.sessionToken = storedToken;
             this.lastActivity = timestampNum;
+
+            medicalLogger.info("Session restored", {
+              category: LOG_CATEGORIES.AUTHENTICATION,
+              source: foundInLocalStorage ? "localStorage" : "sessionStorage",
+              rememberDevice: this.rememberDevice,
+            });
+
             return true;
           }
 
