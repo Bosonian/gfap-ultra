@@ -112,18 +112,29 @@ export async function handleSubmit(e, container) {
     }
   });
 
-  // Harmonize GFAP from whole blood cartridge to legacy plasma cartridge scale
-  // Using clinical cut-off ratio: k = 30 pg/mL (plasma) / 65 pg/mL (whole blood) = 0.46
+  // GFAP conversion from whole blood cartridge to legacy plasma cartridge scale
   // Note: All GFAP inputs are now whole blood only (plasma option removed for study phase)
   if ((module === "full" || module === "coma" || module === "limited") && inputs.gfap_value) {
     // Save original value for display in input summary (so user can verify their input)
     inputs.gfap_value_original = inputs.gfap_value;
 
-    // Harmonization factor: aligns whole blood cartridge scale (65 pg/mL cut-off)
-    // to legacy plasma cartridge scale (30 pg/mL cut-off) that models were trained on
-    const WHOLE_BLOOD_HARMONIZATION_FACTOR = 0.46;
-    inputs.gfap_value = inputs.gfap_value * WHOLE_BLOOD_HARMONIZATION_FACTOR;
-    console.log(`[Submit] GFAP harmonized from whole blood cartridge scale (${module} module): ${inputs.gfap_value.toFixed(2)} pg/mL`);
+    let conversionFactor;
+    let conversionMethod;
+
+    if (module === "coma") {
+      // Coma Module: Abbott Passing-Bablok sample matrix conversion
+      // Professor's instruction: Use Abbott equation for Coma module
+      conversionFactor = 0.94;
+      conversionMethod = "Abbott Passing-Bablok (sample matrix conversion)";
+    } else {
+      // Limited & Full Modules: Clinical cut-off ratio harmonization
+      // k = 30 pg/mL (plasma cut-off) / 65 pg/mL (whole blood cut-off) = 0.46
+      conversionFactor = 0.46;
+      conversionMethod = "Clinical cut-off ratio harmonization";
+    }
+
+    inputs.gfap_value = inputs.gfap_value * conversionFactor;
+    console.log(`[Submit] GFAP converted (${module} module): ${inputs.gfap_value.toFixed(2)} pg/mL using ${conversionMethod} (factor: ${conversionFactor})`);
   }
 
   // Store form data
