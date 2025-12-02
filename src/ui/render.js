@@ -42,6 +42,11 @@ export function render(container) {
   let html = "";
   switch (currentScreen) {
     case "login":
+      // Auto-redirect if valid session exists (e.g., "Remember this device" was used)
+      if (authManager.isValidSession()) {
+        store.navigate("triage1");
+        return;
+      }
       html = renderLoginScreen();
       break;
     case "triage1":
