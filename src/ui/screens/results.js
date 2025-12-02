@@ -39,6 +39,7 @@ function renderInputSummary() {
 
       const itemsHtml = Object.entries(data)
         .filter(([_, value]) => value !== "" && value !== null && value !== undefined)
+        .filter(([key, _]) => key !== "gfap_cartridge_type")
         .map(([key, value]) => {
           const label = formatSummaryLabel(key);
           const displayValue = formatDisplayValue(value, key);

@@ -65,39 +65,17 @@ export function renderLimited() {
                 </span>
               </label>
 
-              <!-- Cartridge Type Toggle -->
-              <div class="mt-2 mb-2">
-                <label class="text-xs font-medium text-gray-600 dark:text-slate-300 mb-1 block" data-i18n-key="gfapCartridgeType"></label>
-                <div class="inline-flex rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 p-1" role="group">
-                  <button type="button" id="cartridge-plasma"
-                          class="cartridge-toggle px-4 py-2 text-sm font-medium rounded-md transition-all duration-200
-                                 bg-blue-500 text-white shadow-sm"
-                          data-cartridge="plasma">
-                    <span data-i18n-key="gfapPlasma"></span>
-                  </button>
-                  <button type="button" id="cartridge-wholeblood"
-                          class="cartridge-toggle px-4 py-2 text-sm font-medium rounded-md transition-all duration-200
-                                 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-                          data-cartridge="wholeblood">
-                    <span data-i18n-key="gfapWholeBlood"></span>
-                  </button>
-                </div>
-                <p class="text-xs text-gray-500 dark:text-slate-400 mt-1 hidden" id="gfap-conversion-note" data-i18n-key="gfapConversionNote"></p>
-              </div>
-
               <div class="relative">
                 <input type="number" name="gfap_value" id="gfap_value"
                        class="mt-1 w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors duration-300"
-                       min="${GFAP_RANGES.plasma.min}" max="${GFAP_RANGES.plasma.max}"
-                       data-plasma-min="${GFAP_RANGES.plasma.min}" data-plasma-max="${GFAP_RANGES.plasma.max}"
-                       data-wb-min="${GFAP_RANGES.wholeblood.min}" data-wb-max="${GFAP_RANGES.wholeblood.max}"
+                       min="${GFAP_RANGES.wholeblood.min}" max="${GFAP_RANGES.wholeblood.max}"
                        step="0.1" required inputmode="decimal">
                  <span class="absolute right-3 top-2.5 text-gray-400 dark:text-slate-400 text-sm" data-i18n-key="pgml"></span>
               </div>
               <p class="text-xs text-gray-500 dark:text-slate-400 mt-1" id="gfap-range-note">
-                <span data-i18n-key="validRange"></span>: <span id="gfap-range-display">${GFAP_RANGES.plasma.min}-${GFAP_RANGES.plasma.max} pg/mL</span>
+                <span data-i18n-key="validRange"></span>: <span id="gfap-range-display">${GFAP_RANGES.wholeblood.min}-${GFAP_RANGES.wholeblood.max} pg/mL</span> (Whole Blood)
               </p>
-              <input type="hidden" id="gfap_cartridge_type" value="plasma">
+              <input type="hidden" id="gfap_cartridge_type" value="wholeblood">
             </div>
           </div>
 
