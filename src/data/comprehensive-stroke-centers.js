@@ -519,6 +519,17 @@ const COMPREHENSIVE_HOSPITAL_DATABASE = {
         beds: 850,
         network: "FAST",
       },
+      {
+        id: "BW-RSU-002",
+        name: "Marienhospital Stuttgart",
+        address: "Böheimstraße 37, 70199 Stuttgart",
+        coordinates: { lat: 48.7607, lng: 9.1637 },
+        phone: "+49 711 6489-0",
+        emergency: "+49 711 6489-4444",
+        thrombolysis: true,
+        beds: 400,
+        network: "FAST",
+      },
       // ... more would be added
     ],
 
