@@ -77,6 +77,12 @@ class Store {
       screenHistory: history,
     };
 
+    // Clear form data when navigating to triage1 (starting fresh)
+    // This prevents cross-module data leakage (e.g., coma GFAP appearing in stroke module)
+    if (screen === "triage1") {
+      newState.formData = {};
+    }
+
     console.log("[Store] Setting new navigation state:", newState);
     this.setState(newState);
     console.log("[Store] State after navigation:", this.state.currentScreen);
@@ -99,11 +105,12 @@ class Store {
     return false;
   }
 
-  // Navigate to home screen
+  // Navigate to home screen and clear all form data for fresh start
   goHome() {
     this.setState({
       currentScreen: "triage1",
       screenHistory: [],
+      formData: {},  // Clear all form data to prevent cross-module data leakage
     });
   }
 
