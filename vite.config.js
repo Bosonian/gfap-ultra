@@ -2,8 +2,8 @@ import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  // 👇 Important: Must match your repo name exactly
-  base: "/gfap-ultra/",
+  // 👇 Base path: "/" for root domain (Bosonian.github.io), "/repo-name/" for project pages
+  base: "/",
   plugins: [tailwindcss()],
   server: {
     host: true,
