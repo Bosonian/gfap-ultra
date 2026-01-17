@@ -21,7 +21,9 @@
  */
 
 const { Firestore } = require("@google-cloud/firestore");
-const firestore = new Firestore();
+const firestore = new Firestore({
+  ignoreUndefinedProperties: true,
+});
 
 // CORS headers for cross-origin requests
 const corsHeaders = {
