@@ -25,6 +25,22 @@ const firestore = new Firestore({
   ignoreUndefinedProperties: true,
 });
 
+// Berlin timezone formatting
+const BERLIN_TZ = "Europe/Berlin";
+
+function toBerlinTime(date) {
+  return date.toLocaleString("de-DE", {
+    timeZone: BERLIN_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
+
 // CORS headers for cross-origin requests
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -85,10 +101,12 @@ exports.logAnalysis = async (req, res) => {
     const now = new Date();
     const expireAt = new Date(now.getTime() + 4 * 60 * 60 * 1000); // 4 hours
 
-    // Prepare log document
+    // Prepare log document with Berlin timezone
     const logEntry = {
-      timestamp: now.toISOString(),
+      timestamp: toBerlinTime(now),
+      timestampUTC: now.toISOString(),
       expireAt: Firestore.Timestamp.fromDate(expireAt),
+      expireAtBerlin: toBerlinTime(expireAt),
       module,
       inputs: sanitizeInputs(inputs),
       results: {
