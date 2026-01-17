@@ -5,6 +5,7 @@ import { showPrerequisitesModal } from "../ui/components/prerequisites-modal.js"
 import { safeSetInnerHTML } from "../security/html-sanitizer.js";
 import { DEV_CONFIG } from "../config.js";
 import { validateForm, showValidationErrors } from "./validate.js";
+import { logAnalysis } from "../utils/analysis-logger.js";
 
 export function handleTriage1(isComatose) {
   store.logEvent("triage1_answer", { comatose: isComatose });
@@ -224,6 +225,11 @@ export async function handleSubmit(e, container) {
     console.log("[Submit] Setting results in store:", results);
     store.setResults(results);
     store.logEvent("models_complete", { module, results });
+
+    // Log analysis data to backend for debugging (excludes age, auto-deletes after 4h)
+    logAnalysis(module, inputs, results).catch(() => {
+      // Silently ignore logging failures - should never affect user experience
+    });
 
     // Verify results were stored
     const storedState = store.getState();

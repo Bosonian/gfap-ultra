@@ -153,6 +153,19 @@ export const KIOSK_CONFIG = {
   staleGpsMinutes: 5,
 };
 
+// Analysis Logger Configuration
+// Logs analysis data to Cloud Function for debugging (auto-deletes after 4 hours)
+export const LOGGER_CONFIG = {
+  // Cloud Function URL - update after deploying the logger function
+  // Deploy with: cd cloud-functions/analysis-logger && gcloud functions deploy logAnalysis ...
+  ANALYSIS_LOGGER_URL: isDevelopment
+    ? null // Disable in development
+    : "https://europe-west3-igfap-452720.cloudfunctions.net/logAnalysis",
+
+  // Disable logging in development mode
+  DISABLE_IN_DEV: true,
+};
+
 export const VALIDATION_RULES = {
   age_years: {
     required: true,

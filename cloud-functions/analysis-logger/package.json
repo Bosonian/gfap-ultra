@@ -1,0 +1,12 @@
+{
+  "name": "igfap-analysis-logger",
+  "version": "1.0.0",
+  "description": "Cloud Function for logging iGFAP analysis data to Firestore",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^7.0.0"
+  }
+}
