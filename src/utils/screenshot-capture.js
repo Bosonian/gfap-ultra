@@ -1224,6 +1224,7 @@ export function showScreenshotToast(blob) {
 
 /**
  * Show loading overlay while screenshot is being captured
+ * Glassmorphism design with fixed dimensions to prevent layout shifts
  * @returns {HTMLElement} The overlay element for later removal
  */
 function showScreenshotLoading() {
@@ -1241,94 +1242,141 @@ function showScreenshotLoading() {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         z-index: 999998;
-        animation: screenshotLoadingFadeIn 0.3s ease-out;
+        animation: ssLoadFadeIn 0.3s ease-out;
       }
 
-      @keyframes screenshotLoadingFadeIn {
+      @keyframes ssLoadFadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
       }
 
-      .screenshot-loading-content {
-        background: white;
-        border-radius: 16px;
-        padding: 28px 36px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      .ss-loading-card {
+        /* Glassmorphism effect */
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        padding: 32px 40px;
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.12),
+          0 2px 8px rgba(0, 0, 0, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
         text-align: center;
-        max-width: 320px;
+        /* Fixed width to prevent layout shifts */
+        width: 280px;
+        animation: ssLoadCardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
-      .screenshot-loading-spinner {
-        width: 48px;
-        height: 48px;
-        border: 4px solid #e5e7eb;
-        border-top-color: #3b82f6;
+      @keyframes ssLoadCardIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      .ss-loading-icon-wrap {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         border-radius: 50%;
-        animation: screenshotSpin 1s linear infinite;
-        margin: 0 auto 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        position: relative;
       }
 
-      @keyframes screenshotSpin {
+      .ss-loading-icon-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        border-top-color: rgba(59, 130, 246, 0.6);
+        animation: ssLoadSpin 1.2s linear infinite;
+      }
+
+      @keyframes ssLoadSpin {
         to { transform: rotate(360deg); }
       }
 
-      .screenshot-loading-icon {
-        font-size: 32px;
-        margin-bottom: 12px;
-        animation: screenshotPulse 1.5s ease-in-out infinite;
+      .ss-loading-icon {
+        font-size: 28px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
       }
 
-      @keyframes screenshotPulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
+      .ss-loading-title {
+        font-size: 17px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 6px;
+        letter-spacing: -0.01em;
       }
 
-      .screenshot-loading-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 8px;
+      .ss-loading-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.5;
       }
 
-      .screenshot-loading-subtitle {
-        font-size: 14px;
-        color: #6b7280;
-        line-height: 1.4;
+      .ss-loading-progress {
+        margin-top: 20px;
+        height: 4px;
+        background: rgba(59, 130, 246, 0.15);
+        border-radius: 2px;
+        overflow: hidden;
       }
 
-      .screenshot-loading-dots {
-        display: inline-block;
+      .ss-loading-progress-bar {
+        height: 100%;
+        width: 30%;
+        background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+        background-size: 200% 100%;
+        border-radius: 2px;
+        animation: ssLoadProgress 1.5s ease-in-out infinite;
       }
 
-      .screenshot-loading-dots::after {
-        content: '';
-        animation: screenshotDots 1.5s steps(4, end) infinite;
-      }
-
-      @keyframes screenshotDots {
-        0% { content: ''; }
-        25% { content: '.'; }
-        50% { content: '..'; }
-        75% { content: '...'; }
-        100% { content: ''; }
+      @keyframes ssLoadProgress {
+        0% {
+          width: 20%;
+          margin-left: 0;
+          background-position: 0% 0%;
+        }
+        50% {
+          width: 60%;
+          margin-left: 20%;
+          background-position: 100% 0%;
+        }
+        100% {
+          width: 20%;
+          margin-left: 80%;
+          background-position: 0% 0%;
+        }
       }
     </style>
-    <div class="screenshot-loading-content">
-      <div class="screenshot-loading-icon">📸</div>
-      <div class="screenshot-loading-spinner"></div>
-      <div class="screenshot-loading-title">
-        Screenshot wird erstellt<span class="screenshot-loading-dots"></span>
+    <div class="ss-loading-card">
+      <div class="ss-loading-icon-wrap">
+        <span class="ss-loading-icon">📸</span>
       </div>
-      <div class="screenshot-loading-subtitle">
-        Bitte warten Sie einen Moment<br/>
-        <span style="font-size: 12px; color: #9ca3af;">Creating long screenshot...</span>
+      <div class="ss-loading-title">Screenshot wird erstellt</div>
+      <div class="ss-loading-subtitle">
+        Bitte warten · Creating screenshot
+      </div>
+      <div class="ss-loading-progress">
+        <div class="ss-loading-progress-bar"></div>
       </div>
     </div>
   `;
@@ -1344,12 +1392,13 @@ function showScreenshotLoading() {
 function hideScreenshotLoading(overlay) {
   if (!overlay) return;
 
-  overlay.style.animation = "screenshotLoadingFadeIn 0.2s ease-out reverse";
+  overlay.style.animation = "ssLoadFadeIn 0.25s ease-out reverse";
+  overlay.style.pointerEvents = "none";
   setTimeout(() => {
     if (overlay.parentNode) {
       overlay.remove();
     }
-  }, 200);
+  }, 250);
 }
 
 /**
