@@ -155,6 +155,7 @@ COMA_ICH: europe-west3-igfap-452720.cloudfunctions.net/predict_coma_ich
 LDM_ICH: europe-west3-igfap-452720.cloudfunctions.net/predict_limited_data_ich
 FULL_STROKE: europe-west3-igfap-452720.cloudfunctions.net/predict_full_stroke
 LVO_PREDICTION: europe-west3-igfap-452720.cloudfunctions.net/predict_lvo
+ANALYSIS_LOGGER: europe-west3-igfap-452720.cloudfunctions.net/logAnalysis
 ```
 
 ### LVO Prediction Models ⭐ **NEW**
@@ -185,6 +186,38 @@ The application now features dual LVO prediction implementations:
 - GFAP=35, FAST-ED=7: 52.3% ✅
 - GFAP=180, FAST-ED=7: 51.2% ✅
 - Clinically realistic probabilities across all scenarios
+
+### Analysis Logging (Debugging) ⭐ **NEW - January 2025**
+
+Backend logging for debugging catastrophic failures (e.g., wrong results):
+
+#### Features
+- **Cloud Function**: Receives analysis data via secure HTTPS endpoint
+- **Firestore Storage**: Stores logs with 4-hour TTL (auto-deletion)
+- **Privacy-First**: Age excluded from all logs; no patient identifiers stored
+- **Non-Blocking**: Logging failures don't affect user experience
+
+#### What Gets Logged
+| Logged | Excluded (Privacy) |
+|--------|-------------------|
+| Module type (coma/limited/full) | Age |
+| GFAP value, Blood pressure | Patient identifiers |
+| GCS, FAST-ED score | Names, MRN |
+| ICH/LVO probabilities | |
+| Timestamp, Session ID | |
+
+#### Technical Implementation
+```
+cloud-functions/analysis-logger/
+├── index.js          # Cloud Function handler
+├── package.json      # Dependencies (@google-cloud/firestore)
+└── DEPLOY.md         # Deployment instructions
+```
+
+#### View Logs
+- **Firebase Console**: Firestore > `analysis_logs` collection
+- **URL**: https://console.firebase.google.com/project/igfap-452720/firestore
+- **Retention**: 4 hours (Firestore TTL policy)
 
 ---
 
@@ -406,9 +439,32 @@ The application now features dual LVO prediction implementations:
 - **Reliability**: Dual-model architecture ensures 99.9% availability
 - **Validation**: Comprehensive test coverage including edge cases
 
+### Analysis Logging Feature (January 17, 2026) ⭐
+**Debugging capability for production issue tracking**
+
+#### Problem Addressed
+- Need for temporary logging to diagnose potential catastrophic failures
+- Privacy-compliant approach required (no patient age stored)
+
+#### Solution Implemented
+- **Cloud Function**: `logAnalysis` endpoint in europe-west3
+- **Storage**: Firestore with 4-hour TTL (automatic deletion)
+- **Privacy**: Age excluded, no patient identifiers
+- **Reliability**: Non-blocking - failures don't affect user experience
+
+#### Files Added
+```
+✅ cloud-functions/analysis-logger/index.js    # Cloud Function
+✅ cloud-functions/analysis-logger/package.json
+✅ cloud-functions/analysis-logger/DEPLOY.md   # Deployment guide
+✅ src/utils/analysis-logger.js                # Client-side utility
+✅ src/config.js                               # Logger configuration
+```
+
 ---
 
-*Last Updated: September 28, 2025*
-*LVO Model Upgrade: Completed*
+*Last Updated: January 17, 2026*
+*Analysis Logging: Deployed January 2026*
+*LVO Model Upgrade: Completed September 2025*
 *Security Audit: Completed September 26, 2025*
-*Next Review: October 26, 2025*
+*Next Review: February 17, 2026*
