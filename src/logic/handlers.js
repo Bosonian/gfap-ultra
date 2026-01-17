@@ -141,8 +141,12 @@ export async function handleSubmit(e, container) {
     }
   }
 
-  // Store form data
-  store.setFormData(module, inputs);
+  // Store form data with ORIGINAL gfap_value for form restoration (not converted value)
+  // This prevents the bug where going back shows the converted plasma value instead of original whole blood
+  const formDataToStore = inputs.gfap_value_original
+    ? { ...inputs, gfap_value: inputs.gfap_value_original }
+    : inputs;
+  store.setFormData(module, formDataToStore);
 
   // Show loading state
   const button = form.querySelector("button[type=submit]");
