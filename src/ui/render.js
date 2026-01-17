@@ -22,6 +22,10 @@ import { fastEdCalculator } from "./components/fastEdModal.js";
 import renderTriage1 from "./screens/triage1.js";
 import renderTriage2 from "./screens/triage2.js";
 import { getKioskHomeUrl } from "../logic/kiosk-loader.js";
+import { captureAndShowToast } from "../utils/screenshot-capture.js";
+
+// Guard to prevent duplicate screenshot captures during same results session
+let screenshotCaptureScheduled = false;
 
 export function render(container) {
   const state = store.getState();
@@ -112,6 +116,11 @@ export function render(container) {
     }, 100);
   }
 
+  // Reset screenshot guard when navigating away from results
+  if (currentScreen !== "results") {
+    screenshotCaptureScheduled = false;
+  }
+
   // Initialize stroke center map if on results screen
   if (currentScreen === "results" && results) {
     setTimeout(() => {
@@ -122,6 +131,31 @@ export function render(container) {
         console.error("[Render] Stroke center map initialization failed:", error);
       }
     }, 100);
+
+    // Auto-capture screenshot for Rettungsdienst documentation
+    // Only capture once per results session (guard prevents duplicate captures)
+    if (!screenshotCaptureScheduled) {
+      screenshotCaptureScheduled = true;
+
+      // Delay to ensure all components are fully rendered
+      // Use longer delay for stroke modules which have more complex UI (LVO, maps, etc.)
+      const module = results?.ich?.module || "";
+      const isComaModule = module === "Coma";
+      const screenshotDelay = isComaModule ? 1500 : 2500;
+
+      console.log("[Render] Scheduling screenshot capture for module:", module, "delay:", screenshotDelay);
+
+      setTimeout(() => {
+        try {
+          console.log("[Render] Triggering screenshot capture now...");
+          captureAndShowToast();
+        } catch (error) {
+          console.error("[Render] Screenshot capture failed:", error);
+        }
+      }, screenshotDelay);
+    } else {
+      console.log("[Render] Screenshot already scheduled, skipping duplicate");
+    }
   }
 
   // Initialize research mode components
