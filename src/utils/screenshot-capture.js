@@ -1223,15 +1223,151 @@ export function showScreenshotToast(blob) {
 }
 
 /**
+ * Show loading overlay while screenshot is being captured
+ * @returns {HTMLElement} The overlay element for later removal
+ */
+function showScreenshotLoading() {
+  // Remove any existing loading overlay
+  const existing = document.getElementById("screenshot-loading-overlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "screenshot-loading-overlay";
+  overlay.innerHTML = `
+    <style>
+      #screenshot-loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 999998;
+        animation: screenshotLoadingFadeIn 0.3s ease-out;
+      }
+
+      @keyframes screenshotLoadingFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .screenshot-loading-content {
+        background: white;
+        border-radius: 16px;
+        padding: 28px 36px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        max-width: 320px;
+      }
+
+      .screenshot-loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #3b82f6;
+        border-radius: 50%;
+        animation: screenshotSpin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+
+      @keyframes screenshotSpin {
+        to { transform: rotate(360deg); }
+      }
+
+      .screenshot-loading-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+        animation: screenshotPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes screenshotPulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+      }
+
+      .screenshot-loading-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+      }
+
+      .screenshot-loading-subtitle {
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.4;
+      }
+
+      .screenshot-loading-dots {
+        display: inline-block;
+      }
+
+      .screenshot-loading-dots::after {
+        content: '';
+        animation: screenshotDots 1.5s steps(4, end) infinite;
+      }
+
+      @keyframes screenshotDots {
+        0% { content: ''; }
+        25% { content: '.'; }
+        50% { content: '..'; }
+        75% { content: '...'; }
+        100% { content: ''; }
+      }
+    </style>
+    <div class="screenshot-loading-content">
+      <div class="screenshot-loading-icon">📸</div>
+      <div class="screenshot-loading-spinner"></div>
+      <div class="screenshot-loading-title">
+        Screenshot wird erstellt<span class="screenshot-loading-dots"></span>
+      </div>
+      <div class="screenshot-loading-subtitle">
+        Bitte warten Sie einen Moment<br/>
+        <span style="font-size: 12px; color: #9ca3af;">Creating long screenshot...</span>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+/**
+ * Hide loading overlay with fade out animation
+ * @param {HTMLElement} overlay - The overlay element to remove
+ */
+function hideScreenshotLoading(overlay) {
+  if (!overlay) return;
+
+  overlay.style.animation = "screenshotLoadingFadeIn 0.2s ease-out reverse";
+  setTimeout(() => {
+    if (overlay.parentNode) {
+      overlay.remove();
+    }
+  }, 200);
+}
+
+/**
  * Main function: Capture screenshot, auto-download, and show toast
  * Called automatically when results page loads
  * Auto-downloads to ensure Rettungsdienst always has a copy saved
  * @returns {Promise<void>}
  */
 export async function captureAndShowToast() {
+  // Show loading overlay while capturing
+  const loadingOverlay = showScreenshotLoading();
+
   try {
     console.log("[Screenshot] Capturing results page...");
     const { blob } = await captureResultsScreenshot();
+
+    // Hide loading overlay
+    hideScreenshotLoading(loadingOverlay);
 
     // Auto-download immediately to ensure screenshot is saved
     console.log("[Screenshot] Auto-downloading screenshot...");
@@ -1242,6 +1378,8 @@ export async function captureAndShowToast() {
     showScreenshotToast(blob);
   } catch (error) {
     console.error("[Screenshot] Failed to capture:", error);
+    // Hide loading overlay on error too
+    hideScreenshotLoading(loadingOverlay);
     // Don't show error to user - screenshot is a convenience feature
   }
 }
